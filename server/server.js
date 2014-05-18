@@ -6,6 +6,9 @@ var TOURNEY_ID = '5376879322ed79dd19a07148';
 
 var UPDATE_INTERVAL = 1000 * 60 * 5; // 5 minutes
 
+var mongo_url = process.env.MONGOHQ_URL;
+var redis_url = process.env.REDISTOGO_URL;
+
 var express = require('express.io');
 var mongoose = require('mongoose');
 var exphbs  = require('express3-handlebars');
@@ -27,11 +30,14 @@ var Tourney = models.Tourney;
 var app = express();
 app.http().io();
 mongoose.set('debug', true);
-mongoose.connect('mongodb://localhost/test');
+mongoose.connect(mongo_url);
 
 // Redis
 app.use(cookieParser()); // Must come before session()
-app.use(session({ store: new RedisStore(), secret: 'odle rules' }));
+app.use(session({
+  store: new RedisStore({ url: redis_url }),
+  secret: 'odle rules'
+}));
 
 // Handlebars
 app.engine('handlebars', exphbs({
