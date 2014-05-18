@@ -21,6 +21,7 @@ var session = require('express-session');
 var RedisStore = require('connect-redis')(session);
 var cookieParser = require('cookie-parser');
 var updateScore = require('./update_score');
+var logfmt = require("logfmt");
 
 var Golfer = models.Golfer;
 var Player = models.Player;
@@ -31,6 +32,9 @@ var app = express();
 app.http().io();
 mongoose.set('debug', true);
 mongoose.connect(mongo_url);
+
+// Request logging
+app.use(logfmt.requestLogger());
 
 // Redis
 app.use(cookieParser()); // Must come before session()

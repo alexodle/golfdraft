@@ -19,6 +19,7 @@
     "jquery": "^2.1.1",
     "jsdom": "^0.10.5",
     "load-grunt-tasks": "^0.4.0",
+    "logfmt": "^1.1.2",
     "mocha": "^1.18.2",
     "moment": "^2.6.0",
     "mongoose": "^3.8.9",
