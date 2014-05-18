@@ -189,5 +189,7 @@ db.once('open', function callback () {
   updateScores();
 
   var port = Number(process.env.PORT || 3000);
-  app.listen(port);
+  app.listen(port, function() {
+    console.log("Listening on " + port);
+  });
 });
