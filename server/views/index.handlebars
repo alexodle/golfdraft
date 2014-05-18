@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Flux • Golf draft</title>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/app.css">
+
+    <script>
+      // BOOTSTRAP DATA
+
+      var sd = window.golfDraftSeed = {};
+      sd.golfers = {{{golfers}}};
+      sd.players = {{{players}}};
+      sd.draft = {{{draft}}};
+      sd.tourney = {{{tourney}}};
+      sd.user = {{{or user "null"}}};
+
+      [
+        sd.golfers,
+        sd.players,
+        [sd.draft],
+        [sd.tourney]
+      ].forEach(function (mongoObjs) {
+        mongoObjs.forEach(function (o) {
+          o.id = o._id;
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <section id="todoapp" />
+    <script src="dist/bundle.js"></script>
+  </body>
+</html>

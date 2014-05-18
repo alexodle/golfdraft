@@ -1,0 +1,8 @@
+.table-enter {
+  background-color: yellow;
+  transition: background-color .5s ease-in;
+}
+
+.table-enter.table-enter-active {
+  background-color: white;
+}
