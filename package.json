@@ -1,23 +1,9 @@
 {
   "name": "golfdraft-react-flux",
   "main": "js/app.js",
-  "devDependencies": {
-    "browserify": "^3.46.1",
-    "grunt": "^0.4.4",
-    "grunt-browserify": "^2.0.8",
-    "grunt-contrib-clean": "^0.5.0",
-    "grunt-contrib-watch": "^0.6.1",
-    "grunt-react": "^0.8.2",
-    "jest-cli": "^0.1.9",
-    "load-grunt-tasks": "^0.4.0",
-    "mocha": "^1.18.2",
-    "reactify": "^0.13.1",
-    "should": "^3.3.1",
-    "time-grunt": "^0.3.1",
-    "watchify": "~0.4.1"
-  },
   "dependencies": {
     "body-parser": "^1.2.0",
+    "browserify": "^3.46.1",
     "connect-redis": "^2.0.0",
     "cookie-parser": "^1.1.0",
     "envify": "^1.2.1",
@@ -26,22 +12,30 @@
     "express-session": "^1.1.0",
     "express.io": "^1.1.13",
     "express3-handlebars": "^0.5.0",
+    "grunt": "^0.4.4",
+    "grunt-browserify": "^2.0.8",
+    "grunt-contrib-clean": "^0.5.0",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-react": "^0.8.2",
     "jquery": "^2.1.1",
     "jsdom": "^0.10.5",
+    "load-grunt-tasks": "^0.4.0",
+    "mocha": "^1.18.2",
     "moment": "^2.6.0",
     "mongoose": "^3.8.9",
     "node-schedule": "^0.1.13",
     "promise": "^5.0.0",
     "react": "^0.10.0",
     "react-async": "^0.9.2",
+    "reactify": "^0.13.1",
+    "should": "^3.3.1",
     "socket.io-client": "^0.9.16",
+    "time-grunt": "^0.3.1",
     "twitter-bootstrap": "^2.1.1",
-    "underscore": "^1.6.0"
+    "underscore": "^1.6.0",
+    "watchify": "~0.4.1"
   },
   "engines": {
     "node": ">=0.10.0"
-  },
-  "scripts": {
-    "test": "jest"
   }
 }
