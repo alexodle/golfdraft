@@ -36,7 +36,7 @@
     "watchify": "~0.4.1"
   },
   "scripts": {
-    "start": "cd server; node server.js",
+    "start": "node server/server.js",
     "test": "mocha"
   },
   "engines": {
