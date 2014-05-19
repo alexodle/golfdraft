@@ -6,10 +6,12 @@ var TOURNEY_ID = '5376879322ed79dd19a07148';
 
 var UPDATE_INTERVAL = 1000 * 60 * 5; // 5 minutes
 
-var mongo_url = process.env.MONGOHQ_URL;
-var redis_url = process.env.REDISTOGO_URL;
+var mongo_url = process.env.MONGOHQ_URL || "mongodb://localhost:27017/test";
+var redis_url = process.env.REDISTOGO_URL || "redis://localhost:6379/0";
+var port = Number(process.env.PORT || 3000);
 
-var express = require('express.io');
+var express = require('express');
+var app = express();
 var mongoose = require('mongoose');
 var exphbs  = require('express3-handlebars');
 var Promise = require('promise');
@@ -22,14 +24,14 @@ var RedisStore = require('connect-redis')(session);
 var cookieParser = require('cookie-parser');
 var updateScore = require('./update_score');
 var logfmt = require("logfmt");
+var server = require("http").createServer(app);
+var io = require('socket.io').listen(server);
 
 var Golfer = models.Golfer;
 var Player = models.Player;
 var Draft = models.Draft;
 var Tourney = models.Tourney;
 
-var app = express();
-app.http().io();
 mongoose.set('debug', true);
 mongoose.connect(mongo_url);
 
@@ -71,7 +73,7 @@ function updateScores() {
     console.log("succeeded: " + succeeded);
     if (succeeded) {
       Tourney.findOne({'_id': TOURNEY_ID}).exec().then(function (result) {
-        app.io.broadcast('change:scores', {
+        io.sockets.emit('change:scores', {
           data: {
             scores: result.scores,
             lastUpdated: result.lastUpdated
@@ -173,7 +175,7 @@ db.once('open', function callback () {
           res.send(500, err);
           return;
         }
-        app.io.broadcast('change:draft', {
+        io.sockets.emit('change:draft', {
           data: result,
           evType: 'change:draft',
           action: 'draft:pick'
@@ -188,8 +190,5 @@ db.once('open', function callback () {
   }, UPDATE_INTERVAL);
   updateScores();
 
-  var port = Number(process.env.PORT || 3000);
-  app.listen(port, function() {
-    console.log("Listening on " + port);
-  });
+  server.listen(port);
 });
