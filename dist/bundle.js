@@ -609,6 +609,9 @@ var PlayerStore = require('../stores/PlayerStore');
 var GolferStore = require('../stores/GolferStore');
 
 function transpose(a) {
+  if (!a.length) {
+    return a;
+  }
   return Object.keys(a[0]).map(function (c) {
     return a.map(function (r) { return r[c]; });
   });
