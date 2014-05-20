@@ -2,3 +2,4 @@ node_modules/.bin/*browserify*
 node_modules/*browserify*
 node_modules/*grunt*
 server/*.sh
+npm-debug.log
