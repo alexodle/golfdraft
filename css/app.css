@@ -1,8 +1,16 @@
 .table-enter {
   background-color: yellow;
-  transition: background-color .5s ease-in;
+  transition: background-color 2s ease-in;
 }
 
 .table-enter.table-enter-active {
   background-color: white;
+}
+
+.pick-order-list .my-player {
+  font-weight: bold;
+}
+
+.pick-order-list .current-player {
+  background-color: yellow;
 }

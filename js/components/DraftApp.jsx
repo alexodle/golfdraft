@@ -71,7 +71,7 @@ var DraftApp = React.createClass({
           <div className="col-md-3">
             <DraftPickOrder
               currentUser={this.props.currentUser}
-              pickNumber={this.props.currentPick.pickNumber}
+              currentPick={this.props.currentPick}
             />
           </div>
           <div className="col-md-9">

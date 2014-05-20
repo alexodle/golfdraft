@@ -275,7 +275,7 @@ var DraftApp = React.createClass({displayName: 'DraftApp',
           React.DOM.div( {className:"col-md-3"}, 
             DraftPickOrder(
               {currentUser:this.props.currentUser,
-              pickNumber:this.props.currentPick.pickNumber}
+              currentPick:this.props.currentPick}
             )
           ),
           React.DOM.div( {className:"col-md-9"}, 
@@ -429,32 +429,40 @@ module.exports = DraftHistory;
 'use strict';
 
 var React = require('react');
+var ReactPropTypes = React.PropTypes;
+var cx = require('react/lib/cx');
 var _ = require('underscore');
 
 var PlayerStore = require('../stores/PlayerStore');
 var UserStore = require('../stores/UserStore');
 var DraftStore = require('../stores/DraftStore');
 
-var N_PICKS = 3;
-
 var DraftPickOrder = React.createClass({displayName: 'DraftPickOrder',
+
+  propTypes: {
+    currentUser: ReactPropTypes.object.isRequired,
+    currentPick: ReactPropTypes.object.isRequired
+  },
 
   render: function () {
     var myPlayer = this.props.currentUser.player;
-    var pickOrder = _.first(
-      _.rest(DraftStore.getPickOrder(), this.props.pickNumber + 1),
-      N_PICKS
-    );
+    var currentPlayer = this.props.currentPick.player;
+    var pickOrder = DraftStore.getPickOrder();
+    pickOrder = _.first(pickOrder, pickOrder.length / 4)
     return (
       React.DOM.div(null, 
-        React.DOM.h2(null, "On deck"),
-        React.DOM.ol(null, 
+        React.DOM.h2(null, "Pick order"),
+        React.DOM.ol( {className:"pick-order-list"}, 
           _.map(pickOrder, function (player, i) {
             var text = PlayerStore.getPlayer(player).name;
-            if (player == myPlayer) {
-              text = (React.DOM.b(null, text));
-            }
-            return (React.DOM.li( {key:i}, text));
+            return (
+              React.DOM.li(
+                {key:player,
+                className:cx({
+                  'my-player': myPlayer == player,
+                  'current-player': currentPlayer == player
+                })}
+              , text));
           })
         )
       )
@@ -465,7 +473,7 @@ var DraftPickOrder = React.createClass({displayName: 'DraftPickOrder',
 
 module.exports = DraftPickOrder;
 
-},{"../stores/DraftStore":21,"../stores/PlayerStore":23,"../stores/UserStore":26,"react":190,"underscore":192}],10:[function(require,module,exports){
+},{"../stores/DraftStore":21,"../stores/PlayerStore":23,"../stores/UserStore":26,"react":190,"react/lib/cx":148,"underscore":192}],10:[function(require,module,exports){
 /** @jsx React.DOM */
 'use strict';
 
