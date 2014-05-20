@@ -16,7 +16,6 @@
     "mocha": "^1.18.2",
     "moment": "^2.6.0",
     "mongoose": "^3.8.9",
-    "node-gyp": "^0.13.1",
     "node-schedule": "^0.1.13",
     "promise": "^5.0.0",
     "react": "^0.10.0",
