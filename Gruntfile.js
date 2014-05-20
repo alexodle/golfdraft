@@ -24,6 +24,12 @@ module.exports = function (grunt) {
       }
     },
 
+    uglify: {
+      dist: {
+        files: { 'dist/bundle.min.js': 'dist/bundle.js' }
+      }
+    },
+
     watch: {
       bundle: {
         files: ['js/**/*.js', 'js/**/*.jsx'],
@@ -35,7 +41,8 @@ module.exports = function (grunt) {
 
   grunt.registerTask('build', [
     'clean:dist',
-    'browserify:dist'
+    'browserify:dist',
+    'uglify:dist'
   ]);
 
   grunt.registerTask('default', [
