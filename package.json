@@ -41,6 +41,7 @@
     "test": "mocha"
   },
   "engines": {
-    "node": "0.10.26"
+    "node": "0.10.26",
+    "npm": "1.2.x"
   }
 }
