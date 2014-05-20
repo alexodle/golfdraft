@@ -1,9 +1,5 @@
 'use strict';
 
-// TEMP HARDCODE DRAFT/TOURNEY ID
-var DRAFT_ID = '537114cc22ed79dd19a07142';
-var TOURNEY_ID = '5376879322ed79dd19a07148';
-
 var UPDATE_INTERVAL = 1000 * 60 * 5; // 5 minutes
 
 var mongo_url = process.env.MONGOHQ_URL || "mongodb://localhost:27017/test";
@@ -26,6 +22,7 @@ var updateScore = require('./update_score');
 var logfmt = require("logfmt");
 var server = require("http").createServer(app);
 var io = require('socket.io').listen(server);
+var config = require('./config');
 
 var Golfer = models.Golfer;
 var Player = models.Player;
@@ -72,7 +69,10 @@ function updateScores() {
   updateScore.run().then(function (succeeded) {
     console.log("succeeded: " + succeeded);
     if (succeeded) {
-      Tourney.findOne({'_id': TOURNEY_ID}).exec().then(function (result) {
+      Tourney.findOne({
+        '_id': config.tourney_id
+      }).exec()
+      .then(function (result) {
         io.sockets.emit('change:scores', {
           data: {
             scores: result.scores,
@@ -97,8 +97,8 @@ db.once('open', function callback () {
     var promises = [
       Golfer.find().exec(),
       Player.find().exec(),
-      Draft.findOne({'_id': DRAFT_ID}).exec(),
-      Tourney.findOne({'_id': TOURNEY_ID}).exec()
+      Draft.findOne({'_id': config.draft_id}).exec(),
+      Tourney.findOne({'_id': config.tourney_id}).exec()
     ];
     Promise.all(promises).done(function (results) {
       var golfers = results[0];
@@ -154,7 +154,7 @@ db.once('open', function callback () {
       player: new ObjectId(body.player),
       golfer: new ObjectId(body.golfer)
     };
-    var draftQuery = { _id: DRAFT_ID };
+    var draftQuery = { _id: config.draft_id };
 
     draftQuery['picks.' + pick.pickNumber] = { $exists: false };
     if (pick.pickNumber > 0) {

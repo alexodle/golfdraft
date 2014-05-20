@@ -1,12 +1,11 @@
 'use strict';
 
-var TOURNEY_ID = '5376879322ed79dd19a07148';
-
 var Promise = require('promise');
 var _ = require('underscore');
 
 var YahooReader = require('./yahoo_reader');
 var models = require('./models');
+var config = require('./config');
 var Tourney = models.Tourney;
 var Golfer = models.Golfer;
 
@@ -65,7 +64,7 @@ var UpdateScore = {
           };
         });
         return Tourney.update(
-          {_id: TOURNEY_ID },
+          {_id: config.tourney_id },
           {$set: {
             par: tourney.par,
             scores: scores,
