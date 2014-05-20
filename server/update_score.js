@@ -11,17 +11,21 @@ var Golfer = models.Golfer;
 
 function validate(d) {
   if (!_.contains([70, 71, 72], d.par)) {
-    console.log("WARNING - Par invalid:" + d.par);
+    console.log("ERROR - Par invalid:" + d.par);
+    return false;
+  }
+  if (_.some(d.players, function (p) { return p.player === '-'; })) {
+    console.log("ERROR - Invalid player name: '-'");
     return false;
   }
   return _.every(d.players, function (p) {
     var inv = false;
     if (!_.every(p.scores, _.isFinite)) {
-      console.log("WARNING - Invalid player scores");
+      console.log("ERROR - Invalid player scores");
       inv = true;
     }
     if (!_.contains([0, 1, 2, 3, 4], p.day)) {
-      console.log("WARNING - Invalid player day");
+      console.log("ERROR - Invalid player day");
       inv = true;
     }
 
