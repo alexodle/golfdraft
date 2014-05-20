@@ -30,6 +30,10 @@
   </head>
   <body>
     <section id="todoapp" />
+    {{#if prod}}
     <script src="dist/bundle.min.js"></script>
+    {{else}}
+    <script src="dist/bundle.js"></script>
+    {{/if}}
   </body>
 </html>

@@ -112,6 +112,7 @@ db.once('open', function callback () {
         draft: JSON.stringify(draft),
         tourney: JSON.stringify(tourney),
         user: JSON.stringify(req.session.user),
+        prod: config.prod
       });
     });
   });
