@@ -550,8 +550,12 @@ var PlayerDetails = React.createClass({displayName: 'PlayerDetails',
   render: function () {
     var player = this.props.player;
     var playerScore = this.props.playerScores[player];
-    var golferScores = playerScore.scoresByGolfer;
     var scoresByDay = playerScore.scoresByDay;
+
+    var golferScores = _.chain(playerScore.scoresByGolfer)
+      .values()
+      .sortBy(function (gs) { return gs.total; })
+      .value();
 
     var trs = _.map(_.values(golferScores), function (gs) {
       return (
