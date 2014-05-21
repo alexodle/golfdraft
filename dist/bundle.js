@@ -534,6 +534,7 @@ module.exports = LogoutButton;
 
 var React = require("react");
 var ReactPropTypes = React.PropTypes;
+var cx = require('react/lib/cx');
 var _ = require("underscore");
 
 var PlayerStore = require('../stores/PlayerStore');
@@ -550,6 +551,7 @@ var PlayerDetails = React.createClass({displayName: 'PlayerDetails',
     var player = this.props.player;
     var playerScore = this.props.playerScores[player];
     var golferScores = playerScore.scoresByGolfer;
+    var scoresByDay = playerScore.scoresByDay;
 
     var trs = _.map(_.values(golferScores), function (gs) {
       return (
@@ -557,7 +559,21 @@ var PlayerDetails = React.createClass({displayName: 'PlayerDetails',
           React.DOM.td(null, GolferStore.getGolfer(gs.golfer).name),
           React.DOM.td(null, gs.total),
           _.map(gs.scores, function (s, i) {
-            return (React.DOM.td( {key:i}, s));
+            var missedCut = gs.missedCuts[i];
+            var scoreUsed = _.some(scoresByDay[i].usedScores, function (s) {
+              return s.golfer === gs.golfer;
+            });
+            return (
+              React.DOM.td(
+                {className:cx({
+                  'missed-cut': missedCut,
+                  'score-used': scoreUsed
+                }),
+                key:i}
+              , 
+                s, " ", React.DOM.sup( {className:"missed-cut-text"}, "MC")
+              )
+            );
           })
         )
       );
@@ -566,7 +582,7 @@ var PlayerDetails = React.createClass({displayName: 'PlayerDetails',
     return (
       React.DOM.section(null, 
         React.DOM.h2(null, PlayerStore.getPlayer(player).name, " ", React.DOM.small(null, "Details")),
-        React.DOM.table( {className:"table"}, 
+        React.DOM.table( {className:"table player-details-table"}, 
           React.DOM.thead(null, 
             React.DOM.tr(null, 
               React.DOM.th(null, "Golfer"),
@@ -587,7 +603,7 @@ var PlayerDetails = React.createClass({displayName: 'PlayerDetails',
 
 module.exports = PlayerDetails;
 
-},{"../stores/GolferStore":23,"../stores/PlayerStore":24,"react":192,"underscore":194}],13:[function(require,module,exports){
+},{"../stores/GolferStore":23,"../stores/PlayerStore":24,"react":192,"react/lib/cx":150,"underscore":194}],13:[function(require,module,exports){
 /** @jsx React.DOM */
 "use strict";
 

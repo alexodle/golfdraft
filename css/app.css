@@ -14,3 +14,15 @@
 .pick-order-list .current-player {
   background-color: yellow;
 }
+
+.player-details-table .score-used {
+  font-weight: bold;
+}
+
+.player-details-table .missed-cut-text {
+  display: none;
+}
+
+.player-details-table .missed-cut .missed-cut-text {
+  display: initial;
+}

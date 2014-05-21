@@ -3,6 +3,7 @@
 
 var React = require("react");
 var ReactPropTypes = React.PropTypes;
+var cx = require('react/lib/cx');
 var _ = require("underscore");
 
 var PlayerStore = require('../stores/PlayerStore');
@@ -19,6 +20,7 @@ var PlayerDetails = React.createClass({
     var player = this.props.player;
     var playerScore = this.props.playerScores[player];
     var golferScores = playerScore.scoresByGolfer;
+    var scoresByDay = playerScore.scoresByDay;
 
     var trs = _.map(_.values(golferScores), function (gs) {
       return (
@@ -26,7 +28,21 @@ var PlayerDetails = React.createClass({
           <td>{GolferStore.getGolfer(gs.golfer).name}</td>
           <td>{gs.total}</td>
           {_.map(gs.scores, function (s, i) {
-            return (<td key={i}>{s}</td>);
+            var missedCut = gs.missedCuts[i];
+            var scoreUsed = _.some(scoresByDay[i].usedScores, function (s) {
+              return s.golfer === gs.golfer;
+            });
+            return (
+              <td
+                className={cx({
+                  'missed-cut': missedCut,
+                  'score-used': scoreUsed
+                })}
+                key={i}
+              >
+                {s} <sup className="missed-cut-text">MC</sup>
+              </td>
+            );
           })}
         </tr>
       );
@@ -35,7 +51,7 @@ var PlayerDetails = React.createClass({
     return (
       <section>
         <h2>{PlayerStore.getPlayer(player).name} <small>Details</small></h2>
-        <table className='table'>
+        <table className='table player-details-table'>
           <thead>
             <tr>
               <th>Golfer</th>
