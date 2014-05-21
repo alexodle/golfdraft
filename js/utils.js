@@ -9,6 +9,12 @@ var utils = {
     return Object.keys(a[0]).map(function (c) {
       return a.map(function (r) { return r[c]; });
     });
+  },
+
+  getOrdinal: function (n) {
+    var s=["th","st","nd","rd"],
+        v=n%100;
+    return n+(s[(v-20)%10]||s[v]||s[0]);
   }
 
 };

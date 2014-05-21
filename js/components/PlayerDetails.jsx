@@ -5,6 +5,7 @@ var React = require("react");
 var ReactPropTypes = React.PropTypes;
 var cx = require('react/lib/cx');
 var _ = require("underscore");
+var utils = require("../utils");
 
 var PlayerStore = require('../stores/PlayerStore');
 var GolferStore = require('../stores/GolferStore');
@@ -20,6 +21,11 @@ var PlayerDetails = React.createClass({
     var player = this.props.player;
     var playerScore = this.props.playerScores[player];
     var scoresByDay = playerScore.scoresByDay;
+
+    var playerRank = _.chain(this.props.playerScores)
+      .sortBy(function (ps) { return ps.total; })
+      .indexOf(playerScore)
+      .value();
 
     var golferScores = _.chain(playerScore.scoresByGolfer)
       .values()
@@ -54,7 +60,10 @@ var PlayerDetails = React.createClass({
 
     return (
       <section>
-        <h2>{PlayerStore.getPlayer(player).name} <small>Details</small></h2>
+        <h2>
+          {PlayerStore.getPlayer(player).name}
+          <small> {utils.getOrdinal(playerRank + 1)} place</small>
+        </h2>
         <table className='table player-details-table'>
           <thead>
             <tr>

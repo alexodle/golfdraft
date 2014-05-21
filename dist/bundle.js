@@ -536,6 +536,7 @@ var React = require("react");
 var ReactPropTypes = React.PropTypes;
 var cx = require('react/lib/cx');
 var _ = require("underscore");
+var utils = require("../utils");
 
 var PlayerStore = require('../stores/PlayerStore');
 var GolferStore = require('../stores/GolferStore');
@@ -551,6 +552,11 @@ var PlayerDetails = React.createClass({displayName: 'PlayerDetails',
     var player = this.props.player;
     var playerScore = this.props.playerScores[player];
     var scoresByDay = playerScore.scoresByDay;
+
+    var playerRank = _.chain(this.props.playerScores)
+      .sortBy(function (ps) { return ps.total; })
+      .indexOf(playerScore)
+      .value();
 
     var golferScores = _.chain(playerScore.scoresByGolfer)
       .values()
@@ -585,7 +591,10 @@ var PlayerDetails = React.createClass({displayName: 'PlayerDetails',
 
     return (
       React.DOM.section(null, 
-        React.DOM.h2(null, PlayerStore.getPlayer(player).name, " ", React.DOM.small(null, "Details")),
+        React.DOM.h2(null, 
+          PlayerStore.getPlayer(player).name,
+          React.DOM.small(null,  " ", utils.getOrdinal(playerRank + 1), " place")
+        ),
         React.DOM.table( {className:"table player-details-table"}, 
           React.DOM.thead(null, 
             React.DOM.tr(null, 
@@ -607,7 +616,7 @@ var PlayerDetails = React.createClass({displayName: 'PlayerDetails',
 
 module.exports = PlayerDetails;
 
-},{"../stores/GolferStore":23,"../stores/PlayerStore":24,"react":192,"react/lib/cx":150,"underscore":194}],13:[function(require,module,exports){
+},{"../stores/GolferStore":23,"../stores/PlayerStore":24,"../utils":28,"react":192,"react/lib/cx":150,"underscore":194}],13:[function(require,module,exports){
 /** @jsx React.DOM */
 "use strict";
 
@@ -1460,6 +1469,12 @@ var utils = {
     return Object.keys(a[0]).map(function (c) {
       return a.map(function (r) { return r[c]; });
     });
+  },
+
+  getOrdinal: function (n) {
+    var s=["th","st","nd","rd"],
+        v=n%100;
+    return n+(s[(v-20)%10]||s[v]||s[0]);
   }
 
 };
