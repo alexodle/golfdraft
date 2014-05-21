@@ -555,7 +555,7 @@ var PlayerDetails = React.createClass({displayName: 'PlayerDetails',
 
     var playerRank = _.chain(this.props.playerScores)
       .sortBy(function (ps) { return ps.total; })
-      .indexOf(playerScore)
+      .indexOf(playerScore, true)
       .value();
 
     var golferScores = _.chain(playerScore.scoresByGolfer)
@@ -1296,6 +1296,7 @@ var ScoreConstants = require('../constants/ScoreConstants');
 var _scores = {};
 var _lastUpdated = null;
 
+// TODO - Move to ScoreLogic
 function fillMissedCutScores(scores) {
   function worstScore(day) {
     var score = _.chain(scores)

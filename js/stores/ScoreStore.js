@@ -11,6 +11,7 @@ var ScoreConstants = require('../constants/ScoreConstants');
 var _scores = {};
 var _lastUpdated = null;
 
+// TODO - Move to ScoreLogic
 function fillMissedCutScores(scores) {
   function worstScore(day) {
     var score = _.chain(scores)

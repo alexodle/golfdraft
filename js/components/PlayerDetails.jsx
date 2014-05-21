@@ -24,7 +24,7 @@ var PlayerDetails = React.createClass({
 
     var playerRank = _.chain(this.props.playerScores)
       .sortBy(function (ps) { return ps.total; })
-      .indexOf(playerScore)
+      .indexOf(playerScore, true)
       .value();
 
     var golferScores = _.chain(playerScore.scoresByGolfer)
