@@ -12,25 +12,15 @@ var PlayerDetails = React.createClass({
 
   propTypes: {
     player: ReactPropTypes.string.isRequired,
-    scores: ReactPropTypes.object.isRequired,
-    golfersByPlayer: ReactPropTypes.object.isRequired
+    playerScores: ReactPropTypes.object.isRequired
   },
 
   render: function () {
     var player = this.props.player;
-    var scores = _.chain(this.props.golfersByPlayer[player])
-      .map(function (g) {
-        var gscores = this.props.scores[g];
-        return {
-          golfer: g,
-          scores: gscores.scores,
-          total: _.reduce(gscores.scores, function (n, s) { return n + s; }, 0)
-        };
-      }, this)
-      .sortBy(function (s) { return s.total; })
-      .value();
+    var playerScore = this.props.playerScores[player];
+    var golferScores = playerScore.scoresByGolfer;
 
-    var trs = _.map(scores, function (gs) {
+    var trs = _.map(_.values(golferScores), function (gs) {
       return (
         <tr key={gs.golfer}>
           <td>{GolferStore.getGolfer(gs.golfer).name}</td>
@@ -44,7 +34,7 @@ var PlayerDetails = React.createClass({
 
     return (
       <section>
-        <h2>Details <small>{PlayerStore.getPlayer(player).name}</small></h2>
+        <h2>{PlayerStore.getPlayer(player).name} <small>Details</small></h2>
         <table className='table'>
           <thead>
             <tr>

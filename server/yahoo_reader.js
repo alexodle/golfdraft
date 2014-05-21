@@ -2,12 +2,12 @@ var jsdom = require('jsdom');
 var Promise = require('promise');
 var _ = require('underscore');
 
-var YSURL = "http://sports.yahoo.com/golf/pga/leaderboard";
+var YSURL = "http://sports.yahoo.com/golf/pga/leaderboard/2014/13";
 
-function eachPlayerCb(callback) {
+function eachGolferCb(callback) {
   return function (tourney) {
-    var newPlayers = _.map(tourney.players, function (p) {
-      callback(p, tourney);
+    var newGolfers = _.map(tourney.golfers, function (g) {
+      callback(g, tourney);
     });
     return tourney;
   };
@@ -28,12 +28,12 @@ var YahooReader = {
           }
           var $ = window.$;
           var par = parseInt($("li.par span").text(), 10);
-          var players = [];
+          var golfers = [];
 
           $("#leaderboardtable table.sportsTable tbody tr").each(function () {
             var tds = $("td", this);
-            var player = $(tds[1]).text().trim();
-            if (!player) {
+            var golfer = $(tds[1]).text().trim();
+            if (!golfer) {
               return;
             }
 
@@ -46,8 +46,8 @@ var YahooReader = {
             var today = $(tds[6]).text().trim();
             var thru = $(tds[7]).text().trim();
 
-            players.push({
-              player: player,
+            golfers.push({
+              golfer: golfer,
               scores: scores,
               thru: thru,
               today: today
@@ -55,23 +55,23 @@ var YahooReader = {
           });
           fulfill({
             par: par,
-            players: players
+            golfers: golfers
           });
         }
       );
     });
   },
 
-  parseScores: function (p) {
+  parseScores: function (g) {
     var day = 0;
-    p.scores = _.map(p.scores, function (s) {
+    g.scores = _.map(g.scores, function (s) {
       if (
         s.toLowerCase().indexOf("pm") !== -1 ||
         s.toLowerCase().indexOf("am") !== -1 ||
         s === "-"
       ) {
         return 0;
-      } else if (_.contains(["MC", "WD", "MDF", "DQ"], s)) {
+      } else if (_.contains(["MC", "WD", "MDF", "DQ", "CUT"], s)) {
         return "MC";
       } else {
         day++;
@@ -79,52 +79,35 @@ var YahooReader = {
       }
     });
 
-    var missedCut = _.contains(p.scores, "MC");
+    var missedCut = _.contains(g.scores, "MC");
     if (missedCut) {
-      p.day = p.scores.length;
+      g.day = g.scores.length;
     } else {
-      p.day = p.thru === "F" || p.thru === "-" ? day : day - 1;
+      g.day = g.thru === "F" || g.thru === "-" ? day : day - 1;
     }
 
-    return p;
+    return g;
   },
 
-  relativeToPar: function (p, tourney) {
+  relativeToPar: function (g, tourney) {
     var par = tourney.par;
-    var missedCut = _.contains(p.scores, "MC");
-    if (p.today === "E") {
-      p.today = 0;
+    var missedCut = _.contains(g.scores, "MC");
+    if (g.today === "E") {
+      g.today = 0;
     }
-    p.scores = _.map(p.scores, function (s, i) {
+    g.scores = _.map(g.scores, function (s, i) {
       if (s === "MC") {
         return s;
-      } else if (i < p.day) {
+      } else if (i < g.day) {
         return s - par;
       } else {
         return s;
       }
     });
-    if (!missedCut && p.thru !== "F" && p.thru !== "-") {
-      p.scores[p.day] = parseInt(p.today, 10);
+    if (!missedCut && g.thru !== "F" && g.thru !== "-") {
+      g.scores[g.day] = parseInt(g.today, 10);
     }
-    return p;
-  },
-
-  adjustMissedCutScores: function (players) {
-    function worstScore(day) {
-      var player = _.chain(players)
-        .filter(function (p) { return p.scores[day] !== "MC"; })
-        .max(function (p) { return p.scores[day]; })
-        .value();
-      return player.scores[day];
-    }
-    var worstScores = _.map(_.range(players[0].scores.length), worstScore);
-    _.each(players, function (p) {
-      p.scores = _.map(p.scores, function (s, i) {
-        return s === "MC" ? worstScores[i] : s;
-      });
-    });
-    return players;
+    return g;
   },
 
   run: function () {
@@ -139,19 +122,15 @@ var YahooReader = {
 
     return this.readUrl()
     .then(printState("Raw"))
-    .then(eachPlayerCb(this.parseScores))
+    .then(eachGolferCb(this.parseScores))
     .then(printState("Parse scores"))
-    .then(eachPlayerCb(this.relativeToPar))
-    .then(printState("Relative to par"))
-    .then(function (tourney) {
-      tourney.players = this.adjustMissedCutScores(tourney.players);
-      return tourney;
-    }.bind(this))
-    .then(printState("Adjust missed cut"),
-    function (e, tb) {
-      console.log(e);
-      return null;
-    });
+    .then(eachGolferCb(this.relativeToPar))
+    .then(printState("Relative to par"),
+      function (e) {
+        console.log(e);
+        return null;
+      }
+    );
   }
 
 };

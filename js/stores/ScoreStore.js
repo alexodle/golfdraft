@@ -11,22 +11,25 @@ var ScoreConstants = require('../constants/ScoreConstants');
 var _scores = {};
 var _lastUpdated = null;
 
-var Score = function (spec) {
-  this.golfer = spec.golfer;
-  this.day = spec.day;
-  this.scores = spec.scores;
-};
-_.extend(Score.prototype, {
-
-  totalScore: function () {
-    return _.chain(this.scores)
-      .reduce(function (n, s) {
-        return n + s;
-      }, 0)
+function fillMissedCutScores(scores) {
+  function worstScore(day) {
+    var score = _.chain(scores)
+      .filter(function (s) { return s.scores[day] !== "MC"; })
+      .max(function (s) { return s.scores[day]; })
       .value();
+    return score.scores[day];
   }
-
-});
+  var worstScores = _.map(_.range(scores[0].scores.length), worstScore);
+  _.each(scores, function (s) {
+    s.missedCuts = _.map(s.scores, function (s) {
+      return s === "MC";
+    });
+    s.scores = _.map(s.scores, function (s, i) {
+      return s === "MC" ? worstScores[i] : s;
+    });
+  });
+  return scores;
+}
 
 var ScoreStore = merge(Store.prototype, {
 
@@ -48,8 +51,11 @@ AppDispatcher.register(function (payload) {
 
   switch(action.actionType) {
     case ScoreConstants.SCORE_UPDATE:
-      _scores = _.indexBy(action.scores, "golfer");
+      var scores = fillMissedCutScores(action.scores);
+
+      _scores = _.indexBy(scores, "golfer");
       _lastUpdated = action.lastUpdated;
+
       ScoreStore.emitChange();
       break;
 
@@ -57,14 +63,13 @@ AppDispatcher.register(function (payload) {
       return true;
   }
 
-  return true; // No errors.  Needed by promise in Dispatcher.
+  return true; // No errors. Needed by promise in Dispatcher.
 });
 
 // HACKHACK
-_scores = _.indexBy(window.golfDraftSeed.tourney.scores, "golfer");
-_lastUpdated = window.golfDraftSeed.tourney.lastUpdated;
-
-// TEMPTEMP
-window.scores = _scores;
+require('../actions/ScoreActions').scoreUpdate({
+  scores: window.golfDraftSeed.tourney.scores,
+  lastUpdated: window.golfDraftSeed.tourney.lastUpdated
+});
 
 module.exports = ScoreStore;

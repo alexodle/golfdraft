@@ -6,6 +6,8 @@ var ReactPropTypes = React.PropTypes;
 var _ = require('underscore');
 var moment = require('moment');
 
+var ScoreLogic = require('../logic/ScoreLogic');
+
 var LogoutButton = require('./LogoutButton.jsx');
 var PlayerStandings = require('./PlayerStandings.jsx');
 var PlayerDetails = require('./PlayerDetails.jsx');
@@ -29,7 +31,10 @@ var TourneyApp = React.createClass({
   },
 
   render: function () {
-    var golfersByPlayer = this._getGolfersByPlayer();
+    var playerScores = ScoreLogic.calcPlayerScores(
+      this.props.draft.draftPicks,
+      this.props.scores
+    );
     return (
       <section>
         <div className="page-header">
@@ -49,20 +54,18 @@ var TourneyApp = React.createClass({
         </div>
         <div className="row">
           <div className="col-md-12">
-            <PlayerStandings
-              currentUser={this.props.currentUser}
-              golfersByPlayer={golfersByPlayer}
-              scores={this.props.scores}
-              onPlayerSelect={this._onPlayerSelect}
+            <PlayerDetails
+              player={this.state.playerDetailsPlayer}
+              playerScores={playerScores}
             />
           </div>
         </div>
         <div className="row">
           <div className="col-md-12">
-            <PlayerDetails
-              player={this.state.playerDetailsPlayer}
-              golfersByPlayer={golfersByPlayer}
-              scores={this.props.scores}
+            <PlayerStandings
+              currentUser={this.props.currentUser}
+              playerScores={playerScores}
+              onPlayerSelect={this._onPlayerSelect}
             />
           </div>
         </div>
@@ -72,18 +75,6 @@ var TourneyApp = React.createClass({
 
   _onPlayerSelect: function (player) {
     this.setState({playerDetailsPlayer: player});
-  },
-
-  _getGolfersByPlayer: function () {
-    return _.chain(this.props.draft.draftPicks)
-      .groupBy(function (pick) { return pick.player; })
-      .map(function (picks, playerId) {
-        return [playerId, _.map(picks, function (pick) {
-          return pick.golfer;
-        })];
-      })
-      .object()
-      .value();
   }
 
 });

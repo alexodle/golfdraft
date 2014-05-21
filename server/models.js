@@ -23,7 +23,12 @@ var tourneySchema = mongoose.Schema({
   scores: [{
     golfer: mongoose.Schema.ObjectId,
     day: Number,
-    scores: [Number]
+    scores: [mongoose.Schema.mixed]
+  }],
+  scoreOverrides: [{
+    golfer: mongoose.Schema.ObjectId,
+    day: Number,
+    scores: [mongoose.Schema.mixed]
   }],
   par: Number,
   lastUpdated: Date

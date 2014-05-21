@@ -9,68 +9,123 @@ var config = require('./config');
 var Tourney = models.Tourney;
 var Golfer = models.Golfer;
 
-function validate(d) {
-  if (!_.contains([70, 71, 72], d.par)) {
-    console.log("ERROR - Par invalid:" + d.par);
-    return false;
-  }
-  if (_.some(d.players, function (p) { return p.player === '-'; })) {
-    console.log("ERROR - Invalid player name: '-'");
-    return false;
-  }
-  return _.every(d.players, function (p) {
-    var inv = false;
-    if (!_.every(p.scores, _.isFinite)) {
-      console.log("ERROR - Invalid player scores");
-      inv = true;
-    }
-    if (!_.contains([0, 1, 2, 3, 4], p.day)) {
-      console.log("ERROR - Invalid player day");
-      inv = true;
-    }
-
-    if (inv) {
-      console.log(JSON.stringify(p));
-    }
-    return !inv;
-  });
-}
+var DAYS = 4;
 
 var UpdateScore = {
+
+  validate: function (d) {
+    if (!_.contains([70, 71, 72], d.par)) {
+      console.log("ERROR - Par invalid:" + d.par);
+      return false;
+    }
+    if (_.some(d.golfers, function (p) { return p.golfer === '-'; })) {
+      console.log("ERROR - Invalid golfer name: '-'");
+      return false;
+    }
+    return _.every(d.golfers, function (g) {
+      var inv = false;
+      var validScores = _.every(g.scores, function (s) {
+        return _.isFinite(s) || s === "MC";
+      });
+
+      if (g.scores.length !== DAYS) {
+        inv = true;
+        console.log("ERROR - Invalid golfer scores length");
+      }
+      if (!validScores) {
+        console.log("ERROR - Invalid golfer scores");
+        inv = true;
+      }
+      if (!_.contains(_.range(DAYS + 1), g.day)) {
+        console.log("ERROR - Invalid golfer day");
+        inv = true;
+      }
+
+      if (inv) {
+        console.log(JSON.stringify(g));
+      }
+      return !inv;
+    });
+  },
+
+  mergeOverrides: function (scores, scoreOverrides) {
+    var overridesByGolfer = _.chain(scoreOverrides)
+      .map(function (o) {
+        // Remove all empty values from scoreOverrides
+        return _.chain(o)
+          .pairs()
+          .filter(function (kv) { return kv[1] !== null; })
+          .object()
+          .value();
+      })
+      .indexBy(function (o) {
+        return o.golfer.toString();
+      })
+      .value();
+
+    var newScores = _.map(scores, function (s) {
+      var override = overridesByGolfer[s.golfer.toString()];
+      if (override) {
+        return _.extend({}, s, override);
+      }
+      return s;
+    });
+
+    return newScores;
+  },
+
   run: function () {
     return YahooReader.run().then(function (tourney) {
       // Quick assertion of data
-      if (!tourney || !validate(tourney)) {
+      if (!tourney || !UpdateScore.validate(tourney)) {
         return false;
       }
 
       // Ensure golfers
-      var promises1 = _.map(tourney.players, function (p) {
+      var promises1 = _.map(tourney.golfers, function (p) {
         return Golfer.update(
-          { name: p.player },
-          { $set: { name: p.player } },
+          { name: p.golfer },
+          { $set: { name: p.golfer } },
           { upsert: true }
         )
         .exec();
       });
 
+      // Ensure tourney/par
+      promises1.push(Tourney.update(
+        {_id: config.tourney_id},
+        {par: tourney.par}
+      ));
+
       return Promise.all(promises1)
       .then(function () {
-        return Golfer.find().exec();
+        return Promise.all([
+          Golfer.find().exec(),
+          Tourney.findOne({'_id': config.tourney_id}).lean().exec()
+        ]);
       })
-      .then(function (gs) {
+      .then(function (results) {
+        var gs = results[0];
+        var scoreOverrides = results[1].scoreOverrides;
+
+        // BUild scores with golfer id
         var golfersByName = _.indexBy(gs, "name");
-        var scores = _.map(tourney.players, function (p) {
+        var scores = _.map(tourney.golfers, function (g) {
+          var golfer = golfersByName[g.golfer]._id;
           return {
-            golfer: golfersByName[p.player]._id,
-            day: p.day,
-            scores: p.scores
+            golfer: golfer,
+            day: g.day,
+            scores: g.scores
           };
         });
+
+        // Merge in overrides
+        scores = UpdateScore.mergeOverrides(scores, scoreOverrides);
+
+        // Save
         return Tourney.update(
           {_id: config.tourney_id },
           {$set: {
-            par: tourney.par,
             scores: scores,
             lastUpdated: new Date()
           }}
@@ -79,6 +134,9 @@ var UpdateScore = {
       .then(function () {
         console.log("HOORAY! - scores updated");
         return true;
+      }, function (e) {
+        console.log(e);
+        return false;
       });
     });
   }

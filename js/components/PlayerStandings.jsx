@@ -7,57 +7,24 @@ var _ = require("underscore");
 
 var PlayerStore = require('../stores/PlayerStore');
 var GolferStore = require('../stores/GolferStore');
-
-function transpose(a) {
-  if (!a.length) {
-    return a;
-  }
-  return Object.keys(a[0]).map(function (c) {
-    return a.map(function (r) { return r[c]; });
-  });
-}
-
-function playerScore(golferScores) {
-  var dayScores = _.map(transpose(golferScores), function (dayScores) {
-    var sorted = _.sortBy(dayScores);
-    return sorted[0] + sorted[1];
-  });
-  return {
-    dayScores: dayScores,
-    total: _.reduce(dayScores, function (n, ds) { return n + ds; }, 0)
-  }
-}
+var utils = require('../utils');
 
 var PlayerStandings = React.createClass({
 
   propTypes: {
     currentUser: ReactPropTypes.object.isRequired,
-    golfersByPlayer: ReactPropTypes.object.isRequired,
-    scores: ReactPropTypes.object.isRequired
+    playerScores: ReactPropTypes.object.isRequired
   },
 
   render: function () {
-    var scores = this.props.scores;
-    var players = PlayerStore.getAll();
-    var golfersByPlayer = this.props.golfersByPlayer;
-
-    var playerScores = _.chain(players)
-      .map(function (p) {
-        var golferScores = _.map(golfersByPlayer[p.id], function (g) {
-          return scores[g].scores;
-        });
-        return {
-          player: p,
-          score: playerScore(golferScores)
-        };
-      })
-      .sortBy(function (ps) { return ps.score.total; })
+    var playerScores = _.chain(this.props.playerScores)
+      .values()
+      .sortBy(function (ps) { return ps.total; })
       .value();
-    var topScore = playerScores[0].score.total;
+    var topScore = playerScores[0].total;
 
     var trs = _.map(playerScores, function (ps, i) {
-      var p = ps.player;
-      var golfers = golfersByPlayer[p.id];
+      var p = PlayerStore.getPlayer(ps.player);
       var playerIsMe = this.props.currentUser.player === p.id;
 
       return (
@@ -71,10 +38,10 @@ var PlayerStandings = React.createClass({
               {playerIsMe ? (<b>{p.name}</b>) : p.name}
             </a>
           </td>
-          <td>{ps.score.total}</td>
-          <td>{topScore - ps.score.total}</td>
-          {_.map(ps.score.dayScores, function (ds, i) {
-            return (<td key={i}>{ds}</td>);
+          <td>{ps.total}</td>
+          <td>{ps.total - topScore}</td>
+          {_.map(ps.scoresByDay, function (ds) {
+            return (<td key={ds.day}>{ds.total}</td>);
           })}
         </tr>
       );
