@@ -227,7 +227,7 @@ function getGolfersRemaining(props) {
 
 function isMyDraftPick(props) {
   return (
-    props.currentUser && props.currentPick.player == props.currentUser.player
+    props.currentUser && props.currentPick.player === props.currentUser.player
   );
 }
 
@@ -237,7 +237,7 @@ var DraftApp = React.createClass({displayName: 'DraftApp',
     var props = this.props;
     if (!isMyDraftPick(props) && isMyDraftPick(nextProps)) {
       myTurnSound.play();
-    } else if (props.draftPicks.length + 1 == nextProps.draftPicks.length) {
+    } else if (props.draftPicks.length + 1 === nextProps.draftPicks.length) {
       pickMadeSound.play();
     }
   },
@@ -459,8 +459,8 @@ var DraftPickOrder = React.createClass({displayName: 'DraftPickOrder',
               React.DOM.li(
                 {key:player,
                 className:cx({
-                  'my-player': myPlayer == player,
-                  'current-player': currentPlayer == player
+                  'my-player': myPlayer === player,
+                  'current-player': currentPlayer === player
                 })}
               , text));
           })

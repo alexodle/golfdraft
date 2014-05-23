@@ -12,7 +12,7 @@ var _picks = [];
 var _pickOrder = [];
 
 function getCurrentPick() {
-  if (_picks.length == _pickOrder.length) {
+  if (_picks.length === _pickOrder.length) {
     return null;
   }
   return {

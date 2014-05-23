@@ -23,7 +23,7 @@ function getGolfersRemaining(props) {
 
 function isMyDraftPick(props) {
   return (
-    props.currentUser && props.currentPick.player == props.currentUser.player
+    props.currentUser && props.currentPick.player === props.currentUser.player
   );
 }
 
@@ -33,7 +33,7 @@ var DraftApp = React.createClass({
     var props = this.props;
     if (!isMyDraftPick(props) && isMyDraftPick(nextProps)) {
       myTurnSound.play();
-    } else if (props.draftPicks.length + 1 == nextProps.draftPicks.length) {
+    } else if (props.draftPicks.length + 1 === nextProps.draftPicks.length) {
       pickMadeSound.play();
     }
   },

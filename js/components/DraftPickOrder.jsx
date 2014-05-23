@@ -32,8 +32,8 @@ var DraftPickOrder = React.createClass({
               <li
                 key={player}
                 className={cx({
-                  'my-player': myPlayer == player,
-                  'current-player': currentPlayer == player
+                  'my-player': myPlayer === player,
+                  'current-player': currentPlayer === player
                 })}
               >{text}</li>);
           })}
