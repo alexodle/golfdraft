@@ -2,7 +2,7 @@ var jsdom = require('jsdom');
 var Promise = require('promise');
 var _ = require('underscore');
 
-var YSURL = "http://sports.yahoo.com/golf/pga/leaderboard/2014/13";
+var YSURL = "http://sports.yahoo.com/golf/pga/leaderboard";
 
 function eachGolferCb(callback) {
   return function (tourney) {
@@ -32,7 +32,7 @@ var YahooReader = {
 
           $("#leaderboardtable table.sportsTable tbody tr").each(function () {
             var tds = $("td", this);
-            var golfer = $(tds[1]).text().trim();
+            var golfer = $(tds[1]).text().trim().replace("*", "");
             if (!golfer) {
               return;
             }

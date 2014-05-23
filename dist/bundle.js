@@ -1214,19 +1214,9 @@ AppDispatcher.register(function (payload) {
 _picks = window.golfDraftSeed.draft.picks;
 _pickOrder = window.golfDraftSeed.draft.pickOrder;
 
-// HACKHACK - manual driver
-window.draftman = {
-
-  makePick: function (golfer) {
-    var DraftActions = require('../actions/DraftActions');
-    DraftActions.makePick(golfer);
-  }
-
-};
-
 module.exports = DraftStore;
 
-},{"../actions/DraftActions":1,"../constants/DraftConstants":17,"../dispatcher/AppDispatcher":19,"./Store":26,"jquery":41,"react/lib/merge":177,"underscore":194}],23:[function(require,module,exports){
+},{"../constants/DraftConstants":17,"../dispatcher/AppDispatcher":19,"./Store":26,"jquery":41,"react/lib/merge":177,"underscore":194}],23:[function(require,module,exports){
 'use strict';
 
 var Store = require('./Store');
