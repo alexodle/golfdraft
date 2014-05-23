@@ -81,14 +81,4 @@ AppDispatcher.register(function (payload) {
 _picks = window.golfDraftSeed.draft.picks;
 _pickOrder = window.golfDraftSeed.draft.pickOrder;
 
-// HACKHACK - manual driver
-window.draftman = {
-
-  makePick: function (golfer) {
-    var DraftActions = require('../actions/DraftActions');
-    DraftActions.makePick(golfer);
-  }
-
-};
-
 module.exports = DraftStore;
