@@ -22,10 +22,12 @@ var PlayerDetails = React.createClass({
     var playerScore = this.props.playerScores[player];
     var scoresByDay = playerScore.scoresByDay;
 
-    var playerRank = _.chain(this.props.playerScores)
-      .sortBy(function (ps) { return ps.total; })
-      .indexOf(playerScore)
+    var sortedScores = _.chain(this.props.playerScores)
+      .pluck("total")
+      .sortBy()
       .value();
+    var playerRank = _.sortedIndex(sortedScores, playerScore.total);
+    var isTied = sortedScores[playerRank + 1] === playerScore.total;
 
     var golferScores = _.chain(playerScore.scoresByGolfer)
       .values()
@@ -58,11 +60,12 @@ var PlayerDetails = React.createClass({
       );
     });
 
+    var tieText = isTied ? "(Tie)" : "";
     return (
       <section>
         <h2>
           {PlayerStore.getPlayer(player).name}
-          <small> {utils.getOrdinal(playerRank + 1)} place</small>
+          <small> {utils.getOrdinal(playerRank + 1)} place {tieText}</small>
         </h2>
         <table className='table player-details-table'>
           <thead>

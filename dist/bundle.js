@@ -553,10 +553,12 @@ var PlayerDetails = React.createClass({displayName: 'PlayerDetails',
     var playerScore = this.props.playerScores[player];
     var scoresByDay = playerScore.scoresByDay;
 
-    var playerRank = _.chain(this.props.playerScores)
-      .sortBy(function (ps) { return ps.total; })
-      .indexOf(playerScore)
+    var sortedScores = _.chain(this.props.playerScores)
+      .pluck("total")
+      .sortBy()
       .value();
+    var playerRank = _.sortedIndex(sortedScores, playerScore.total);
+    var isTied = sortedScores[playerRank + 1] === playerScore.total;
 
     var golferScores = _.chain(playerScore.scoresByGolfer)
       .values()
@@ -589,11 +591,12 @@ var PlayerDetails = React.createClass({displayName: 'PlayerDetails',
       );
     });
 
+    var tieText = isTied ? "(Tie)" : "";
     return (
       React.DOM.section(null, 
         React.DOM.h2(null, 
           PlayerStore.getPlayer(player).name,
-          React.DOM.small(null,  " ", utils.getOrdinal(playerRank + 1), " place")
+          React.DOM.small(null,  " ", utils.getOrdinal(playerRank + 1), " place ", tieText)
         ),
         React.DOM.table( {className:"table player-details-table"}, 
           React.DOM.thead(null, 
@@ -640,7 +643,8 @@ var PlayerStandings = React.createClass({displayName: 'PlayerStandings',
       .values()
       .sortBy(function (ps) { return ps.total; })
       .value();
-    var topScore = playerScores[0].total;
+    var playerTotals = _.pluck(playerScores, "total");
+    var topScore = playerTotals[0];
 
     var trs = _.map(playerScores, function (ps, i) {
       var p = PlayerStore.getPlayer(ps.player);
@@ -648,7 +652,7 @@ var PlayerStandings = React.createClass({displayName: 'PlayerStandings',
 
       return (
         React.DOM.tr( {key:p.id}, 
-          React.DOM.td(null, i + 1),
+          React.DOM.td(null, _.sortedIndex(playerTotals, ps.total) + 1),
           React.DOM.td(null, 
             React.DOM.a(
               {href:"#noop",

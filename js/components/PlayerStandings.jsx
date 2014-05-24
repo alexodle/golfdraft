@@ -21,7 +21,8 @@ var PlayerStandings = React.createClass({
       .values()
       .sortBy(function (ps) { return ps.total; })
       .value();
-    var topScore = playerScores[0].total;
+    var playerTotals = _.pluck(playerScores, "total");
+    var topScore = playerTotals[0];
 
     var trs = _.map(playerScores, function (ps, i) {
       var p = PlayerStore.getPlayer(ps.player);
@@ -29,7 +30,7 @@ var PlayerStandings = React.createClass({
 
       return (
         <tr key={p.id}>
-          <td>{i + 1}</td>
+          <td>{_.sortedIndex(playerTotals, ps.total) + 1}</td>
           <td>
             <a
               href="#noop"
