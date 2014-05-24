@@ -3,3 +3,4 @@ node_modules/*browserify*
 node_modules/*grunt*
 server/*.sh
 npm-debug.log
+server/devenv.sh
