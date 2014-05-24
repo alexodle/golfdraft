@@ -1,5 +1,5 @@
 .table-enter {
-  background-color: yellow;
+  background-color: #dff0d8;
   transition: background-color 2s ease-in;
 }
 
@@ -12,15 +12,20 @@
 }
 
 .pick-order-list .current-player {
-  background-color: yellow;
+  background-color: #f5f5f5;
 }
 
 .player-details-table .score-used {
   font-weight: bold;
+  background-color: #dff0d8;
 }
 
 .player-details-table .missed-cut-text {
   display: none;
+}
+
+.player-details-table .missed-cut {
+  color: #a94442;
 }
 
 .player-details-table .missed-cut .missed-cut-text {
