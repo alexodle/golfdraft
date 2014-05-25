@@ -3,6 +3,7 @@
 
 var React = require("react");
 var ReactPropTypes = React.PropTypes;
+var cx = require('react/lib/cx');
 var _ = require("underscore");
 
 var PlayerStore = require('../stores/PlayerStore');
@@ -13,7 +14,8 @@ var PlayerStandings = React.createClass({
 
   propTypes: {
     currentUser: ReactPropTypes.object.isRequired,
-    playerScores: ReactPropTypes.object.isRequired
+    playerScores: ReactPropTypes.object.isRequired,
+    selectedPlayer: ReactPropTypes.string.isRequired
   },
 
   render: function () {
@@ -27,18 +29,18 @@ var PlayerStandings = React.createClass({
     var trs = _.map(playerScores, function (ps, i) {
       var p = PlayerStore.getPlayer(ps.player);
       var playerIsMe = this.props.currentUser.player === p.id;
+      var playerIsSelected = this.props.selectedPlayer === p.id;
 
       return (
-        <tr key={p.id}>
+        <tr
+          key={p.id}
+          className={cx({
+            'selected-player-row': playerIsSelected
+          })}
+          onClick={_.partial(this.props.onPlayerSelect, p.id)}
+        >
           <td>{_.sortedIndex(playerTotals, ps.total) + 1}</td>
-          <td>
-            <a
-              href="#noop"
-              onClick={_.partial(this.props.onPlayerSelect, p.id)}
-            >
-              {playerIsMe ? (<b>{p.name}</b>) : p.name}
-            </a>
-          </td>
+          <td>{playerIsMe ? (<b>{p.name}</b>) : p.name}</td>
           <td>{ps.total}</td>
           <td>{ps.total - topScore}</td>
           {_.map(ps.scoresByDay, function (ds) {
@@ -51,7 +53,7 @@ var PlayerStandings = React.createClass({
     return (
       <section>
         <h2>Pool player standings</h2>
-        <table className='table'>
+        <table className='table standings-table table-hover'>
           <thead>
             <tr>
               <th>#</th>

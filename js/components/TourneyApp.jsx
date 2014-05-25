@@ -65,6 +65,7 @@ var TourneyApp = React.createClass({
             <PlayerStandings
               currentUser={this.props.currentUser}
               playerScores={playerScores}
+              selectedPlayer={this.state.playerDetailsPlayer}
               onPlayerSelect={this._onPlayerSelect}
             />
           </div>

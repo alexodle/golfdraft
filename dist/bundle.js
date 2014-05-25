@@ -625,6 +625,7 @@ module.exports = PlayerDetails;
 
 var React = require("react");
 var ReactPropTypes = React.PropTypes;
+var cx = require('react/lib/cx');
 var _ = require("underscore");
 
 var PlayerStore = require('../stores/PlayerStore');
@@ -635,7 +636,8 @@ var PlayerStandings = React.createClass({displayName: 'PlayerStandings',
 
   propTypes: {
     currentUser: ReactPropTypes.object.isRequired,
-    playerScores: ReactPropTypes.object.isRequired
+    playerScores: ReactPropTypes.object.isRequired,
+    selectedPlayer: ReactPropTypes.string.isRequired
   },
 
   render: function () {
@@ -649,18 +651,18 @@ var PlayerStandings = React.createClass({displayName: 'PlayerStandings',
     var trs = _.map(playerScores, function (ps, i) {
       var p = PlayerStore.getPlayer(ps.player);
       var playerIsMe = this.props.currentUser.player === p.id;
+      var playerIsSelected = this.props.selectedPlayer === p.id;
 
       return (
-        React.DOM.tr( {key:p.id}, 
+        React.DOM.tr(
+          {key:p.id,
+          className:cx({
+            'selected-player-row': playerIsSelected
+          }),
+          onClick:_.partial(this.props.onPlayerSelect, p.id)}
+        , 
           React.DOM.td(null, _.sortedIndex(playerTotals, ps.total) + 1),
-          React.DOM.td(null, 
-            React.DOM.a(
-              {href:"#noop",
-              onClick:_.partial(this.props.onPlayerSelect, p.id)}
-            , 
-              playerIsMe ? (React.DOM.b(null, p.name)) : p.name
-            )
-          ),
+          React.DOM.td(null, playerIsMe ? (React.DOM.b(null, p.name)) : p.name),
           React.DOM.td(null, ps.total),
           React.DOM.td(null, ps.total - topScore),
           _.map(ps.scoresByDay, function (ds) {
@@ -673,7 +675,7 @@ var PlayerStandings = React.createClass({displayName: 'PlayerStandings',
     return (
       React.DOM.section(null, 
         React.DOM.h2(null, "Pool player standings"),
-        React.DOM.table( {className:"table"}, 
+        React.DOM.table( {className:"table standings-table table-hover"}, 
           React.DOM.thead(null, 
             React.DOM.tr(null, 
               React.DOM.th(null, "#"),
@@ -696,7 +698,7 @@ var PlayerStandings = React.createClass({displayName: 'PlayerStandings',
 
 module.exports = PlayerStandings;
 
-},{"../stores/GolferStore":23,"../stores/PlayerStore":24,"../utils":28,"react":192,"underscore":194}],14:[function(require,module,exports){
+},{"../stores/GolferStore":23,"../stores/PlayerStore":24,"../utils":28,"react":192,"react/lib/cx":150,"underscore":194}],14:[function(require,module,exports){
 /** @jsx React.DOM */
 'use strict';
 
@@ -764,6 +766,7 @@ var TourneyApp = React.createClass({displayName: 'TourneyApp',
             PlayerStandings(
               {currentUser:this.props.currentUser,
               playerScores:playerScores,
+              selectedPlayer:this.state.playerDetailsPlayer,
               onPlayerSelect:this._onPlayerSelect}
             )
           )
