@@ -1,9 +1,5 @@
 'use strict';
 
-var UPDATE_INTERVAL = 1000 * 60 * 5; // 5 minutes
-
-var mongo_url = process.env.MONGOHQ_URL || "mongodb://localhost:27017/test";
-var redis_url = process.env.REDISTOGO_URL || "redis://localhost:6379/0";
 var port = Number(process.env.PORT || 3000);
 
 var express = require('express');
@@ -18,11 +14,12 @@ var ObjectId = mongoose.Types.ObjectId;
 var session = require('express-session');
 var RedisStore = require('connect-redis')(session);
 var cookieParser = require('cookie-parser');
-var updateScore = require('./update_score');
 var logfmt = require("logfmt");
 var server = require("http").createServer(app);
 var io = require('socket.io').listen(server);
 var config = require('./config');
+var redis = require("./redis");
+var redisCli = redis.client;
 
 var Golfer = models.Golfer;
 var Player = models.Player;
@@ -30,7 +27,7 @@ var Draft = models.Draft;
 var Tourney = models.Tourney;
 
 mongoose.set('debug', true);
-mongoose.connect(mongo_url);
+mongoose.connect(config.mongo_url);
 
 // Request logging
 app.use(logfmt.requestLogger());
@@ -38,7 +35,7 @@ app.use(logfmt.requestLogger());
 // Redis
 app.use(cookieParser()); // Must come before session()
 app.use(session({
-  store: new RedisStore({ url: redis_url }),
+  store: new RedisStore({ url: config.redis_url }),
   secret: 'odle rules'
 }));
 
@@ -58,18 +55,14 @@ app.use('/assets', express.static(__dirname + '/../assets'));
 // Parsing
 app.use(bodyParser());
 
-var running = false;
-function updateScores() {
-  if (running) {
-    console.log("WARNING - may be stuck running update. Holding off.");
-    return;
-  }
-  running = true;
-  console.log("attempting update...");
-  updateScore.run().then(function (succeeded) {
-    console.log("succeeded: " + succeeded);
-    if (succeeded) {
-      Tourney.findOne({
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function callback () {
+
+  redisCli.on("message", function (channel, message) {
+    // Scores updated, alert clients
+    console.log("redis message: channel " + channel + ": " + message);
+    Tourney.findOne({
         '_id': config.tourney_id
       }).exec()
       .then(function (result) {
@@ -81,17 +74,8 @@ function updateScores() {
           evType: 'change:scores',
           action: 'scores:periodic_update'
         });
-        running = false;
       });
-    } else {
-      running = false;
-    }
   });
-}
-
-var db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function callback () {
 
   app.get('/', function (req, res) {
     var promises = [
@@ -186,10 +170,6 @@ db.once('open', function callback () {
     );
   });
 
-  setInterval(function () {
-    updateScores();
-  }, UPDATE_INTERVAL);
-  updateScores();
-
   server.listen(port);
+  redisCli.subscribe("scores:update");
 });
