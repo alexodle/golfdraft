@@ -749,7 +749,7 @@ var TourneyApp = React.createClass({displayName: 'TourneyApp',
         React.DOM.div( {className:"row"}, 
           React.DOM.div( {className:"col-md-12"}, 
             React.DOM.small(null, 
-              "Scores sync every 5 minutes. Last sync: ", React.DOM.b(null, moment(this.props.lastScoresUpdate).calendar())
+              "Scores sync every 10 minutes. Last sync: ", React.DOM.b(null, moment(this.props.lastScoresUpdate).calendar())
             )
           )
         ),

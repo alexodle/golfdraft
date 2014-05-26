@@ -14,6 +14,10 @@ describe('update_score', function () {
         par: 70,
         golfers: [{golfer: '-'}]
       }).should.not.be.ok;
+      updater.validate({
+        par: 70,
+        golfers: [{golfer: 'x-Adam Scott'}]
+      }).should.not.be.ok;
     });
 
     it('catches non-numeric golfer score', function () {

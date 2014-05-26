@@ -32,7 +32,9 @@ var YahooReader = {
 
           $("#leaderboardtable table.sportsTable tbody tr").each(function () {
             var tds = $("td", this);
-            var golfer = $(tds[1]).text().trim().replace("*", "");
+            var golfer = $(tds[1]).text().trim()
+              .replace("*", "")
+              .replace("x-", "");
             if (!golfer) {
               return;
             }

@@ -11,6 +11,9 @@ var Golfer = models.Golfer;
 
 var DAYS = 4;
 
+var INVALID_NAME = /[^a-zA-Z ]/;
+var INVALID_NAME_TEST = INVALID_NAME.test.bind(INVALID_NAME);
+
 var UpdateScore = {
 
   validate: function (d) {
@@ -18,25 +21,23 @@ var UpdateScore = {
       console.log("ERROR - Par invalid:" + d.par);
       return false;
     }
-    if (_.some(d.golfers, function (p) { return p.golfer === '-'; })) {
-      console.log("ERROR - Invalid golfer name: '-'");
-      return false;
-    }
+
     return _.every(d.golfers, function (g) {
       var inv = false;
       var validScores = _.every(g.scores, function (s) {
         return _.isFinite(s) || s === "MC";
       });
 
-      if (g.scores.length !== DAYS) {
+      if (INVALID_NAME.test(g.golfer)) {
+        console.log("ERROR - Invalid golfer name");
         inv = true;
+      } else if (g.scores.length !== DAYS) {
         console.log("ERROR - Invalid golfer scores length");
-      }
-      if (!validScores) {
+        inv = true;
+      } else if (!validScores) {
         console.log("ERROR - Invalid golfer scores");
         inv = true;
-      }
-      if (!_.contains(_.range(DAYS + 1), g.day)) {
+      } else if (!_.contains(_.range(DAYS + 1), g.day)) {
         console.log("ERROR - Invalid golfer day");
         inv = true;
       }
