@@ -48,7 +48,7 @@ var TourneyApp = React.createClass({
         <div className="row">
           <div className="col-md-12">
             <small>
-              Scores sync every 5 minutes. Last sync: <b>{moment(this.props.lastScoresUpdate).calendar()}</b>
+              Scores sync every 10 minutes. Last sync: <b>{moment(this.props.lastScoresUpdate).calendar()}</b>
             </small>
           </div>
         </div>
