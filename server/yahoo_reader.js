@@ -2,7 +2,7 @@ var jsdom = require('jsdom');
 var Promise = require('promise');
 var _ = require('underscore');
 
-var YSURL = "http://sports.yahoo.com/golf/pga/leaderboard/2014/22";
+var YSURL = "http://sports.yahoo.com/golf/pga/leaderboard";
 
 function eachGolferCb(callback) {
   return function (tourney) {
