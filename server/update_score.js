@@ -11,9 +11,6 @@ var Golfer = models.Golfer;
 
 var DAYS = 4;
 
-var INVALID_NAME = /[^a-zA-Z\.\- ]/;
-var INVALID_NAME_TEST = INVALID_NAME.test.bind(INVALID_NAME);
-
 var UpdateScore = {
 
   validate: function (d) {
@@ -28,7 +25,7 @@ var UpdateScore = {
         return _.isFinite(s) || s === "MC";
       });
 
-      if (INVALID_NAME.test(g.golfer) || g.golfer === "-") {
+      if (g.golfer === "-") {
         console.log("ERROR - Invalid golfer name");
         inv = true;
       } else if (g.scores.length !== DAYS) {

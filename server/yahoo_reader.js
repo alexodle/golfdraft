@@ -2,7 +2,7 @@ var jsdom = require('jsdom');
 var Promise = require('promise');
 var _ = require('underscore');
 
-var YSURL = "http://sports.yahoo.com/golf/pga/leaderboard/2014/13";
+var YSURL = "http://sports.yahoo.com/golf/pga/leaderboard/2014/22";
 
 function eachGolferCb(callback) {
   return function (tourney) {
@@ -30,9 +30,22 @@ var YahooReader = {
           var par = parseInt($("li.par span").text(), 10);
           var golfers = [];
 
+          var nheaders = $("#leaderboardtable table.sportsTable thead tr").length;
+          var adjust = 0;
+          if (nheaders === 2) {
+            adjust = 1;
+          } else if (nheaders === 1) {
+            adjust = 0;
+          } else {
+            reject("Unknown number of headers: " + nheaders);
+          }
+          console.log("adjust: " + adjust);
+
           $("#leaderboardtable table.sportsTable tbody tr").each(function () {
             var tds = $("td", this);
-            var golfer = $(tds[1]).text().trim()
+            var i = adjust;
+
+            var golfer = $("a", tds[i++]).text().trim()
               .replace("*", "")
               .replace("x-", "");
             if (!golfer) {
@@ -40,13 +53,13 @@ var YahooReader = {
             }
 
             var scores = [
-              $(tds[2]).text().trim(),
-              $(tds[3]).text().trim(),
-              $(tds[4]).text().trim(),
-              $(tds[5]).text().trim()
+              $(tds[i++]).text().trim(),
+              $(tds[i++]).text().trim(),
+              $(tds[i++]).text().trim(),
+              $(tds[i++]).text().trim()
             ];
-            var today = $(tds[6]).text().trim();
-            var thru = $(tds[7]).text().trim();
+            var today = $(tds[i++]).text().trim();
+            var thru = $(tds[i++]).text().trim();
 
             golfers.push({
               golfer: golfer,
