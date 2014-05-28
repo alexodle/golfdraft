@@ -338,7 +338,7 @@ var DraftChooser = React.createClass({displayName: 'DraftChooser',
                   {id:"golfersRemaining",
                   value:this.state.selectedGolfer,
                   onChange:this._onChange,
-                  size:"5",
+                  size:"10",
                   className:"form-control"}
                 , 
                   options
@@ -826,7 +826,7 @@ var WhoIsYou = React.createClass({displayName: 'WhoIsYou',
                   {id:"userSelect",
                   value:this.state.selectedUser,
                   onChange:this._onChange,
-                  size:"5",
+                  size:"15",
                   className:"form-control"}
                 , 
                   options

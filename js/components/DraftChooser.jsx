@@ -43,7 +43,7 @@ var DraftChooser = React.createClass({
                   id="golfersRemaining"
                   value={this.state.selectedGolfer}
                   onChange={this._onChange}
-                  size="5"
+                  size="10"
                   className="form-control"
                 >
                   {options}

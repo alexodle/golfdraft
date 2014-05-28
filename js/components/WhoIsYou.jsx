@@ -40,7 +40,7 @@ var WhoIsYou = React.createClass({
                   id="userSelect"
                   value={this.state.selectedUser}
                   onChange={this._onChange}
-                  size="5"
+                  size="15"
                   className="form-control"
                 >
                   {options}
