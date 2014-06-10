@@ -54,7 +54,7 @@ var DraftApp = React.createClass({
     return (
       <section>
         <div className="page-header">
-          <h1>Welcome to the 2014 Masters Draft <small>
+          <h1>Welcome to the 2014 U.S. Open Draft <small>
             {this.props.currentUser.name}</small>
           </h1>
           <div className="logout-row">

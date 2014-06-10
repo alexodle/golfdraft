@@ -38,7 +38,7 @@ var TourneyApp = React.createClass({
     return (
       <section>
         <div className="page-header">
-          <h1>Welcome to the 2014 Masters <small>
+          <h1>Welcome to the 2014 U.S. Open <small>
             {this.props.currentUser.name}</small>
           </h1>
           <div className="logout-row">
