@@ -31,7 +31,8 @@ var tourneySchema = mongoose.Schema({
     scores: [mongoose.Schema.mixed]
   }],
   par: Number,
-  lastUpdated: Date
+  lastUpdated: Date,
+  yahooUrl: String
 });
 
 var Golfer = mongoose.model('Golfer', golferSchema);
