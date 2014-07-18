@@ -90,6 +90,7 @@ var UpdateScore = {
       });
 
       // Ensure tourney/par
+      console.log("ensuring tourney par: " + tourney.par + ", " + config.tourney_id);
       promises1.push(Tourney.update(
         {_id: config.tourney_id},
         {par: tourney.par}
@@ -118,7 +119,11 @@ var UpdateScore = {
         });
 
         // Merge in overrides
+        console.log("scores BEFORE overrides: " + JSON.stringify(scores));
         scores = UpdateScore.mergeOverrides(scores, scoreOverrides);
+        console.log("");
+        console.log("scores AFTER overrides: " + JSON.stringify(scores));
+        console.log("");
 
         // Save
         return Tourney.update(
