@@ -258,7 +258,7 @@ var DraftApp = React.createClass({displayName: 'DraftApp',
     return (
       React.DOM.section(null, 
         React.DOM.div( {className:"page-header"}, 
-          React.DOM.h1(null, "Welcome to the 2014 Masters Draft ", React.DOM.small(null, 
+          React.DOM.h1(null, "Welcome to the 2014 U.S. Open Draft ", React.DOM.small(null, 
             this.props.currentUser.name)
           ),
           React.DOM.div( {className:"logout-row"}, 
@@ -595,7 +595,7 @@ var PlayerDetails = React.createClass({displayName: 'PlayerDetails',
     return (
       React.DOM.section(null, 
         React.DOM.h2(null, 
-          PlayerStore.getPlayer(player).name,
+          PlayerStore.getPlayer(player).name, " (",playerScore.total,")",
           React.DOM.small(null,  " ", utils.getOrdinal(playerRank + 1), " place ", tieText)
         ),
         React.DOM.table( {className:"table player-details-table"}, 
@@ -739,7 +739,7 @@ var TourneyApp = React.createClass({displayName: 'TourneyApp',
     return (
       React.DOM.section(null, 
         React.DOM.div( {className:"page-header"}, 
-          React.DOM.h1(null, "Welcome to the 2014 Masters ", React.DOM.small(null, 
+          React.DOM.h1(null, "Welcome to the 2014 U.S. Open ", React.DOM.small(null, 
             this.props.currentUser.name)
           ),
           React.DOM.div( {className:"logout-row"}, 
