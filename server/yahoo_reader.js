@@ -30,36 +30,22 @@ var YahooReader = {
           var par = parseInt($("li.par span").text(), 10);
           var golfers = [];
 
-          var nheaders = $("#leaderboardtable table.sportsTable thead tr").length;
-          var adjust = 0;
-          if (nheaders === 2) {
-            adjust = 1;
-          } else if (nheaders === 1) {
-            adjust = 0;
-          } else {
-            reject("Unknown number of headers: " + nheaders);
-          }
-          console.log("adjust: " + adjust);
-
           $("#leaderboardtable table.sportsTable tbody tr").each(function () {
-            var tds = $("td", this);
-            var i = adjust;
+            var $tr = $(this);
+            var $td = $("td.player", $tr);
 
-            var golfer = $("a", tds[i++]).text().trim()
+            var golfer = $("a", $td).text().trim()
               .replace("*", "")
               .replace("x-", "");
             if (!golfer) {
               return;
             }
 
-            var scores = [
-              $(tds[i++]).text().trim(),
-              $(tds[i++]).text().trim(),
-              $(tds[i++]).text().trim(),
-              $(tds[i++]).text().trim()
-            ];
-            var today = $(tds[i++]).text().trim();
-            var thru = $(tds[i++]).text().trim();
+            var scores = _.map(_.range(4), function () {
+              return $($td = $td.next()).text().trim();
+            });
+            var today = $($td = $td.next()).text().trim();
+            var thru = $($td = $td.next()).text().trim();
 
             golfers.push({
               golfer: golfer,
@@ -68,6 +54,7 @@ var YahooReader = {
               today: today
             });
           });
+
           fulfill({
             par: par,
             golfers: golfers
