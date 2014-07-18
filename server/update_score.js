@@ -124,6 +124,9 @@ var UpdateScore = {
         console.log("");
         console.log("scores AFTER overrides: " + JSON.stringify(scores));
         console.log("");
+        if (!scores.length) {
+          throw new Error("wtf. no scores.");
+        }
 
         // Save
         return Tourney.update(
