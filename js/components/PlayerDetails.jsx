@@ -64,7 +64,7 @@ var PlayerDetails = React.createClass({
     return (
       <section>
         <h2>
-          {PlayerStore.getPlayer(player).name}
+          {PlayerStore.getPlayer(player).name} ({playerScore.total})
           <small> {utils.getOrdinal(playerRank + 1)} place {tieText}</small>
         </h2>
         <table className='table player-details-table'>
