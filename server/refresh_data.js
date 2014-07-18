@@ -102,7 +102,7 @@ function refreshData(pickOrderNames, yahooUrl) {
   })
   .then(printState)
   .then(function () {
-    console.log("BEGIN Updating scores")
+    console.log("BEGIN Updating scores");
     return updateScore.run().then(function () {
       console.log("END Updating scores");
     });
