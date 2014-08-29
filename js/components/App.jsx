@@ -7,6 +7,7 @@ var _ = require("underscore");
 var UserStore = require("../stores/UserStore");
 var DraftStore = require("../stores/DraftStore");
 var ScoreStore = require('../stores/ScoreStore');
+var AppSettingsStore = require('../stores/AppSettingsStore');
 
 var DraftApp = require("./DraftApp.jsx");
 var TourneyApp = require("./TourneyApp.jsx");
@@ -15,7 +16,8 @@ var WhoIsYou = require("./WhoIsYou.jsx");
 var RELEVANT_STORES = [
   UserStore,
   DraftStore,
-  ScoreStore
+  ScoreStore,
+  AppSettingsStore
 ];
 
 function getAppState() {
@@ -28,7 +30,9 @@ function getAppState() {
     },
 
     scores: ScoreStore.getScores(),
-    lastScoresUpdate: ScoreStore.getLastUpdated()
+    lastScoresUpdate: ScoreStore.getLastUpdated(),
+
+    playSounds: AppSettingsStore.getPlaySounds()
   }
 }
 
@@ -57,6 +61,7 @@ var App = React.createClass({
     } else if (this.state.draft.currentPick) {
       view = (
         <DraftApp
+          playSounds={this.state.playSounds}
           currentUser={this.state.currentUser}
           currentPick={this.state.draft.currentPick}
           draftPicks={this.state.draft.draftPicks}

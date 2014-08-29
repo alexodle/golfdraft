@@ -5,12 +5,13 @@ var React = require("react");
 var _ = require("underscore");
 
 var GolferStore = require("../stores/GolferStore");
+var SettingsActions = require("../actions/SettingsActions");
 
 var DraftChooser = require("./DraftChooser.jsx");
 var DraftHistory = require("./DraftHistory.jsx");
 var DraftStatus = require("./DraftStatus.jsx");
 var DraftPickOrder = require("./DraftPickOrder.jsx");
-var LogoutButton = require("./LogoutButton.jsx")
+var LogoutButton = require("./LogoutButton.jsx");
 
 var myTurnSound = new Audio("/assets/boxing_bell_multiple.wav");
 var pickMadeSound = new Audio("/assets/boxing_bell.wav");
@@ -31,6 +32,8 @@ var DraftApp = React.createClass({
 
   componentWillReceiveProps: function (nextProps) {
     var props = this.props;
+    if (!props.playSounds) return;
+
     if (!isMyDraftPick(props) && isMyDraftPick(nextProps)) {
       myTurnSound.play();
     } else if (props.draftPicks.length + 1 === nextProps.draftPicks.length) {
@@ -57,6 +60,13 @@ var DraftApp = React.createClass({
           <h1>Welcome to the 2014 U.S. Open Draft <small>
             {this.props.currentUser.name}</small>
           </h1>
+
+          <span onClick={this._togglePlaySounds}>
+            {this.props.playSounds ?
+              "Playing sounds" :
+              "Not playing sounds"}
+          </span>
+
           <div className="logout-row">
             <LogoutButton currentUser={this.props.currentUser} />
           </div>
@@ -82,6 +92,10 @@ var DraftApp = React.createClass({
         </div>
       </section>
     );
+  },
+
+  _togglePlaySounds: function () {
+    SettingsActions.setPlaySounds(!this.props.playSounds);
   }
 
 });
