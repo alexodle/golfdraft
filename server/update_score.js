@@ -7,7 +7,6 @@ var YahooReader = require('./yahoo_reader');
 var models = require('./models');
 var config = require('./config');
 var Tourney = models.Tourney;
-var Golfer = models.Golfer;
 
 var DAYS = 4;
 
@@ -81,8 +80,8 @@ var UpdateScore = {
 
       // Ensure golfers
       var promises1 = _.map(tourney.golfers, function (p) {
-        return Golfer.update(
-          { name: p.golfer },
+        return Tourney.update(
+          { _id: config.tourney_id, golfers: { name: p.golfer } },
           { $set: { name: p.golfer } },
           { upsert: true }
         )
@@ -92,20 +91,18 @@ var UpdateScore = {
       // Ensure tourney/par
       console.log("ensuring tourney par: " + tourney.par + ", " + config.tourney_id);
       promises1.push(Tourney.update(
-        {_id: config.tourney_id},
-        {par: tourney.par}
+        { _id: config.tourney_id},
+        { par: tourney.par},
+        { upsert: true }
       ));
 
       return Promise.all(promises1)
       .then(function () {
-        return Promise.all([
-          Golfer.find().exec(),
-          Tourney.findOne({'_id': config.tourney_id}).lean().exec()
-        ]);
+        return Tourney.findOne({ _id: config.tourney_id }).exec();
       })
-      .then(function (results) {
-        var gs = results[0];
-        var scoreOverrides = results[1].scoreOverrides;
+      .then(function (tourney) {
+        var gs = tourney.golfers;
+        var scoreOverrides = tourney.scoreOverrides;
 
         // BUild scores with golfer id
         var golfersByName = _.indexBy(gs, "name");

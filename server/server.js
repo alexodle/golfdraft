@@ -21,9 +21,6 @@ var config = require('./config');
 var redis = require("./redis");
 var redisCli = redis.client;
 
-var Golfer = models.Golfer;
-var Player = models.Player;
-var Draft = models.Draft;
 var Tourney = models.Tourney;
 
 mongoose.set('debug', true);
@@ -78,23 +75,15 @@ db.once('open', function callback () {
   });
 
   app.get('/', function (req, res) {
-    var promises = [
-      Golfer.find().exec(),
-      Player.find().exec(),
-      Draft.findOne({'_id': config.draft_id}).exec(),
-      Tourney.findOne({'_id': config.tourney_id}).exec()
-    ];
-    Promise.all(promises).done(function (results) {
-      var golfers = results[0];
-      var players = results[1];
-      var draft = results[2];
-      var tourney = results[3];
-
+    Tourney.findOne({'_id': config.tourney_id}).exec()
+    .then(function (tourney) {
       res.render('index', {
-        golfers: JSON.stringify(golfers),
-        players: JSON.stringify(players),
-        draft: JSON.stringify(draft),
-        tourney: JSON.stringify(tourney),
+        golfers: JSON.stringify(tourney.golfers),
+        players: JSON.stringify(tourney.players),
+        draft: JSON.stringify(tourney.draft),
+        tourney: JSON.stringify(_.pick(tourney,
+          "scores", "name", "par", "lastUpdated", "yahooUrl"
+        )),
         user: JSON.stringify(req.session.user),
         prod: config.prod
       });
@@ -139,18 +128,25 @@ db.once('open', function callback () {
       player: new ObjectId(body.player),
       golfer: new ObjectId(body.golfer)
     };
-    var draftQuery = { _id: config.draft_id };
+    var draftQuery = { _id: config.tourney_id };
 
-    draftQuery['picks.' + pick.pickNumber] = { $exists: false };
+    draftQuery['draft.picks.' + pick.pickNumber] = { $exists: false };
     if (pick.pickNumber > 0) {
-      draftQuery['picks.' + (pick.pickNumber - 1)] = { $exists: true };
+      draftQuery['draft.picks.' + (pick.pickNumber - 1)] = { $exists: true };
     }
 
-    draftQuery['pickOrder.' + pick.pickNumber] = pick.player;
+    draftQuery['draft.pickOrder.' + pick.pickNumber] = pick.player;
 
-    draftQuery.picks = { $not: { $elemMatch: { golfer: pick.golfer } } };
+    draftQuery.golfers = {
+       $elemMatch: { _id: pick.golfer }
+    };
+    draftQuery['draft.picks'] = {
+      $not: { $elemMatch: { golfer: pick.golfer } }
+    };
 
-    Draft.findOneAndUpdate(draftQuery, { $push: { picks: pick } }, {},
+    console.log(JSON.stringify(draftQuery));
+    Tourney.findOneAndUpdate(draftQuery,
+      { $push: { "draft.picks": pick } }, {},
       function (err, result) {
         if (!result) {
           res.send(400, 'Invalid pick');
@@ -160,8 +156,9 @@ db.once('open', function callback () {
           res.send(500, err);
           return;
         }
+        console.log("hihi result: " + JSON.stringify(result));
         io.sockets.emit('change:draft', {
-          data: result,
+          data: result.draft,
           evType: 'change:draft',
           action: 'draft:pick'
         });

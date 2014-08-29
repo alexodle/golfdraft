@@ -1,8 +1,6 @@
 var config = require('./config');
 var updateScore = require('./update_score');
 var mongoose = require('mongoose');
-var models = require('./models');
-var Tourney = models.Tourney;
 var redis = require("./redis");
 var redisCli = redis.client;
 
