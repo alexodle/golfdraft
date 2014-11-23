@@ -1,8 +1,8 @@
 /** @jsx React.DOM */
 'use strict';
 
-var React = require('react/addons');
-var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
+var React = require('react');
+var ReactCSSTransitionGroup = require('react/lib/ReactCSSTransitionGroup');
 var _ = require('underscore');
 
 var PlayerStore = require('../stores/PlayerStore');
@@ -18,22 +18,20 @@ var DraftHistory = React.createClass({
         <h2>Draft history</h2>
         <table className='table'>
           <thead><tr><th>#</th><th>Pool Player</th><th>Golfer</th></tr></thead>
-          <tbody>
-            <ReactCSSTransitionGroup
-              transitionName="table"
-              component={React.DOM.tbody}
-            >
-              {_.map(draftPicks, function (p) {
-                return (
-                  <tr key={p.pickNumber}>
-                    <td>{p.pickNumber + 1}</td>
-                    <td>{PlayerStore.getPlayer(p.player).name}</td>
-                    <td>{GolferStore.getGolfer(p.golfer).name}</td>
-                  </tr>
-                );
-              })}
-            </ReactCSSTransitionGroup>
-          </tbody>
+          <ReactCSSTransitionGroup
+            transitionName="tablerow"
+            component={React.DOM.tbody}
+          >
+            {_.map(draftPicks, function (p) {
+              return (
+                <tr key={p.pickNumber}>
+                  <td>{p.pickNumber + 1}</td>
+                  <td>{PlayerStore.getPlayer(p.player).name}</td>
+                  <td>{GolferStore.getGolfer(p.golfer).name}</td>
+                </tr>
+              );
+            })}
+          </ReactCSSTransitionGroup>
         </table>
       </div>
     );
