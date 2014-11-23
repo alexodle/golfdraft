@@ -15,8 +15,8 @@ var SoundToggle = React.createClass({
   render: function () {
     var playSounds = this.props.playSounds;
     var ico = playSounds ? 'fa-bell-o' : 'fa-bell-slash-o';
-    return this.transferPropsTo(
-      <span>
+    return (
+      <span {...this.props}>
         <i onClick={this._togglePlaySounds} className={'fa ' + ico} />
       </span>
     );

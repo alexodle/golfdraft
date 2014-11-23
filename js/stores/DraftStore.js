@@ -1,7 +1,6 @@
 'use strict';
 
-var merge = require('react/lib/merge');
-var _ = require('underscore');
+ var _ = require('underscore');
 var $ = require('jquery');
 
 var Store = require('./Store');
@@ -22,14 +21,14 @@ function getCurrentPick() {
 }
 
 function addPick(golfer) {
-  var pick = merge(getCurrentPick(), {
+  var pick =  _.extend({}, getCurrentPick(), {
     golfer: golfer
   });
   _picks.push(pick);
   return pick;
 }
 
-var DraftStore = merge(Store.prototype, {
+var DraftStore =  _.extend({}, Store.prototype, {
 
   changeEvent: 'DraftStore:change',
 

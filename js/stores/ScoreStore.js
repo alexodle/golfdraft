@@ -1,7 +1,6 @@
 'use strict';
 
-var merge = require('react/lib/merge');
-var _ = require('underscore');
+ var _ = require('underscore');
 
 var Store = require('./Store');
 var AppDispatcher = require('../dispatcher/AppDispatcher');
@@ -12,7 +11,7 @@ var ScoreLogic = require('../logic/ScoreLogic');
 var _scores = {};
 var _lastUpdated = null;
 
-var ScoreStore = merge(Store.prototype, {
+var ScoreStore =  _.extend({}, Store.prototype, {
 
   changeEvent: 'ScoreStore:change',
 

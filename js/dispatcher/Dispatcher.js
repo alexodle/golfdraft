@@ -22,7 +22,7 @@
  */
 
 var Promise = require('es6-promise').Promise;
-var merge = require('react/lib/merge');
+ var _ = require('underscore');
 
 var _callbacks = [];
 var _promises = [];
@@ -50,7 +50,7 @@ var _clearPromises = function() {
 };
 
 var Dispatcher = function() {};
-Dispatcher.prototype = merge(Dispatcher.prototype, {
+Dispatcher.prototype =  _.extend({}, Dispatcher.prototype, {
 
   /**
    * Register a Store's callback so that it may be invoked by an action.
@@ -81,7 +81,7 @@ Dispatcher.prototype = merge(Dispatcher.prototype, {
    *
    * Example usage where StoreB waits for StoreA:
    *
-   *   var StoreA = merge(EventEmitter.prototype, {
+   *   var StoreA =  _.extend({}, EventEmitter.prototype, {
    *     // other methods omitted
    *
    *     dispatchIndex: Dispatcher.register(function(payload) {
@@ -89,7 +89,7 @@ Dispatcher.prototype = merge(Dispatcher.prototype, {
    *     })
    *   }
    *
-   *   var StoreB = merge(EventEmitter.prototype, {
+   *   var StoreB =  _.extend({}, EventEmitter.prototype, {
    *     // other methods omitted
    *
    *     dispatchIndex: Dispatcher.register(function(payload) {

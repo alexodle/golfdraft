@@ -18,10 +18,7 @@ var DraftHistory = React.createClass({
         <h2>Draft history</h2>
         <table className='table'>
           <thead><tr><th>#</th><th>Pool Player</th><th>Golfer</th></tr></thead>
-          <ReactCSSTransitionGroup
-            transitionName="tablerow"
-            component={React.DOM.tbody}
-          >
+          <ReactCSSTransitionGroup transitionName="tablerow" component="tbody">
             {_.map(draftPicks, function (p) {
               return (
                 <tr key={p.pickNumber}>

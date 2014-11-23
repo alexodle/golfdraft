@@ -19,10 +19,9 @@
  */
 
 var Dispatcher = require('./Dispatcher');
+var _ = require('underscore');
 
-var merge = require('react/lib/merge');
-
-var AppDispatcher = merge(Dispatcher.prototype, {
+var AppDispatcher =  _.extend({}, Dispatcher.prototype, {
 
   /**
    * A bridge function between the views and the dispatcher, marking the action

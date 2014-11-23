@@ -29,7 +29,7 @@ var App = require('./components/App.jsx');
 var DraftActions = require('./actions/DraftActions');
 var ScoreActions = require('./actions/ScoreActions');
 
-React.renderComponent(
+React.render(
   (<div className="container">
     <div className="row">
       <div className="col-md-offset-1 col-md-10">

@@ -1,12 +1,11 @@
 'use strict';
 
 var Store = require('./Store');
-var merge = require('react/lib/merge');
-var _ = require('underscore');
+ var _ = require('underscore');
 
 var _players = {};
 
-var PlayerStore = merge(Store.prototype, {
+var PlayerStore =  _.extend({}, Store.prototype, {
 
   changeEvent: 'PlayerStore:change',
 

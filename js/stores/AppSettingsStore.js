@@ -1,7 +1,6 @@
 'use strict';
 
-var merge = require('react/lib/merge');
-var _ = require('underscore');
+ var _ = require('underscore');
 
 var Store = require('./Store');
 var AppDispatcher = require('../dispatcher/AppDispatcher');
@@ -9,7 +8,7 @@ var AppConstants = require('../constants/AppConstants');
 
 var _playSounds = true;
 
-var AppSettingsStore = merge(Store.prototype, {
+var AppSettingsStore =  _.extend({}, Store.prototype, {
 
   changeEvent: 'AppSettingsStore:change',
 

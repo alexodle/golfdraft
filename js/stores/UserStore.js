@@ -1,7 +1,6 @@
 'use strict';
 
-var merge = require('react/lib/merge');
-var _ = require('underscore');
+ var _ = require('underscore');
 var $ = require('jquery');
 
 var Store = require('./Store');
@@ -11,7 +10,7 @@ var AppConstants = require('../constants/AppConstants');
 var _currentUser = null;
 var _users = {};
 
-var UserStore = merge(Store.prototype, {
+var UserStore =  _.extend({}, Store.prototype, {
 
   changeEvent: 'UserStore:change',
 
