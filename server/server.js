@@ -44,8 +44,7 @@ app.engine('handlebars', exphbs({
 app.set('view engine', 'handlebars');
 
 // Static routes
-app.use('/distd', express.static(__dirname + '/../distd'));
-app.use('/css', express.static(__dirname + '/../css'));
+app.use('/', express.static(__dirname + '/../distd'));
 app.use('/assets', express.static(__dirname + '/../assets'));
 
 // Parsing

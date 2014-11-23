@@ -3,12 +3,14 @@
   "main": "js/app.js",
   "dependencies": {
     "body-parser": "^1.2.0",
+    "bootstrap": "^3.3.1",
     "connect-redis": "^2.0.0",
     "cookie-parser": "^1.1.0",
     "es6-promise": "^1.0.0",
     "express": "^4.2.0",
     "express-session": "^1.1.0",
     "express3-handlebars": "^0.5.0",
+    "font-awesome": "^4.2.0",
     "hiredis": "^0.1.16",
     "jquery": "^2.1.1",
     "jsdom": "^0.10.5",
@@ -28,14 +30,19 @@
     "underscore": "^1.6.0"
   },
   "devDependencies": {
+    "css-loader": "^0.9.0",
+    "file-loader": "^0.8.1",
     "grunt": "^0.4.4",
     "grunt-contrib-clean": "^0.5.0",
     "grunt-webpack": "^1.0.8",
+    "json-loader": "^0.5.1",
+    "jsx-loader": "0.10.0",
     "load-grunt-tasks": "^0.4.0",
+    "style-loader": "^0.8.2",
     "time-grunt": "^0.3.1",
+    "url-loader": "^0.5.5",
     "webpack": "^1.4.13",
-    "webpack-dev-server": "^1.6.6",
-    "jsx-loader": "0.10.0"
+    "webpack-dev-server": "^1.6.6"
   },
   "scripts": {
     "start": "node server/server.js",
