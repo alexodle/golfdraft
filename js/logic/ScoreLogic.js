@@ -23,7 +23,9 @@ function playerScore(playerGolfers, scores, player) {
   var scoresByGolfer = _.chain(playerGolfers)
     .map(function (g) {
       return _.extend({}, scores[g], {
-        total: _.reduce(scores[g].scores, function (n, s) { return n + s; }, 0)
+        total: _.reduce(scores[g].scores, function (n, s) {
+          return n + s;
+        }, 0)
       });
     })
     .indexBy("golfer")
@@ -31,8 +33,12 @@ function playerScore(playerGolfers, scores, player) {
 
   var scoresByDay = _.map(_.range(ndays), function (day) {
     var dayScores = _.chain(playerGolfers)
-      .map(function (g) { return scores[g]; })
-      .sortBy(function (s) { return s.scores[day]; })
+      .map(function (g) {
+        return scores[g];
+      })
+      .sortBy(function (s) {
+        return s.scores[day];
+      })
       .value();
     var usedScores = _.first(dayScores, 2);
 
@@ -41,8 +47,8 @@ function playerScore(playerGolfers, scores, player) {
       allScores: dayScores,
       usedScores: usedScores,
       total: _.reduce(usedScores, function (n, s) {
-          return n + s.scores[day];
-        }, 0)
+        return n + s.scores[day];
+      }, 0)
     };
   });
 
@@ -50,8 +56,22 @@ function playerScore(playerGolfers, scores, player) {
     player: player,
     scoresByDay: scoresByDay,
     scoresByGolfer: scoresByGolfer,
-    total: _.reduce(scoresByDay, function (n, s) { return n + s.total; }, 0)
+    total: _.reduce(scoresByDay, function (n, s) {
+      return n + s.total;
+    }, 0)
   };
+}
+
+function worstScore(scores, day) {
+  var score = _.chain(scores)
+    .filter(function (s) {
+      return s.scores[day] !== "MC";
+    })
+    .max(function (s) {
+      return s.scores[day];
+    })
+    .value();
+  return score.scores[day];
 }
 
 var ScoreLogic = {
@@ -70,6 +90,22 @@ var ScoreLogic = {
       .value();
 
     return playerScores;
+  },
+
+  fillMissedCutScores: function (scores) {
+    var worstScores = _.chain(scores[0].scores.length)
+      .range()
+      .map(_.partial(worstScore, scores))
+      .value();
+    _.each(scores, function (s) {
+      s.missedCuts = _.map(s.scores, function (s) {
+        return s === "MC";
+      });
+      s.scores = _.map(s.scores, function (s, i) {
+        return s === "MC" ? worstScores[i] : s;
+      });
+    });
+    return scores;
   }
 
 };

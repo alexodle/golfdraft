@@ -1,4 +1,4 @@
-var updater = require('../server/update_score.js');
+var updater = require('../server/update_score');
 var should = require('should');
 
 describe('update_score', function () {

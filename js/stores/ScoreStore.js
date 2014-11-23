@@ -6,31 +6,11 @@ var _ = require('underscore');
 var Store = require('./Store');
 var AppDispatcher = require('../dispatcher/AppDispatcher');
 var ScoreConstants = require('../constants/ScoreConstants');
+var ScoreLogic = require('../logic/ScoreLogic');
 
 // Indexed by golfer id
 var _scores = {};
 var _lastUpdated = null;
-
-// TODO - Move to ScoreLogic
-function fillMissedCutScores(scores) {
-  function worstScore(day) {
-    var score = _.chain(scores)
-      .filter(function (s) { return s.scores[day] !== "MC"; })
-      .max(function (s) { return s.scores[day]; })
-      .value();
-    return score.scores[day];
-  }
-  var worstScores = _.map(_.range(scores[0].scores.length), worstScore);
-  _.each(scores, function (s) {
-    s.missedCuts = _.map(s.scores, function (s) {
-      return s === "MC";
-    });
-    s.scores = _.map(s.scores, function (s, i) {
-      return s === "MC" ? worstScores[i] : s;
-    });
-  });
-  return scores;
-}
 
 var ScoreStore = merge(Store.prototype, {
 
@@ -52,7 +32,7 @@ AppDispatcher.register(function (payload) {
 
   switch(action.actionType) {
     case ScoreConstants.SCORE_UPDATE:
-      var scores = fillMissedCutScores(action.scores);
+      var scores = ScoreLogic.fillMissedCutScores(action.scores);
 
       _scores = _.indexBy(scores, "golfer");
       _lastUpdated = action.lastUpdated;
