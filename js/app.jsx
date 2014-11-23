@@ -32,7 +32,7 @@ React.renderComponent(
       </div>
     </div>
   </div>),
-  document.getElementById('todoapp')
+  document.getElementById('golfdraftapp')
 );
 
 // TODO - Move

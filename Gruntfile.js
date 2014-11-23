@@ -7,47 +7,39 @@ module.exports = function (grunt) {
   // Time how long tasks take. Can help when optimizing build times
   require('time-grunt')(grunt);
 
+  var webpack = require('webpack');
+
   grunt.initConfig({
 
     clean: {
-      dist: {
-        src: 'dist'
+      dev: {
+        src: 'distd'
       }
     },
 
-    browserify: {
-      dist: {
-        files: { 'dist/bundle.js': 'js/app.jsx' }
-      },
-      options: {
-        transform: [ require('grunt-react').browserify ]
-      }
-    },
+    webpack: {
+      options: require('./webpackConfig'),
 
-    uglify: {
-      dist: {
-        files: { 'dist/bundle.min.js': 'dist/bundle.js' }
-      }
-    },
-
-    watch: {
-      bundle: {
-        files: ['js/**/*.js', 'js/**/*.jsx'],
-        tasks: ['build']
+      dev: {
+        output: {
+          path: "./distd/",
+          filename: "bundle.js"
+        },
+        devtool: "eval", // Fast rebuild
+        watch: true,
+        keepalive: true
       }
     }
 
   });
 
-  grunt.registerTask('build', [
-    'clean:dist',
-    'browserify:dist',
-    'uglify:dist'
+  grunt.registerTask('buildd', [
+    'clean:dev',
+    'webpack:dev',
   ]);
 
   grunt.registerTask('default', [
-    'build',
-    'watch'
+    'buildd'
   ]);
 
 };
