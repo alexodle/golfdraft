@@ -1,6 +1,4 @@
-node_modules/.bin/*browserify*
-node_modules/*browserify*
-node_modules/*grunt*
+node_modules
 server/*.sh
-npm-debug.log
+npm-*.log
 server/prodenv.sh
