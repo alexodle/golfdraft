@@ -21,7 +21,7 @@
 // load css right away
 require('bootstrap/dist/css/bootstrap.css');
 require('font-awesome/css/font-awesome.css');
-require('../css/app.css');
+require('../less/app.less');
 
 var React = require('react');
 
