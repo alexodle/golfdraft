@@ -39,3 +39,17 @@
 .standings-table tr:hover {
   cursor: pointer;
 }
+
+.global-sound-toggle {
+  position: absolute;
+  top: 0.2em;
+  right: 0px;
+  font-size: smaller;
+  width: 1.5em;
+  text-align: center;
+}
+
+.draft-page-header {
+  position: relative;
+  colorg
+}

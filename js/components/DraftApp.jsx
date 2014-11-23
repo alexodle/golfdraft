@@ -12,6 +12,7 @@ var DraftHistory = require("./DraftHistory.jsx");
 var DraftStatus = require("./DraftStatus.jsx");
 var DraftPickOrder = require("./DraftPickOrder.jsx");
 var LogoutButton = require("./LogoutButton.jsx");
+var SoundToggle = require("./SoundToggle.jsx");
 
 var myTurnSound = new Audio("/assets/boxing_bell_multiple.wav");
 var pickMadeSound = new Audio("/assets/boxing_bell.wav");
@@ -56,16 +57,14 @@ var DraftApp = React.createClass({
 
     return (
       <section>
-        <div className="page-header">
-          <h1>Welcome to the 2014 U.S. Open Draft <small>
-            {this.props.currentUser.name}</small>
+        <div className="page-header draft-page-header">
+          <h1>Welcome to the 2014 U.S. Open Draft
+            <span> </span><small>{this.props.currentUser.name}</small>
+            <SoundToggle
+              className="global-sound-toggle"
+              playSounds={this.props.playSounds}
+            />
           </h1>
-
-          <span onClick={this._togglePlaySounds}>
-            {this.props.playSounds ?
-              "Playing sounds" :
-              "Not playing sounds"}
-          </span>
 
           <div className="logout-row">
             <LogoutButton currentUser={this.props.currentUser} />
@@ -92,10 +91,6 @@ var DraftApp = React.createClass({
         </div>
       </section>
     );
-  },
-
-  _togglePlaySounds: function () {
-    SettingsActions.setPlaySounds(!this.props.playSounds);
   }
 
 });

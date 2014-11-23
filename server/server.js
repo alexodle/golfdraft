@@ -6,7 +6,6 @@ var express = require('express');
 var app = express();
 var mongoose = require('mongoose');
 var exphbs  = require('express3-handlebars');
-var Promise = require('promise');
 var bodyParser = require('body-parser');
 var _ = require('underscore');
 var models = require('./models');

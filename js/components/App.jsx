@@ -33,7 +33,7 @@ function getAppState() {
     lastScoresUpdate: ScoreStore.getLastUpdated(),
 
     playSounds: AppSettingsStore.getPlaySounds()
-  }
+  };
 }
 
 var App = React.createClass({
