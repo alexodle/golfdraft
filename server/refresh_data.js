@@ -1,7 +1,7 @@
 'use strict';
 
 var Promise = require('promise');
-var _ = require('underscore');
+var _ = require('lodash');
 var models = require('./models');
 var mongoose = require('mongoose');
 var config = require('./config');
