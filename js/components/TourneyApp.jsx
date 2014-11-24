@@ -3,7 +3,7 @@
 
 var React = require('react');
 var ReactPropTypes = React.PropTypes;
-var _ = require('underscore');
+var _ = require('lodash');
 var moment = require('moment');
 
 var ScoreLogic = require('../logic/ScoreLogic');

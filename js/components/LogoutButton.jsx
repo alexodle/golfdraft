@@ -2,7 +2,7 @@
 "use strict";
 
 var React = require("react");
-var _ = require("underscore");
+var _ = require("lodash");
 
 var UserActions = require("../actions/UserActions");
 

@@ -1,7 +1,7 @@
 'use strict';
 
 var Store = require('./Store');
- var _ = require('underscore');
+ var _ = require('lodash');
 
 var _players = {};
 

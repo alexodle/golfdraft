@@ -1,6 +1,6 @@
 var jsdom = require('jsdom');
 var Promise = require('promise');
-var _ = require('underscore');
+var _ = require('lodash');
 
 var YSURL = "http://sports.yahoo.com/golf/pga/leaderboard";
 

@@ -19,7 +19,7 @@
  */
 
 var Dispatcher = require('./Dispatcher');
-var _ = require('underscore');
+var _ = require('lodash');
 
 var AppDispatcher =  _.extend({}, Dispatcher.prototype, {
 

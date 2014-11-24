@@ -4,7 +4,7 @@
 var React = require("react");
 var ReactPropTypes = React.PropTypes;
 var cx = require('react/lib/cx');
-var _ = require("underscore");
+var _ = require("lodash");
 var utils = require("../utils");
 
 var PlayerStore = require('../stores/PlayerStore');

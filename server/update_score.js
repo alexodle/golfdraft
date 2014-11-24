@@ -1,7 +1,7 @@
 'use strict';
 
 var Promise = require('promise');
-var _ = require('underscore');
+var _ = require('lodash');
 
 var YahooReader = require('./yahoo_reader');
 var models = require('./models');
