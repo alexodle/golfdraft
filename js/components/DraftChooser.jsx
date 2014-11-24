@@ -7,12 +7,8 @@ var _ = require('lodash');
 var PlayerStore = require('../stores/PlayerStore');
 var DraftActions = require('../actions/DraftActions');
 
-function sortedGolfers(golfers) {
-  var sortedGolfers = _.chain(golfers)
-    .values()
-    .sortBy(function (g) { return g.name; })
-    .value();
-  return sortedGolfers;
+function getSortedGolfers(golfers) {
+  return _.sortBy(golfers, 'name');
 }
 
 var DraftChooser = React.createClass({
@@ -27,11 +23,7 @@ var DraftChooser = React.createClass({
   },
 
   render: function () {
-    var options = _.chain(sortedGolfers(this.props.golfersRemaining))
-      .map(function (g) {
-        return (<option key={g.id} value={g.id}>{g.name}</option>);
-      })
-      .value();
+    var sortedGolfers = getSortedGolfers(this.props.golfersRemaining);
     return (
       <div>
         <div className="panel panel-default">
@@ -46,7 +38,9 @@ var DraftChooser = React.createClass({
                   size="10"
                   className="form-control"
                 >
-                  {options}
+                  {_.map(sortedGolfers, function (g) {
+                    return (<option key={g.id} value={g.id}>{g.name}</option>);
+                  })}
                 </select>
               </div>
               <button
@@ -65,7 +59,7 @@ var DraftChooser = React.createClass({
   _getState: function (golfersRemaining) {
     var selectedGolfer = (this.state || {}).selectedGolfer;
     if (!selectedGolfer || !golfersRemaining[selectedGolfer]) {
-      selectedGolfer = sortedGolfers(golfersRemaining)[0].id;
+      selectedGolfer = _.first(getSortedGolfers(golfersRemaining)).id;
     }
     return {selectedGolfer: selectedGolfer};
   },

@@ -22,7 +22,7 @@
  */
 
 var Promise = require('es6-promise').Promise;
- var _ = require('lodash');
+var _ = require('lodash');
 
 var _callbacks = [];
 var _promises = [];

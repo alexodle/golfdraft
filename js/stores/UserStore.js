@@ -1,6 +1,6 @@
 'use strict';
 
- var _ = require('lodash');
+var _ = require('lodash');
 var $ = require('jquery');
 
 var Store = require('./Store');
@@ -55,13 +55,10 @@ AppDispatcher.register(function (payload) {
 
 // HACKHACK - For now users are just wrappers around players
 var PlayerStore = require('./PlayerStore');
-_users = _.chain(PlayerStore.getAll())
-  .map(function (p) {
-    var uid = 'user_' + p.id;
-    return [uid, { id: uid, name: p.name, player: p.id }];
-  })
-  .object()
-  .value();
+_users = _.transform(PlayerStore.getAll(), function (memo, p) {
+  var uid = 'user_' + p.id;
+  memo[uid] = { id: uid, name: p.name, player: p.id };
+});
 
 // HACKHACK
 _currentUser = (window.golfDraftSeed.user || {}).id;

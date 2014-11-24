@@ -1,7 +1,7 @@
 'use strict';
 
 var Store = require('./Store');
- var _ = require('lodash');
+var _ = require('lodash');
 
 var _golfers = {};
 
@@ -10,7 +10,7 @@ var GolferStore =  _.extend({}, Store.prototype, {
   changeEvent: 'GolferStore:change',
 
   getAll: function () {
-    return _.clone(_golfers);
+    return _golfers;
   },
 
   getGolfer: function (id) {

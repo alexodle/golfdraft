@@ -1,6 +1,6 @@
 'use strict';
 
- var _ = require('lodash');
+var _ = require('lodash');
 var $ = require('jquery');
 
 var Store = require('./Store');
@@ -35,11 +35,11 @@ var DraftStore =  _.extend({}, Store.prototype, {
   getCurrentPick: getCurrentPick,
 
   getPickOrder: function () {
-    return _.clone(_pickOrder);
+    return _pickOrder;
   },
 
   getDraftPicks: function () {
-    return _.clone(_picks);
+    return _picks;
   }
 
 });

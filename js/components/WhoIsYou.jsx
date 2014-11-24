@@ -8,27 +8,18 @@ var UserActions = require('../actions/UserActions');
 var UserStore = require('../stores/UserStore');
 var PlayerStore = require('../stores/PlayerStore');
 
-function sortedUsers() {
-  var sortedUsers = _.chain(UserStore.getAll())
-    .values()
-    .sortBy(function (u) {
-      return u.name;
-    })
-    .value();
-  return sortedUsers;
+function getSortedUsers() {
+  return _.sortBy(UserStore.getAll(), 'name');
 }
 
 var WhoIsYou = React.createClass({
 
   getInitialState: function () {
-    var selectedUser = sortedUsers()[0].id;
+    var selectedUser = getSortedUsers()[0].id;
     return { selectedUser: selectedUser };
   },
 
   render: function () {
-    var options = _.map(sortedUsers(), function (u) {
-      return (<option key={u.id} value={u.id}>{u.name}</option>);
-    });
     return (
       <div>
         <h2>Who is you?</h2>
@@ -43,7 +34,9 @@ var WhoIsYou = React.createClass({
                   size="15"
                   className="form-control"
                 >
-                  {options}
+                  {_.map(getSortedUsers(), function (u) {
+                    return (<option key={u.id} value={u.id}>{u.name}</option>);
+                  })}
                 </select>
               </div>
               <button

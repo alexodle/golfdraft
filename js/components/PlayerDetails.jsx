@@ -29,21 +29,15 @@ var PlayerDetails = React.createClass({
     var playerRank = _.sortedIndex(sortedScores, playerScore.total);
     var isTied = sortedScores[playerRank + 1] === playerScore.total;
 
-    var golferScores = _.chain(playerScore.scoresByGolfer)
-      .values()
-      .sortBy(function (gs) { return gs.total; })
-      .value();
-
-    var trs = _.map(_.values(golferScores), function (gs) {
+    var golferScores = _.sortBy(playerScore.scoresByGolfer, 'total');
+    var trs = _.map(golferScores, function (gs) {
       return (
         <tr key={gs.golfer}>
           <td>{GolferStore.getGolfer(gs.golfer).name}</td>
           <td>{gs.total}</td>
           {_.map(gs.scores, function (s, i) {
             var missedCut = gs.missedCuts[i];
-            var scoreUsed = _.some(scoresByDay[i].usedScores, function (s) {
-              return s.golfer === gs.golfer;
-            });
+            var scoreUsed = _.some(scoresByDay[i].usedScores, { golfer: s.golfer });
             return (
               <td
                 className={cx({

@@ -19,14 +19,11 @@ var PlayerStandings = React.createClass({
   },
 
   render: function () {
-    var playerScores = _.chain(this.props.playerScores)
-      .values()
-      .sortBy(function (ps) { return ps.total; })
-      .value();
-    var playerTotals = _.pluck(playerScores, "total");
+    var playerScores = _.sortBy(this.props.playerScores, 'total');
+    var playerTotals = _.pluck(playerScores, 'total');
     var topScore = playerTotals[0];
 
-    var trs = _.map(playerScores, function (ps, i) {
+    var trs = _.map(playerScores, function (ps) {
       var p = PlayerStore.getPlayer(ps.player);
       var playerIsMe = this.props.currentUser.player === p.id;
       var playerIsSelected = this.props.selectedPlayer === p.id;

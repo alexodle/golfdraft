@@ -21,7 +21,7 @@ var DraftPickOrder = React.createClass({
     var myPlayer = this.props.currentUser.player;
     var currentPlayer = this.props.currentPick.player;
     var pickOrder = DraftStore.getPickOrder();
-    pickOrder = _.first(pickOrder, pickOrder.length / 4)
+    pickOrder = _.first(pickOrder, pickOrder.length / 4);
     return (
       <div>
         <h2>Pick order</h2>

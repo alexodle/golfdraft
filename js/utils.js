@@ -1,15 +1,17 @@
 var _ = require('lodash');
 
-var utils = {
+_.mixin({
 
-  transpose: function (a) {
-    if (!a.length) {
-      return a;
-    }
-    return Object.keys(a[0]).map(function (c) {
-      return a.map(function (r) { return r[c]; });
-    });
-  },
+  sum: function (arr, it, context) {
+    it = _.createCallback(it);
+    return _.reduce(arr, function (memo, value, index, list) {
+      return memo + it.call(context, value, index, list);
+    }, 0, context);
+  }
+
+});
+
+var utils = {
 
   getOrdinal: function (n) {
     var s=["th","st","nd","rd"],

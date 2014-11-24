@@ -4,68 +4,65 @@ var _ = require('lodash');
 
 var utils = require('../utils');
 
+// TODO - Define this somewhere
+var NDAYS = 4;
+
 function getGolfersByPlayer(draftPicks) {
   return _.chain(draftPicks)
-    .groupBy(function (pick) { return pick.player; })
-    .map(function (picks, playerId) {
-      return [playerId, _.map(picks, function (pick) {
-        return pick.golfer;
-      })];
+    .groupBy('player')
+    .transform(function (memo, picks, playerId) {
+      memo[memo] = _.pluck(picks, 'golfer');
     })
-    .object()
     .value();
 }
 
 function playerScore(playerGolfers, scores, player) {
-  // TODO - Define this somewhere
-  var ndays = 4;
 
   var scoresByGolfer = _.chain(playerGolfers)
     .map(function (g) {
       return _.extend({}, scores[g], {
-        total: _.reduce(scores[g].scores, function (n, s) {
-          return n + s;
-        }, 0)
+        total: _.sum(scores[g].scores)
       });
     })
-    .indexBy("golfer")
+    .indexBy('golfer')
     .value();
 
-  var scoresByDay = _.map(_.range(ndays), function (day) {
-    var dayScores = _.chain(playerGolfers)
-      .map(function (g) {
-        return scores[g];
-      })
-      .sortBy(function (s) {
-        return s.scores[day];
-      })
-      .value();
-    var usedScores = _.first(dayScores, 2);
+  var scoresByDay = _.chain(NDAYS)
+    .range()
+    .map(function (day) {
+      var dayScores = _.chain(playerGolfers)
+        .map(function (g) {
+          return scores[g];
+        })
+        .sortBy(function (s) {
+          return s.scores[day];
+        })
+        .value();
 
-    return {
-      day: day,
-      allScores: dayScores,
-      usedScores: usedScores,
-      total: _.reduce(usedScores, function (n, s) {
-        return n + s.scores[day];
-      }, 0)
-    };
-  });
+      var usedScores = _.first(dayScores, 2);
+      return {
+        day: day,
+        allScores: dayScores,
+        usedScores: usedScores,
+        total: _.sum(usedScores, function (s) {
+          return s.scores[day];
+        })
+      };
+    })
+    .value();
 
   return {
     player: player,
     scoresByDay: scoresByDay,
     scoresByGolfer: scoresByGolfer,
-    total: _.reduce(scoresByDay, function (n, s) {
-      return n + s.total;
-    }, 0)
+    total: _.sum(scoresByDay, 'total')
   };
 }
 
 function worstScore(scores, day) {
   var score = _.chain(scores)
-    .filter(function (s) {
-      return s.scores[day] !== "MC";
+    .reject(function (s) {
+      return s.scores[day] === 'MC';
     })
     .max(function (s) {
       return s.scores[day];
@@ -80,20 +77,17 @@ var ScoreLogic = {
     var golfersByPlayer = getGolfersByPlayer(draftPicks);
 
     var playerScores = _.chain(golfersByPlayer)
-      .pairs()
-      .map(function (pg) {
-        var p = pg[0];
-        var g = pg[1];
-        return playerScore(g, scores, p);
+      .map(function (golfers, player) {
+        return playerScore(golfers, scores, player);
       })
-      .indexBy("player")
+      .indexBy('player')
       .value();
 
     return playerScores;
   },
 
   fillMissedCutScores: function (scores) {
-    var worstScores = _.chain(scores[0].scores.length)
+    var worstScores = _.chain(NDAYS)
       .range()
       .map(_.partial(worstScore, scores))
       .value();
