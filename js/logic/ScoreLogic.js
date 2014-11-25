@@ -11,7 +11,7 @@ function getGolfersByPlayer(draftPicks) {
   return _.chain(draftPicks)
     .groupBy('player')
     .transform(function (memo, picks, playerId) {
-      memo[memo] = _.pluck(picks, 'golfer');
+      memo[playerId] = _.pluck(picks, 'golfer');
     })
     .value();
 }
