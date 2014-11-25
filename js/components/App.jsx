@@ -102,7 +102,7 @@ var TourneyWrapper = React.createClass({
   render: function () {
     var props = this.props;
     return (
-      <DraftApp
+      <TourneyApp
         currentUser={props.currentUser}
         scores={props.scores}
         draft={props.draft}
