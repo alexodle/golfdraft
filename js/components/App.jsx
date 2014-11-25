@@ -1,17 +1,20 @@
 /** @jsx React.DOM */
 "use strict";
 
-var React = require("react");
 var _ = require("lodash");
-
-var UserStore = require("../stores/UserStore");
-var DraftStore = require("../stores/DraftStore");
-var ScoreStore = require('../stores/ScoreStore');
 var AppSettingsStore = require('../stores/AppSettingsStore');
-
 var DraftApp = require("./DraftApp.jsx");
+var DraftStore = require("../stores/DraftStore");
+var React = require("react");
+var Router = require('react-router');
+var ScoreStore = require('../stores/ScoreStore');
 var TourneyApp = require("./TourneyApp.jsx");
+var UserStore = require("../stores/UserStore");
 var WhoIsYou = require("./WhoIsYou.jsx");
+
+var RouteHandler = Router.RouteHandler;
+var Navigation = Router.Navigation;
+var RouterState = Router.State;
 
 var RELEVANT_STORES = [
   UserStore,
@@ -36,10 +39,95 @@ function getAppState() {
   };
 }
 
-var App = React.createClass({
+function getCurrentRoute(state) {
+  state = state || getAppState();
+  if (!state.currentUser) {
+    return 'whoisyou';
+  } else if (state.draft.currentPick) {
+    return 'draft';
+  } else {
+    return 'tourney';
+  }
+}
+
+function createWillTransitionTo(allowedRoute) {
+  return function (transition) {
+    var route = getCurrentRoute();
+    if (route !== allowedRoute) {
+      transition.redirect(route);
+    }
+  };
+}
+
+var WhoIsYouWrapper = React.createClass({
+
+  statics: {
+    willTransitionTo: createWillTransitionTo('whoisyou')
+  },
+
+  render: function () {
+    return (
+      <WhoIsYou />
+    );
+  }
+
+});
+
+var DraftWrapper = React.createClass({
+
+  statics: {
+    willTransitionTo: createWillTransitionTo('draft')
+  },
+
+  render: function () {
+    var props = this.props;
+    return (
+      <DraftApp
+        playSounds={props.playSounds}
+        currentUser={props.currentUser}
+        currentPick={props.draft.currentPick}
+        draftPicks={props.draft.draftPicks}
+      />
+    );
+  }
+
+});
+
+var TourneyWrapper = React.createClass({
+
+  statics: {
+    willTransitionTo: createWillTransitionTo('tourney')
+  },
+
+  render: function () {
+    var props = this.props;
+    return (
+      <DraftApp
+        currentUser={props.currentUser}
+        scores={props.scores}
+        draft={props.draft}
+        lastScoresUpdate={props.lastScoresUpdate}
+      />
+    );
+  }
+
+});
+
+var AppNode = React.createClass({
+  mixins: [Navigation, RouterState],
 
   getInitialState: function () {
     return getAppState();
+  },
+
+  shouldComponentUpdate: function (nextProps, nextState) {
+    var currRoute = _.last(this.getRoutes()).name;
+    var newRoute = getCurrentRoute(nextState);
+    var routeChange = newRoute !== currRoute;
+    if (routeChange) {
+      this.transitionTo(newRoute);
+    }
+    return !routeChange;
   },
 
   componentDidMount: function () {
@@ -55,29 +143,7 @@ var App = React.createClass({
   },
 
   render: function () {
-    var view = null;
-    if (!this.state.currentUser) {
-      view = (<WhoIsYou />);
-    } else if (this.state.draft.currentPick) {
-      view = (
-        <DraftApp
-          playSounds={this.state.playSounds}
-          currentUser={this.state.currentUser}
-          currentPick={this.state.draft.currentPick}
-          draftPicks={this.state.draft.draftPicks}
-        />
-      );
-    } else {
-      view = (
-        <TourneyApp
-          currentUser={this.state.currentUser}
-          scores={this.state.scores}
-          draft={this.state.draft}
-          lastScoresUpdate={this.state.lastScoresUpdate}
-        />
-      );
-    }
-    return view;
+    return (<RouteHandler {...this.state} />);
   },
 
   _onChange: function () {
@@ -86,7 +152,12 @@ var App = React.createClass({
 
 });
 
-module.exports = App;
+module.exports = {
+  AppNode: AppNode,
+  WhoIsYouWrapper: WhoIsYouWrapper,
+  DraftWrapper: DraftWrapper,
+  TourneyWrapper: TourneyWrapper
+};
 
 // HACKHACK
 window.React = React;

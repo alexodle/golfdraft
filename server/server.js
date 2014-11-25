@@ -72,7 +72,7 @@ db.once('open', function callback () {
       });
   });
 
-  app.get('/', function (req, res) {
+  app.get(/\/(draft|tourney)?/, function (req, res) {
     Tourney.findOne({'_id': config.tourney_id}).exec()
     .then(function (tourney) {
       res.render('index', {
