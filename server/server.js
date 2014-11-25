@@ -2,14 +2,13 @@
 
 var port = Number(process.env.PORT || 3000);
 
+var _ = require('lodash');
 var express = require('express');
 var app = express();
 var mongoose = require('mongoose');
 var exphbs  = require('express3-handlebars');
 var bodyParser = require('body-parser');
-var _ = require('lodash');
-var models = require('./models');
-var ObjectId = mongoose.Types.ObjectId;
+var access = require('./access');
 var session = require('express-session');
 var RedisStore = require('connect-redis')(session);
 var cookieParser = require('cookie-parser');
@@ -18,9 +17,10 @@ var server = require("http").createServer(app);
 var io = require('socket.io').listen(server);
 var config = require('./config');
 var redis = require("./redis");
-var redisCli = redis.client;
+var Promise = require('promise');
 
-var Tourney = models.Tourney;
+var redisCli = redis.client;
+var ObjectId = mongoose.Types.ObjectId;
 
 mongoose.set('debug', true);
 mongoose.connect(config.mongo_url);
@@ -57,31 +57,31 @@ db.once('open', function callback () {
   redisCli.on("message", function (channel, message) {
     // Scores updated, alert clients
     console.log("redis message: channel " + channel + ": " + message);
-    Tourney.findOne({
-        '_id': config.tourney_id
-      }).exec()
-      .then(function (result) {
-        io.sockets.emit('change:scores', {
-          data: {
-            scores: result.scores,
-            lastUpdated: result.lastUpdated
-          },
-          evType: 'change:scores',
-          action: 'scores:periodic_update'
-        });
+    access.getTourney().then(function (tourney) {
+      io.sockets.emit('change:scores', {
+        data: {
+          scores: tourney.scores,
+          lastUpdated: tourney.lastUpdated
+        },
+        evType: 'change:scores',
+        action: 'scores:periodic_update'
       });
+    });
   });
 
   app.get(/\/(draft|tourney)?/, function (req, res) {
-    Tourney.findOne({'_id': config.tourney_id}).exec()
-    .then(function (tourney) {
+    Promise.all([
+      access.getGolfers(),
+      access.getPlayers(),
+      access.getDraft(),
+      access.getTourney()
+    ])
+    .then(function (results) {
       res.render('index', {
-        golfers: JSON.stringify(tourney.golfers),
-        players: JSON.stringify(tourney.players),
-        draft: JSON.stringify(tourney.draft),
-        tourney: JSON.stringify(_.pick(tourney,
-          "scores", "name", "par", "lastUpdated", "yahooUrl"
-        )),
+        golfers: JSON.stringify(results[0]),
+        players: JSON.stringify(results[1]),
+        draft: JSON.stringify(results[2]),
+        tourney: JSON.stringify(results[3]),
         user: JSON.stringify(req.session.user),
         prod: config.prod
       });

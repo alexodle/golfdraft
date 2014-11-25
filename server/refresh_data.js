@@ -1,19 +1,17 @@
 'use strict';
 
-var Promise = require('promise');
 var _ = require('lodash');
-var models = require('./models');
-var mongoose = require('mongoose');
+var access = require('./access');
 var config = require('./config');
+var mongoose = require('mongoose');
+var Promise = require('promise');
 var updateScore = require('./update_score');
 
-var Tourney = models.Tourney;
-
+mongoose.set('debug', true);
 mongoose.connect(config.mongo_url);
 
 function printState() {
-  return Promise.all([Tourney.findOne({_id: config.tourney_id}).exec()
-  .then(function (tourney) {
+  return access.getTourney().then(function (tourney) {
     console.log("BEGIN Logging current state...");
     console.log("");
     console.log("Tourney:");
@@ -21,7 +19,7 @@ function printState() {
     console.log("");
     console.log("END Logging current state...");
     console.log("");
-  })]);
+  });
 }
 
 function refreshData(pickOrderNames, yahooUrl) {
@@ -36,15 +34,7 @@ function refreshData(pickOrderNames, yahooUrl) {
   printState()
   .then(function () {
     console.log("Clearing current state");
-    return Tourney.update({_id: config.tourney_id}, {$set: {
-      players: [],
-      golfers: [],
-      draft: {},
-      scores: [],
-      scoreOverrides: [],
-      par: -1,
-      yahooUrl: yahooUrl
-    }}).exec();
+    return access.resetTourney();
   })
   .then(function () {
     console.log("Adding players");
@@ -52,32 +42,27 @@ function refreshData(pickOrderNames, yahooUrl) {
     var players = _.map(pickOrderNames, function (name) {
       return {name: name};
     });
-    return Tourney.update({_id: config.tourney_id}, {$set: {
-      players: players,
-
-      // TEMP TEMP HIHI
-      golfers: _.map(
-        ["Tiger Woods", "Phil Mickelson", "Padraig Harrington", "Kevin Na", "Sergio Garcia"], function (name) { return { name: name }; })
-    }}).exec();
+    return access.addPlayers(players);
   })
   .then(function () {
-    return Tourney.findOne({_id: config.tourney_id}).exec().then(function (r) {
-      return _.sortBy(r.players, function (p) {
+    return access.getPlayers().then(function (players) {
+      return _.sortBy(players, function (p) {
         return _.indexOf(pickOrderNames, p.name);
       });
     });
   })
-  .then(function (players) {
+  .then(function (sortedPlayers) {
     console.log("Updating pickOrder");
-    var ps = players;
+    var ps = sortedPlayers;
     var rps = _.clone(ps).reverse();
-    var pickOrder = _.flatten([ps, rps, ps, rps]);
-    return Tourney.update({_id: config.tourney_id}, {$set: {
-      draft: {
-        pickOrder: _.pluck(pickOrder, "_id"),
-        picks: []
-      }
-    }}).exec();
+    var pickOrderPlayers = _.flatten([ps, rps, ps, rps]);
+    var pickOrder = _.map(pickOrderPlayers, function (p, i) {
+      return {
+        pickNumber: i,
+        player: p._id
+      };
+    });
+    return access.setPickOrder(pickOrder);
   })
   .then(function () {
     console.log("END Refreshing all data...");
@@ -85,7 +70,7 @@ function refreshData(pickOrderNames, yahooUrl) {
   .then(printState)
   .then(function () {
     console.log("BEGIN Updating scores");
-    return updateScore.run().then(function () {
+    return updateScore.run(yahooUrl).then(function () {
       console.log("END Updating scores");
     });
   })
@@ -106,5 +91,5 @@ db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function callback () {
   refreshData([
     'Alex O',
-  ], 'http://sports.yahoo.com/golf/pga/leaderboard');
+  ], 'http://sports.yahoo.com/golf/pga/leaderboard/2015/360');
 });

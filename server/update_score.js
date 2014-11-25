@@ -1,14 +1,13 @@
 'use strict';
 
-var Promise = require('promise');
 var _ = require('lodash');
-
-var YahooReader = require('./yahoo_reader');
-var models = require('./models');
+var access = require('./access');
 var config = require('./config');
-var Tourney = models.Tourney;
+var constants = require('../common/constants');
+var Promise = require('promise');
+var YahooReader = require('./yahoo_reader');
 
-var DAYS = 4;
+var DAYS = constants.NDAYS;
 
 var UpdateScore = {
 
@@ -71,42 +70,44 @@ var UpdateScore = {
     return newScores;
   },
 
-  run: function () {
-    return YahooReader.run().then(function (tourney) {
+  run: function (yahooUrl) {
+    return YahooReader.run(yahooUrl).then(function (yahooTourney) {
       // Quick assertion of data
-      if (!tourney || !UpdateScore.validate(tourney)) {
+      if (!yahooTourney || !UpdateScore.validate(yahooTourney)) {
         return false;
       }
 
-      // Ensure golfers
-      var promises1 = _.map(tourney.golfers, function (p) {
-        return Tourney.update(
-          { _id: config.tourney_id, golfers: { name: p.golfer } },
-          { $set: { name: p.golfer } },
-          { upsert: true }
-        )
-        .exec();
-      });
-
       // Ensure tourney/par
-      console.log("ensuring tourney par: " + tourney.par + ", " + config.tourney_id);
-      promises1.push(Tourney.update(
-        { _id: config.tourney_id},
-        { par: tourney.par},
-        { upsert: true }
-      ));
-
-      return Promise.all(promises1)
-      .then(function () {
-        return Tourney.findOne({ _id: config.tourney_id }).exec();
+      var mainPromise = access.updateTourney({
+        par: yahooTourney.par,
+        yahooUrl: yahooUrl
       })
-      .then(function (tourney) {
-        var gs = tourney.golfers;
-        var scoreOverrides = tourney.scoreOverrides;
 
-        // BUild scores with golfer id
+      .then(function () {
+        console.log('hihi1');
+        // Ensure golfers
+        var golfers = _.map(yahooTourney.golfers, function (g) {
+          return { name: g.golfer };
+        });
+        return access.ensureGolfers(golfers);
+      })
+
+      .then(function () {
+        console.log('hihi2');
+        return Promise.all([
+          access.getGolfers(),
+          access.getScoreOverrides()
+        ]);
+      })
+
+      .then(function (results) {
+        console.log('hihi3');
+        var gs = results[0];
+        var scoreOverrides = results[1];
+
+        // Build scores with golfer id
         var golfersByName = _.indexBy(gs, "name");
-        var scores = _.map(tourney.golfers, function (g) {
+        var scores = _.map(yahooTourney.golfers, function (g) {
           var golfer = golfersByName[g.golfer]._id;
           return {
             golfer: golfer,
@@ -126,21 +127,20 @@ var UpdateScore = {
         }
 
         // Save
-        return Tourney.update(
-          {_id: config.tourney_id },
-          {$set: {
-            scores: scores,
-            lastUpdated: new Date()
-          }}
-        ).exec();
+        return access.updateScores(scores);
       })
+
       .then(function () {
         console.log("HOORAY! - scores updated");
         return true;
-      }, function (e) {
+      })
+
+      .catch(function (e) {
         console.log(e);
         return false;
       });
+
+      return mainPromise;
     });
   }
 };

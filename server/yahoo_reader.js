@@ -2,7 +2,7 @@ var jsdom = require('jsdom');
 var Promise = require('promise');
 var _ = require('lodash');
 
-var YSURL = "http://sports.yahoo.com/golf/pga/leaderboard";
+var DEFAULT_YSURL = "http://sports.yahoo.com/golf/pga/leaderboard";
 
 function eachGolferCb(callback) {
   return function (tourney) {
@@ -15,14 +15,16 @@ function eachGolferCb(callback) {
 
 var YahooReader = {
 
-  readUrl: function () {
+  readUrl: function (yahooUrl) {
+    yahooUrl = yahooUrl || DEFAULT_YSURL;
+    console.log('hihi reading url: ' + yahooUrl);
     return new Promise(function (fulfill, reject) {
       jsdom.env(
-        YSURL,
+        yahooUrl,
         ["http://code.jquery.com/jquery.js"],
         function (errors, window) {
           if (errors) {
-            console.log("Error retrieving: " + YSURL);
+            console.log("Error retrieving: " + yahooUrl);
             reject(new Error(JSON.stringify(errors)));
             return;
           }
@@ -112,7 +114,7 @@ var YahooReader = {
     return g;
   },
 
-  run: function () {
+  run: function (yahooUrl) {
     function printState(state) {
       return function (tourney) {
         console.log("Contents (" + state + "):");
@@ -122,7 +124,7 @@ var YahooReader = {
       };
     }
 
-    return this.readUrl()
+    return this.readUrl(yahooUrl)
     .then(printState("Raw"))
     .then(eachGolferCb(this.parseScores))
     .then(printState("Parse scores"))
