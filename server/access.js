@@ -65,8 +65,6 @@ var access = {
   makePick: function (pick) {
     return promiseize(models.DraftPick.count(FK_TOURNEY_ID_QUERY).exec())
     .then(function (nPicks) {
-      console.log('hihi .......>>>>>>>>>>>>> ' + nPicks + ', ' + pick.pickNumber);
-      console.log('hihi .......>>>>>>>>>>>>> ' + JSON.stringify(pick));
       if (nPicks !== _.parseInt(pick.pickNumber)) {
         throw new Error('invalid pick');
       }
