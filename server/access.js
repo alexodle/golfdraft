@@ -9,10 +9,12 @@ var TOURNEY_ID = config.tourney_id;
 var TOURNEY_ID_QUERY = { _id: TOURNEY_ID };
 var FK_TOURNEY_ID_QUERY = { tourneyId: TOURNEY_ID };
 
-function extendWithTourneyId(objs) {
-  return _.map(objs, function (o) {
-    return _.extend({}, o, FK_TOURNEY_ID_QUERY);
-  });
+function extendWithTourneyId(obj) {
+  return _.extend({}, obj, FK_TOURNEY_ID_QUERY);
+}
+
+function extendAllWithTourneyId(objs) {
+  return _.map(objs, extendWithTourneyId);
 }
 
 function promiseize(mongoosePromise) {
@@ -40,7 +42,7 @@ function createBasicGetter(model) {
 
 function createMultiUpdater(model, queryMask) {
   return function (objs) {
-    objs = extendWithTourneyId(objs);
+    objs = extendAllWithTourneyId(objs);
     return Promise.all(_.map(objs, function (o) {
       var query = _.pick(o, queryMask);
       return promiseize(model.update(query, o, {upsert: true}).exec());
@@ -59,6 +61,20 @@ var access = {
   getPlayers: createBasicGetter(models.Player),
 
   getScoreOverrides: createBasicGetter(models.GolferScoreOverrides),
+
+  makePick: function (pick) {
+    return promiseize(models.DraftPick.count(FK_TOURNEY_ID_QUERY).exec())
+    .then(function (nPicks) {
+      console.log('hihi .......>>>>>>>>>>>>> ' + nPicks + ', ' + pick.pickNumber);
+      console.log('hihi .......>>>>>>>>>>>>> ' + JSON.stringify(pick));
+      if (nPicks !== _.parseInt(pick.pickNumber)) {
+        throw new Error('invalid pick');
+      }
+
+      pick = extendWithTourneyId(pick);
+      return promiseize(models.DraftPick.create(pick));
+    });
+  },
 
   resetTourney: function () {
     return Promise.all(_.map([

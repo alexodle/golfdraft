@@ -126,43 +126,22 @@ db.once('open', function callback () {
       player: new ObjectId(body.player),
       golfer: new ObjectId(body.golfer)
     };
-    var draftQuery = { _id: config.tourney_id };
-
-    draftQuery['draft.picks.' + pick.pickNumber] = { $exists: false };
-    if (pick.pickNumber > 0) {
-      draftQuery['draft.picks.' + (pick.pickNumber - 1)] = { $exists: true };
-    }
-
-    draftQuery['draft.pickOrder.' + pick.pickNumber] = pick.player;
-
-    draftQuery.golfers = {
-       $elemMatch: { _id: pick.golfer }
-    };
-    draftQuery['draft.picks'] = {
-      $not: { $elemMatch: { golfer: pick.golfer } }
-    };
-
-    console.log(JSON.stringify(draftQuery));
-    Tourney.findOneAndUpdate(draftQuery,
-      { $push: { "draft.picks": pick } }, {},
-      function (err, result) {
-        if (!result) {
-          res.send(400, 'Invalid pick');
-          return;
-        }
-        if (err) {
-          res.send(500, err);
-          return;
-        }
-        console.log("hihi result: " + JSON.stringify(result));
+    access.makePick(pick)
+    .then(function () {
+      access.getDraft().then(function (draft) {
         io.sockets.emit('change:draft', {
-          data: result.draft,
+          data: draft,
           evType: 'change:draft',
           action: 'draft:pick'
         });
         res.send(200);
+      });
+    })
+    .catch(function (err) {
+      if (err.message === 'invalid pick') {
+        res.send(400, 'Invalid pick');
       }
-    );
+    });
   });
 
   server.listen(port);
