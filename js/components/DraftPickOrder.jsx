@@ -26,7 +26,8 @@ var DraftPickOrder = React.createClass({
       <div>
         <h2>Pick order</h2>
         <ol className='pick-order-list'>
-          {_.map(pickOrder, function (player, i) {
+          {_.map(pickOrder, function (pick, i) {
+            var player = pick.player;
             var text = PlayerStore.getPlayer(player).name;
             return (
               <li

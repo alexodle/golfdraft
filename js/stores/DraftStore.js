@@ -15,7 +15,7 @@ function getCurrentPick() {
     return null;
   }
   return {
-    player: _pickOrder[_picks.length],
+    player: _pickOrder[_picks.length].player,
     pickNumber: _picks.length
   };
 }
