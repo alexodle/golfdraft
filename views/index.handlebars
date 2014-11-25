@@ -11,12 +11,14 @@
       sd.golfers = {{{golfers}}};
       sd.players = {{{players}}};
       sd.draft = {{{draft}}};
+      sd.scores = {{{scores}}};
       sd.tourney = {{{tourney}}};
       sd.user = {{{or user "null"}}};
 
       [
         sd.golfers,
         sd.players,
+        sd.scores,
         [sd.draft],
         [sd.tourney]
       ].forEach(function (mongoObjs) {

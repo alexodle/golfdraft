@@ -48,7 +48,7 @@ AppDispatcher.register(function (payload) {
 
 // HACKHACK
 require('../actions/ScoreActions').scoreUpdate({
-  scores: window.golfDraftSeed.tourney.scores,
+  scores: window.golfDraftSeed.scores,
   lastUpdated: window.golfDraftSeed.tourney.lastUpdated
 });
 

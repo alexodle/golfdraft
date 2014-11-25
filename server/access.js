@@ -60,6 +60,8 @@ var access = {
 
   getPlayers: createBasicGetter(models.Player),
 
+  getScores: createBasicGetter(models.GolferScore),
+
   getScoreOverrides: createBasicGetter(models.GolferScoreOverrides),
 
   makePick: function (pick) {

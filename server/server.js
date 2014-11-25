@@ -74,6 +74,7 @@ db.once('open', function callback () {
       access.getGolfers(),
       access.getPlayers(),
       access.getDraft(),
+      access.getScores(),
       access.getTourney()
     ])
     .then(function (results) {
@@ -81,7 +82,8 @@ db.once('open', function callback () {
         golfers: JSON.stringify(results[0]),
         players: JSON.stringify(results[1]),
         draft: JSON.stringify(results[2]),
-        tourney: JSON.stringify(results[3]),
+        scores: JSON.stringify(results[3]),
+        tourney: JSON.stringify(results[4]),
         user: JSON.stringify(req.session.user),
         prod: config.prod
       });
