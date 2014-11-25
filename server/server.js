@@ -140,8 +140,8 @@ db.once('open', function callback () {
       });
     })
     .catch(function (err) {
-      if (err.message === 'invalid pick') {
-        res.send(400, 'Invalid pick');
+      if (err.message.indexOf('invalid pick') !== -1) {
+        res.send(400, err.message);
       }
     });
   });

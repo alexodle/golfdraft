@@ -65,10 +65,20 @@ var access = {
   getScoreOverrides: createBasicGetter(models.GolferScoreOverrides),
 
   makePick: function (pick) {
-    return promiseize(models.DraftPick.count(FK_TOURNEY_ID_QUERY).exec())
-    .then(function (nPicks) {
+    return Promise.all([
+      promiseize(models.DraftPick.count(FK_TOURNEY_ID_QUERY).exec()),
+      promiseize(models.DraftPickOrder.find(_.extend({}, FK_TOURNEY_ID_QUERY, {
+        pickNumber: pick.pickNumber,
+        player: pick.player
+      })).exec())
+    ])
+    .then(function (result) {
+      var nPicks = result[0];
+      var draftPickOrder = result[1];
       if (nPicks !== _.parseInt(pick.pickNumber)) {
-        throw new Error('invalid pick');
+        throw new Error('invalid pick: pick order out of sync');
+      } else if (!draftPickOrder) {
+        throw new Error('invalid pick: player picked out of order');
       }
 
       pick = extendWithTourneyId(pick);
