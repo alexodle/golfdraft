@@ -37,7 +37,10 @@ var PlayerDetails = React.createClass({
           <td>{gs.total}</td>
           {_.map(gs.scores, function (s, i) {
             var missedCut = gs.missedCuts[i];
-            var scoreUsed = _.some(scoresByDay[i].usedScores, { golfer: s.golfer });
+            var scoreUsed = _.chain(scoresByDay[i].usedScores)
+              .pluck('golfer')
+              .contains(gs.golfer)
+              .value();
             return (
               <td
                 className={cx({
