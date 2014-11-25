@@ -38,6 +38,16 @@ function createBasicGetter(model) {
   });
 }
 
+function createMultiUpdater(model, queryMask) {
+  return function (objs) {
+    objs = extendWithTourneyId(objs);
+    return Promise.all(_.map(objs, function (o) {
+      var query = _.pick(o, queryMask);
+      return promiseize(model.update(query, o, {upsert: true}).exec());
+    }));
+  };
+}
+
 var access = {
 
   getTourney: promiseizeFn(function () {
@@ -66,33 +76,6 @@ var access = {
     ], promiseize));
   },
 
-  addPlayers: promiseizeFn(function (players) {
-    players = extendWithTourneyId(players);
-    return Promise.all(_.map(players, function (p) {
-      var query = _.pick(p, 'name', 'tourneyId');
-      return promiseize(
-        models.Player.update(query, p, { upsert: true }).exec()
-      );
-    }));
-  }),
-
-  setPickOrder: function (pickOrder) {
-    pickOrder = extendWithTourneyId(pickOrder);
-    return models.DraftPickOrder.remove(FK_TOURNEY_ID_QUERY).exec()
-    .then(function () {
-      return Promise.all(_.map(pickOrder, function (dpo) {
-        var query = _.pick(dpo, 'tourneyId', 'player', 'pickNumber');
-        return promiseize(
-          models.DraftPickOrder.update(
-            query,
-            dpo,
-            { upsert: true }
-          ).exec()
-        );
-      }));
-    });
-  },
-
   getDraft: function () {
     return Promise.all([
       promiseize(models.DraftPickOrder.find(FK_TOURNEY_ID_QUERY).exec()),
@@ -115,25 +98,19 @@ var access = {
     ).exec();
   }),
 
-  ensureGolfers: function (golfers) {
-    golfers = extendWithTourneyId(golfers);
-    return Promise.all(_.map(golfers, function (g) {
-      var query = _.pick(g, 'name', 'tourneyId');
-      return promiseize(
-        models.Golfer.update(query, g, {upsert: true}).exec()
-      );
-    }));
-  },
+  addPlayers: createMultiUpdater(models.Player, ['name', 'tourneyId']),
 
-  updateScores: function (golferScores) {
-    golferScores = extendWithTourneyId(golferScores);
-    return Promise.all(_.map(golferScores, function (gs) {
-      var query = _.pick(gs, 'golfer', 'tourneyId');
-      return promiseize(
-        models.GolferScore.update(query, gs, {upsert: true}).exec()
-      );
-    }));
-  }
+  setPickOrder: createMultiUpdater(
+    models.DraftPickOrder,
+    ['tourneyId', 'player', 'pickNumber']
+  ),
+
+  ensureGolfers: createMultiUpdater(models.Golfer, ['name', 'tourneyId']),
+
+  updateScores:  createMultiUpdater(
+    models.GolferScore,
+    ['golfer', 'tourneyId']
+  )
 
 };
 
