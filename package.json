@@ -16,7 +16,6 @@
     "jsdom": "^0.10.5",
     "lodash": "^2.4.1",
     "logfmt": "^1.1.2",
-    "mocha": "^1.18.2",
     "moment": "^2.6.0",
     "mongoose": "^3.8.9",
     "node-schedule": "^0.1.13",
@@ -39,6 +38,7 @@
     "grunt-contrib-clean": "^0.5.0",
     "grunt-express-server": "^0.4.19",
     "grunt-mocha-selenium": "^1.0.0",
+    "grunt-mocha-test": "^0.12.4",
     "grunt-webpack": "^1.0.8",
     "json-loader": "^0.5.1",
     "jsx-loader": "^0.12.1",
@@ -52,8 +52,7 @@
     "webpack-dev-server": "^1.6.6"
   },
   "scripts": {
-    "start": "node server/server.js",
-    "test": "mocha"
+    "start": "node server/server.js"
   },
   "engines": {
     "node": "0.10.26",
