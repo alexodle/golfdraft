@@ -6,10 +6,12 @@ chai.should();
 describe('test1', function () {
   it('test should run 1', function (done) {
     var browser = this.browser;
-    browser.get('http://google.com')
+    browser.get('http://localhost:3000')
     .title('q')
     .should
-    .become('Alex is cool thanks')
-    .then(done, done);
+    .become('The Golf Pool')
+    .then(function () {
+      done();
+    }, done);
   });
 });

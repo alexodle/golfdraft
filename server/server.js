@@ -148,4 +148,6 @@ db.once('open', function callback () {
 
   server.listen(port);
   redisCli.subscribe("scores:update");
+
+  console.log('I am fully running now!');
 });

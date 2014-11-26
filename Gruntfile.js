@@ -11,6 +11,16 @@ module.exports = function (grunt) {
 
   grunt.initConfig({
 
+    express: {
+      dev: {
+         options: {
+          script: './server/server.js',
+          debug: true,
+          output: 'I am fully running now!'
+        }
+      }
+    },
+
     clean: {
       dev: {
         src: 'distd'
@@ -49,6 +59,7 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('test', [
+    'express:dev',
     'mochaSelenium:firefox'
   ]);
 
