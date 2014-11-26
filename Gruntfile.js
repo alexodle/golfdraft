@@ -29,6 +29,16 @@ module.exports = function (grunt) {
         watch: true,
         keepalive: true
       }
+    },
+
+    mochaSelenium: {
+      options: {
+        reporter: 'spec',
+        useChaining: true
+      },
+      firefox: {
+        src: ['./test/selenium/test*.js']
+      }
     }
 
   });
@@ -36,6 +46,10 @@ module.exports = function (grunt) {
   grunt.registerTask('buildd', [
     'clean:dev',
     'webpack:dev',
+  ]);
+
+  grunt.registerTask('test', [
+    'mochaSelenium:firefox'
   ]);
 
   grunt.registerTask('default', [
