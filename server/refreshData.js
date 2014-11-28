@@ -84,5 +84,5 @@ db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function callback () {
   refreshData([
     'Alex O', 'Bobby G'
-  ], 'http://sports.yahoo.com/golf/pga/leaderboard/2015/360');
+  ], config.yahoo_url);
 });

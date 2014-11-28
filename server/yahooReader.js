@@ -17,6 +17,7 @@ var YahooReader = {
 
   readUrl: function (yahooUrl) {
     yahooUrl = yahooUrl || DEFAULT_YSURL;
+    console.log('YahooReader - updating score from: ' + yahooUrl);
     return new Promise(function (fulfill, reject) {
       jsdom.env(
         yahooUrl,
