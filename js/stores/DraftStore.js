@@ -1,11 +1,10 @@
 'use strict';
 
-var _ = require('lodash');
 var $ = require('jquery');
-
-var Store = require('./Store');
+var _ = require('lodash');
 var AppDispatcher = require('../dispatcher/AppDispatcher');
 var DraftConstants = require('../constants/DraftConstants');
+var Store = require('./Store');
 
 var _picks = [];
 var _pickOrder = [];
@@ -55,6 +54,8 @@ AppDispatcher.register(function (payload) {
       // TODO - Move to separate server sync
       $.post('/draft/picks', pick)
       .fail(function () {
+        // No real error handling here, just reload the page to make sure we
+        // don't get people in a weird state.
         window.location.reload();
       });
 
@@ -75,9 +76,5 @@ AppDispatcher.register(function (payload) {
 
   return true; // No errors.  Needed by promise in Dispatcher.
 });
-
-// HACKHACK
-_picks = window.golfDraftSeed.draft.picks;
-_pickOrder = window.golfDraftSeed.draft.pickOrder;
 
 module.exports = DraftStore;

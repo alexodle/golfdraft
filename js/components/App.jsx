@@ -158,6 +158,3 @@ module.exports = {
   DraftWrapper: DraftWrapper,
   TourneyWrapper: TourneyWrapper
 };
-
-// HACKHACK
-window.React = React;

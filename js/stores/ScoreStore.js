@@ -1,11 +1,10 @@
 'use strict';
 
 var _ = require('lodash');
-
-var Store = require('./Store');
 var AppDispatcher = require('../dispatcher/AppDispatcher');
 var ScoreConstants = require('../constants/ScoreConstants');
 var ScoreLogic = require('../logic/ScoreLogic');
+var Store = require('./Store');
 
 // Indexed by golfer id
 var _scores = {};
@@ -38,18 +37,9 @@ AppDispatcher.register(function (payload) {
 
       ScoreStore.emitChange();
       break;
-
-    default:
-      return true;
   }
 
   return true; // No errors. Needed by promise in Dispatcher.
-});
-
-// HACKHACK
-require('../actions/ScoreActions').scoreUpdate({
-  scores: window.golfDraftSeed.scores,
-  lastUpdated: window.golfDraftSeed.tourney.lastUpdated
 });
 
 module.exports = ScoreStore;

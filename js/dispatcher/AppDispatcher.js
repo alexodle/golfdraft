@@ -29,6 +29,7 @@ var AppDispatcher =  _.extend({}, Dispatcher.prototype, {
    * @param  {object} action The data coming from the view.
    */
   handleViewAction: function (action) {
+    console.log('VIEW_ACTION: ' + action.actionType);
     this.dispatch({
       source: 'VIEW_ACTION',
       action: action
@@ -36,6 +37,7 @@ var AppDispatcher =  _.extend({}, Dispatcher.prototype, {
   },
 
   handleServerAction: function (action) {
+    console.log('SERVER_ACTION: ' + action.actionType);
     this.dispatch({
       source: 'SERVER_ACTION',
       action: action

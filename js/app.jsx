@@ -15,6 +15,9 @@ var router = Router.create({
   location: Router.HistoryLocation
 });
 
+// Hydrate the app with seed data before running
+require('./hydrate')();
+
 var node = document.getElementById('golfdraftapp');
 router.run(function (Handler, state) {
   React.render(

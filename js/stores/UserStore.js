@@ -8,7 +8,7 @@ var AppDispatcher = require('../dispatcher/AppDispatcher');
 var AppConstants = require('../constants/AppConstants');
 
 var _currentUser = null;
-var _users = {};
+var _users = null;
 
 var UserStore =  _.extend({}, Store.prototype, {
 
@@ -19,7 +19,7 @@ var UserStore =  _.extend({}, Store.prototype, {
   },
 
   getAll: function () {
-    return _.clone(_users);
+    return _users;
   }
 
 });
@@ -29,6 +29,11 @@ AppDispatcher.register(function (payload) {
   var action = payload.action;
 
   switch(action.actionType) {
+    case AppConstants.SET_USERS:
+      _users = action.users;
+      UserStore.emitChange();
+      break;
+
     case AppConstants.CURRENT_USER_CHANGE:
       _currentUser = action.currentUser;
 
@@ -45,22 +50,9 @@ AppDispatcher.register(function (payload) {
 
       UserStore.emitChange();
       break;
-
-    default:
-      return true;
   }
 
   return true; // No errors.  Needed by promise in Dispatcher.
 });
-
-// HACKHACK - For now users are just wrappers around players
-var PlayerStore = require('./PlayerStore');
-_users = _.transform(PlayerStore.getAll(), function (memo, p) {
-  var uid = 'user_' + p.id;
-  memo[uid] = { id: uid, name: p.name, player: p.id };
-});
-
-// HACKHACK
-_currentUser = (window.golfDraftSeed.user || {}).id;
 
 module.exports = UserStore;
