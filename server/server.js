@@ -57,11 +57,11 @@ db.once('open', function callback () {
   redisCli.on("message", function (channel, message) {
     // Scores updated, alert clients
     console.log("redis message: channel " + channel + ": " + message);
-    access.getTourney().then(function (tourney) {
+    access.getScores().then(function (scores) {
       io.sockets.emit('change:scores', {
         data: {
-          scores: tourney.scores,
-          lastUpdated: tourney.lastUpdated
+          scores: scores,
+          lastUpdated: new Date()
         },
         evType: 'change:scores',
         action: 'scores:periodic_update'
