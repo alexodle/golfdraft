@@ -5,7 +5,8 @@ var access = require('./access');
 var config = require('./config');
 var mongoose = require('mongoose');
 var Promise = require('promise');
-var updateScore = require('./update_score');
+var tourneyUtils = require('./tourneyUtils');
+var updateScore = require('./updateScore');
 
 mongoose.set('debug', true);
 mongoose.connect(config.mongo_url);
@@ -42,7 +43,7 @@ function refreshData(pickOrderNames, yahooUrl) {
     var players = _.map(pickOrderNames, function (name) {
       return {name: name};
     });
-    return access.addPlayers(players);
+    return access.ensurePlayers(players);
   })
   .then(function () {
     return access.getPlayers().then(function (players) {
@@ -53,15 +54,7 @@ function refreshData(pickOrderNames, yahooUrl) {
   })
   .then(function (sortedPlayers) {
     console.log("Updating pickOrder");
-    var ps = sortedPlayers;
-    var rps = _.clone(ps).reverse();
-    var pickOrderPlayers = _.flatten([ps, rps, ps, rps]);
-    var pickOrder = _.map(pickOrderPlayers, function (p, i) {
-      return {
-        pickNumber: i,
-        player: p._id
-      };
-    });
+    var pickOrder = tourneyUtils.snakeDraftOrder(sortedPlayers);
     return access.setPickOrder(pickOrder);
   })
   .then(function () {

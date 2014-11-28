@@ -5,7 +5,7 @@ var access = require('./access');
 var config = require('./config');
 var constants = require('../common/constants');
 var Promise = require('promise');
-var YahooReader = require('./yahoo_reader');
+var YahooReader = require('./yahooReader');
 
 var DAYS = constants.NDAYS;
 

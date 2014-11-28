@@ -43,7 +43,7 @@ module.exports = function (grunt) {
 
     mochaTest: {
       test: {
-        src: ['./test/*test.js']
+        src: ['./test/*Test.js']
       }
     },
 
@@ -64,10 +64,18 @@ module.exports = function (grunt) {
     'webpack:dev',
   ]);
 
-  grunt.registerTask('test', [
-    'express:dev',
-    'mochaSelenium:firefox',
+  grunt.registerTask('testdata', [
     'mochaTest'
+  ]);
+
+  grunt.registerTask('testselenium', [
+    'express:dev',
+    'mochaSelenium:firefox'
+  ]);
+
+  grunt.registerTask('testall', [
+    'testselenium',
+    'testdata'
   ]);
 
   grunt.registerTask('default', [

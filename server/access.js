@@ -50,7 +50,14 @@ function createMultiUpdater(model, queryMask) {
   };
 }
 
-var access = {
+function createBasicClearer(model) {
+  return promiseizeFn(function () {
+    return model.remove(FK_TOURNEY_ID_QUERY).exec();
+  });
+}
+
+var access = {};
+_.extend(access, {
 
   getTourney: promiseizeFn(function () {
     return models.Tourney.findOne(TOURNEY_ID_QUERY).exec();
@@ -65,41 +72,48 @@ var access = {
   getScoreOverrides: createBasicGetter(models.GolferScoreOverrides),
 
   makePick: function (pick) {
+    var pickOrderQuery = _.extend({}, FK_TOURNEY_ID_QUERY, {
+      pickNumber: pick.pickNumber,
+      player: pick.player
+    });
+    var golferDraftedQuery = _.extend({}, FK_TOURNEY_ID_QUERY, {
+      golfer: pick.golfer
+    });
+    var golferExistsQuery = _.extend({}, FK_TOURNEY_ID_QUERY, {
+      _id: pick.golfer
+    });
     return Promise.all([
+      // Ensure correct pick numnber
       promiseize(models.DraftPick.count(FK_TOURNEY_ID_QUERY).exec()),
-      promiseize(models.DraftPickOrder.find(_.extend({}, FK_TOURNEY_ID_QUERY, {
-        pickNumber: pick.pickNumber,
-        player: pick.player
-      })).exec())
+
+      // Ensure this player is actually up in the draft
+      promiseize(models.DraftPickOrder.findOne(pickOrderQuery).exec()),
+
+      // Ensure golfer isn't already picked
+      promiseize(models.DraftPick.findOne(golferDraftedQuery).exec()),
+
+      // Ensure this golfer actually exists
+      promiseize(models.Golfer.findOne(golferExistsQuery).exec())
     ])
     .then(function (result) {
       var nPicks = result[0];
-      var draftPickOrder = result[1];
+      var playerIsUp = !!result[1];
+      var golferAlreadyDrafted = result[2];
+      var golferExists = !!result[3];
+
       if (nPicks !== _.parseInt(pick.pickNumber)) {
         throw new Error('invalid pick: pick order out of sync');
-      } else if (!draftPickOrder) {
+      } else if (!playerIsUp) {
         throw new Error('invalid pick: player picked out of order');
+      } else if (golferAlreadyDrafted) {
+        throw new Error('invalid pick: golfer already drafted');
+      } else if (!golferExists) {
+        throw new Error('invalid pick: invalid golfer');
       }
 
       pick = extendWithTourneyId(pick);
       return promiseize(models.DraftPick.create(pick));
     });
-  },
-
-  resetTourney: function () {
-    return Promise.all(_.map([
-      models.Tourney.update(TOURNEY_ID_QUERY, {
-        name: null,
-        par: -1,
-        yahooUrl: null
-      }).exec(),
-      models.Golfer.remove(FK_TOURNEY_ID_QUERY).exec(),
-      models.Player.remove(FK_TOURNEY_ID_QUERY).exec(),
-      models.DraftPickOrder.remove(FK_TOURNEY_ID_QUERY).exec(),
-      models.DraftPick.remove(FK_TOURNEY_ID_QUERY).exec(),
-      models.GolferScore.remove(FK_TOURNEY_ID_QUERY).exec(),
-      models.GolferScoreOverrides.remove(FK_TOURNEY_ID_QUERY).exec()
-    ], promiseize));
   },
 
   getDraft: function () {
@@ -124,20 +138,58 @@ var access = {
     ).exec();
   }),
 
-  addPlayers: createMultiUpdater(models.Player, ['name', 'tourneyId']),
+  ensurePlayers: createMultiUpdater(models.Player, ['name', 'tourneyId']),
+
+  ensureGolfers: createMultiUpdater(models.Golfer, ['name', 'tourneyId']),
 
   setPickOrder: createMultiUpdater(
     models.DraftPickOrder,
     ['tourneyId', 'player', 'pickNumber']
   ),
 
-  ensureGolfers: createMultiUpdater(models.Golfer, ['name', 'tourneyId']),
 
   updateScores:  createMultiUpdater(
     models.GolferScore,
     ['golfer', 'tourneyId']
-  )
+  ),
 
-};
+  // DEBUGGING/TESTING
+
+  clearTourney: promiseizeFn(function () {
+    return models.Tourney.remove(TOURNEY_ID_QUERY).exec();
+  }),
+
+  clearPlayers: createBasicClearer(models.Player),
+
+  clearPickOrder: createBasicClearer(models.DraftPickOrder),
+
+  clearDraftPicks: createBasicClearer(models.DraftPick),
+
+  clearGolfers: createBasicClearer(models.Golfer),
+
+  clearGolferScores: createBasicClearer(models.GolferScore),
+
+  clearGolferScoreOverrides: createBasicClearer(
+    models.GolferScoreOverrides
+  ),
+
+  resetTourney: function () {
+    return Promise.all(_.map([
+      models.Tourney.update(TOURNEY_ID_QUERY, {
+        name: null,
+        par: -1,
+        yahooUrl: null
+      }).exec(),
+
+      access.clearPlayers(),
+      access.clearPickOrder(),
+      access.clearDraftPicks(),
+      access.clearGolfers(),
+      access.clearGolferScores(),
+      access.clearGolferScoreOverrides()
+    ], promiseize));
+  }
+
+});
 
 module.exports = access;

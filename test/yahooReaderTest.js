@@ -1,7 +1,9 @@
-var reader = require('../server/yahoo_reader.js');
+require('./initTestConfig');
+
+var reader = require('../server/yahooReader.js');
 var should = require('should');
 
-describe('yahoo_reader', function () {
+describe('yahooReader', function () {
   describe('parseScores', function () {
 
     it('parses scores to ints', function () {

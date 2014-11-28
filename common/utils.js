@@ -7,6 +7,12 @@ _.mixin({
     return _.reduce(arr, function (memo, value, index, list) {
       return memo + it.call(context, value, index, list);
     }, 0, context);
+  },
+
+  lock: function (fn) {
+    return function () {
+      return fn();
+    };
   }
 
 });

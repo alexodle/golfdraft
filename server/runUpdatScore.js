@@ -1,5 +1,5 @@
 var config = require('./config');
-var updateScore = require('./update_score');
+var updateScore = require('./updateScore');
 var mongoose = require('mongoose');
 var redis = require("./redis");
 var redisCli = redis.client;

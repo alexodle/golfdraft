@@ -2,7 +2,7 @@
 
 var _ = require('lodash');
 
-var utils = require('../utils');
+var utils = require('../../common/utils');
 
 // TODO - Define this somewhere
 var NDAYS = 4;

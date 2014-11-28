@@ -1,7 +1,9 @@
-var updater = require('../server/update_score');
+require('./initTestConfig');
+
+var updater = require('../server/updateScore');
 var should = require('should');
 
-describe('update_score', function () {
+describe('updateScore', function () {
 
   describe('validate', function () {
 

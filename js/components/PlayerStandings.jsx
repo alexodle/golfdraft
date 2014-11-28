@@ -8,7 +8,7 @@ var _ = require("lodash");
 
 var PlayerStore = require('../stores/PlayerStore');
 var GolferStore = require('../stores/GolferStore');
-var utils = require('../utils');
+var utils = require('../../common/utils');
 
 var PlayerStandings = React.createClass({
 
