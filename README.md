@@ -10,4 +10,4 @@
 
 ## Build code ##
 
-```grunt```
+```grunt buildd```
