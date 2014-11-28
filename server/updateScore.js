@@ -84,7 +84,6 @@ var UpdateScore = {
       })
 
       .then(function () {
-        console.log('hihi1');
         // Ensure golfers
         var golfers = _.map(yahooTourney.golfers, function (g) {
           return { name: g.golfer };
@@ -93,7 +92,6 @@ var UpdateScore = {
       })
 
       .then(function () {
-        console.log('hihi2');
         return Promise.all([
           access.getGolfers(),
           access.getScoreOverrides()
@@ -101,7 +99,6 @@ var UpdateScore = {
       })
 
       .then(function (results) {
-        console.log('hihi3');
         var gs = results[0];
         var scoreOverrides = results[1];
 

@@ -83,6 +83,6 @@ var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function callback () {
   refreshData([
-    'Alex O',
+    'Alex O', 'Bobby G'
   ], 'http://sports.yahoo.com/golf/pga/leaderboard/2015/360');
 });

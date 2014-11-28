@@ -17,7 +17,6 @@ var YahooReader = {
 
   readUrl: function (yahooUrl) {
     yahooUrl = yahooUrl || DEFAULT_YSURL;
-    console.log('hihi reading url: ' + yahooUrl);
     return new Promise(function (fulfill, reject) {
       jsdom.env(
         yahooUrl,
