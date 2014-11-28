@@ -6,7 +6,7 @@
 
 ## Run tests ##
 
-```mocha```
+```grunt test```
 
 ## Build code ##
 

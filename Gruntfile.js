@@ -47,6 +47,7 @@ module.exports = function (grunt) {
       }
     },
 
+    // Experimental at this point
     mochaSelenium: {
       options: {
         reporter: 'spec',
@@ -68,13 +69,8 @@ module.exports = function (grunt) {
     'mochaTest'
   ]);
 
-  grunt.registerTask('testselenium', [
-    'express:dev',
-    'mochaSelenium:firefox'
-  ]);
-
   grunt.registerTask('testall', [
-    'testselenium',
+    //'testselenium',
     'testdata'
   ]);
 
