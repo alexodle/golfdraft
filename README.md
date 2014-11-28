@@ -1,13 +1,16 @@
 # README #
 
-## Run server ##
+## Prepare ##
 
-```foreman start```
+```
+npm install
+grunt buildd
+```
 
 ## Run tests ##
 
 ```grunt test```
 
-## Build code ##
+## Run server ##
 
-```grunt buildd```
+```foreman start```
