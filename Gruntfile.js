@@ -10,6 +10,11 @@ module.exports = function (grunt) {
   var webpack = require('webpack');
 
   grunt.initConfig({
+    env: {
+      dev: {
+        DEBUG: 'DEBUG'
+      }
+    },
 
     express: {
       dev: {
@@ -22,6 +27,9 @@ module.exports = function (grunt) {
     },
 
     clean: {
+      prod: {
+        src: 'dist'
+      },
       dev: {
         src: 'distd'
       }
@@ -30,12 +38,30 @@ module.exports = function (grunt) {
     webpack: {
       options: require('./webpackConfig'),
 
+      prod: {
+        output: {
+          path: './dist/',
+          filename: 'bundle.[hash].js'
+        },
+        storeStatsTo: 'bundle', // use it later as <%= bundle.hash %>
+
+        // Don't bother minimizing. Not a big app. Not trying to hide code.
+        plugins: [
+          new webpack.DefinePlugin({
+            // Remove all debug-only code from React
+            'process.env': {
+              'NODE_ENV': JSON.stringify('production')
+            }
+          })
+        ]
+      },
+
       dev: {
         output: {
-          path: "./distd/",
-          filename: "bundle.js"
+          path: './distd/',
+          filename: 'bundle.js'
         },
-        devtool: "eval", // Fast rebuild
+        devtool: 'eval', // Fast rebuild
         watch: true,
         keepalive: true
       }
@@ -44,6 +70,23 @@ module.exports = function (grunt) {
     mochaTest: {
       test: {
         src: ['./test/*Test.js']
+      }
+    },
+
+    replace: {
+      prod: {
+        src: ['./views/index.handlebars'],
+        dest: './dist/views/',
+        replacements: [
+          { from: '$$bundleSrc$$', to: '"/dist/bundle.<%= bundle.hash %>.js"' }
+        ]
+      },
+      dev: {
+        src: ['./views/index.handlebars'],
+        dest: './distd/views/',
+        replacements: [
+          { from: '$$bundleSrc$$', to: '"/distd/bundle.js"' }
+        ]
       }
     },
 
@@ -60,22 +103,30 @@ module.exports = function (grunt) {
 
   });
 
-  grunt.registerTask('buildd', [
-    'clean:dev',
-    'webpack:dev',
-  ]);
-
-  grunt.registerTask('testdata', [
+  grunt.registerTask('test', [
     'mochaTest'
   ]);
 
-  grunt.registerTask('test', [
-    //'testselenium',
-    'testdata'
+  grunt.registerTask('buildd', [
+    'clean:dev',
+    'replace:dev',
+    'webpack:dev'
+  ]);
+
+  grunt.registerTask('build', [
+    'clean:prod',
+    'webpack:prod',
+    'replace:prod'
+  ]);
+
+  grunt.registerTask('rund', [
+    'env:dev',
+    'express:dev',
+    'buildd'
   ]);
 
   grunt.registerTask('default', [
-    'buildd'
+    'rund'
   ]);
 
 };

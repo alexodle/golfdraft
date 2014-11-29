@@ -1,5 +1,5 @@
 node_modules
 server/*.sh
 npm-*.log
-distd
+dist*
 server/prodenv.sh

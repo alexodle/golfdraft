@@ -44,7 +44,13 @@ app.engine('handlebars', exphbs({
 app.set('view engine', 'handlebars');
 
 // Static routes
-app.use('/', express.static(__dirname + '/../distd'));
+if (process.env.DEBUG) {
+  app.set('views', './distd/views/');
+  app.use('/distd', express.static(__dirname + '/../distd'));
+} else {
+  app.set('views', './dist/views/');
+  app.use('/dist', express.static(__dirname + '/../dist'));
+}
 app.use('/assets', express.static(__dirname + '/../assets'));
 
 // Parsing
