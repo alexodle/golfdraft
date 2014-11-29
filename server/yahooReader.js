@@ -1,8 +1,10 @@
+var _ = require('lodash');
+var constants = require('../common/constants');
 var jsdom = require('jsdom');
 var Promise = require('promise');
-var _ = require('lodash');
 
 var DEFAULT_YSURL = "http://sports.yahoo.com/golf/pga/leaderboard";
+var MISSED_CUT = constants.MISSED_CUT;
 
 function eachGolferCb(callback) {
   return function (tourney) {
@@ -75,15 +77,15 @@ var YahooReader = {
         s === "-"
       ) {
         return 0;
-      } else if (_.contains(["MC", "WD", "MDF", "DQ", "CUT"], s)) {
-        return "MC";
+      } else if (_.contains([MISSED_CUT, "WD", "MDF", "DQ", "CUT"], s)) {
+        return MISSED_CUT;
       } else {
         day++;
         return parseInt(s, 10);
       }
     });
 
-    var missedCut = _.contains(g.scores, "MC");
+    var missedCut = _.contains(g.scores, MISSED_CUT);
     if (missedCut) {
       g.day = g.scores.length;
     } else {
@@ -95,12 +97,12 @@ var YahooReader = {
 
   relativeToPar: function (g, tourney) {
     var par = tourney.par;
-    var missedCut = _.contains(g.scores, "MC");
+    var missedCut = _.contains(g.scores, MISSED_CUT);
     if (g.today === "E") {
       g.today = 0;
     }
     g.scores = _.map(g.scores, function (s, i) {
-      if (s === "MC") {
+      if (s === MISSED_CUT) {
         return s;
       } else if (i < g.day) {
         return s - par;

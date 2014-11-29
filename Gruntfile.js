@@ -69,7 +69,7 @@ module.exports = function (grunt) {
     'mochaTest'
   ]);
 
-  grunt.registerTask('testall', [
+  grunt.registerTask('test', [
     //'testselenium',
     'testdata'
   ]);

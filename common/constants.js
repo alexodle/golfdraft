@@ -5,5 +5,7 @@ module.exports = {
   NDAYS: 4,
 
   // Each player can draft 4 golfers
-  NGOLFERS: 4
+  NGOLFERS: 4,
+
+  MISSED_CUT: 'MC'
 };

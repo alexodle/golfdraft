@@ -1,11 +1,11 @@
 'use strict';
 
 var _ = require('lodash');
-
+var constants = require('../../common/constants');
 var utils = require('../../common/utils');
 
-// TODO - Define this somewhere
-var NDAYS = 4;
+var NDAYS = constants.NDAYS;
+var MISSED_CUT = constants.MISSED_CUT;
 
 function getGolfersByPlayer(draftPicks) {
   return _.chain(draftPicks)
@@ -17,7 +17,6 @@ function getGolfersByPlayer(draftPicks) {
 }
 
 function playerScore(playerGolfers, scores, player) {
-
   var scoresByGolfer = _.chain(playerGolfers)
     .map(function (g) {
       return _.extend({}, scores[g], {
@@ -59,26 +58,23 @@ function playerScore(playerGolfers, scores, player) {
   };
 }
 
-function worstScore(scores, day) {
-  var score = _.chain(scores)
-    .reject(function (s) {
-      return s.scores[day] === 'MC';
-    })
-    .max(function (s) {
-      return s.scores[day];
-    })
+function worstScoreForDay(playerScores, day) {
+  return _.chain(playerScores)
+    .pluck('scores')
+    .pluck(day)
+    .reject(MISSED_CUT)
+    .max()
     .value();
-  return score.scores[day];
 }
 
 var ScoreLogic = {
 
-  calcPlayerScores: function (draftPicks, scores) {
+  calcPlayerScores: function (draftPicks, playerScores) {
     var golfersByPlayer = getGolfersByPlayer(draftPicks);
 
-    var playerScores = _.chain(golfersByPlayer)
+    playerScores = _.chain(golfersByPlayer)
       .map(function (golfers, player) {
-        return playerScore(golfers, scores, player);
+        return playerScore(golfers, playerScores, player);
       })
       .indexBy('player')
       .value();
@@ -86,20 +82,20 @@ var ScoreLogic = {
     return playerScores;
   },
 
-  fillMissedCutScores: function (scores) {
+  fillMissedCutScores: function (playerScores) {
     var worstScores = _.chain(NDAYS)
       .range()
-      .map(_.partial(worstScore, scores))
+      .map(_.partial(worstScoreForDay, playerScores))
       .value();
-    _.each(scores, function (s) {
-      s.missedCuts = _.map(s.scores, function (s) {
-        return s === "MC";
+    _.each(playerScores, function (ps) {
+      ps.missedCuts = _.map(ps.scores, function (s) {
+        return s === MISSED_CUT;
       });
-      s.scores = _.map(s.scores, function (s, i) {
-        return s === "MC" ? worstScores[i] : s;
+      ps.scores = _.map(ps.scores, function (s, i) {
+        return ps.missedCuts[i] ? worstScores[i] : s;
       });
     });
-    return scores;
+    return playerScores;
   }
 
 };

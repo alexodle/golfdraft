@@ -8,6 +8,7 @@ var Promise = require('promise');
 var YahooReader = require('./yahooReader');
 
 var DAYS = constants.NDAYS;
+var MISSED_CUT = constants.MISSED_CUT;
 
 var UpdateScore = {
 
@@ -20,7 +21,7 @@ var UpdateScore = {
     return _.every(d.golfers, function (g) {
       var inv = false;
       var validScores = _.every(g.scores, function (s) {
-        return _.isFinite(s) || s === "MC";
+        return _.isFinite(s) || s === MISSED_CUT;
       });
 
       if (g.golfer === "-") {
