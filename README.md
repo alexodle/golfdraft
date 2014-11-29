@@ -1,21 +1,25 @@
 # README #
 
-## Prepare ##
+## Run webserver locally ##
+
+Requires mongodb and redis instances. See server/config.js default values for setup.
 
 ```
 npm install
-grunt buildd
+grunt rund
 ```
+
+Navigate to http://localhost:3000
 
 ## Run tests ##
 
 ```grunt test```
 
-## Run server ##
+## Build prod files (checked in) ##
 
-```npm start```
+If building, keep in a separate commit in master.
 
-Navigate to http://localhost:3000
+```grunt build```
 
 ## Live updating of scores ##
 
