@@ -24,7 +24,6 @@ _.extend(config, {
 function initDb() {
   // set up db connection
   var mongoose = require('mongoose');
-  mongoose.set('debug', true);
   mongoose.connect(config.mongo_url);
 
   return new Promise(function (fulfill, reject) {
