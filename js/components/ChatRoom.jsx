@@ -1,6 +1,7 @@
 /** @jsx React.DOM */
 'use strict';
 
+var $ = require('jquery');
 var _ = require('lodash');
 var ChatActions = require('../actions/ChatActions');
 var moment = require('moment');
@@ -19,16 +20,18 @@ var ChatRoomInput = React.createClass({
 
   render: function () {
     return (
-      <div className='form-group'>
-        <input
-          className='form-control'
-          value={this.state.text}
-          onChange={this._updateText}
-        />
-        <button className='btn btn-default' onClick={this._onSend}>
-          Send
-        </button>
-      </div>
+      <form onSubmit={this._onSend}>
+        <div className='form-group'>
+          <input
+            className='form-control'
+            value={this.state.text}
+            onChange={this._updateText}
+          />
+          <button type='submit' className='btn btn-default'>
+            Send
+          </button>
+        </div>
+      </form>
     );
   },
 
@@ -36,7 +39,9 @@ var ChatRoomInput = React.createClass({
     this.setState({ text: ev.target.value });
   },
 
-  _onSend: function () {
+  _onSend: function (ev) {
+    ev.preventDefault();
+
     var text = this.state.text;
     if (_.isEmpty(text)) return;
 
@@ -51,6 +56,14 @@ var ChatRoom = React.createClass({
 
   propTypes: {
     messages: ReactPropTypes.array
+  },
+
+  componentDidMount: function () {
+    this._forceScroll();
+  },
+
+  componentDidUpdate: function () {
+    this._forceScroll();
   },
 
   render: function () {
@@ -83,10 +96,21 @@ var ChatRoom = React.createClass({
     return (
       <section>
         <h2>Chat Room!</h2>
-        {body}
+        <div className='panel panel-default chat-panel' ref='chatPanel'>
+          <div className='panel-body' ref='chatPanelBody'>
+            {body}
+          </div>
+        </div>
         {!messages ? null : (<ChatRoomInput />)}
       </section>
     );
+  },
+
+  _forceScroll: function () {
+    var refs = this.refs;
+    var $panel = $(refs.chatPanel.getDOMNode());
+    var $body = $(refs.chatPanelBody.getDOMNode());
+    $panel.scrollTop($body.height());
   }
 
 });
