@@ -6,6 +6,8 @@ require('bootstrap/dist/css/bootstrap.css');
 require('font-awesome/css/font-awesome.css');
 require('../less/app.less');
 
+var $ = require('jquery');
+var ChatActions = require('./actions/ChatActions');
 var React = require('react');
 var Router = require('react-router');
 var routes = require('./routes.jsx');
@@ -34,3 +36,10 @@ router.run(function (Handler, state) {
 
 // Begin listening for live socket updates
 require('./startSocketUpdates')();
+
+// Lazily get chat messages
+//
+// TODO - move to separate server sync
+$.getJSON('/chat/messages').success(function (messages) {
+  ChatActions.setMessages(messages);
+});

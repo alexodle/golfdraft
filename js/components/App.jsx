@@ -4,6 +4,7 @@
 var _ = require("lodash");
 var AppSettingsStore = require('../stores/AppSettingsStore');
 var ChatStore = require("../stores/ChatStore");
+var ChatStore = require("../stores/ChatStore");
 var DraftApp = require("./DraftApp.jsx");
 var DraftStore = require("../stores/DraftStore");
 var React = require("react");
@@ -18,10 +19,11 @@ var Navigation = Router.Navigation;
 var RouterState = Router.State;
 
 var RELEVANT_STORES = [
-  UserStore,
+  AppSettingsStore,
+  ChatStore,
   DraftStore,
   ScoreStore,
-  AppSettingsStore
+  UserStore
 ];
 
 function getAppState() {

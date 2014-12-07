@@ -2,8 +2,8 @@
 
 var $ = require('jquery');
 var _ = require('lodash');
-var ChatConstants = require('../constants/ChatConstants');
 var AppDispatcher = require('../dispatcher/AppDispatcher');
+var ChatConstants = require('../constants/ChatConstants');
 var Store = require('./Store');
 
 var _messages = null;
@@ -29,9 +29,13 @@ AppDispatcher.register(function (payload) {
       ChatStore.emitChange();
       break;
 
-    case ChatConstants.ON_NEW_MESSAGE:
-      _messages = _messages.concat([action.message]);
-      ChatStore.emitChange();
+    case ChatConstants.NEW_MESSAGE:
+      // If we still haven't received our first message, move on. We'll get
+      // this message with our first payload.
+      if (_messages) {
+        _messages = _messages.concat([action.message]);
+        ChatStore.emitChange();
+      }
       break;
 
     case ChatConstants.CREATE_MESSAGE:
@@ -44,7 +48,7 @@ AppDispatcher.register(function (payload) {
       // For now, fire and forget. If success, we will update the UI via
       // socket.io update.
       //
-      $.post('/chat/messages', action.message);
+      $.post('/chat/messages', { message: action.message });
       break;
   }
 });

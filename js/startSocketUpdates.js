@@ -13,6 +13,9 @@ function startSocketUpdates() {
   io.on('change:scores', function (ev) {
     ScoreActions.scoreUpdate(ev.data);
   });
+  io.on('change:chat', function (ev) {
+    ChatActions.newMessage(ev.data);
+  });
 }
 
 module.exports = _.once(startSocketUpdates);
