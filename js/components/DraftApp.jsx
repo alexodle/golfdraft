@@ -1,17 +1,16 @@
 /** @jsx React.DOM */
 "use strict";
 
-var React = require("react");
 var _ = require("lodash");
-
-var GolferStore = require("../stores/GolferStore");
-var SettingsActions = require("../actions/SettingsActions");
-
+var ChatRoom = require("./ChatRoom.jsx");
 var DraftChooser = require("./DraftChooser.jsx");
 var DraftHistory = require("./DraftHistory.jsx");
-var DraftStatus = require("./DraftStatus.jsx");
 var DraftPickOrder = require("./DraftPickOrder.jsx");
+var DraftStatus = require("./DraftStatus.jsx");
+var GolferStore = require("../stores/GolferStore");
 var LogoutButton = require("./LogoutButton.jsx");
+var React = require("react");
+var SettingsActions = require("../actions/SettingsActions");
 var SoundToggle = require("./SoundToggle.jsx");
 
 var myTurnSound = new Audio("/assets/boxing_bell_multiple.wav");
@@ -87,6 +86,11 @@ var DraftApp = React.createClass({
             <DraftHistory
               draftPicks={this.props.draftPicks}
             />
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-md-12">
+            <ChatRoom messages={this.props.chatMessages} />
           </div>
         </div>
       </section>

@@ -3,6 +3,7 @@
 
 var _ = require("lodash");
 var AppSettingsStore = require('../stores/AppSettingsStore');
+var ChatStore = require("../stores/ChatStore");
 var DraftApp = require("./DraftApp.jsx");
 var DraftStore = require("../stores/DraftStore");
 var React = require("react");
@@ -35,7 +36,9 @@ function getAppState() {
     scores: ScoreStore.getScores(),
     lastScoresUpdate: ScoreStore.getLastUpdated(),
 
-    playSounds: AppSettingsStore.getPlaySounds()
+    playSounds: AppSettingsStore.getPlaySounds(),
+
+    chatMessages: ChatStore.getMessages()
   };
 }
 
@@ -87,6 +90,7 @@ var DraftWrapper = React.createClass({
         currentUser={props.currentUser}
         currentPick={props.draft.currentPick}
         draftPicks={props.draft.draftPicks}
+        chatMessages={props.chatMessages}
       />
     );
   }
@@ -107,6 +111,7 @@ var TourneyWrapper = React.createClass({
         scores={props.scores}
         draft={props.draft}
         lastScoresUpdate={props.lastScoresUpdate}
+        chatMessages={props.chatMessages}
       />
     );
   }

@@ -16,7 +16,7 @@ var PlayerStore =  _.extend({}, Store.prototype, {
   },
 
   getAll: function () {
-    return _.clone(_players);
+    return _players;
   }
 
 });

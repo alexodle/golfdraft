@@ -3,6 +3,7 @@
 var _ = require('lodash');
 var config = require('./config');
 var models = require('./models');
+var chatModels = require('./chatModels');
 var Promise = require('promise');
 
 var TOURNEY_ID = config.tourney_id;
@@ -152,6 +153,19 @@ _.extend(access, {
     models.GolferScore,
     ['golfer', 'tourneyId']
   ),
+
+  // Chat
+
+  getChatMessages: promiseizeFn(function () {
+    return chatModels.Message.find(FK_TOURNEY_ID_QUERY).exec();
+  }),
+
+  createChatMessage: promiseizeFn(function (message) {
+    message = _.extend({}, message, {
+      date: new Date()
+    });
+    return chatModels.Message.create(message);
+  }),
 
   // DEBUGGING/TESTING
 

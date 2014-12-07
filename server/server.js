@@ -3,21 +3,24 @@
 var port = Number(process.env.PORT || 3000);
 
 var _ = require('lodash');
-var express = require('express');
-var app = express();
-var mongoose = require('mongoose');
-var exphbs  = require('express3-handlebars');
-var bodyParser = require('body-parser');
 var access = require('./access');
-var session = require('express-session');
-var RedisStore = require('connect-redis')(session);
-var cookieParser = require('cookie-parser');
-var logfmt = require("logfmt");
-var server = require("http").createServer(app);
-var io = require('socket.io').listen(server);
+var app = require('./expressApp');
+var bodyParser = require('body-parser');
 var config = require('./config');
-var redis = require("./redis");
+var cookieParser = require('cookie-parser');
+var exphbs  = require('express3-handlebars');
+var express = require('express');
+var io = require('./socketIO');
+var logfmt = require("logfmt");
+var mongoose = require('mongoose');
 var Promise = require('promise');
+var redis = require("./redis");
+var session = require('express-session');
+
+// Include chat routes
+require('./chatRoutes');
+
+var RedisStore = require('connect-redis')(session);
 
 var redisCli = redis.client;
 var ObjectId = mongoose.Types.ObjectId;
@@ -152,7 +155,7 @@ db.once('open', function callback () {
     });
   });
 
-  server.listen(port);
+  require('./expressServer').listen(port);
   redisCli.subscribe("scores:update");
 
   console.log('I am fully running now!');

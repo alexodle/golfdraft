@@ -1,16 +1,16 @@
 /** @jsx React.DOM */
 'use strict';
 
-var React = require('react');
-var ReactPropTypes = React.PropTypes;
 var _ = require('lodash');
+var ChatRoom = require('./ChatRoom.jsx');
+var LogoutButton = require('./LogoutButton.jsx');
 var moment = require('moment');
-
+var PlayerDetails = require('./PlayerDetails.jsx');
+var PlayerStandings = require('./PlayerStandings.jsx');
+var React = require('react');
 var ScoreLogic = require('../logic/ScoreLogic');
 
-var LogoutButton = require('./LogoutButton.jsx');
-var PlayerStandings = require('./PlayerStandings.jsx');
-var PlayerDetails = require('./PlayerDetails.jsx');
+var ReactPropTypes = React.PropTypes;
 
 function getState(state, props) {
   return {
@@ -23,7 +23,8 @@ var TourneyApp = React.createClass({
   propTypes: {
     currentUser: ReactPropTypes.object.isRequired,
     scores: ReactPropTypes.object.isRequired,
-    draft: ReactPropTypes.object.isRequired
+    draft: ReactPropTypes.object.isRequired,
+    chatMessages: ReactPropTypes.array
   },
 
   getInitialState: function () {
@@ -68,6 +69,11 @@ var TourneyApp = React.createClass({
               selectedPlayer={this.state.playerDetailsPlayer}
               onPlayerSelect={this._onPlayerSelect}
             />
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-md-12">
+            <ChatRoom messages={this.props.chatMessages} />
           </div>
         </div>
       </section>

@@ -1,13 +1,12 @@
 /** @jsx React.DOM */
 'use strict';
 
-var React = require('react');
-var ReactCSSTransitionGroup = require('react/lib/ReactCSSTransitionGroup');
 var _ = require('lodash');
-
-var PlayerStore = require('../stores/PlayerStore');
 var DraftStore = require('../stores/DraftStore');
 var GolferStore = require('../stores/GolferStore');
+var PlayerStore = require('../stores/PlayerStore');
+var React = require('react');
+var ReactCSSTransitionGroup = require('react/lib/ReactCSSTransitionGroup');
 
 var DraftHistory = React.createClass({
 
