@@ -161,9 +161,8 @@ _.extend(access, {
   }),
 
   createChatMessage: promiseizeFn(function (message) {
-    message = _.extend({}, message, {
-      date: new Date()
-    });
+    message = extendWithTourneyId(message);
+    message.date = new Date(); // probably not needed b/c we can use ObjectId
     return chatModels.Message.create(message);
   }),
 

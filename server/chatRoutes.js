@@ -34,7 +34,7 @@ app.post('/chat/messages', function (req, res) {
   access.createChatMessage(message)
   .then(function () {
     io.sockets.emit('change:chat', {
-      message: message,
+      data: message,
       evType: 'change:chat',
       action: 'chat:newMessage'
     });

@@ -17,9 +17,6 @@ var Promise = require('promise');
 var redis = require("./redis");
 var session = require('express-session');
 
-// Include chat routes
-require('./chatRoutes');
-
 var RedisStore = require('connect-redis')(session);
 
 var redisCli = redis.client;
@@ -77,6 +74,9 @@ db.once('open', function callback () {
       });
     });
   });
+
+  // Include chat routes
+  require('./chatRoutes');
 
   app.get(/\/(draft|tourney)?/, function (req, res) {
     Promise.all([

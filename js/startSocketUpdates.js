@@ -1,4 +1,5 @@
 var _ = require('lodash');
+var ChatActions = require('./actions/ChatActions');
 var DraftActions = require('./actions/DraftActions');
 var ScoreActions = require('./actions/ScoreActions');
 var socketio = require('socket.io-client');

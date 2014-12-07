@@ -2,12 +2,49 @@
 'use strict';
 
 var _ = require('lodash');
-var React = require('react');
-var PureRenderMixin = require('react/lib/ReactComponentWithPureRenderMixin');
-var PlayerStore = require('../stores/PlayerStore');
+var ChatActions = require('../actions/ChatActions');
 var moment = require('moment');
+var PlayerStore = require('../stores/PlayerStore');
+var PureRenderMixin = require('react/lib/ReactComponentWithPureRenderMixin');
+var React = require('react');
 
 var ReactPropTypes = React.PropTypes;
+
+var ChatRoomInput = React.createClass({
+  mixins: [PureRenderMixin],
+
+  getInitialState: function () {
+    return { text: '' };
+  },
+
+  render: function () {
+    return (
+      <div className='form-group'>
+        <input
+          className='form-control'
+          value={this.state.text}
+          onChange={this._updateText}
+        />
+        <button className='btn btn-default' onClick={this._onSend}>
+          Send
+        </button>
+      </div>
+    );
+  },
+
+  _updateText: function (ev) {
+    this.setState({ text: ev.target.value });
+  },
+
+  _onSend: function () {
+    var text = this.state.text;
+    if (_.isEmpty(text)) return;
+
+    ChatActions.createMessage(text);
+    this.setState({ text: '' });
+  }
+
+});
 
 var ChatRoom = React.createClass({
   mixins: [PureRenderMixin],
@@ -47,6 +84,7 @@ var ChatRoom = React.createClass({
       <section>
         <h2>Chat Room!</h2>
         {body}
+        {!messages ? null : (<ChatRoomInput />)}
       </section>
     );
   }
