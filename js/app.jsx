@@ -40,6 +40,4 @@ require('./startSocketUpdates')();
 // Lazily get chat messages
 //
 // TODO - move to separate server sync
-$.getJSON('/chat/messages').success(function (messages) {
-  ChatActions.setMessages(messages);
-});
+$.getJSON('/chat/messages').success(ChatActions.setMessages);
