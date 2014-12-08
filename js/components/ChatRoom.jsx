@@ -10,6 +10,8 @@ var PlayerStore = require('../stores/PlayerStore');
 var PureRenderMixin = require('react/lib/ReactComponentWithPureRenderMixin');
 var React = require('react');
 
+var BOT_NAME = 'DraftBot';
+
 var ReactPropTypes = React.PropTypes;
 
 var newMessageSound = new Audio(Assets.NEW_CHAT_MESSAGE_SOUND);
@@ -89,17 +91,23 @@ var ChatRoom = React.createClass({
       body = (
         <dl className='chat-list dl-horizontal'>
           {_.map(messages, function (message, i) {
-            return [(
-              <dt key={'dt' + i}>
-                {PlayerStore.getPlayer(message.player).name}
-                <span className='message-date'> (
-                  {moment(message.date).calendar()}
-                )</span>:
-              </dt>), (
-              <dd key={'dd' + i}>
-                {message.message}
-              </dd>
-            )];
+            var displayName = message.isBot ?
+              BOT_NAME : PlayerStore.getPlayer(message.player).name;
+            var className = message.isBot ? 'bot-message' : '';
+            return [
+              (
+                <dt key={'dt' + i} className={className}>
+                  {displayName} <span className='message-date'>
+                    ({moment(message.date).calendar()})
+                  </span>:
+                </dt>
+              ),
+              (
+                <dd key={'dd' + i} className={className}>
+                  {message.message}
+                </dd>
+              )
+            ];
           })}
         </dl>
       );

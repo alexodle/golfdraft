@@ -6,6 +6,7 @@ var _ = require('lodash');
 var access = require('./access');
 var app = require('./expressApp');
 var bodyParser = require('body-parser');
+var chatBot = require('./chatBot');
 var compression = require('compression');
 var config = require('./config');
 var cookieParser = require('cookie-parser');
@@ -25,6 +26,7 @@ var MAX_AGE = 1000 * 60 * 60 * 24 * 365;
 var redisCli = redis.client;
 var ObjectId = mongoose.Types.ObjectId;
 
+mongoose.set('debug', true);
 mongoose.connect(config.mongo_url);
 
 // Request logging
@@ -150,11 +152,16 @@ db.once('open', function callback () {
     access.makePick(pick)
     .then(function () {
       access.getDraft().then(function (draft) {
+        // Update chat
+        chatBot.broadcastPickMessage(pick, draft);
+
+        // Alert clients
         io.sockets.emit('change:draft', {
           data: draft,
           evType: 'change:draft',
           action: 'draft:pick'
         });
+
         res.send(200);
       });
     })

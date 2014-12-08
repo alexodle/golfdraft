@@ -5,6 +5,7 @@ var config = require('./config');
 var models = require('./models');
 var chatModels = require('./chatModels');
 var Promise = require('promise');
+var io = require('./socketIO');
 
 var TOURNEY_ID = config.tourney_id;
 var TOURNEY_ID_QUERY = { _id: TOURNEY_ID };
@@ -31,7 +32,8 @@ function promiseize(mongoosePromise) {
 function promiseizeFn(fn) {
   return function () {
     var mongoosePromise = fn.apply(null, arguments);
-    return promiseize(mongoosePromise);
+    var rVal = promiseize(mongoosePromise);
+    return rVal;
   };
 }
 
@@ -62,6 +64,16 @@ _.extend(access, {
 
   getTourney: promiseizeFn(function () {
     return models.Tourney.findOne(TOURNEY_ID_QUERY).exec();
+  }),
+
+  getGolfer: promiseizeFn(function (golferId) {
+    var query = _.extend({ _id: golferId }, FK_TOURNEY_ID_QUERY);
+    return models.Golfer.findOne(query).exec();
+  }),
+
+  getPlayer: promiseizeFn(function (playerId) {
+    var query = _.extend({ _id: playerId }, FK_TOURNEY_ID_QUERY);
+    return models.Player.findOne(query).exec();
   }),
 
   getGolfers: createBasicGetter(models.Golfer),
@@ -163,8 +175,19 @@ _.extend(access, {
   createChatMessage: promiseizeFn(function (message) {
     message = extendWithTourneyId(message);
     message.date = new Date(); // probably not needed b/c we can use ObjectId
-    return chatModels.Message.create(message);
+    return chatModels.Message.create(message)
+    .then(function () {
+      io.sockets.emit('change:chat', {
+        data: message,
+        evType: 'change:chat',
+        action: 'chat:newMessage'
+      });
+    });
   }),
+
+  createChatBotMessage: function (message) {
+    return access.createChatMessage(_.extend({ isBot: true }, message));
+  },
 
   // DEBUGGING/TESTING
 

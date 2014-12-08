@@ -3,7 +3,6 @@
 var _ = require('lodash');
 var app = require('./expressApp');
 var access = require('./access');
-var io = require('./socketIO');
 
 app.get('/chat/messages', function (req, res) {
   access.getChatMessages()
@@ -33,12 +32,7 @@ app.post('/chat/messages', function (req, res) {
   };
   access.createChatMessage(message)
   .then(function () {
-    io.sockets.emit('change:chat', {
-      data: message,
-      evType: 'change:chat',
-      action: 'chat:newMessage'
-    });
-    res.send(200);
+    res.send(201);
   })
   .catch(function (err) {
     res.send(500, err);
