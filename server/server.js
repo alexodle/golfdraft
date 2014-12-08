@@ -51,12 +51,16 @@ app.set('view engine', 'handlebars');
 // Static routes
 if (process.env.DEBUG) {
   app.set('views', './distd/views/');
-  app.use('/distd', express.static(__dirname + '/../distd'));
+  app.use('/dist', express.static(__dirname + '/../distd'));
 } else {
   app.set('views', './dist/views/');
-  app.use('/dist', express.static(__dirname + '/../dist', { maxAge: MAX_AGE }));
+  app.use('/dist', express.static(__dirname + '/../dist', {
+    maxAge: MAX_AGE
+  }));
 }
-app.use('/assets', express.static(__dirname + '/../assets', { maxAge: MAX_AGE }));
+app.use('/assets', express.static(__dirname + '/../assets', {
+  maxAge: MAX_AGE
+}));
 
 // Parsing
 app.use(bodyParser());

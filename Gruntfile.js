@@ -65,7 +65,8 @@ module.exports = function (grunt) {
         },
         devtool: 'eval', // Fast rebuild
         watch: true,
-        keepalive: true
+        keepalive: true,
+        failOnError: false
       }
     },
 
@@ -87,7 +88,7 @@ module.exports = function (grunt) {
         src: ['./views/index.handlebars'],
         dest: './distd/views/',
         replacements: [
-          { from: '$$bundleSrc$$', to: 'distd/bundle.js' }
+          { from: '$$bundleSrc$$', to: 'dist/bundle.js' }
         ]
       }
     },
