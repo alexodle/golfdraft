@@ -87,7 +87,7 @@ db.once('open', function callback () {
   // Include chat routes
   require('./chatRoutes');
 
-  app.get(/\/(draft|tourney)?/, function (req, res) {
+  app.get(['/', '/draft', '/tourney'], function (req, res) {
     Promise.all([
       access.getGolfers(),
       access.getPlayers(),
