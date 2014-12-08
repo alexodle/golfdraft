@@ -80,7 +80,7 @@ module.exports = function (grunt) {
         replacements: [
           {
             from: '$$bundleSrc$$',
-            to: '"https://d32f0b5bf2mq7f.cloudfront.net/dist/bundle.<%= bundle.hash %>.js"'
+            to: '"//d32f0b5bf2mq7f.cloudfront.net/dist/bundle.<%= bundle.hash %>.js"'
           }
         ]
       },
