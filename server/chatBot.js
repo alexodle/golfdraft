@@ -12,13 +12,13 @@ module.exports = {
 
     Promise.all(_.compact([
       access.getPlayer(draftPick.player),
-      access.getPlayer(nextPick.player),
-      nextPick ? access.getGolfer(draftPick.golfer) : null
+      access.getGolfer(draftPick.golfer),
+      nextPick ? access.getPlayer(nextPick.player) : null,
     ]))
     .then(function (results) {
       var player = results[0];
-      nextPlayer = results[1];
-      var golfer = results[2];
+      var golfer = results[1];
+      nextPlayer = results[2];
       return access.createChatBotMessage({
         message: player.name + ' picks ' + golfer.name
       });
