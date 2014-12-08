@@ -10,6 +10,18 @@ var UserActions = {
       actionType: AppConstants.CURRENT_USER_CHANGE,
       currentUser: user
     });
+  },
+
+  /**
+   Same as setting the current user, except that this is specifically
+   reserved for app startup
+   */
+  hydrateCurrentUser: function (user) {
+    AppDispatcher.handleServerAction({
+      actionType: AppConstants.CURRENT_USER_CHANGE,
+      currentUser: user,
+      doNotSync: true
+    });
   }
 
 };

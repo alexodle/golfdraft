@@ -25,7 +25,7 @@ function hydrate(seedData) {
   AppActions.setUsers(users);
 
   if (seedData.user) {
-    UserActions.setCurrentUser(seedData.user.id);
+    UserActions.hydrateCurrentUser(seedData.user.id);
   }
 }
 

@@ -37,16 +37,18 @@ AppDispatcher.register(function (payload) {
     case AppConstants.CURRENT_USER_CHANGE:
       _currentUser = action.currentUser;
 
-      // TODO - Move to separate server sync
-      var xhr = null;
-      if (_currentUser) {
-        xhr = $.post('/login', UserStore.getCurrentUser());
-      } else {
-        xhr = $.post('/logout');
+      if (!action.doNotSync) {
+        // TODO - Move to separate server sync
+        var xhr = null;
+        if (_currentUser) {
+          xhr = $.post('/login', UserStore.getCurrentUser());
+        } else {
+          xhr = $.post('/logout');
+        }
+        xhr.fail(function () {
+          window.location.reload();
+        });
       }
-      xhr.fail(function () {
-        window.location.reload();
-      });
 
       UserStore.emitChange();
       break;
