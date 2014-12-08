@@ -149,26 +149,33 @@ db.once('open', function callback () {
       player: new ObjectId(body.player),
       golfer: new ObjectId(body.golfer)
     };
+
+    // Make the pick
     access.makePick(pick)
     .then(function () {
-      access.getDraft().then(function (draft) {
-        // Update chat
-        chatBot.broadcastPickMessage(pick, draft);
-
-        // Alert clients
-        io.sockets.emit('change:draft', {
-          data: draft,
-          evType: 'change:draft',
-          action: 'draft:pick'
-        });
-
-        res.send(200);
-      });
+      res.send(200);
     })
     .catch(function (err) {
       if (err.message.indexOf('invalid pick') !== -1) {
         res.send(400, err.message);
       }
+      throw err;
+    })
+
+    // Alert clients
+    .then(access.getDraft)
+    .then(function (draft) {
+      io.sockets.emit('change:draft', {
+        data: draft,
+        evType: 'change:draft',
+        action: 'draft:pick'
+      });
+
+      // Do this second, since it's least important
+      chatBot.broadcastPickMessage(pick, draft);
+    })
+    .catch(function (err) {
+      console.error('Unknown error: ' + err);
     });
   });
 
