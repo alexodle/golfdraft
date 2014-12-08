@@ -25,6 +25,7 @@ var ChatRoomInput = React.createClass({
       <form onSubmit={this._onSend}>
         <div className='form-group'>
           <input
+            ref='input'
             className='form-control'
             value={this.state.text}
             onChange={this._updateText}
@@ -49,6 +50,8 @@ var ChatRoomInput = React.createClass({
 
     ChatActions.createMessage(text);
     this.setState({ text: '' });
+
+    $(this.refs.input.getDOMNode()).focus();
   }
 
 });
