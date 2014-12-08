@@ -45,15 +45,7 @@ var DraftApp = React.createClass({
   render: function () {
     var draftView = null;
     var golfersRemaining = getGolfersRemaining(this.props);
-
-    if (isMyDraftPick(this.props)) {
-      draftView = (
-        <DraftChooser
-          golfersRemaining={golfersRemaining}
-          currentPick={this.props.currentPick}
-        />
-      );
-    }
+    var isMyPick = isMyDraftPick(this.props);
 
     return (
       <section>
@@ -72,8 +64,15 @@ var DraftApp = React.createClass({
         </div>
         <div className="row">
           <div className="col-md-12">
-            <DraftStatus currentPick={this.props.currentPick} />
-            {draftView}
+
+            {!isMyPick ? (
+              <DraftStatus currentPick={this.props.currentPick} />
+            ) : (
+              <DraftChooser
+                golfersRemaining={golfersRemaining}
+                currentPick={this.props.currentPick}
+              />
+            )}
           </div>
         </div>
         <div className="row">

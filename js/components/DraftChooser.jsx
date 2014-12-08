@@ -26,7 +26,7 @@ var DraftChooser = React.createClass({
     var sortedGolfers = getSortedGolfers(this.props.golfersRemaining);
     return (
       <section>
-        <h2>Make your pick</h2>
+        <h2>It's your turn! Make your pick.</h2>
         <div className="panel panel-default">
           <div className="panel-body">
             <form role="form">
