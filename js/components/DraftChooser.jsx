@@ -25,7 +25,8 @@ var DraftChooser = React.createClass({
   render: function () {
     var sortedGolfers = getSortedGolfers(this.props.golfersRemaining);
     return (
-      <div>
+      <section>
+        <h2>Make your pick</h2>
         <div className="panel panel-default">
           <div className="panel-body">
             <form role="form">
@@ -52,7 +53,7 @@ var DraftChooser = React.createClass({
             </form>
           </div>
         </div>
-      </div>
+      </section>
     );
   },
 
