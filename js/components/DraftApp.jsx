@@ -2,6 +2,7 @@
 "use strict";
 
 var _ = require("lodash");
+var Assets = require("../constants/Assets");
 var ChatRoom = require("./ChatRoom.jsx");
 var DraftChooser = require("./DraftChooser.jsx");
 var DraftHistory = require("./DraftHistory.jsx");
@@ -13,8 +14,8 @@ var React = require("react");
 var SettingsActions = require("../actions/SettingsActions");
 var SoundToggle = require("./SoundToggle.jsx");
 
-var myTurnSound = new Audio("/assets/airplane_chime.wav");
-var pickMadeSound = new Audio("/assets/bleep1.wav");
+var myTurnSound = new Audio(Assets.MY_TURN_SOUND);
+var pickMadeSound = new Audio(Assets.PICK_MADE_SOUND);
 
 function getGolfersRemaining(props) {
   var pickedGolfers = _.pluck(props.draftPicks, "golfer");

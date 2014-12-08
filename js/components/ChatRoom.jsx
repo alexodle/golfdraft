@@ -4,6 +4,7 @@
 var $ = require('jquery');
 var _ = require('lodash');
 var ChatActions = require('../actions/ChatActions');
+var Assets = require('../constants/Assets');
 var moment = require('moment');
 var PlayerStore = require('../stores/PlayerStore');
 var PureRenderMixin = require('react/lib/ReactComponentWithPureRenderMixin');
@@ -11,7 +12,7 @@ var React = require('react');
 
 var ReactPropTypes = React.PropTypes;
 
-var newMessageSound = new Audio('/assets/tone1.wav');
+var newMessageSound = new Audio(Assets.NEW_CHAT_MESSAGE_SOUND);
 
 var ChatRoomInput = React.createClass({
   mixins: [PureRenderMixin],

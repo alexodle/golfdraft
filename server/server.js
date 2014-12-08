@@ -98,7 +98,8 @@ db.once('open', function callback () {
         scores: JSON.stringify(results[3]),
         tourney: JSON.stringify(results[4]),
         user: JSON.stringify(req.session.user),
-        prod: config.prod
+        prod: config.prod,
+        cdnUrl: config.cdn_url
       });
     });
   });

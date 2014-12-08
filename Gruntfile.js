@@ -78,17 +78,14 @@ module.exports = function (grunt) {
         src: ['./views/index.handlebars'],
         dest: './dist/views/',
         replacements: [
-          {
-            from: '$$bundleSrc$$',
-            to: '"//d32f0b5bf2mq7f.cloudfront.net/dist/bundle.<%= bundle.hash %>.js"'
-          }
+          { from: '$$bundleSrc$$', to: 'dist/bundle.<%= bundle.hash %>.js' }
         ]
       },
       dev: {
         src: ['./views/index.handlebars'],
         dest: './distd/views/',
         replacements: [
-          { from: '$$bundleSrc$$', to: '"/distd/bundle.js"' }
+          { from: '$$bundleSrc$$', to: 'distd/bundle.js' }
         ]
       }
     },

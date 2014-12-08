@@ -6,6 +6,8 @@ var cfg = {
 
   tourney_id: process.env.TOURNEY_ID || '5376879322ed79dd19a07148',
 
+  cdn_url: process.env.CDN_URL || '',
+
   yahoo_url: 'http://sports.yahoo.com/golf/pga/leaderboard/2015/360'
 };
 
