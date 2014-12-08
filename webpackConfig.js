@@ -7,7 +7,7 @@ module.exports = {
   ],
   module: {
     loaders: [
-      { test: /\.eot($|\?)/, loader: "file?prefix=/dist/" },
+      { test: /\.eot($|\?)/, loader: "file?" },
       { test: /\.gif($|\?)/, loader: "url?limit=10000&minetype=image/gif" },
       { test: /\.jpg($|\?)/, loader: "url?limit=10000&minetype=image/jpg" },
       { test: /\.json($|\?)/, loader: 'json' },
@@ -30,9 +30,9 @@ module.exports = {
         ].join('!'))
       },
       { test: /\.png($|\?)/, loader: "url?limit=10000&minetype=image/png&prefix=/img/" },
-      { test: /\.svg($|\?)/, loader: "file?prefix=/dist222/" },
-      { test: /\.ttf($|\?)/, loader: "file?prefix=/dist222/" },
-      { test: /\.woff($|\?)/, loader: "url?prefix=/dist222/&limit=10000&mimetype=application/font-woff" }
+      { test: /\.svg($|\?)/, loader: "file?" },
+      { test: /\.ttf($|\?)/, loader: "file?" },
+      { test: /\.woff($|\?)/, loader: "url?&limit=10000&mimetype=application/font-woff" }
     ]
   },
   stats: {
