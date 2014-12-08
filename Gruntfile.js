@@ -44,9 +44,11 @@ module.exports = function (grunt) {
           filename: 'bundle.[hash].js'
         },
         storeStatsTo: 'bundle', // use it later as <%= bundle.hash %>
-
-        // Don't bother minimizing. Not a big app. Not trying to hide code.
         plugins: [
+          new webpack.optimize.DedupePlugin(),
+          new webpack.optimize.UglifyJsPlugin(),
+          new webpack.optimize.OccurenceOrderPlugin(),
+          new webpack.optimize.AggressiveMergingPlugin(),
           new webpack.DefinePlugin({
             // Remove all debug-only code from React
             'process.env': {
