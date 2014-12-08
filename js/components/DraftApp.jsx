@@ -13,8 +13,8 @@ var React = require("react");
 var SettingsActions = require("../actions/SettingsActions");
 var SoundToggle = require("./SoundToggle.jsx");
 
-var myTurnSound = new Audio("/assets/boxing_bell_multiple.wav");
-var pickMadeSound = new Audio("/assets/boxing_bell.wav");
+var myTurnSound = new Audio("/assets/airplane_chime.wav");
+var pickMadeSound = new Audio("/assets/bleep1.wav");
 
 function getGolfersRemaining(props) {
   var pickedGolfers = _.pluck(props.draftPicks, "golfer");
