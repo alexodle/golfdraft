@@ -6,7 +6,8 @@ var messageSchema = mongoose.Schema({
   tourneyId: mongoose.Schema.ObjectId,
   player: mongoose.Schema.ObjectId,
   isBot: Boolean,
-  message: String
+  message: String,
+  date: Date
 });
 messageSchema.index({ tourneyId: 1 });
 

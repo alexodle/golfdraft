@@ -25,7 +25,7 @@ AppDispatcher.register(function (payload) {
   switch(action.actionType) {
 
     case ChatConstants.SET_MESSAGES:
-      _messages = action.messages;
+      _messages = _.sortBy(action.messages, 'date');
       ChatStore.emitChange();
       break;
 
