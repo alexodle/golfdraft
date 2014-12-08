@@ -20,6 +20,8 @@ var session = require('express-session');
 
 var RedisStore = require('connect-redis')(session);
 
+var MAX_AGE = 1000 * 60 * 60 * 24 * 365;
+
 var redisCli = redis.client;
 var ObjectId = mongoose.Types.ObjectId;
 
@@ -52,9 +54,9 @@ if (process.env.DEBUG) {
   app.use('/distd', express.static(__dirname + '/../distd'));
 } else {
   app.set('views', './dist/views/');
-  app.use('/dist', express.static(__dirname + '/../dist'));
+  app.use('/dist', express.static(__dirname + '/../dist', { maxAge: MAX_AGE }));
 }
-app.use('/assets', express.static(__dirname + '/../assets'));
+app.use('/assets', express.static(__dirname + '/../assets', { maxAge: MAX_AGE }));
 
 // Parsing
 app.use(bodyParser());
