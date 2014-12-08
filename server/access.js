@@ -186,6 +186,8 @@ _.extend(access, {
     models.GolferScoreOverrides
   ),
 
+  clearChatMessages: createBasicClearer(chatModels.Message),
+
   resetTourney: function () {
     return Promise.all(_.map([
       models.Tourney.update(TOURNEY_ID_QUERY, {
@@ -199,7 +201,8 @@ _.extend(access, {
       access.clearDraftPicks(),
       access.clearGolfers(),
       access.clearGolferScores(),
-      access.clearGolferScoreOverrides()
+      access.clearGolferScoreOverrides(),
+      access.clearChatMessages()
     ], promiseize));
   }
 
