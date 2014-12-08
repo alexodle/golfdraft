@@ -7,7 +7,7 @@ module.exports = {
   ],
   module: {
     loaders: [
-      { test: /\.eot($|\?)/, loader: "file?" },
+      { test: /\.eot($|\?)/, loader: "url?prefix=dist/" },
       { test: /\.gif($|\?)/, loader: "url?limit=10000&minetype=image/gif" },
       { test: /\.jpg($|\?)/, loader: "url?limit=10000&minetype=image/jpg" },
       { test: /\.json($|\?)/, loader: 'json' },
