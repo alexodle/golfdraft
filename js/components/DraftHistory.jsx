@@ -14,7 +14,7 @@ var DraftHistory = React.createClass({
     var draftPicks = _.clone(this.props.draftPicks).reverse();
     return (
       <div>
-        <h2>Draft history</h2>
+        <h2>Draft picks</h2>
         <table className='table'>
           <thead><tr><th>#</th><th>Pool Player</th><th>Golfer</th></tr></thead>
           <ReactCSSTransitionGroup transitionName="tablerow" component="tbody">
