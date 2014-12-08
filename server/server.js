@@ -6,6 +6,7 @@ var _ = require('lodash');
 var access = require('./access');
 var app = require('./expressApp');
 var bodyParser = require('body-parser');
+var compression = require('compression');
 var config = require('./config');
 var cookieParser = require('cookie-parser');
 var exphbs  = require('express3-handlebars');
@@ -34,6 +35,9 @@ app.use(session({
   store: new RedisStore({ url: config.redis_url }),
   secret: 'odle rules'
 }));
+
+// Gzip
+app.use(compression());
 
 // Handlebars
 app.engine('handlebars', exphbs({
