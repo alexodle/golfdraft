@@ -7,6 +7,7 @@ var messageSchema = mongoose.Schema({
   player: mongoose.Schema.ObjectId,
   message: String
 });
+messageSchema.index({ tourneyId: 1 });
 
 var Message = mongoose.model('Message', messageSchema);
 
