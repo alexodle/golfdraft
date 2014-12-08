@@ -23,7 +23,6 @@ var RedisStore = require('connect-redis')(session);
 var redisCli = redis.client;
 var ObjectId = mongoose.Types.ObjectId;
 
-mongoose.set('debug', true);
 mongoose.connect(config.mongo_url);
 
 // Request logging
