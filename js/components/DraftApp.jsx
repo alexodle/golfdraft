@@ -76,6 +76,11 @@ var DraftApp = React.createClass({
           </div>
         </div>
         <div className="row">
+          <div className="col-md-12">
+            <ChatRoom messages={this.props.chatMessages} />
+          </div>
+        </div>
+        <div className="row">
           <div className="col-md-3">
             <DraftPickOrder
               currentUser={this.props.currentUser}
@@ -86,11 +91,6 @@ var DraftApp = React.createClass({
             <DraftHistory
               draftPicks={this.props.draftPicks}
             />
-          </div>
-        </div>
-        <div className="row">
-          <div className="col-md-12">
-            <ChatRoom messages={this.props.chatMessages} />
           </div>
         </div>
       </section>
