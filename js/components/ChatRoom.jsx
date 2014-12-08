@@ -103,7 +103,7 @@ var ChatRoom = React.createClass({
 
     return (
       <section>
-        <h2>Chat Room!</h2>
+        <h2>Chat Room</h2>
         <div className='panel panel-default chat-panel' ref='chatPanel'>
           <div className='panel-body' ref='chatPanelBody'>
             {body}
