@@ -123,7 +123,7 @@ module.exports = function (grunt) {
     'clean:prod',
     'copy:prod',
     'webpack:prod',
-    'hashres:prod'
+    'hashres'
   ]);
 
   grunt.registerTask('rund', [
