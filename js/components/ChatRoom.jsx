@@ -11,6 +11,8 @@ var React = require('react');
 
 var ReactPropTypes = React.PropTypes;
 
+var newMessageSound = new Audio('/assets/tone1.wav');
+
 var ChatRoomInput = React.createClass({
   mixins: [PureRenderMixin],
 
@@ -62,8 +64,11 @@ var ChatRoom = React.createClass({
     this._forceScroll();
   },
 
-  componentDidUpdate: function () {
+  componentDidUpdate: function (prevProps) {
     this._forceScroll();
+    if (prevProps.messages) {
+      newMessageSound.play();
+    }
   },
 
   render: function () {
@@ -78,18 +83,21 @@ var ChatRoom = React.createClass({
 
     } else {
       body = (
-        <ul className='chat-list list-unstyled'>
+        <dl className='chat-list dl-horizontal'>
           {_.map(messages, function (message, i) {
-            return (
-              <li key={i}>
+            return [(
+              <dt key={'dt' + i}>
                 {PlayerStore.getPlayer(message.player).name}
                 <span className='message-date'> (
                   {moment(message.date).calendar()}
-                )</span>: {message.message}
-              </li>
-            );
+                )</span>:
+              </dt>), (
+              <dd key={'dd' + i}>
+                {message.message}
+              </dd>
+            )];
           })}
-        </ul>
+        </dl>
       );
     }
 
