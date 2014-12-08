@@ -41,9 +41,8 @@ module.exports = function (grunt) {
       prod: {
         output: {
           path: './dist/',
-          filename: 'bundle.[hash].js'
+          filename: 'bundle.js'
         },
-        storeStatsTo: 'bundle', // use it later as <%= bundle.hash %>
         plugins: [
           new webpack.optimize.DedupePlugin(),
           new webpack.optimize.UglifyJsPlugin(),
@@ -76,20 +75,24 @@ module.exports = function (grunt) {
       }
     },
 
-    replace: {
+    copy: {
       prod: {
-        src: ['./views/index.handlebars'],
-        dest: './dist/views/',
-        replacements: [
-          { from: '$$bundleSrc$$', to: 'dist/bundle.<%= bundle.hash %>.js' }
-        ]
+        src: './views/index.handlebars',
+        dest: './dist/'
       },
       dev: {
-        src: ['./views/index.handlebars'],
-        dest: './distd/views/',
-        replacements: [
-          { from: '$$bundleSrc$$', to: 'dist/bundle.js' }
-        ]
+        src: './views/index.handlebars',
+        dest: './distd/'
+      }
+    },
+
+    hashres: {
+      options: {
+        fileNameFormat: '${name}.${hash}.${ext}',
+      },
+      prod: {
+        src: ['./dist/*.js', './dist/*.css'],
+        dest: './dist/views/index.handlebars'
       }
     },
 
@@ -112,14 +115,15 @@ module.exports = function (grunt) {
 
   grunt.registerTask('buildd', [
     'clean:dev',
-    'replace:dev',
+    'copy:dev',
     'webpack:dev'
   ]);
 
   grunt.registerTask('build', [
     'clean:prod',
+    'copy:prod',
     'webpack:prod',
-    'replace:prod'
+    'hashres:prod'
   ]);
 
   grunt.registerTask('rund', [

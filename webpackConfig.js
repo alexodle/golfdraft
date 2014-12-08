@@ -1,5 +1,10 @@
+var ExtractTextPlugin = require('extract-text-webpack-plugin');
+
 module.exports = {
   entry: "./js/app.jsx",
+  plugins: [
+    new ExtractTextPlugin("bundle.css")
+  ],
   module: {
     loaders: [
       { test: /\.eot($|\?)/, loader: "file?prefix=/dist/" },
@@ -7,12 +12,27 @@ module.exports = {
       { test: /\.jpg($|\?)/, loader: "url?limit=10000&minetype=image/jpg" },
       { test: /\.json($|\?)/, loader: 'json' },
       { test: /\.jsx($|\?)/, loader: 'jsx-loader?harmony' },
-      { test: /\.less($|\?)/, loader: 'style!css!less' },
-      { test: /\.css($|\?)/, loader: 'style!css' },
+      {
+        test: /\.less($|\?)/,
+        loader: ExtractTextPlugin.extract('style-loader', [
+          'css-loader',
+          'autoprefixer-loader?{browsers:["last 2 version", "IE 9"]}',
+          'less-loader',
+          ''
+        ].join('!'))
+      },
+      {
+        test: /\.css($|\?)/,
+        loader: ExtractTextPlugin.extract('style-loader', [
+          'css-loader',
+          'autoprefixer-loader?{browsers:["last 2 version", "IE 9"]}',
+          ''
+        ].join('!'))
+      },
       { test: /\.png($|\?)/, loader: "url?limit=10000&minetype=image/png&prefix=/img/" },
-      { test: /\.svg($|\?)/, loader: "file?prefix=/dist/" },
-      { test: /\.ttf($|\?)/, loader: "file?prefix=/dist/" },
-      { test: /\.woff($|\?)/, loader: "url?prefix=/dist/&limit=10000&mimetype=application/font-woff" }
+      { test: /\.svg($|\?)/, loader: "file?prefix=/dist222/" },
+      { test: /\.ttf($|\?)/, loader: "file?prefix=/dist222/" },
+      { test: /\.woff($|\?)/, loader: "url?prefix=/dist222/&limit=10000&mimetype=application/font-woff" }
     ]
   },
   stats: {
