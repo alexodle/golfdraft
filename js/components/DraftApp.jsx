@@ -25,7 +25,9 @@ function getGolfersRemaining(props) {
 
 function isMyDraftPick(props) {
   return (
-    props.currentUser && props.currentPick.player === props.currentUser.player
+    props.currentUser &&
+    props.currentPick &&
+    props.currentPick.player === props.currentUser.player
   );
 }
 
@@ -46,9 +48,11 @@ var DraftApp = React.createClass({
     var draftView = null;
     var golfersRemaining = getGolfersRemaining(this.props);
     var isMyPick = isMyDraftPick(this.props);
+    var isDraftOver = !this.props.currentPick;
 
     return (
       <section>
+
         <div className="page-header draft-page-header">
           <h1>Welcome to the 2014 U.S. Open Draft
             <span> </span><small>{this.props.currentUser.name}</small>
@@ -62,9 +66,9 @@ var DraftApp = React.createClass({
             <LogoutButton currentUser={this.props.currentUser} />
           </div>
         </div>
+
         <div className="row">
           <div className="col-md-12">
-
             {!isMyPick ? (
               <DraftStatus currentPick={this.props.currentPick} />
             ) : (

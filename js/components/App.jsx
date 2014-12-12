@@ -44,7 +44,18 @@ function getAppState() {
   };
 }
 
-function getCurrentRoute(state) {
+function shouldTransition(currRoute, newRoute) {
+  return (
+    currRoute !== newRoute && (
+      currRoute === 'whoisyou' || newRoute === 'whoisyou'
+    )
+  );
+}
+
+/**
+ Returns route that should app should be in based on state
+ */
+function getTransitionRoute(state) {
   state = state || getAppState();
   if (!state.currentUser) {
     return 'whoisyou';
@@ -55,11 +66,11 @@ function getCurrentRoute(state) {
   }
 }
 
-function createWillTransitionTo(allowedRoute) {
+function createWillTransitionTo(currRoute) {
   return function (transition) {
-    var route = getCurrentRoute();
-    if (route !== allowedRoute) {
-      transition.redirect(route);
+    var newRoute = getTransitionRoute();
+    if (shouldTransition(currRoute, newRoute)) {
+      transition.redirect(newRoute);
     }
   };
 }
@@ -127,14 +138,12 @@ var AppNode = React.createClass({
     return getAppState();
   },
 
-  shouldComponentUpdate: function (nextProps, nextState) {
+  componentWillUpdate: function (nextProps, nextState) {
     var currRoute = _.last(this.getRoutes()).name;
-    var newRoute = getCurrentRoute(nextState);
-    var routeChange = newRoute !== currRoute;
-    if (routeChange) {
+    var newRoute = getTransitionRoute();
+    if (shouldTransition(currRoute, newRoute)) {
       this.transitionTo(newRoute);
     }
-    return !routeChange;
   },
 
   componentDidMount: function () {

@@ -14,12 +14,14 @@ var DraftPickOrder = React.createClass({
 
   propTypes: {
     currentUser: ReactPropTypes.object.isRequired,
-    currentPick: ReactPropTypes.object.isRequired
+    currentPick: ReactPropTypes.object
   },
 
   render: function () {
+    var currentPick = this.props.currentPick;
+    var currentPlayer = currentPick ? currentPick.player : null;
+
     var myPlayer = this.props.currentUser.player;
-    var currentPlayer = this.props.currentPick.player;
     var pickOrder = DraftStore.getPickOrder();
     pickOrder = _.first(pickOrder, pickOrder.length / 4);
     return (
