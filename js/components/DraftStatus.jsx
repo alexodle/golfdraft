@@ -16,7 +16,7 @@ var DraftStatus = React.createClass({
           <div className="col-md-12">
             <div className="alert alert-success" role="alert">
               The draft is over! <Link to='tourney'>
-                Click here to check out live scoring here.
+                Click here to check out live scoring
               </Link>
             </div>
           </div>
