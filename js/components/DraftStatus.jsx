@@ -6,22 +6,25 @@ var Link = require('react-router').Link;
 var PlayerStore = require('../stores/PlayerStore');
 var React = require('react');
 
+var DraftOver = React.createClass({
+
+  render: function () {
+    return (
+      <div className="jumbotron">
+        <h1>The draft is over!</h1>
+        <p><Link to='tourney'>Check out the live leaderboard</Link></p>
+      </div>
+    );
+  }
+
+});
+
 var DraftStatus = React.createClass({
 
   render: function () {
     var currentPick = this.props.currentPick;
     if (!currentPick) {
-      return (
-        <div className="row">
-          <div className="col-md-12">
-            <div className="alert alert-success" role="alert">
-              The draft is over! <Link to='tourney'>
-                Click here to check out live scoring
-              </Link>
-            </div>
-          </div>
-        </div>
-      );
+      return (<DraftOver />);
     }
 
     return (
