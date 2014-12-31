@@ -6,6 +6,7 @@ var utils = require('../../common/utils');
 
 var NDAYS = constants.NDAYS;
 var MISSED_CUT = constants.MISSED_CUT;
+var NSCORES_PER_DAY = constants.NSCORES_PER_DAY;
 
 function getGolfersByPlayer(draftPicks) {
   return _.chain(draftPicks)
@@ -38,7 +39,7 @@ function playerScore(playerGolfers, scores, player) {
         })
         .value();
 
-      var usedScores = _.first(dayScores, 2);
+      var usedScores = _.first(dayScores, NSCORES_PER_DAY);
       return {
         day: day,
         allScores: dayScores,
