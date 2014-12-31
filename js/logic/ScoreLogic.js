@@ -69,6 +69,18 @@ function worstScoreForDay(playerScores, day) {
 
 var ScoreLogic = {
 
+  /**
+   * Calculates the overall score for each pool player in tournament. Scoring
+   * works on a per-day basis, and is calculated as such:
+   *
+   * score = 0
+   * for each day:
+   *   score += best golfer score for day
+   *   score += 2nd best golfer score for day
+   *
+   * If the either of the top 2 scores contains a MISSED_CUT, then the worst
+   * score of all golfers for the particular day will be used instead.
+   */
   calcPlayerScores: function (draftPicks, playerScores) {
     var golfersByPlayer = getGolfersByPlayer(draftPicks);
 
@@ -82,6 +94,16 @@ var ScoreLogic = {
     return playerScores;
   },
 
+  /**
+   * Replaces missed cut scores with the worst score of any golfer for that
+   * particular day. See calcPlayerScores() description for why this is
+   * important.
+   *
+   * Appends a missedCuts array to the scores object, which contains true for
+   * each day the golfer missed the cut. This can be used by the UI to display
+   * which scores were actually the result of a missed cut instead of the
+   * golfer actually shooting that particular score.
+   */
   fillMissedCutScores: function (playerScores) {
     var worstScores = _.chain(NDAYS)
       .range()
