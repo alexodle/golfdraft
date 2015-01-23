@@ -23,6 +23,16 @@ function printState() {
   });
 }
 
+function handleError(err) {
+  console.log("UM HOW DID I END UP HERE HIHI");
+  if (err.stack) {
+    console.log(err.stack);
+  } else {
+    console.log(err);
+  }
+  throw err;
+}
+
 function refreshData(pickOrderNames, yahooUrl) {
   console.log("BEGIN Refreshing all data...");
   console.log("");
@@ -63,17 +73,18 @@ function refreshData(pickOrderNames, yahooUrl) {
   .then(printState)
   .then(function () {
     console.log("BEGIN Updating scores");
-    return updateScore.run(yahooUrl).then(function () {
-      console.log("END Updating scores");
-    });
+    return updateScore.run(yahooUrl);
   })
-  .catch(function (err) {
-    if (err.stack) {
-      console.log(err.stack);
-    } else {
-      console.log(err);
-    }
+  .catch(function () {
+    // If we can't get to yahoo, just add some randome golfers
+    return access.ensureGolfers(_.times(50, function (i) {
+      return { name: 'Fake Golfer' + i };
+    }));
   })
+  .then(function () {
+    console.log("END Updating scores");
+  })
+  .catch(handleError)
   .then(function () {
     process.exit(0);
   });
