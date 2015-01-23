@@ -23,7 +23,7 @@ function addPick(golfer) {
   var pick =  _.extend({}, getCurrentPick(), {
     golfer: golfer
   });
-  _picks.push(pick);
+  _picks = _picks.concat([pick]);
   return pick;
 }
 

@@ -14,8 +14,6 @@ var BOT_NAME = 'DraftBot';
 
 var ReactPropTypes = React.PropTypes;
 
-var newMessageSound = new Audio(Assets.NEW_CHAT_MESSAGE_SOUND);
-
 var ChatRoomInput = React.createClass({
   mixins: [PureRenderMixin],
 
@@ -70,11 +68,8 @@ var ChatRoom = React.createClass({
     this._forceScroll();
   },
 
-  componentDidUpdate: function (prevProps) {
+  componentDidUpdate: function () {
     this._forceScroll();
-    if (prevProps.messages) {
-      newMessageSound.play();
-    }
   },
 
   render: function () {

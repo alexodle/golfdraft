@@ -2,20 +2,18 @@
 "use strict";
 
 var _ = require("lodash");
-var Assets = require("../constants/Assets");
 var ChatRoom = require("./ChatRoom.jsx");
+var DraftAppSounds = require("./DraftAppSounds.jsx");
 var DraftChooser = require("./DraftChooser.jsx");
 var DraftHistory = require("./DraftHistory.jsx");
 var DraftPickOrder = require("./DraftPickOrder.jsx");
 var DraftStatus = require("./DraftStatus.jsx");
 var GolferStore = require("../stores/GolferStore");
+var IsMyDraftPickMixin = require("./IsMyDraftPickMixin");
 var LogoutButton = require("./LogoutButton.jsx");
 var React = require("react");
 var SettingsActions = require("../actions/SettingsActions");
 var SoundToggle = require("./SoundToggle.jsx");
-
-var myTurnSound = new Audio(Assets.MY_TURN_SOUND);
-var pickMadeSound = new Audio(Assets.PICK_MADE_SOUND);
 
 function getGolfersRemaining(props) {
   var pickedGolfers = _.pluck(props.draftPicks, "golfer");
@@ -23,31 +21,13 @@ function getGolfersRemaining(props) {
   return golfersRemaining;
 }
 
-function isMyDraftPick(props) {
-  return (
-    props.currentUser &&
-    props.currentPick &&
-    props.currentPick.player === props.currentUser.player
-  );
-}
-
 var DraftApp = React.createClass({
-
-  componentWillReceiveProps: function (nextProps) {
-    var props = this.props;
-    if (!props.playSounds) return;
-
-    if (!isMyDraftPick(props) && isMyDraftPick(nextProps)) {
-      myTurnSound.play();
-    } else if (props.draftPicks.length + 1 === nextProps.draftPicks.length) {
-      pickMadeSound.play();
-    }
-  },
+  mixins: [IsMyDraftPickMixin],
 
   render: function () {
     var draftView = null;
     var golfersRemaining = getGolfersRemaining(this.props);
-    var isMyPick = isMyDraftPick(this.props);
+    var isMyPick = this.isMyDraftPick();
     var isDraftOver = !this.props.currentPick;
 
     return (
@@ -92,11 +72,18 @@ var DraftApp = React.createClass({
             />
           </div>
           <div className="col-md-9">
-            <DraftHistory
-              draftPicks={this.props.draftPicks}
-            />
+            <DraftHistory draftPicks={this.props.draftPicks} />
           </div>
         </div>
+
+        {/* Hidden */}
+        <DraftAppSounds
+          currentUser={this.props.currentUser}
+          currentPick={this.props.currentPick}
+          draftPicks={this.props.draftPicks}
+          playSounds={this.props.playSounds}
+          messages={this.props.chatMessages}
+        />
       </section>
     );
   }
