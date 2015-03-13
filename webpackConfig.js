@@ -32,7 +32,7 @@ module.exports = {
       { test: /\.png($|\?)/, loader: "url?limit=10000&minetype=image/png&prefix=/img/" },
       { test: /\.svg($|\?)/, loader: "url" },
       { test: /\.ttf($|\?)/, loader: "url" },
-      { test: /\.woff($|\?)/, loader: "url?mimetype=application/font-woff" }
+      { test: /\.woff2?($|\?)/, loader: "url?mimetype=application/font-woff" }
     ]
   },
   stats: {
