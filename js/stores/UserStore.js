@@ -9,6 +9,7 @@ var AppConstants = require('../constants/AppConstants');
 
 var _currentUser = null;
 var _users = null;
+var _isAdmin = false;
 
 var UserStore =  _.extend({}, Store.prototype, {
 
@@ -16,6 +17,10 @@ var UserStore =  _.extend({}, Store.prototype, {
 
   getCurrentUser: function () {
     return _users[_currentUser];
+  },
+
+  isAdmin: function () {
+    return _isAdmin;
   },
 
   getAll: function () {
@@ -50,6 +55,11 @@ AppDispatcher.register(function (payload) {
         });
       }
 
+      UserStore.emitChange();
+      break;
+
+    case AppConstants.SET_IS_ADMIN:
+      _isAdmin = action.isAdmin;
       UserStore.emitChange();
       break;
   }

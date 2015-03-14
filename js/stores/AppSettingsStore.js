@@ -7,6 +7,7 @@ var AppDispatcher = require('../dispatcher/AppDispatcher');
 var AppConstants = require('../constants/AppConstants');
 
 var _playSounds = true;
+var _isPaused = false;
 
 var AppSettingsStore =  _.extend({}, Store.prototype, {
 
@@ -14,6 +15,10 @@ var AppSettingsStore =  _.extend({}, Store.prototype, {
 
   getPlaySounds: function () {
     return _playSounds;
+  },
+
+  getIsPaused: function () {
+    return _isPaused;
   }
 
 });
@@ -26,6 +31,11 @@ AppDispatcher.register(function (payload) {
 
     case AppConstants.SET_PLAY_SOUNDS:
       _playSounds = action.playSounds;
+      AppSettingsStore.emitChange();
+      break;
+
+    case AppConstants.SET_IS_PAUSED:
+      _isPaused = action.isPaused;
       AppSettingsStore.emitChange();
       break;
 

@@ -29,6 +29,9 @@ var ObjectId = mongoose.Types.ObjectId;
 mongoose.set('debug', true);
 mongoose.connect(config.mongo_url);
 
+// Temp state
+var _isPaused = false;
+
 // Request logging
 app.use(logfmt.requestLogger());
 
@@ -89,7 +92,7 @@ db.once('open', function callback () {
   // Include chat routes
   require('./chatRoutes');
 
-  app.get(['/', '/draft', '/tourney'], function (req, res) {
+  app.get(['/', '/draft', '/tourney', '/admin'], function (req, res) {
     Promise.all([
       access.getGolfers(),
       access.getPlayers(),
@@ -134,8 +137,44 @@ db.once('open', function callback () {
     });
   });
 
+  app.post('/admin/login', function (req, res) {
+    if (req.body.password !== config.admin_password) {
+      res.send(401, 'Bad password');
+      return;
+    }
+    req.session.isAdmin = true;
+    req.session.save(function (err) {
+      if (err) {
+        res.send(500, err);
+        return;
+      }
+      res.send(200);
+    });
+  });
+
+  app.put('/admin/pause', function (req, res) {
+    if (!req.session.isAdmin) {
+      res.send(401, 'Only can admin can pause the draft');
+      return;
+    }
+
+    var isPaused = !!req.body.isPaused;
+    if (isPaused !== _isPaused) {
+      _isPaused = isPaused;
+      io.sockets.emit('change:ispaused', {
+        data: { isPaused: _isPaused }
+      });
+      res.send(200);
+    }
+  });
+
   app.post('/draft/picks', function (req, res) {
     var body = req.body;
+
+    if (_isPaused) {
+      res.send(400, 'Admin has paused the app');
+      return;
+    }
 
     var user = req.session.user;
     if (!user || body.player !== user.player) {

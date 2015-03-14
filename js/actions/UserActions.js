@@ -22,7 +22,14 @@ var UserActions = {
       currentUser: user,
       doNotSync: true
     });
-  }
+  },
+
+  setIsAdmin: function (isAdmin) {
+    AppDispatcher.handleServerAction({
+      actionType: AppConstants.SET_IS_ADMIN,
+      isAdmin: isAdmin
+    })
+  },
 
 };
 
