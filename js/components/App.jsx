@@ -108,6 +108,7 @@ var DraftWrapper = React.createClass({
         currentPick={props.draft.currentPick}
         draftPicks={props.draft.draftPicks}
         chatMessages={props.chatMessages}
+        isPaused={props.isPaused}
       />
     );
   }

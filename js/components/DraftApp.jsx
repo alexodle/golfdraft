@@ -2,6 +2,7 @@
 "use strict";
 
 var _ = require("lodash");
+var AppPausedStatus = require('./AppPausedStatus.jsx');
 var Assets = require("../constants/Assets");
 var ChatRoom = require("./ChatRoom.jsx");
 var DraftChooser = require("./DraftChooser.jsx");
@@ -49,6 +50,7 @@ var DraftApp = React.createClass({
     var golfersRemaining = getGolfersRemaining(this.props);
     var isMyPick = isMyDraftPick(this.props);
     var isDraftOver = !this.props.currentPick;
+    var isDraftPaused = this.props.isPaused;
 
     return (
       <section>
@@ -69,13 +71,15 @@ var DraftApp = React.createClass({
 
         <div className="row">
           <div className="col-md-12">
-            {!isMyPick ? (
-              <DraftStatus currentPick={this.props.currentPick} />
-            ) : (
-              <DraftChooser
-                golfersRemaining={golfersRemaining}
-                currentPick={this.props.currentPick}
-              />
+            {isDraftPaused ? (<AppPausedStatus />) : (
+              (!isMyPick ? (
+                <DraftStatus currentPick={this.props.currentPick} />
+              ) : (
+                <DraftChooser
+                  golfersRemaining={golfersRemaining}
+                  currentPick={this.props.currentPick}
+                />
+              ))
             )}
           </div>
         </div>
