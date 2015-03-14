@@ -52,6 +52,22 @@ var DraftApp = React.createClass({
     var isDraftOver = !this.props.currentPick;
     var isDraftPaused = this.props.isPaused;
 
+    var statusUi = null;
+    if (isDraftPaused) {
+      statusUi = (<AppPausedStatus />);
+    } else {
+      if (!isMyPick) {
+        statusUi = (<DraftStatus currentPick={this.props.currentPick} />);
+      } else {
+        statusUi = (
+          <DraftChooser
+            golfersRemaining={golfersRemaining}
+            currentPick={this.props.currentPick}
+          />
+        );
+      }
+    }
+
     return (
       <section>
 
@@ -71,16 +87,7 @@ var DraftApp = React.createClass({
 
         <div className="row">
           <div className="col-md-12">
-            {isDraftPaused ? (<AppPausedStatus />) : (
-              (!isMyPick ? (
-                <DraftStatus currentPick={this.props.currentPick} />
-              ) : (
-                <DraftChooser
-                  golfersRemaining={golfersRemaining}
-                  currentPick={this.props.currentPick}
-                />
-              ))
-            )}
+            {statusUi}
           </div>
         </div>
         <div className="row">

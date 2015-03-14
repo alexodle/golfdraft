@@ -138,7 +138,7 @@ var AdminApp = React.createClass({
           </div>
         </div>
 
-        <DraftStatus draftPicks={props.currentPick} />
+        <DraftStatus currentPick={props.currentPick} />
         <DraftHistory draftPicks={props.draftPicks} />
       </section>
     );
