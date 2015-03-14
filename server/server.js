@@ -137,37 +137,6 @@ db.once('open', function callback () {
     });
   });
 
-  app.post('/admin/login', function (req, res) {
-    if (req.body.password !== config.admin_password) {
-      res.send(401, 'Bad password');
-      return;
-    }
-    req.session.isAdmin = true;
-    req.session.save(function (err) {
-      if (err) {
-        res.send(500, err);
-        return;
-      }
-      res.send(200);
-    });
-  });
-
-  app.put('/admin/pause', function (req, res) {
-    if (!req.session.isAdmin) {
-      res.send(401, 'Only can admin can pause the draft');
-      return;
-    }
-
-    var isPaused = !!req.body.isPaused;
-    if (isPaused !== _isPaused) {
-      _isPaused = isPaused;
-      io.sockets.emit('change:ispaused', {
-        data: { isPaused: _isPaused }
-      });
-      res.send(200);
-    }
-  });
-
   app.post('/draft/picks', function (req, res) {
     var body = req.body;
 
@@ -204,19 +173,89 @@ db.once('open', function callback () {
     // Alert clients
     .then(access.getDraft)
     .then(function (draft) {
-      io.sockets.emit('change:draft', {
-        data: draft,
-        evType: 'change:draft',
-        action: 'draft:pick'
-      });
+      updateClients(draft);
 
       // Do this second, since it's least important
       chatBot.broadcastPickMessage(pick, draft);
     })
     .catch(function (err) {
-      console.error('Unknown error: ' + err);
+      // The main functionality finished,
+      // so don't return a failed response code
+      console.log('err: ' + err);
     });
   });
+
+  // ADMIN FUNCTIONALITY
+
+  app.post('/admin/login', function (req, res) {
+    if (req.body.password !== config.admin_password) {
+      res.send(401, 'Bad password');
+      return;
+    }
+    req.session.isAdmin = true;
+    req.session.save(function (err) {
+      if (err) {
+        res.send(500, err);
+        return;
+      }
+      res.send(200);
+    });
+  });
+
+  app.put('/admin/pause', function (req, res) {
+    if (!req.session.isAdmin) {
+      res.send(401, 'Only can admin can pause the draft');
+      return;
+    }
+
+    _isPaused = !!req.body.isPaused;
+    io.sockets.emit('change:ispaused', {
+      data: { isPaused: _isPaused }
+    });
+    res.send(200);
+  });
+
+  app.delete('/admin/lastpick', function (req, res) {
+    if (!req.session.isAdmin) {
+      res.send(401, 'Only can admin can undo picks');
+      return;
+    }
+
+    access.undoLastPick()
+    .then(function () {
+      res.send(200);
+    })
+    .catch(function (err) {
+      res.send(500, err);
+      throw err;
+    })
+
+    // Alert clients
+    .then(access.getDraft)
+    .then(updateClients)
+    .catch(function (err) {
+      console.log('err: ' + err);
+    });
+
+  });
+
+  app.put('/admin/forceRefresh', function (req, res) {
+    if (!req.session.isAdmin) {
+      res.send(401, 'Only can admin can force refreshes');
+      return;
+    }
+
+    io.sockets.emit('action:forcerefresh');
+    res.send(200);
+  });
+
+  function updateClients(draft) {
+    io.sockets.emit('change:draft', {
+      data: draft,
+      evType: 'change:draft',
+      action: 'draft:pick'
+    });
+  }
 
   require('./expressServer').listen(port);
   redisCli.subscribe("scores:update");

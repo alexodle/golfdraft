@@ -43,7 +43,8 @@ function getAppState() {
 
     chatMessages: ChatStore.getMessages(),
 
-    isAdmin: UserStore.isAdmin()
+    isAdmin: UserStore.isAdmin(),
+    isPaused: AppSettingsStore.getIsPaused()
   };
 }
 
@@ -148,6 +149,7 @@ var AdminWrapper = React.createClass({
         currentUser={props.currentUser}
         currentPick={props.draft.currentPick}
         draftPicks={props.draft.draftPicks}
+        isPaused={props.isPaused}
       />
     );
   }
