@@ -10,6 +10,13 @@ var SettingsActions = {
       actionType: AppConstants.SET_PLAY_SOUNDS,
       playSounds: playSounds
     });
+  },
+
+  setIsPaused: function (isPaused) {
+    AppDispatcher.handleServerAction({
+      actionType: AppConstants.SET_IS_PAUSED,
+      isPaused: isPaused
+    })
   }
 
 };

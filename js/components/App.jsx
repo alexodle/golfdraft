@@ -2,6 +2,7 @@
 "use strict";
 
 var _ = require("lodash");
+var AdminApp = require("./AdminApp.jsx");
 var AppSettingsStore = require('../stores/AppSettingsStore');
 var ChatStore = require("../stores/ChatStore");
 var ChatStore = require("../stores/ChatStore");
@@ -40,7 +41,9 @@ function getAppState() {
 
     playSounds: AppSettingsStore.getPlaySounds(),
 
-    chatMessages: ChatStore.getMessages()
+    chatMessages: ChatStore.getMessages(),
+
+    isAdmin: UserStore.isAdmin()
   };
 }
 
@@ -131,6 +134,26 @@ var TourneyWrapper = React.createClass({
 
 });
 
+var AdminWrapper = React.createClass({
+
+  statics: {
+    willTransitionTo: createWillTransitionTo('admin')
+  },
+
+  render: function () {
+    var props = this.props;
+    return (
+      <AdminApp
+        isAdmin={props.isAdmin}
+        currentUser={props.currentUser}
+        currentPick={props.draft.currentPick}
+        draftPicks={props.draft.draftPicks}
+      />
+    );
+  }
+
+});
+
 var AppNode = React.createClass({
   mixins: [Navigation, RouterState],
 
@@ -169,8 +192,9 @@ var AppNode = React.createClass({
 });
 
 module.exports = {
+  AdminWrapper: AdminWrapper,
   AppNode: AppNode,
-  WhoIsYouWrapper: WhoIsYouWrapper,
   DraftWrapper: DraftWrapper,
-  TourneyWrapper: TourneyWrapper
+  TourneyWrapper: TourneyWrapper,
+  WhoIsYouWrapper: WhoIsYouWrapper
 };
