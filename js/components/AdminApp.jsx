@@ -12,7 +12,8 @@ function togglePause(isPaused) {
   $.ajax({
     url: '/admin/pause',
     type: 'PUT',
-    data: { isPaused: isPaused }
+    contentType: 'application/json',
+    data: JSON.stringify({ isPaused: isPaused })
   });
 }
 
@@ -77,8 +78,15 @@ var PasswordInput = React.createClass({
 
 var AdminApp = React.createClass({
 
+  getInitialState: function () {
+    return {
+      confirmingUndo: false
+    }
+  },
+
   render: function () {
     var props = this.props;
+    var confirmingUndo = this.state.confirmingUndo;
 
     if (!props.isAdmin) {
       return (<PasswordInput />);
@@ -87,13 +95,50 @@ var AdminApp = React.createClass({
     return (
       <section>
         <h1>Hello admin!</h1>
+
+        {!props.isPaused ? null : (
+          <h2>Paused!</h2>
+        )}
         <div className='panel'>
           <div className='panel-body'>
             <button className='btn' onClick={this._onPause}>Pause</button>
+            <span> </span>
             <button className='btn' onClick={this._onUnpause}>Unpause</button>
           </div>
         </div>
-        <DraftStatus draftPicks={props.currentPick} />
+
+        <div className='panel'>
+          <div className='panel-body'>
+            {confirmingUndo ? null : (
+              <button
+                className='btn'
+                onClick={this._undoLastPick}
+              >Undo Pick</button>
+            )}
+            {!confirmingUndo ? null : (
+              <span>
+                <label>Are you sure you want to undo the last pick?</label>
+                <button
+                  className='btn'
+                  onClick={this._confirmUndoLastPick}
+                >I'm sure</button>
+                <span> </span>
+                <button
+                  className='btn'
+                  onClick={this._cancelUndoLastPick}
+                >Cancel</button>
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div className='panel'>
+          <div className='panel-body'>
+            <button className='btn' onClick={this._forceRefresh}>Force Refresh</button>
+          </div>
+        </div>
+
+        <DraftStatus currentPick={props.currentPick} />
         <DraftHistory draftPicks={props.draftPicks} />
       </section>
     );
@@ -107,6 +152,29 @@ var AdminApp = React.createClass({
     togglePause(false);
   },
 
+  _undoLastPick: function () {
+    this.setState({ confirmingUndo: true });
+  },
+
+  _confirmUndoLastPick: function () {
+    $.ajax({
+      url: '/admin/lastPick',
+      type: 'DELETE',
+      contentType: 'application/json'
+    });
+    this._cancelUndoLastPick();
+  },
+
+  _cancelUndoLastPick: function () {
+    this.setState({ confirmingUndo: false });
+  },
+
+  _forceRefresh: function () {
+    $.ajax({
+      url: '/admin/forceRefresh',
+      type: 'PUT'
+    });
+  }
 
 });
 

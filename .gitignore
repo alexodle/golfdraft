@@ -3,3 +3,4 @@ server/*.sh
 npm-*.log
 distd
 server/prodenv.sh
+dump.rdb

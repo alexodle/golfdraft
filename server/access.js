@@ -129,6 +129,13 @@ _.extend(access, {
     });
   },
 
+  undoLastPick: function () {
+    return promiseize(models.DraftPick.count(FK_TOURNEY_ID_QUERY).exec())
+    .then(function (nPicks) {
+      return promiseize(models.DraftPick.remove({ pickNumber: nPicks - 1 }).exec());
+    })
+  },
+
   getDraft: function () {
     return Promise.all([
       promiseize(models.DraftPickOrder.find(FK_TOURNEY_ID_QUERY).exec()),

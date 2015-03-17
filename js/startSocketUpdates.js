@@ -10,16 +10,24 @@ var socketio = require('socket.io-client');
 function startSocketUpdates() {
   var io = socketio.connect();
   io.on('change:draft', function (ev) {
+    console.log('hihi.change.draft');
     DraftActions.draftUpdate(ev.data);
   });
   io.on('change:scores', function (ev) {
+    console.log('hihi.change.scores');
     ScoreActions.scoreUpdate(ev.data);
   });
   io.on('change:chat', function (ev) {
+    console.log('hihi.change.chat');
     ChatActions.newMessage(ev.data);
   });
   io.on('change:ispaused', function (ev) {
+    console.log('hihi.change.ispaused');
     SettingsActions.setIsPaused(ev.data.isPaused);
+  });
+  io.on('action:forcerefresh', function (ev) {
+    console.log('hihi.action.forcerefresh');
+    window.location.reload();
   });
 }
 
