@@ -12,7 +12,6 @@ mongoose.connect(config.mongo_url);
 
 function end() {
   mongoose.connection.close();
-  redisCli.unref();
 }
 
 function updateWGR() {
@@ -20,7 +19,14 @@ function updateWGR() {
   var wgrEntries = _.map(currentWGR, function (golfer, i) {
     return { name: golfer, wgr: i + 1 };
   });
-  access.ensureWGR(wgrEntries);
+  access.ensureWGR(wgrEntries)
+  .then(function () {
+    end();
+  })
+  .catch(function (err) {
+    console.warn('Error: ' + err);
+    end();
+  });
 }
 
 var db = mongoose.connection;
