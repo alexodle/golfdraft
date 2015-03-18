@@ -1,34 +1,56 @@
 /** @jsx React.DOM */
 'use strict';
 
-var React = require('react');
 var _ = require('lodash');
-
-var PlayerStore = require('../stores/PlayerStore');
+var cx = require('react/lib/cx');
 var DraftActions = require('../actions/DraftActions');
-
-function getSortedGolfers(golfers) {
-  return _.sortBy(golfers, 'name');
-}
+var PlayerStore = require('../stores/PlayerStore');
+var React = require('react');
 
 var DraftChooser = React.createClass({
 
   getInitialState: function () {
-    return this._getState(this.props.golfersRemaining);
+    return _.extend(this._getSelectionState(this.props.golfersRemaining), {
+      sortKey: 'name'
+    });
   },
 
   componentWillReceiveProps: function (nextProps) {
-    var newState = this._getState(nextProps.golfersRemaining);
+    var newState = this._getSelectionState(nextProps.golfersRemaining);
     this.setState(newState);
   },
 
   render: function () {
-    var sortedGolfers = getSortedGolfers(this.props.golfersRemaining);
+    var golfersRemaining = this.props.golfersRemaining;
+    var sortKey = this.state.sortKey;
+
+    var sortedGolfers = _.sortBy(golfersRemaining, sortKey);
     return (
       <section>
         <h2>It's your turn! Make your pick.</h2>
         <div className="panel panel-default">
           <div className="panel-body">
+
+            <div class="btn-group" role="group" aria-label="Sorting choices">
+              <label>Sort players by:</label><br />
+              <button
+                type="button"
+                className={cx({
+                  "btn btn-default": true,
+                  "active": sortKey === 'name'
+                })}
+                onClick={_.partial(this._setSortKey, 'name')}
+              >First Name</button>
+              <button
+                type="button"
+                className={cx({
+                  "btn btn-default": true,
+                  "active": sortKey === 'wgr'
+                })}
+                onClick={_.partial(this._setSortKey, 'wgr')}
+              >World Golf Ranking</button>
+            </div>
+
             <form role="form">
               <div className="form-group">
                 <label labelFor="golfersRemaining">Select your player:</label>
@@ -40,7 +62,11 @@ var DraftChooser = React.createClass({
                   className="form-control"
                 >
                   {_.map(sortedGolfers, function (g) {
-                    return (<option key={g.id} value={g.id}>{g.name}</option>);
+                    return (
+                      <option key={g.id} value={g.id}>
+                        {g.name} (WGR: {g.wgr})
+                      </option>
+                    );
                   })}
                 </select>
               </div>
@@ -57,16 +83,38 @@ var DraftChooser = React.createClass({
     );
   },
 
-  _getState: function (golfersRemaining) {
-    var selectedGolfer = (this.state || {}).selectedGolfer;
+  _getSelectionState: function (golfersRemaining) {
+    var state = this.state || {};
+    var selectedGolfer = state.selectedGolfer;
+    var sortKey = state.sortKey || 'name';
+
     if (!selectedGolfer || !golfersRemaining[selectedGolfer]) {
-      selectedGolfer = _.first(getSortedGolfers(golfersRemaining)).id;
+      selectedGolfer = _.chain(golfersRemaining)
+        .sortBy(sortKey)
+        .first()
+        .value()
+        .id;
     }
-    return {selectedGolfer: selectedGolfer};
+    return {
+      selectedGolfer: selectedGolfer
+    };
   },
 
   _onChange: function (ev) {
-    this.setState({selectedGolfer: ev.target.value});
+    this.setState({ selectedGolfer: ev.target.value });
+  },
+
+  _setSortKey: function (sortKey) {
+    if (sortKey === this.state.sortKey) return;
+
+    this.setState({
+      sortKey: sortKey,
+      selectedGolfer: _.chain(this.props.golfersRemaining)
+        .sortBy(sortKey)
+        .first()
+        .value()
+        .id
+    });
   },
 
   _onSubmit: function (ev) {
