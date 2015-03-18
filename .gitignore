@@ -1,6 +1,7 @@
-node_modules
-server/*.sh
-npm-*.log
+devEnv.sh
 distd
-prodEnv.sh
 dump.rdb
+node_modules
+npm-*.log
+prodEnv.sh
+server/*.sh

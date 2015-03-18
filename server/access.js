@@ -59,6 +59,17 @@ function createBasicClearer(model) {
   });
 }
 
+function mergeWGR(golfer, wgrEntry) {
+  golfer = _.pick(golfer, '_id', 'name');
+  if (!wgrEntry) {
+    console.warn('WGR not found for: ' + golfer.name);
+    golfer.wgr = 1500;
+  } else {
+    golfer.wgr = wgrEntry.wgr;
+  }
+  return golfer;
+}
+
 var access = {};
 _.extend(access, {
 
@@ -66,17 +77,43 @@ _.extend(access, {
     return models.Tourney.findOne(TOURNEY_ID_QUERY).exec();
   }),
 
-  getGolfer: promiseizeFn(function (golferId) {
+  getGolfer: function (golferId) {
     var query = _.extend({ _id: golferId }, FK_TOURNEY_ID_QUERY);
-    return models.Golfer.findOne(query).exec();
-  }),
+    return promiseize(models.Golfer.findOne(query).exec())
+    .then(function (golfer) {
+      return promiseize(models.WGR.findOne({ name: golfer.name }).exec())
+      .then(function (wgr) {
+        golfer = mergeWGR(golfer, wgr);
+      })
+      .catch(function () {
+        golfer = mergeWGR(golfer);
+      })
+      .then(function () {
+        return golfer;
+      });
+    })
+  },
 
   getPlayer: promiseizeFn(function (playerId) {
     var query = _.extend({ _id: playerId }, FK_TOURNEY_ID_QUERY);
     return models.Player.findOne(query).exec();
   }),
 
-  getGolfers: createBasicGetter(models.Golfer),
+  getGolfers: function () {
+    return Promise.all([
+      promiseize(models.WGR.find().exec()),
+      promiseize(models.Golfer.find(FK_TOURNEY_ID_QUERY).exec()),
+    ])
+
+    .then(function (results) {
+      var wgrs = _.indexBy(results[0], 'name');
+      var golfers = _.map(results[1], function (g) {
+        return mergeWGR(g, wgrs[g.name]);
+      });
+
+      return golfers;
+    });
+  },
 
   getPlayers: createBasicGetter(models.Player),
 
@@ -161,6 +198,8 @@ _.extend(access, {
   ensurePlayers: createMultiUpdater(models.Player, ['name', 'tourneyId']),
 
   ensureGolfers: createMultiUpdater(models.Golfer, ['name', 'tourneyId']),
+
+  ensureWGR: createMultiUpdater(models.WGR, ['name']),
 
   setPickOrder: createMultiUpdater(
     models.DraftPickOrder,
