@@ -8,6 +8,13 @@ var golferSchema = mongoose.Schema({
 });
 golferSchema.index({ name: 1, tourneyId: 1 });
 
+// Keep this separate for now, that way I don't have to change it often
+var wgrSchema = mongoose.Schema({
+  name: String,
+  wgr: Number
+});
+wgrSchema.index({ name: 1 });
+
 // For now these are the same
 var playerSchema = golferSchema;
 
@@ -43,6 +50,7 @@ var tourneySchema = mongoose.Schema({
 });
 
 var Golfer = mongoose.model('Golfer', golferSchema);
+var WGR = mongoose.model('WGR', wgrSchema);
 var Player = mongoose.model('Player', playerSchema);
 var DraftPickOrder = mongoose.model('DraftPickOrder', draftPickOrderSchema);
 var DraftPick = mongoose.model('DraftPick', draftPickSchema);
@@ -56,6 +64,7 @@ var Tourney = mongoose.model('Tourney', tourneySchema);
 module.exports = {
   Golfer: Golfer,
   Player: Player,
+  WGR: WGR,
   DraftPickOrder: DraftPickOrder,
   DraftPick: DraftPick,
   GolferScore: GolferScore,

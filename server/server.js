@@ -111,6 +111,10 @@ db.once('open', function callback () {
         prod: config.prod,
         cdnUrl: config.cdn_url
       });
+    })
+    .catch(function (err) {
+      console.log(err);
+      res.send(500, err);
     });
   });
 
