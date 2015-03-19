@@ -31,7 +31,7 @@ var DraftChooser = React.createClass({
         <div className="panel panel-default">
           <div className="panel-body">
 
-            <div class="btn-group" role="group" aria-label="Sorting choices">
+            <div className="btn-group" role="group" aria-label="Sorting choices">
               <label>Sort players by:</label><br />
               <button
                 type="button"

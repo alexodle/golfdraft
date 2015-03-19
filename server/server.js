@@ -70,6 +70,10 @@ app.use('/assets', express.static(__dirname + '/../assets', {
 // Parsing
 app.use(bodyParser());
 
+function logRequest(req, cat, msg) {
+  console.log(cat + ': ip:' + req.connection.remoteAddress + ' ' + msg);
+}
+
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function callback () {
@@ -120,23 +124,31 @@ db.once('open', function callback () {
 
   app.post('/login', function (req, res) {
     var body = req.body;
+    logRequest(req, 'LOGIN.ATTEMPT', 'user: ' + body);
+
     req.session.user = body;
     req.session.save(function (err) {
       if (err) {
+        logRequest(req, 'LOGIN.FAILURE', 'user: ' + body + ' err:' + err);
         res.send(500, err);
         return;
       }
+      logRequest(req, 'LOGIN.SUCCESS', 'user: ' + body);
       res.send(200);
     });
   });
 
   app.post('/logout', function (req, res) {
+    logRequest(req, 'LOGOUT.ATTEMPT', 'user: ' + req.session.user);
+
     req.session.user = null;
     req.session.save(function (err) {
       if (err) {
+        logRequest(req, 'LOGOUT.FAILURE', 'user: ' + req.session.user);
         res.send(500, err);
         return;
       }
+      logRequest(req, 'LOGOUT.SUCCESS', 'user: ' + req.session.user);
       res.send(200);
     });
   });

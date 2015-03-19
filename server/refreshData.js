@@ -4,6 +4,7 @@ var _ = require('lodash');
 var access = require('./access');
 var config = require('./config');
 var mongoose = require('mongoose');
+var poolPlayerConfig = require('../poolPlayerConfig');
 var Promise = require('promise');
 var tourneyUtils = require('./tourneyUtils');
 var updateScore = require('./updateScore');
@@ -82,7 +83,5 @@ function refreshData(pickOrderNames, yahooUrl) {
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function callback () {
-  refreshData([
-    'Alex O', 'Bobby G'
-  ], config.yahoo_url);
+  refreshData(poolPlayerConfig.draftOrder, config.yahoo_url);
 });
