@@ -6,4 +6,3 @@ npm-*.log
 prodEnv*.sh
 server/*.sh
 mongolog.txt*
-temptemp
