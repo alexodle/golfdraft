@@ -17,6 +17,13 @@ var DraftActions = {
       actionType: DraftConstants.DRAFT_UPDATE,
       draft: draft
     });
+  },
+
+  draftForCurrentPlayer: function (player) {
+    AppDispatcher.handleViewAction({
+      actionType: DraftConstants.DRAFT_FOR_PLAYER,
+      player: player
+    });
   }
 
 };

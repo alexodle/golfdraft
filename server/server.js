@@ -167,13 +167,6 @@ db.once('open', function callback () {
       return;
     }
 
-    var user = req.session.user;
-    if (!user || body.player !== user.player) {
-      console.log('401 - Request from user: ' + JSON.stringify(user) + ' not allowed to pick for player: "' + body.player + '"');
-      res.send(401, 'Picked from wrong player.');
-      return;
-    }
-
     var pick = {
       pickNumber: body.pickNumber,
       player: new ObjectId(body.player),

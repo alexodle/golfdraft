@@ -5,17 +5,24 @@ var _ = require('lodash');
 var AppDispatcher = require('../dispatcher/AppDispatcher');
 var DraftConstants = require('../constants/DraftConstants');
 var Store = require('./Store');
+var UserStore = require('./UserStore');
 
 var _picks = [];
 var _pickOrder = [];
+var _pickForPlayer = null; // { player: <player_id>, pickNumber: <n> }
+
+function getCurrentPickNumber() {
+  return _picks.length;
+}
 
 function getCurrentPick() {
-  if (_picks.length === _pickOrder.length) {
+  var pickNumber = getCurrentPickNumber();
+  if (pickNumber === _pickOrder.length) {
     return null;
   }
   return {
-    player: _pickOrder[_picks.length].player,
-    pickNumber: _picks.length
+    player: _pickOrder[pickNumber].player,
+    pickNumber: pickNumber
   };
 }
 
@@ -39,6 +46,18 @@ var DraftStore =  _.extend({}, Store.prototype, {
 
   getDraftPicks: function () {
     return _picks;
+  },
+
+  getIsMyDraftPick: function () {
+    var currentPick = getCurrentPick();
+    var currentUser = UserStore.getCurrentUser();
+    if (!currentPick || !currentUser) return false;
+
+    return currentPick.player === currentUser.player || (
+      _pickForPlayer &&
+        _pickForPlayer.player === currentPick.player &&
+        _pickForPlayer.pickNumber - currentPick.pickNumber <= 1
+    );
   }
 
 });
@@ -67,6 +86,14 @@ AppDispatcher.register(function (payload) {
       _picks = draft.picks;
       _pickOrder = draft.pickOrder;
 
+      DraftStore.emitChange();
+      break;
+
+    case DraftConstants.DRAFT_FOR_PLAYER:
+      _pickForPlayer = {
+        player: action.player,
+        pickNumber: getCurrentPickNumber()
+      };
       DraftStore.emitChange();
       break;
 

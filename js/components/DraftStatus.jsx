@@ -2,6 +2,7 @@
 'use strict';
 
 var _ = require('lodash');
+var DraftActions = require('../actions/DraftActions');
 var Link = require('react-router').Link;
 var PlayerStore = require('../stores/PlayerStore');
 var React = require('react');
@@ -27,11 +28,17 @@ var DraftStatus = React.createClass({
       return (<DraftOver />);
     }
 
+    var playerName = PlayerStore.getPlayer(currentPick.player).name;
     return (
-      <span>
-        Now drafting (Pick #{currentPick.pickNumber + 1}): <b>{PlayerStore.getPlayer(currentPick.player).name}</b>
-      </span>
+      <section>
+        Now drafting (Pick #{currentPick.pickNumber + 1}): <b>{playerName}</b>
+        <br /><a href='#' onClick={this._onTakePick}>I'll pick for {playerName}</a>
+      </section>
     );
+  },
+
+  _onTakePick: function () {
+    DraftActions.draftForCurrentPlayer(this.props.currentPick.player);
   }
 
 });

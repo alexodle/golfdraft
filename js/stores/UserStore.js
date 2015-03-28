@@ -1,11 +1,10 @@
 'use strict';
 
-var _ = require('lodash');
 var $ = require('jquery');
-
-var Store = require('./Store');
-var AppDispatcher = require('../dispatcher/AppDispatcher');
+var _ = require('lodash');
 var AppConstants = require('../constants/AppConstants');
+var AppDispatcher = require('../dispatcher/AppDispatcher');
+var Store = require('./Store');
 
 var _currentUser = null;
 var _users = null;

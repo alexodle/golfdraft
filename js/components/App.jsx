@@ -32,6 +32,7 @@ function getAppState() {
     currentUser: UserStore.getCurrentUser(),
 
     draft: {
+      isMyDraftPick: DraftStore.getIsMyDraftPick(),
       currentPick: DraftStore.getCurrentPick(),
       draftPicks: DraftStore.getDraftPicks()
     },
@@ -106,6 +107,7 @@ var DraftWrapper = React.createClass({
         playSounds={props.playSounds}
         currentUser={props.currentUser}
         currentPick={props.draft.currentPick}
+        isMyDraftPick={props.draft.isMyDraftPick}
         draftPicks={props.draft.draftPicks}
         chatMessages={props.chatMessages}
         isPaused={props.isPaused}

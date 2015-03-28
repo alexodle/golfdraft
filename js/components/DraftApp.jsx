@@ -24,21 +24,13 @@ function getGolfersRemaining(props) {
   return golfersRemaining;
 }
 
-function isMyDraftPick(props) {
-  return (
-    props.currentUser &&
-    props.currentPick &&
-    props.currentPick.player === props.currentUser.player
-  );
-}
-
 var DraftApp = React.createClass({
 
   componentWillReceiveProps: function (nextProps) {
     var props = this.props;
     if (!props.playSounds) return;
 
-    if (!isMyDraftPick(props) && isMyDraftPick(nextProps)) {
+    if (!props.isMyDraftPick && nextProps.isMyDraftPick) {
       myTurnSound.play();
     } else if (props.draftPicks.length + 1 === nextProps.draftPicks.length) {
       pickMadeSound.play();
@@ -48,7 +40,7 @@ var DraftApp = React.createClass({
   render: function () {
     var draftView = null;
     var golfersRemaining = getGolfersRemaining(this.props);
-    var isMyPick = isMyDraftPick(this.props);
+    var isMyPick = this.props.isMyDraftPick;
     var isDraftOver = !this.props.currentPick;
     var isDraftPaused = this.props.isPaused;
 
