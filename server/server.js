@@ -26,7 +26,6 @@ var MAX_AGE = 1000 * 60 * 60 * 24 * 365;
 var redisCli = redis.client;
 var ObjectId = mongoose.Types.ObjectId;
 
-mongoose.set('debug', true);
 mongoose.connect(config.mongo_url);
 
 // Temp state
@@ -54,7 +53,8 @@ app.engine('handlebars', exphbs({
 app.set('view engine', 'handlebars');
 
 // Static routes
-if (process.env.DEBUG) {
+if (!config.prod) {
+  mongoose.set('debug', true);
   app.set('views', './distd/views/');
   app.use('/dist', express.static(__dirname + '/../distd'));
 } else {
@@ -70,9 +70,22 @@ app.use('/assets', express.static(__dirname + '/../assets', {
 // Parsing
 app.use(bodyParser());
 
-function logRequest(req, cat, msg) {
-  console.log(cat + ': ip:' + req.connection.remoteAddress + ' ' + msg);
+// Log session state on every request
+function logSessionState(req, res, next) {
+  try {
+    var session = req.session;
+    console.log(
+      'ip=%s user=%j isAdmin=%s',
+      req.connection.remoteAddress,
+      session.user,
+      !!session.isAdmin
+    );
+  } catch (e) {
+    console.error(e);
+  }
+  next();
 }
+app.use(logSessionState);
 
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
@@ -124,31 +137,24 @@ db.once('open', function callback () {
 
   app.post('/login', function (req, res) {
     var body = req.body;
-    logRequest(req, 'LOGIN.ATTEMPT', 'user: ' + body);
 
     req.session.user = body;
     req.session.save(function (err) {
       if (err) {
-        logRequest(req, 'LOGIN.FAILURE', 'user: ' + body + ' err:' + err);
         res.send(500, err);
         return;
       }
-      logRequest(req, 'LOGIN.SUCCESS', 'user: ' + body);
       res.send(200);
     });
   });
 
   app.post('/logout', function (req, res) {
-    logRequest(req, 'LOGOUT.ATTEMPT', 'user: ' + req.session.user);
-
     req.session.user = null;
     req.session.save(function (err) {
       if (err) {
-        logRequest(req, 'LOGOUT.FAILURE', 'user: ' + req.session.user);
         res.send(500, err);
         return;
       }
-      logRequest(req, 'LOGOUT.SUCCESS', 'user: ' + req.session.user);
       res.send(200);
     });
   });

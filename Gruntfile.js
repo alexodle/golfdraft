@@ -10,12 +10,6 @@ module.exports = function (grunt) {
   var webpack = require('webpack');
 
   grunt.initConfig({
-    env: {
-      dev: {
-        DEBUG: 'DEBUG'
-      }
-    },
-
     express: {
       dev: {
          options: {
@@ -127,7 +121,6 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('rund', [
-    'env:dev',
     'express:dev',
     'buildd'
   ]);
