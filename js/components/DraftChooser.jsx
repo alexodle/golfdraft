@@ -22,12 +22,22 @@ var DraftChooser = React.createClass({
 
   render: function () {
     var golfersRemaining = this.props.golfersRemaining;
+    var currentPick = this.props.currentPick;
     var sortKey = this.state.sortKey;
 
     var sortedGolfers = _.sortBy(golfersRemaining, sortKey);
+
+    var header = null;
+    if (this.props.currentUser.player === currentPick.player) {
+      header = (<h2>It's your turn! Make your pick.</h2>);
+    } else {
+      var playerName = PlayerStore.getPlayer(currentPick.player).name;
+      header = (<h2>Make a pick for: {playerName}</h2>);
+    }
+
     return (
       <section>
-        <h2>It's your turn! Make your pick.</h2>
+        {header}
         <div className="panel panel-default">
           <div className="panel-body">
 

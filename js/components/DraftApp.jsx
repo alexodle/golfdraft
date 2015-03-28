@@ -53,6 +53,7 @@ var DraftApp = React.createClass({
       } else {
         statusUi = (
           <DraftChooser
+            currentUser={this.props.currentUser}
             golfersRemaining={golfersRemaining}
             currentPick={this.props.currentPick}
           />
