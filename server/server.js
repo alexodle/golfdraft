@@ -161,7 +161,12 @@ db.once('open', function callback () {
 
   app.post('/draft/picks', function (req, res) {
     var body = req.body;
+    var user = req.session.user;
 
+    if (!user || !user.id) {
+      res.send(401, 'Must be logged in to make a pick');
+      return;
+    }
     if (_isPaused) {
       res.send(400, 'Admin has paused the app');
       return;
@@ -191,7 +196,7 @@ db.once('open', function callback () {
       updateClients(draft);
 
       // Do this second, since it's least important
-      chatBot.broadcastPickMessage(pick, draft);
+      chatBot.broadcastPickMessage(user, pick, draft);
     })
     .catch(function (err) {
       // The main functionality finished,

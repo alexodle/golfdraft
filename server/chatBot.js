@@ -6,9 +6,12 @@ var Promise = require('promise');
 
 module.exports = {
 
-  broadcastPickMessage: function (draftPick, draft) {
+  broadcastPickMessage: function (user, draftPick, draft) {
     var nextPlayer = null;
     var nextPick = draft.pickOrder[draft.picks.length];
+
+    // draftPick.player is an ObjectId, so use its equals() method
+    var isProxyPick = !draftPick.player.equals(user.player);
 
     Promise.all(_.compact([
       access.getPlayer(draftPick.player),
@@ -19,9 +22,11 @@ module.exports = {
       var player = results[0];
       var golfer = results[1];
       nextPlayer = results[2];
-      return access.createChatBotMessage({
-        message: player.name + ' picks ' + golfer.name
-      });
+
+      var message = !isProxyPick ?
+        player.name + ' picks ' + golfer.name :
+        player.name + ' picks ' + golfer.name + ' (proxy from: ' + user.name + ')';
+      return access.createChatBotMessage({ message: message });
     })
     .then(function () {
       if (nextPlayer) {
