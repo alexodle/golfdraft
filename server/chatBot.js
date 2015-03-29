@@ -25,7 +25,7 @@ module.exports = {
 
       var message = !isProxyPick ?
         player.name + ' picks ' + golfer.name :
-        player.name + ' picks ' + golfer.name + ' (proxy from: ' + user.name + ')';
+        player.name + ' picks ' + golfer.name + ' (proxy from ' + user.name + ')';
       return access.createChatBotMessage({ message: message });
     })
     .then(function () {
