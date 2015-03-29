@@ -34,7 +34,7 @@ var PlayerDetails = React.createClass({
       return (
         <tr key={gs.golfer}>
           <td>{GolferStore.getGolfer(gs.golfer).name}</td>
-          <td>{gs.total}</td>
+          <td>{utils.toGolferScoreStr(gs.total)}</td>
           {_.map(gs.scores, function (s, i) {
             var missedCut = gs.missedCuts[i];
             var scoreUsed = _.chain(scoresByDay[i].usedScores)
@@ -49,7 +49,8 @@ var PlayerDetails = React.createClass({
                 })}
                 key={i}
               >
-                {s} <sup className="missed-cut-text">MC</sup>
+                {utils.toGolferScoreStr(s)}
+                <sup className="missed-cut-text"> MC</sup>
               </td>
             );
           })}
@@ -61,7 +62,8 @@ var PlayerDetails = React.createClass({
     return (
       <section>
         <h2>
-          {PlayerStore.getPlayer(player).name} ({playerScore.total})
+          {PlayerStore.getPlayer(player).name}
+          <span> </span>({utils.toGolferScoreStr(playerScore.total)})
           <small> {utils.getOrdinal(playerRank + 1)} place {tieText}</small>
         </h2>
         <table className='table player-details-table'>

@@ -114,17 +114,25 @@ var DraftWrapper = React.createClass({
   render: function () {
     var props = this.props;
     return (
-      <DraftApp
-        tourneyName={props.tourneyName}
-        playSounds={props.playSounds}
-        currentUser={props.currentUser}
-        currentPick={props.draft.currentPick}
-        isMyDraftPick={props.draft.isMyDraftPick}
-        draftPicks={props.draft.draftPicks}
-        chatMessages={props.chatMessages}
-        isPaused={props.isPaused}
-        golfersRemaining={props.golfersRemaining}
-      />
+      <section>
+        <AppHeader
+          tourneyName={props.tourneyName}
+          currentUser={props.currentUser}
+          playSounds={props.playSounds}
+          drafting
+        />
+        <DraftApp
+          tourneyName={props.tourneyName}
+          playSounds={props.playSounds}
+          currentUser={props.currentUser}
+          currentPick={props.draft.currentPick}
+          isMyDraftPick={props.draft.isMyDraftPick}
+          draftPicks={props.draft.draftPicks}
+          chatMessages={props.chatMessages}
+          isPaused={props.isPaused}
+          golfersRemaining={props.golfersRemaining}
+        />
+      </section>
     );
   }
 
@@ -139,14 +147,21 @@ var TourneyWrapper = React.createClass({
   render: function () {
     var props = this.props;
     return (
-      <TourneyApp
-        tourneyName={props.tourneyName}
-        currentUser={props.currentUser}
-        scores={props.scores}
-        draft={props.draft}
-        lastScoresUpdate={props.lastScoresUpdate}
-        chatMessages={props.chatMessages}
-      />
+      <section>
+        <AppHeader
+          tourneyName={props.tourneyName}
+          currentUser={props.currentUser}
+          playSounds={props.playSounds}
+        />
+        <TourneyApp
+          tourneyName={props.tourneyName}
+          currentUser={props.currentUser}
+          scores={props.scores}
+          draft={props.draft}
+          lastScoresUpdate={props.lastScoresUpdate}
+          chatMessages={props.chatMessages}
+        />
+      </section>
     );
   }
 
@@ -161,14 +176,21 @@ var AdminWrapper = React.createClass({
   render: function () {
     var props = this.props;
     return (
-      <AdminApp
-        isAdmin={props.isAdmin}
-        currentUser={props.currentUser}
-        currentPick={props.draft.currentPick}
-        draftPicks={props.draft.draftPicks}
-        isPaused={props.isPaused}
-        golfersRemaining={props.golfersRemaining}
-      />
+      <section>
+        <AppHeader
+          tourneyName={props.tourneyName}
+          currentUser={props.currentUser}
+          playSounds={props.playSounds}
+        />
+        <AdminApp
+          isAdmin={props.isAdmin}
+          currentUser={props.currentUser}
+          currentPick={props.draft.currentPick}
+          draftPicks={props.draft.draftPicks}
+          isPaused={props.isPaused}
+          golfersRemaining={props.golfersRemaining}
+        />
+      </section>
     );
   }
 
@@ -211,14 +233,7 @@ var AppNode = React.createClass({
     );
 
     return (
-      <section>
-        <AppHeader
-          tourneyName={state.tourneyName}
-          currentUser={state.currentUser}
-          playSounds={state.playSounds}
-        />
-        <RouteHandler {...state} golfersRemaining={golfersRemaining} />
-      </section>
+      <RouteHandler {...state} golfersRemaining={golfersRemaining} />
     );
   },
 

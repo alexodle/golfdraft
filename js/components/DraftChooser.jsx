@@ -4,6 +4,7 @@
 var _ = require('lodash');
 var cx = require('react/lib/cx');
 var DraftActions = require('../actions/DraftActions');
+var GolfDraftPanel = require('./GolfDraftPanel.jsx');
 var PlayerStore = require('../stores/PlayerStore');
 var React = require('react');
 
@@ -29,15 +30,15 @@ var DraftChooser = React.createClass({
 
     var header = null;
     if (this.props.currentUser.player === currentPick.player) {
-      header = (<h2>It's your turn! Make your pick.</h2>);
+      header = (<h4>It's your turn! Make your pick.</h4>);
     } else {
       var playerName = PlayerStore.getPlayer(currentPick.player).name;
       header = (
         <section>
-          <h2>Make a pick for: {playerName}</h2>
+          <h4>Make a pick for: {playerName}</h4>
           <p>
             <a href="#" onClick={this._onStopTakingPick}>
-              I'll stop taking picks for {playerName}
+              I'll stop making picks for {playerName}
             </a>
           </p>
         </section>
@@ -45,60 +46,56 @@ var DraftChooser = React.createClass({
     }
 
     return (
-      <section>
+      <GolfDraftPanel heading='Draft Picker'>
         {header}
-        <div className="panel panel-default">
-          <div className="panel-body">
 
-            <div className="btn-group" role="group" aria-label="Sorting choices">
-              <label>Sort players by:</label><br />
-              <button
-                type="button"
-                className={cx({
-                  "btn btn-default": true,
-                  "active": sortKey === 'name'
-                })}
-                onClick={_.partial(this._setSortKey, 'name')}
-              >First Name</button>
-              <button
-                type="button"
-                className={cx({
-                  "btn btn-default": true,
-                  "active": sortKey === 'wgr'
-                })}
-                onClick={_.partial(this._setSortKey, 'wgr')}
-              >World Golf Ranking</button>
-            </div>
-
-            <form role="form">
-              <div className="form-group">
-                <label labelFor="golfersRemaining">Select your player:</label>
-                <select
-                  id="golfersRemaining"
-                  value={this.state.selectedGolfer}
-                  onChange={this._onChange}
-                  size="10"
-                  className="form-control"
-                >
-                  {_.map(sortedGolfers, function (g) {
-                    return (
-                      <option key={g.id} value={g.id}>
-                        {g.name} (WGR: {g.wgr})
-                      </option>
-                    );
-                  })}
-                </select>
-              </div>
-              <button
-                className="btn btn-default btn-primary"
-                onClick={this._onSubmit}
-              >
-                Pick
-              </button>
-            </form>
-          </div>
+        <div className="btn-group" role="group" aria-label="Sorting choices">
+          <label>Sort players by:</label><br />
+          <button
+            type="button"
+            className={cx({
+              "btn btn-default": true,
+              "active": sortKey === 'name'
+            })}
+            onClick={_.partial(this._setSortKey, 'name')}
+          >First Name</button>
+          <button
+            type="button"
+            className={cx({
+              "btn btn-default": true,
+              "active": sortKey === 'wgr'
+            })}
+            onClick={_.partial(this._setSortKey, 'wgr')}
+          >World Golf Ranking</button>
         </div>
-      </section>
+
+        <form role="form">
+          <div className="form-group">
+            <label labelFor="golfersRemaining">Select your player:</label>
+            <select
+              id="golfersRemaining"
+              value={this.state.selectedGolfer}
+              onChange={this._onChange}
+              size="10"
+              className="form-control"
+            >
+              {_.map(sortedGolfers, function (g) {
+                return (
+                  <option key={g.id} value={g.id}>
+                    {g.name} (WGR: {g.wgr})
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+          <button
+            className="btn btn-default btn-primary"
+            onClick={this._onSubmit}
+          >
+            Pick
+          </button>
+        </form>
+      </GolfDraftPanel>
     );
   },
 

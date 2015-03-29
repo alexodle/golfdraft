@@ -1,14 +1,14 @@
 /** @jsx React.DOM */
 "use strict";
 
-var React = require("react");
-var ReactPropTypes = React.PropTypes;
-var cx = require('react/lib/cx');
 var _ = require("lodash");
-
-var PlayerStore = require('../stores/PlayerStore');
+var cx = require('react/lib/cx');
 var GolferStore = require('../stores/GolferStore');
+var PlayerStore = require('../stores/PlayerStore');
+var React = require("react");
 var utils = require('../../common/utils');
+
+var ReactPropTypes = React.PropTypes;
 
 var PlayerStandings = React.createClass({
 
@@ -38,10 +38,10 @@ var PlayerStandings = React.createClass({
         >
           <td>{_.sortedIndex(playerTotals, ps.total) + 1}</td>
           <td>{playerIsMe ? (<b>{p.name}</b>) : p.name}</td>
-          <td>{ps.total}</td>
+          <td>{utils.toGolferScoreStr(ps.total)}</td>
           <td>{ps.total - topScore}</td>
           {_.map(ps.scoresByDay, function (ds) {
-            return (<td key={ds.day}>{ds.total}</td>);
+            return (<td key={ds.day}>{utils.toGolferScoreStr(ds.total)}</td>);
           })}
         </tr>
       );
@@ -49,14 +49,18 @@ var PlayerStandings = React.createClass({
 
     return (
       <section>
-        <h2>Pool player standings</h2>
+        <p>
+          <small>
+            <b>Tip:</b> Click on a player row to view score details (above)
+          </small>
+        </p>
         <table className='table standings-table table-hover'>
           <thead>
             <tr>
               <th>#</th>
               <th>Pool Player</th>
               <th>Total</th>
-              <th>Behind</th>
+              <th>Shots Back</th>
               <th>Day 1</th>
               <th>Day 2</th>
               <th>Day 3</th>

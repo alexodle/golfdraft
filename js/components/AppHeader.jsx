@@ -12,14 +12,16 @@ var AppHeader = React.createClass({
   propTypes: {
     tourneyName: ReactPropTypes.string.isRequired,
     currentUser: ReactPropTypes.object.isRequired,
-    playSounds: ReactPropTypes.bool.isRequired
+    playSounds: ReactPropTypes.bool.isRequired,
+    drafting: ReactPropTypes.bool
   },
 
   render: function () {
     return (
       <div className='page-header draft-page-header'>
         <h1>
-          Welcome to the {this.props.tourneyName}<br />
+          Welcome to the {this.props.tourneyName}
+          {!this.props.drafting ? null : ' Draft'}<br />
           <small>{this.props.currentUser.name}</small>
           <span> </span>
           <span className='logout-button'>
