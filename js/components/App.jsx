@@ -3,6 +3,7 @@
 
 var _ = require("lodash");
 var AdminApp = require("./AdminApp.jsx");
+var AppHeader = require("./AppHeader.jsx");
 var AppSettingsStore = require('../stores/AppSettingsStore');
 var ChatStore = require("../stores/ChatStore");
 var ChatStore = require("../stores/ChatStore");
@@ -12,7 +13,9 @@ var React = require("react");
 var Router = require('react-router');
 var ScoreStore = require('../stores/ScoreStore');
 var TourneyApp = require("./TourneyApp.jsx");
+var TourneyStore = require("../stores/TourneyStore");
 var UserStore = require("../stores/UserStore");
+var GolferStore = require("../stores/GolferStore");
 var WhoIsYou = require("./WhoIsYou.jsx");
 
 var RouteHandler = Router.RouteHandler;
@@ -29,7 +32,9 @@ var RELEVANT_STORES = [
 
 function getAppState() {
   return {
+    tourneyName: TourneyStore.getTourneyName(),
     currentUser: UserStore.getCurrentUser(),
+    golfers: GolferStore.getAll(),
 
     draft: {
       isMyDraftPick: DraftStore.getIsMyDraftPick(),
@@ -80,6 +85,12 @@ function createWillTransitionTo(currRoute) {
   };
 }
 
+function getGolfersRemaining(golfers, draftPicks) {
+  var pickedGolfers = _.pluck(draftPicks, "golfer");
+  var golfersRemaining = _.omit(golfers, pickedGolfers);
+  return golfersRemaining;
+}
+
 var WhoIsYouWrapper = React.createClass({
 
   statics: {
@@ -104,6 +115,7 @@ var DraftWrapper = React.createClass({
     var props = this.props;
     return (
       <DraftApp
+        tourneyName={props.tourneyName}
         playSounds={props.playSounds}
         currentUser={props.currentUser}
         currentPick={props.draft.currentPick}
@@ -111,6 +123,7 @@ var DraftWrapper = React.createClass({
         draftPicks={props.draft.draftPicks}
         chatMessages={props.chatMessages}
         isPaused={props.isPaused}
+        golfersRemaining={props.golfersRemaining}
       />
     );
   }
@@ -127,6 +140,7 @@ var TourneyWrapper = React.createClass({
     var props = this.props;
     return (
       <TourneyApp
+        tourneyName={props.tourneyName}
         currentUser={props.currentUser}
         scores={props.scores}
         draft={props.draft}
@@ -153,6 +167,7 @@ var AdminWrapper = React.createClass({
         currentPick={props.draft.currentPick}
         draftPicks={props.draft.draftPicks}
         isPaused={props.isPaused}
+        golfersRemaining={props.golfersRemaining}
       />
     );
   }
@@ -187,7 +202,24 @@ var AppNode = React.createClass({
   },
 
   render: function () {
-    return (<RouteHandler {...this.state} />);
+    var state = this.state;
+
+    // Calculated here since it's used in multiple places
+    var golfersRemaining = getGolfersRemaining(
+      state.golfers,
+      state.draft.draftPicks
+    );
+
+    return (
+      <section>
+        <AppHeader
+          tourneyName={state.tourneyName}
+          currentUser={state.currentUser}
+          playSounds={state.playSounds}
+        />
+        <RouteHandler {...state} golfersRemaining={golfersRemaining} />
+      </section>
+    );
   },
 
   _onChange: function () {

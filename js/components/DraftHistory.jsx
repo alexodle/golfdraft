@@ -3,6 +3,7 @@
 
 var _ = require('lodash');
 var DraftStore = require('../stores/DraftStore');
+var GolfDraftPanel = require('./GolfDraftPanel.jsx');
 var GolferStore = require('../stores/GolferStore');
 var PlayerStore = require('../stores/PlayerStore');
 var React = require('react');
@@ -13,8 +14,7 @@ var DraftHistory = React.createClass({
   render: function () {
     var draftPicks = _.clone(this.props.draftPicks).reverse();
     return (
-      <div>
-        <h2>Draft picks</h2>
+      <GolfDraftPanel heading='Draft History'>
         <table className='table'>
           <thead><tr><th>#</th><th>Pool Player</th><th>Golfer</th></tr></thead>
           <ReactCSSTransitionGroup
@@ -33,7 +33,7 @@ var DraftHistory = React.createClass({
             })}
           </ReactCSSTransitionGroup>
         </table>
-      </div>
+      </GolfDraftPanel>
     );
   }
 

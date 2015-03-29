@@ -59,9 +59,20 @@
   position: relative;
 }
 
+@dtWidth: 220px;
 .chat-panel {
   height: 200px;
   overflow-y: scroll;
+
+  @media (min-width: 768px) {
+    dt {
+      width: @dtWidth;
+    }
+
+    dd {
+      margin-left: @dtWidth + 20;
+    }
+  }
 
   .message-date {
     font-size: x-small;
@@ -74,4 +85,12 @@
   .bot-message {
     font-weight: bold;
   }
+}
+
+.logout-button {
+  font-size: small;
+}
+
+.draft-status {
+  font-size: larger;
 }

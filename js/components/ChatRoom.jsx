@@ -5,6 +5,7 @@ var $ = require('jquery');
 var _ = require('lodash');
 var ChatActions = require('../actions/ChatActions');
 var Assets = require('../constants/Assets');
+var GolfDraftPanel = require('./GolfDraftPanel.jsx');
 var moment = require('moment');
 var PlayerStore = require('../stores/PlayerStore');
 var PureRenderMixin = require('react/lib/ReactComponentWithPureRenderMixin');
@@ -114,15 +115,14 @@ var ChatRoom = React.createClass({
     }
 
     return (
-      <section>
-        <h2>Chat Room</h2>
+      <GolfDraftPanel heading='Chat Room'>
         <div className='panel panel-default chat-panel' ref='chatPanel'>
           <div className='panel-body' ref='chatPanelBody'>
             {body}
           </div>
         </div>
         {!messages ? null : (<ChatRoomInput />)}
-      </section>
+      </GolfDraftPanel>
     );
   },
 

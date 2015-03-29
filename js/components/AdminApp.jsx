@@ -3,8 +3,10 @@
 
 var $ = require('jquery');
 var _ = require('lodash');
+var DraftActions = require('../actions/DraftActions');
 var DraftHistory = require('./DraftHistory.jsx');
 var DraftStatus = require('./DraftStatus.jsx');
+var DraftStore = require('../stores/DraftStore');
 var React = require('react');
 var UserActions = require('../actions/UserActions');
 
@@ -81,7 +83,7 @@ var AdminApp = React.createClass({
   getInitialState: function () {
     return {
       confirmingUndo: false
-    }
+    };
   },
 
   render: function () {
@@ -104,6 +106,14 @@ var AdminApp = React.createClass({
             <button className='btn' onClick={this._onPause}>Pause</button>
             <span> </span>
             <button className='btn' onClick={this._onUnpause}>Unpause</button>
+          </div>
+        </div>
+
+        <div className='panel'>
+          <div className='panel-body'>
+            <button className='btn' onClick={this._onPickBestWGR}>
+              Pick best WGR
+            </button>
           </div>
         </div>
 
@@ -174,6 +184,15 @@ var AdminApp = React.createClass({
       url: '/admin/forceRefresh',
       type: 'PUT'
     });
+  },
+
+  _onPickBestWGR: function () {
+    var nextBestGolfer = _.chain(this.props.golfersRemaining)
+      .sortBy('wgr')
+      .first()
+      .value()
+      .id;
+    DraftActions.makePick(nextBestGolfer);
   }
 
 });

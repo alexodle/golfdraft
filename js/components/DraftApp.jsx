@@ -18,12 +18,6 @@ var SoundToggle = require("./SoundToggle.jsx");
 var myTurnSound = new Audio(Assets.MY_TURN_SOUND);
 var pickMadeSound = new Audio(Assets.PICK_MADE_SOUND);
 
-function getGolfersRemaining(props) {
-  var pickedGolfers = _.pluck(props.draftPicks, "golfer");
-  var golfersRemaining = _.omit(GolferStore.getAll(), pickedGolfers);
-  return golfersRemaining;
-}
-
 var DraftApp = React.createClass({
 
   componentWillReceiveProps: function (nextProps) {
@@ -39,7 +33,6 @@ var DraftApp = React.createClass({
 
   render: function () {
     var draftView = null;
-    var golfersRemaining = getGolfersRemaining(this.props);
     var isMyPick = this.props.isMyDraftPick;
     var isDraftOver = !this.props.currentPick;
     var isDraftPaused = this.props.isPaused;
@@ -54,7 +47,7 @@ var DraftApp = React.createClass({
         statusUi = (
           <DraftChooser
             currentUser={this.props.currentUser}
-            golfersRemaining={golfersRemaining}
+            golfersRemaining={this.props.golfersRemaining}
             currentPick={this.props.currentPick}
           />
         );
@@ -63,21 +56,6 @@ var DraftApp = React.createClass({
 
     return (
       <section>
-
-        <div className="page-header draft-page-header">
-          <h1>Welcome to the 2014 U.S. Open Draft
-            <span> </span><small>{this.props.currentUser.name}</small>
-            <SoundToggle
-              className="global-sound-toggle"
-              playSounds={this.props.playSounds}
-            />
-          </h1>
-
-          <div className="logout-row">
-            <LogoutButton currentUser={this.props.currentUser} />
-          </div>
-        </div>
-
         <div className="row">
           <div className="col-md-12">
             {statusUi}
@@ -89,13 +67,13 @@ var DraftApp = React.createClass({
           </div>
         </div>
         <div className="row">
-          <div className="col-md-3">
+          <div className="col-md-4">
             <DraftPickOrder
               currentUser={this.props.currentUser}
               currentPick={this.props.currentPick}
             />
           </div>
-          <div className="col-md-9">
+          <div className="col-md-8">
             <DraftHistory
               draftPicks={this.props.draftPicks}
             />

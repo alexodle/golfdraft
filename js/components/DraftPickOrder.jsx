@@ -1,14 +1,15 @@
 /** @jsx React.DOM */
 'use strict';
 
-var React = require('react');
-var ReactPropTypes = React.PropTypes;
-var cx = require('react/lib/cx');
 var _ = require('lodash');
-
-var PlayerStore = require('../stores/PlayerStore');
-var UserStore = require('../stores/UserStore');
+var cx = require('react/lib/cx');
 var DraftStore = require('../stores/DraftStore');
+var GolfDraftPanel = require('./GolfDraftPanel.jsx');
+var PlayerStore = require('../stores/PlayerStore');
+var React = require('react');
+var UserStore = require('../stores/UserStore');
+
+var ReactPropTypes = React.PropTypes;
 
 var DraftPickOrder = React.createClass({
 
@@ -25,8 +26,7 @@ var DraftPickOrder = React.createClass({
     var pickOrder = DraftStore.getPickOrder();
     pickOrder = _.first(pickOrder, pickOrder.length / 4);
     return (
-      <div>
-        <h2>Pick order</h2>
+      <GolfDraftPanel heading='Pick Order'>
         <ol className='pick-order-list'>
           {_.map(pickOrder, function (pick, i) {
             var player = pick.player;
@@ -41,7 +41,7 @@ var DraftPickOrder = React.createClass({
               >{text}</li>);
           })}
         </ol>
-      </div>
+      </GolfDraftPanel>
     );
   }
 
