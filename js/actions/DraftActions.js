@@ -19,9 +19,16 @@ var DraftActions = {
     });
   },
 
-  draftForCurrentPlayer: function (player) {
+  draftForPlayer: function (player) {
     AppDispatcher.handleViewAction({
       actionType: DraftConstants.DRAFT_FOR_PLAYER,
+      player: player
+    });
+  },
+
+  stopDraftingForPlayer: function (player) {
+    AppDispatcher.handleViewAction({
+      actionType: DraftConstants.STOP_DRAFT_FOR_PLAYER,
       player: player
     });
   }

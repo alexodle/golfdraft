@@ -37,8 +37,9 @@ var DraftStatus = React.createClass({
     );
   },
 
-  _onTakePick: function () {
-    DraftActions.draftForCurrentPlayer(this.props.currentPick.player);
+  _onTakePick: function (ev) {
+    ev.preventDefault();
+    DraftActions.draftForPlayer(this.props.currentPick.player);
   }
 
 });

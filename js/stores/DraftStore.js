@@ -89,11 +89,13 @@ AppDispatcher.register(function (payload) {
       break;
 
     case DraftConstants.DRAFT_FOR_PLAYER:
-      var player = action.player;
-      if (!_.contains(_pickForPlayers, player)) {
-        _pickForPlayers = _pickForPlayers.concat([player]);
-        DraftStore.emitChange();
-      }
+      _pickForPlayers = _.uniq(_pickForPlayers.concat([action.player]));
+      DraftStore.emitChange();
+      break;
+
+    case DraftConstants.STOP_DRAFT_FOR_PLAYER:
+      _pickForPlayers = _.without(_pickForPlayers, action.player);
+      DraftStore.emitChange();
       break;
   }
 

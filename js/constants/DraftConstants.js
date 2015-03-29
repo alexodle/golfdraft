@@ -5,5 +5,6 @@ var keyMirror = require('react/lib/keyMirror');
 module.exports = keyMirror({
   DRAFT_FOR_PLAYER: null,
   DRAFT_PICK: null,
-  DRAFT_UPDATE: null
+  DRAFT_UPDATE: null,
+  STOP_DRAFT_FOR_PLAYER: null
 });

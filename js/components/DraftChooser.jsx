@@ -32,7 +32,14 @@ var DraftChooser = React.createClass({
       header = (<h2>It's your turn! Make your pick.</h2>);
     } else {
       var playerName = PlayerStore.getPlayer(currentPick.player).name;
-      header = (<h2>Make a pick for: {playerName}</h2>);
+      header = (
+        <section>
+          <h2>Make a pick for: {playerName}</h2>
+          <h4><a href="#" onClick={this._onStopTakingPick}>
+            Stop taking picks for {playerName}
+          </a></h4>
+        </section>
+      );
     }
 
     return (
@@ -130,6 +137,11 @@ var DraftChooser = React.createClass({
   _onSubmit: function (ev) {
     ev.preventDefault();
     DraftActions.makePick(this.state.selectedGolfer);
+  },
+
+  _onStopTakingPick: function (ev) {
+    ev.preventDefault();
+    DraftActions.stopDraftingForPlayer(this.props.currentPick.player);
   }
 
 });
