@@ -19,6 +19,8 @@ var DraftPickOrder = React.createClass({
   },
 
   render: function () {
+    var pickingForPlayers = this.props.pickingForPlayers;
+
     var currentPick = this.props.currentPick;
     var currentPlayer = currentPick ? currentPick.player : null;
 
@@ -27,6 +29,9 @@ var DraftPickOrder = React.createClass({
     pickOrder = _.first(pickOrder, pickOrder.length / 4);
     return (
       <GolfDraftPanel heading='Pick Order'>
+        <p><small>
+          <b>Tip:</b> your are picking for all players in bold
+        </small></p>
         <ol className='pick-order-list'>
           {_.map(pickOrder, function (pick, i) {
             var player = pick.player;
@@ -35,7 +40,10 @@ var DraftPickOrder = React.createClass({
               <li
                 key={player}
                 className={cx({
-                  'my-player': myPlayer === player,
+                  'my-player': (
+                    myPlayer === player ||
+                    _.contains(pickingForPlayers, player)
+                  ),
                   'current-player': currentPlayer === player
                 })}
               >{text}</li>);

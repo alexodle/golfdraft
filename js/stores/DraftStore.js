@@ -57,6 +57,10 @@ var DraftStore =  _.extend({}, Store.prototype, {
       currentPick.player === currentUser.player ||
       _.contains(_pickForPlayers, currentPick.player)
     );
+  },
+
+  getPickingForPlayers: function () {
+    return _pickForPlayers;
   }
 
 });

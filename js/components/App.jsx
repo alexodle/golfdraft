@@ -39,7 +39,8 @@ function getAppState() {
     draft: {
       isMyDraftPick: DraftStore.getIsMyDraftPick(),
       currentPick: DraftStore.getCurrentPick(),
-      draftPicks: DraftStore.getDraftPicks()
+      draftPicks: DraftStore.getDraftPicks(),
+      pickingForPlayers: DraftStore.getPickingForPlayers()
     },
 
     scores: ScoreStore.getScores(),
@@ -131,6 +132,7 @@ var DraftWrapper = React.createClass({
           chatMessages={props.chatMessages}
           isPaused={props.isPaused}
           golfersRemaining={props.golfersRemaining}
+          pickingForPlayers={props.draft.pickingForPlayers}
         />
       </section>
     );
