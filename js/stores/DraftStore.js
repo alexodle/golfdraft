@@ -9,7 +9,7 @@ var UserStore = require('./UserStore');
 
 var _picks = [];
 var _pickOrder = [];
-var _pickForPlayer = null; // { player: <player_id>, pickNumber: <n> }
+var _pickForPlayers = [];
 
 function getCurrentPickNumber() {
   return _picks.length;
@@ -53,10 +53,9 @@ var DraftStore =  _.extend({}, Store.prototype, {
     var currentUser = UserStore.getCurrentUser();
     if (!currentPick || !currentUser) return false;
 
-    return currentPick.player === currentUser.player || (
-      _pickForPlayer &&
-        _pickForPlayer.player === currentPick.player &&
-        _pickForPlayer.pickNumber - currentPick.pickNumber <= 1
+    return (
+      currentPick.player === currentUser.player ||
+      _.contains(_pickForPlayers, currentPick.player)
     );
   }
 
@@ -90,15 +89,12 @@ AppDispatcher.register(function (payload) {
       break;
 
     case DraftConstants.DRAFT_FOR_PLAYER:
-      _pickForPlayer = {
-        player: action.player,
-        pickNumber: getCurrentPickNumber()
-      };
-      DraftStore.emitChange();
+      var player = action.player;
+      if (!_.contains(_pickForPlayers, player)) {
+        _pickForPlayers = _pickForPlayers.concat([player]);
+        DraftStore.emitChange();
+      }
       break;
-
-    default:
-      return true;
   }
 
   return true; // No errors.  Needed by promise in Dispatcher.
