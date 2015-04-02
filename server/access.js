@@ -91,7 +91,7 @@ _.extend(access, {
       .then(function () {
         return golfer;
       });
-    })
+    });
   },
 
   getPlayer: promiseizeFn(function (playerId) {
@@ -170,7 +170,7 @@ _.extend(access, {
     return promiseize(models.DraftPick.count(FK_TOURNEY_ID_QUERY).exec())
     .then(function (nPicks) {
       return promiseize(models.DraftPick.remove({ pickNumber: nPicks - 1 }).exec());
-    })
+    });
   },
 
   getDraft: function () {
@@ -199,7 +199,11 @@ _.extend(access, {
 
   ensureGolfers: createMultiUpdater(models.Golfer, ['name', 'tourneyId']),
 
-  ensureWGR: createMultiUpdater(models.WGR, ['name']),
+  replaceWgrs: function (wgrEntries) {
+    return promiseize(models.WGR.remove().exec()).then(function () {
+      return promiseize(models.WGR.create(wgrEntries));
+    });
+  },
 
   setPickOrder: createMultiUpdater(
     models.DraftPickOrder,
