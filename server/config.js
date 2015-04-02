@@ -10,7 +10,7 @@ var cfg = {
 
   yahoo_url: 'http://sports.yahoo.com/golf/pga/leaderboard/2015/15',
 
-  // Unsafe not to hash. But who cares in this case?
+  // Unsafe not to hash. But who cares in this case? Matt Simon cares.
   admin_password: process.env.ADMIN_PASS || 'admin'
 };
 cfg.debug = !cfg.prod;
