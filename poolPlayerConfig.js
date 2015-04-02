@@ -16,7 +16,6 @@ module.exports = {
     'Chris Willet',
     'Matt Hennessey',
     'Alex Odle',
-    'Rob Phillips',
     'Kevin Phillips'
   ]
 };
