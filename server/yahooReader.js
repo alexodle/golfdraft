@@ -45,7 +45,7 @@ var YahooReader = {
               return;
             }
 
-            var scores = _.map(_.range(4), function () {
+            var scores = _.times(4, function () {
               return $($td = $td.next()).text().trim();
             });
             var today = $($td = $td.next()).text().trim();
@@ -140,6 +140,5 @@ var YahooReader = {
   }
 
 };
-
 
 module.exports = YahooReader;
