@@ -8,7 +8,7 @@ var cfg = {
 
   cdn_url: process.env.CDN_URL || '',
 
-  yahoo_url: 'http://sports.yahoo.com/golf/pga/leaderboard/2015/360',
+  yahoo_url: 'http://sports.yahoo.com/golf/pga/leaderboard/2015/15',
 
   // Unsafe not to hash. But who cares in this case?
   admin_password: process.env.ADMIN_PASS || 'admin'
