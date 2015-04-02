@@ -43,7 +43,7 @@ var WhoIsYou = React.createClass({
                 className="btn btn-default btn-primary"
                 onClick={this._onSubmit}
               >
-                Pick
+                Sign in
               </button>
             </form>
           </div>
