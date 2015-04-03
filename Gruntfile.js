@@ -8,7 +8,7 @@ module.exports = function (grunt) {
   require('time-grunt')(grunt);
 
   var webpack = require('webpack');
-  var temp;
+
   grunt.initConfig({
     express: {
       dev: {
