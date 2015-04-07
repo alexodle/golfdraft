@@ -121,9 +121,12 @@ _.extend(access, {
 
   getScoreOverrides: createBasicGetter(models.GolferScoreOverrides),
 
-  getAppState: promiseizeFn(function () {
-    return models.AppState.findOne(FK_TOURNEY_ID_QUERY).exec();
-  }),
+  getAppState: function () {
+    return promiseize(models.AppState.findOne(FK_TOURNEY_ID_QUERY).exec())
+      .then(function (appState) {
+        return appState || { isDraftPause: false };
+      });
+  },
 
   updateAppState: promiseizeFn(function (props) {
     return models.AppState.update(
