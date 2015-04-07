@@ -16,7 +16,7 @@ var SettingsActions = {
     AppDispatcher.handleServerAction({
       actionType: AppConstants.SET_IS_PAUSED,
       isPaused: isPaused
-    })
+    });
   }
 
 };

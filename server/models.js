@@ -49,6 +49,12 @@ var tourneySchema = mongoose.Schema({
   yahooUrl: String
 });
 
+var appStateSchema = mongoose.Schema({
+  tourneyId: mongoose.Schema.ObjectId,
+  isDraftPaused: Boolean
+});
+appStateSchema.index({ tourneyId: 1 });
+
 var Golfer = mongoose.model('Golfer', golferSchema);
 var WGR = mongoose.model('WGR', wgrSchema);
 var Player = mongoose.model('Player', playerSchema);
@@ -60,6 +66,7 @@ var GolferScoreOverrides = mongoose.model(
   golferScoreSchema
 );
 var Tourney = mongoose.model('Tourney', tourneySchema);
+var AppState = mongoose.model('AppState', appStateSchema);
 
 module.exports = {
   Golfer: Golfer,
@@ -69,5 +76,6 @@ module.exports = {
   DraftPick: DraftPick,
   GolferScore: GolferScore,
   GolferScoreOverrides: GolferScoreOverrides,
-  Tourney: Tourney
+  Tourney: Tourney,
+  AppState: AppState
 };

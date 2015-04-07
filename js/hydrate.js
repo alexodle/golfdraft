@@ -1,8 +1,9 @@
 var AppActions = require('./actions/AppActions');
 var DraftActions = require('./actions/DraftActions');
-var ScoreActions = require('./actions/ScoreActions');
-var UserActions = require('./actions/UserActions');
 var PlayerStore = require('./stores/PlayerStore');
+var ScoreActions = require('./actions/ScoreActions');
+var SettingsActions = require('./actions/SettingsActions');
+var UserActions = require('./actions/UserActions');
 
 /** Hydrates the app with data stamped on initial page load
 */
@@ -14,6 +15,7 @@ function hydrate(seedData) {
     scores: seedData.scores,
     lastUpdated: seedData.tourney.lastUpdated
   });
+  SettingsActions.setIsPaused(seedData.appState.isDraftPaused);
 
   // HACKHACK - For now users are just wrappers around players. I may or may
   // not need to differentiate the two in the future, so just keep the

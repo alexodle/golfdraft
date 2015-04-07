@@ -121,6 +121,18 @@ _.extend(access, {
 
   getScoreOverrides: createBasicGetter(models.GolferScoreOverrides),
 
+  getAppState: promiseizeFn(function () {
+    return models.AppState.findOne(FK_TOURNEY_ID_QUERY).exec();
+  }),
+
+  updateAppState: promiseizeFn(function (props) {
+    return models.AppState.update(
+      FK_TOURNEY_ID_QUERY,
+      props,
+      {upsert: true}
+    ).exec();
+  }),
+
   makePick: function (pick) {
     var pickOrderQuery = _.extend({}, FK_TOURNEY_ID_QUERY, {
       pickNumber: pick.pickNumber,

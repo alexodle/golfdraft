@@ -28,9 +28,6 @@ var ObjectId = mongoose.Types.ObjectId;
 
 mongoose.connect(config.mongo_url);
 
-// Temp state
-var _isPaused = false;
-
 // Request logging
 app.use(logfmt.requestLogger());
 
@@ -115,7 +112,8 @@ db.once('open', function callback () {
       access.getPlayers(),
       access.getDraft(),
       access.getScores(),
-      access.getTourney()
+      access.getTourney(),
+      access.getAppState()
     ])
     .then(function (results) {
       res.render('index', {
@@ -124,6 +122,7 @@ db.once('open', function callback () {
         draft: JSON.stringify(results[2]),
         scores: JSON.stringify(results[3]),
         tourney: JSON.stringify(results[4]),
+        appState: JSON.stringify(results[5]),
         user: JSON.stringify(req.session.user),
         prod: config.prod,
         cdnUrl: config.cdn_url
@@ -167,10 +166,6 @@ db.once('open', function callback () {
       res.send(401, 'Must be logged in to make a pick');
       return;
     }
-    if (_isPaused) {
-      res.send(400, 'Admin has paused the app');
-      return;
-    }
 
     var pick = {
       pickNumber: body.pickNumber,
@@ -178,12 +173,27 @@ db.once('open', function callback () {
       golfer: new ObjectId(body.golfer)
     };
 
+    var notAnError = {};
+
+    // Ensure not paused
+    access.getAppState()
+    .then(function (appState) {
+      if (appState && appState.isDraftPaused) {
+        res.send(400, 'Admin has paused the app');
+        throw notAnError;
+      }
+    })
+
     // Make the pick
-    access.makePick(pick)
+    .then(function () {
+      return access.makePick(pick);
+    })
     .then(function () {
       res.send(200);
     })
     .catch(function (err) {
+      if (err === notAnError) throw err;
+
       if (err.message.indexOf('invalid pick') !== -1) {
         res.send(400, err.message);
       }
@@ -199,6 +209,8 @@ db.once('open', function callback () {
       chatBot.broadcastPickMessage(user, pick, draft);
     })
     .catch(function (err) {
+      if (err === notAnError) throw err;
+
       // The main functionality finished,
       // so don't return a failed response code
       console.log('err: ' + err);
@@ -228,11 +240,16 @@ db.once('open', function callback () {
       return;
     }
 
-    _isPaused = !!req.body.isPaused;
-    io.sockets.emit('change:ispaused', {
-      data: { isPaused: _isPaused }
+    var isDraftPaused = !!req.body.isPaused;
+    access.updateAppState({
+      isDraftPaused: isDraftPaused
+    })
+    .then(function () {
+      io.sockets.emit('change:ispaused', {
+        data: { isPaused: isDraftPaused }
+      });
+      res.send(200);
     });
-    res.send(200);
   });
 
   app.delete('/admin/lastpick', function (req, res) {
