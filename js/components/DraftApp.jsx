@@ -4,6 +4,7 @@
 var _ = require("lodash");
 var AppPausedStatus = require('./AppPausedStatus.jsx');
 var Assets = require("../constants/Assets");
+var BestLeft = require("./BestLeft.jsx");
 var ChatRoom = require("./ChatRoom.jsx");
 var DraftChooser = require("./DraftChooser.jsx");
 var DraftHistory = require("./DraftHistory.jsx");
@@ -67,17 +68,20 @@ var DraftApp = React.createClass({
           </div>
         </div>
         <div className="row">
-          <div className="col-md-4">
+          <div className="col-md-6">
             <DraftPickOrder
               currentUser={this.props.currentUser}
               currentPick={this.props.currentPick}
               pickingForPlayers={this.props.pickingForPlayers}
             />
           </div>
-          <div className="col-md-8">
-            <DraftHistory
-              draftPicks={this.props.draftPicks}
-            />
+          <div className="col-md-6">
+            <BestLeft golfersRemaining={this.props.golfersRemaining} />
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-md-12">
+            <DraftHistory draftPicks={this.props.draftPicks} />
           </div>
         </div>
       </section>
