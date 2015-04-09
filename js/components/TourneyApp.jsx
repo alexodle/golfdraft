@@ -48,6 +48,7 @@ var TourneyApp = React.createClass({
           <PlayerDetails
             player={this.state.playerDetailsPlayer}
             playerScores={playerScores}
+            draftPicks={this.props.draft.draftPicks}
           />
         </GolfDraftPanel>
 

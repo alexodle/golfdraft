@@ -27,29 +27,26 @@ function playerScore(playerGolfers, scores, player) {
     .indexBy('golfer')
     .value();
 
-  var scoresByDay = _.chain(NDAYS)
-    .range()
-    .map(function (day) {
-      var dayScores = _.chain(playerGolfers)
-        .map(function (g) {
-          return scores[g];
-        })
-        .sortBy(function (s) {
-          return s.scores[day];
-        })
-        .value();
+  var scoresByDay = _.times(NDAYS, function (day) {
+    var dayScores = _.chain(playerGolfers)
+      .map(function (g) {
+        return scores[g];
+      })
+      .sortBy(function (s) {
+        return s.scores[day];
+      })
+      .value();
 
-      var usedScores = _.first(dayScores, NSCORES_PER_DAY);
-      return {
-        day: day,
-        allScores: dayScores,
-        usedScores: usedScores,
-        total: _.sum(usedScores, function (s) {
-          return s.scores[day];
-        })
-      };
-    })
-    .value();
+    var usedScores = _.first(dayScores, NSCORES_PER_DAY);
+    return {
+      day: day,
+      allScores: dayScores,
+      usedScores: usedScores,
+      total: _.sum(usedScores, function (s) {
+        return s.scores[day];
+      })
+    };
+  });
 
   return {
     player: player,

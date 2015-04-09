@@ -21,6 +21,7 @@ var PlayerDetails = React.createClass({
     var player = this.props.player;
     var playerScore = this.props.playerScores[player];
     var scoresByDay = playerScore.scoresByDay;
+    var draftPicksByGolfer = _.indexBy(this.props.draftPicks, 'golfer');
 
     var sortedScores = _.chain(this.props.playerScores)
       .pluck("total")
@@ -33,7 +34,10 @@ var PlayerDetails = React.createClass({
     var trs = _.map(golferScores, function (gs) {
       return (
         <tr key={gs.golfer}>
-          <td>{GolferStore.getGolfer(gs.golfer).name}</td>
+          <td>
+            {GolferStore.getGolfer(gs.golfer).name}
+            <small> ({utils.getOrdinal(draftPicksByGolfer[gs.golfer].pickNumber)} pick)</small>
+          </td>
           <td>{utils.toGolferScoreStr(gs.total)}</td>
           {_.map(gs.scores, function (s, i) {
             var missedCut = gs.missedCuts[i];
