@@ -36,7 +36,7 @@ var PlayerDetails = React.createClass({
         <tr key={gs.golfer}>
           <td>
             {GolferStore.getGolfer(gs.golfer).name}
-            <small> ({utils.getOrdinal(draftPicksByGolfer[gs.golfer].pickNumber)} pick)</small>
+            <small> ({utils.getOrdinal(draftPicksByGolfer[gs.golfer].pickNumber + 1)} pick)</small>
           </td>
           <td>{utils.toGolferScoreStr(gs.total)}</td>
           {_.map(gs.scores, function (s, i) {
