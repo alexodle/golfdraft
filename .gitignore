@@ -1,8 +1,8 @@
-devEnv.sh
+dev*.sh
+prod*.sh
 distd
 dump.rdb
 node_modules
 npm-*.log
-prodEnv*.sh
 server/*.sh
 mongolog.txt*
