@@ -17,7 +17,6 @@ var utils = require('../../common/utils');
 var ReactPropTypes = React.PropTypes;
 
 var NDAYS = constants.NDAYS;
-var MISSED_CUT = constants.MISSED_CUT;
 
 function getState(state, props) {
   return {
@@ -49,7 +48,7 @@ var TourneyApp = React.createClass({
       .times(function (day) {
         var worstScore = _.chain(scores)
           .reject(function (s) {
-            return s.scores[day] === MISSED_CUT;
+            return s.missedCuts[day];
           })
           .max(function (s) {
             return s.scores[day];
