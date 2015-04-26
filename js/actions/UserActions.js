@@ -28,7 +28,7 @@ var UserActions = {
     AppDispatcher.handleServerAction({
       actionType: AppConstants.SET_IS_ADMIN,
       isAdmin: isAdmin
-    })
+    });
   },
 
 };

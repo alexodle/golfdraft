@@ -23,7 +23,7 @@ var RedisStore = require('connect-redis')(session);
 
 var MAX_AGE = 1000 * 60 * 60 * 24 * 365;
 
-var redisCli = redis.client;
+var redisPubSubClient = redis.pubSubClient;
 var ObjectId = mongoose.Types.ObjectId;
 
 mongoose.connect(config.mongo_url);
@@ -88,7 +88,7 @@ var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function callback () {
 
-  redisCli.on("message", function (channel, message) {
+  redisPubSubClient.on("message", function (channel, message) {
     // Scores updated, alert clients
     console.log("redis message: channel " + channel + ": " + message);
     access.getScores().then(function (scores) {
@@ -135,9 +135,8 @@ db.once('open', function callback () {
   });
 
   app.post('/login', function (req, res) {
-    var body = req.body;
-
-    req.session.user = body;
+    var user = req.body;
+    req.session.user = user;
     req.session.save(function (err) {
       if (err) {
         res.send(500, err);
@@ -149,6 +148,7 @@ db.once('open', function callback () {
 
   app.post('/logout', function (req, res) {
     req.session.user = null;
+
     req.session.save(function (err) {
       if (err) {
         res.send(500, err);
@@ -295,7 +295,7 @@ db.once('open', function callback () {
   }
 
   require('./expressServer').listen(port);
-  redisCli.subscribe("scores:update");
+  redisPubSubClient.subscribe("scores:update");
 
   console.log('I am fully running now!');
 });

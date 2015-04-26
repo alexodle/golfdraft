@@ -5,7 +5,7 @@ var updateScore = require('./updateScore');
 
 var TIMEOUT = 30 * 1000; // 30 seconds
 
-var redisCli = redis.client;
+var redisCli = redis.pubSubClient;
 
 mongoose.set('debug', true);
 mongoose.connect(config.mongo_url);

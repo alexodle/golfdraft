@@ -6,15 +6,20 @@ if (!config.prod) {
 }
 
 var redisUrl = require("url").parse(config.redis_url);
-var redisCli = redis.createClient(redisUrl.port, redisUrl.hostname);
-redisCli.auth(redisUrl.auth.split(":")[1]);
 
-redisCli.on("error", function (err) {
-  console.log("REDIS ERROR - " + err);
-});
+function createClient() {
+  var redisCli = redis.createClient(redisUrl.port, redisUrl.hostname);
+  redisCli.auth(redisUrl.auth.split(":")[1]);
 
+  redisCli.on("error", function (err) {
+    console.log("REDIS ERROR - " + err);
+  });
+
+  return redisCli;
+}
 
 module.exports = {
   redis: redis,
-  client: redisCli
+  pubSubClient: createClient(),
+  client: createClient()
 };
