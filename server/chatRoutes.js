@@ -7,10 +7,10 @@ var access = require('./access');
 app.get('/chat/messages', function (req, res) {
   access.getChatMessages()
   .then(function (messages) {
-    res.send(200, messages);
+    res.status(200).send(messages);
   })
   .catch(function (err) {
-    res.send(500, err);
+    res.status(500).send(err);
   });
 });
 
@@ -19,10 +19,10 @@ app.post('/chat/messages', function (req, res) {
   var user = req.session.user;
 
   if (!user) {
-    res.send(401, 'Must be logged in to post');
+    res.status(401).send('Must be logged in to post');
     return;
   } else if (_.isEmpty(body.message)) {
-    res.send(400, 'Empty message not accepted');
+    res.status(400).send('Empty message not accepted');
     return;
   }
 
@@ -32,9 +32,9 @@ app.post('/chat/messages', function (req, res) {
   };
   access.createChatMessage(message)
   .then(function () {
-    res.send(201);
+    res.sendStatus(201);
   })
   .catch(function (err) {
-    res.send(500, err);
+    res.status(500).send(err);
   });
 });

@@ -10,7 +10,7 @@ var chatBot = require('./chatBot');
 var compression = require('compression');
 var config = require('./config');
 var cookieParser = require('cookie-parser');
-var exphbs  = require('express3-handlebars');
+var exphbs  = require('express-handlebars');
 var express = require('express');
 var io = require('./socketIO');
 var logfmt = require("logfmt");
@@ -130,7 +130,7 @@ db.once('open', function callback () {
     })
     .catch(function (err) {
       console.log(err);
-      res.send(500, err);
+      res.status(500).send(err);
     });
   });
 
@@ -139,10 +139,10 @@ db.once('open', function callback () {
     req.session.user = user;
     req.session.save(function (err) {
       if (err) {
-        res.send(500, err);
+        res.status(500).send(err);
         return;
       }
-      res.send(200);
+      res.sendStatus(200);
     });
   });
 
@@ -151,10 +151,10 @@ db.once('open', function callback () {
 
     req.session.save(function (err) {
       if (err) {
-        res.send(500, err);
+        res.status(500).send(err);
         return;
       }
-      res.send(200);
+      res.sendStatus(200);
     });
   });
 
@@ -163,7 +163,7 @@ db.once('open', function callback () {
     var user = req.session.user;
 
     if (!user || !user.id) {
-      res.send(401, 'Must be logged in to make a pick');
+      res.status(401).send('Must be logged in to make a pick');
       return;
     }
 
@@ -179,7 +179,7 @@ db.once('open', function callback () {
     access.getAppState()
     .then(function (appState) {
       if (appState && appState.isDraftPaused) {
-        res.send(400, 'Admin has paused the app');
+        res.status(400).status('Admin has paused the app');
         throw notAnError;
       }
     })
@@ -189,13 +189,13 @@ db.once('open', function callback () {
       return access.makePick(pick);
     })
     .then(function () {
-      res.send(200);
+      res.sendStatus(200);
     })
     .catch(function (err) {
       if (err === notAnError) throw err;
 
       if (err.message.indexOf('invalid pick') !== -1) {
-        res.send(400, err.message);
+        res.status(400).send(err.message);
       }
       throw err;
     })
@@ -221,22 +221,22 @@ db.once('open', function callback () {
 
   app.post('/admin/login', function (req, res) {
     if (req.body.password !== config.admin_password) {
-      res.send(401, 'Bad password');
+      res.status(401).send('Bad password');
       return;
     }
     req.session.isAdmin = true;
     req.session.save(function (err) {
       if (err) {
-        res.send(500, err);
+        res.status(500).send(err);
         return;
       }
-      res.send(200);
+      res.sendStatus(200);
     });
   });
 
   app.put('/admin/pause', function (req, res) {
     if (!req.session.isAdmin) {
-      res.send(401, 'Only can admin can pause the draft');
+      res.status(401).send('Only can admin can pause the draft');
       return;
     }
 
@@ -248,22 +248,22 @@ db.once('open', function callback () {
       io.sockets.emit('change:ispaused', {
         data: { isPaused: isDraftPaused }
       });
-      res.send(200);
+      res.sendStatus(200);
     });
   });
 
   app.delete('/admin/lastpick', function (req, res) {
     if (!req.session.isAdmin) {
-      res.send(401, 'Only can admin can undo picks');
+      res.status(401).send('Only can admin can undo picks');
       return;
     }
 
     access.undoLastPick()
     .then(function () {
-      res.send(200);
+      res.sendStatus(200);
     })
     .catch(function (err) {
-      res.send(500, err);
+      res.status(500).send(err);
       throw err;
     })
 
@@ -278,12 +278,12 @@ db.once('open', function callback () {
 
   app.put('/admin/forceRefresh', function (req, res) {
     if (!req.session.isAdmin) {
-      res.send(401, 'Only can admin can force refreshes');
+      res.status(401).send('Only can admin can force refreshes');
       return;
     }
 
     io.sockets.emit('action:forcerefresh');
-    res.send(200);
+    res.sendStatus(200);
   });
 
   function updateClients(draft) {
