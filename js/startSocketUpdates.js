@@ -21,6 +21,12 @@ function startSocketUpdates() {
   io.on('change:ispaused', function (ev) {
     SettingsActions.setIsPaused(ev.data.isPaused);
   });
+  io.on('change:activeusers', function (ev) {
+    console.log('change:activeusers');
+    console.log(JSON.stringify(ev.data.userCounts));
+  });
+
+  // ADMIN power
   io.on('action:forcerefresh', function (ev) {
     window.location.reload();
   });

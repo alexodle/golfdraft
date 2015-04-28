@@ -18,6 +18,7 @@ var mongoose = require('mongoose');
 var Promise = require('promise');
 var redis = require("./redis");
 var session = require('express-session');
+var UserAccess = require('./userAccess');
 
 var RedisStore = require('connect-redis')(session);
 
@@ -31,12 +32,16 @@ mongoose.connect(config.mongo_url);
 // Request logging
 app.use(logfmt.requestLogger());
 
-// Redis
-app.use(cookieParser()); // Must come before session()
-app.use(session({
+// Middlewares
+var sessionMiddleware = session({
   store: new RedisStore({ url: config.redis_url }),
   secret: 'odle rules'
-}));
+});
+app.use(cookieParser()); // Must come before session()
+app.use(sessionMiddleware);
+io.use(function(socket, next) {
+    sessionMiddleware(socket.request, socket.request.res, next);
+});
 
 // Gzip
 app.use(compression());
@@ -106,6 +111,9 @@ db.once('open', function callback () {
   // Include chat routes
   require('./chatRoutes');
 
+  // Include socket server
+  require('./socketServer');
+
   app.get(['/', '/draft', '/tourney', '/admin'], function (req, res) {
     Promise.all([
       access.getGolfers(),
@@ -142,6 +150,7 @@ db.once('open', function callback () {
         res.status(500).send(err);
         return;
       }
+      UserAccess.onUserLogin(req.session);
       res.sendStatus(200);
     });
   });
@@ -154,6 +163,7 @@ db.once('open', function callback () {
         res.status(500).send(err);
         return;
       }
+      UserAccess.onUserLogout(req.session);
       res.sendStatus(200);
     });
   });
