@@ -64,7 +64,10 @@ var DraftApp = React.createClass({
         </div>
         <div className="row">
           <div className="col-md-12">
-            <ChatRoom messages={this.props.chatMessages} />
+            <ChatRoom
+              messages={this.props.chatMessages}
+              activeUsers={this.props.activeUsers}
+            />
           </div>
         </div>
         <div className="row">

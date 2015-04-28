@@ -10,6 +10,7 @@ var moment = require('moment');
 var PlayerStore = require('../stores/PlayerStore');
 var PureRenderMixin = require('react/lib/ReactComponentWithPureRenderMixin');
 var React = require('react');
+var UserStore = require('../stores/UserStore');
 
 var BOT_NAME = 'DraftBot';
 
@@ -116,9 +117,27 @@ var ChatRoom = React.createClass({
 
     return (
       <GolfDraftPanel heading='Chat Room'>
-        <div className='panel panel-default chat-panel' ref='chatPanel'>
-          <div className='panel-body' ref='chatPanelBody'>
-            {body}
+        <div className='row'>
+          <div className='col-md-9'>
+            <div className='panel panel-default chat-panel' ref='chatPanel'>
+              <div className='panel-body' ref='chatPanelBody'>
+                {body}
+              </div>
+            </div>
+          </div>
+          <div className='col-md-3'>
+            <div className='panel panel-default'>
+              <div className='panel-body'>
+                <b>Online:</b>
+                <ul className='list-unstyled'>
+                  {_.map(this.props.activeUsers, function (count, user) {
+                    return (
+                      <li key={user}>{UserStore.getUser(user).name}</li>
+                    );
+                  })}
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
         {!messages ? null : (<ChatRoomInput />)}

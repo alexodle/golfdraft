@@ -29,6 +29,9 @@ var ObjectId = mongoose.Types.ObjectId;
 
 mongoose.connect(config.mongo_url);
 
+// Temp temp - remove this when we have multiple nodes
+UserAccess.refresh();
+
 // Request logging
 app.use(logfmt.requestLogger());
 

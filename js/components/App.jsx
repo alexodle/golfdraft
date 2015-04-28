@@ -34,6 +34,7 @@ function getAppState() {
   return {
     tourneyName: TourneyStore.getTourneyName(),
     currentUser: UserStore.getCurrentUser(),
+    activeUsers: UserStore.getActive(),
     golfers: GolferStore.getAll(),
 
     draft: {
@@ -133,6 +134,7 @@ var DraftWrapper = React.createClass({
           isPaused={props.isPaused}
           golfersRemaining={props.golfersRemaining}
           pickingForPlayers={props.draft.pickingForPlayers}
+          activeUsers={props.activeUsers}
         />
       </section>
     );
@@ -162,6 +164,7 @@ var TourneyWrapper = React.createClass({
           draft={props.draft}
           lastScoresUpdate={props.lastScoresUpdate}
           chatMessages={props.chatMessages}
+          activeUsers={props.activeUsers}
         />
       </section>
     );
@@ -191,6 +194,7 @@ var AdminWrapper = React.createClass({
           draftPicks={props.draft.draftPicks}
           isPaused={props.isPaused}
           golfersRemaining={props.golfersRemaining}
+          activeUsers={props.activeUsers}
         />
       </section>
     );

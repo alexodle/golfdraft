@@ -31,6 +31,13 @@ var UserActions = {
     });
   },
 
+  setActiveUsers: function (activeUsers) {
+    AppDispatcher.handleServerAction({
+      actionType: AppConstants.SET_ACTIVE_USERS,
+      activeUsers: activeUsers
+    });
+  }
+
 };
 
 module.exports = UserActions;

@@ -105,7 +105,10 @@ var TourneyApp = React.createClass({
           />
         </GolfDraftPanel>
 
-        <ChatRoom messages={this.props.chatMessages} />
+        <ChatRoom
+          messages={this.props.chatMessages}
+          activeUsers={this.props.activeUsers}
+        />
       </section>
     );
   },

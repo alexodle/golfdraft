@@ -21,6 +21,10 @@ function onUserChange() {
 
 var UserAccess = {
 
+  refresh: function () {
+    redisClient.del('users');
+  },
+
   onUserLogin: function (session) {
     redisClient.hset('users', session.id, session.user.id, onUserChange);
   },

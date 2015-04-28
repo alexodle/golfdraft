@@ -4,6 +4,7 @@ var DraftActions = require('./actions/DraftActions');
 var ScoreActions = require('./actions/ScoreActions');
 var SettingsActions = require('./actions/SettingsActions');
 var socketio = require('socket.io-client');
+var UserActions = require('./actions/UserActions');
 
 /** Starts listening for app-wide socket.io updates
 */
@@ -22,8 +23,7 @@ function startSocketUpdates() {
     SettingsActions.setIsPaused(ev.data.isPaused);
   });
   io.on('change:activeusers', function (ev) {
-    console.log('change:activeusers');
-    console.log(JSON.stringify(ev.data.userCounts));
+    UserActions.setActiveUsers(ev.data.userCounts);
   });
 
   // ADMIN power

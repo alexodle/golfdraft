@@ -9,6 +9,7 @@ var Store = require('./Store');
 var _currentUser = null;
 var _users = null;
 var _isAdmin = false;
+var _activeUsers = null;
 
 var UserStore =  _.extend({}, Store.prototype, {
 
@@ -18,12 +19,20 @@ var UserStore =  _.extend({}, Store.prototype, {
     return _users[_currentUser];
   },
 
+  getUser: function (user) {
+    return _users[user];
+  },
+
   isAdmin: function () {
     return _isAdmin;
   },
 
   getAll: function () {
     return _users;
+  },
+
+  getActive: function () {
+    return _activeUsers;
   }
 
 });
@@ -33,6 +42,7 @@ AppDispatcher.register(function (payload) {
   var action = payload.action;
 
   switch(action.actionType) {
+
     case AppConstants.SET_USERS:
       _users = action.users;
       UserStore.emitChange();
@@ -61,6 +71,12 @@ AppDispatcher.register(function (payload) {
       _isAdmin = action.isAdmin;
       UserStore.emitChange();
       break;
+
+    case AppConstants.SET_ACTIVE_USERS:
+      _activeUsers = action.activeUsers;
+      UserStore.emitChange();
+      break;
+
   }
 
   return true; // No errors.  Needed by promise in Dispatcher.
