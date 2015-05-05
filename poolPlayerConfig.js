@@ -1,22 +1,22 @@
 module.exports = {
   draftOrder: [
-    'Jonathan Mullen',
-    'Chad Larson',
-    'Jay Fredlund',
     'Kevin Phillips',
-    'Bo Welch',
-    'Rob Phillips',
-    'Frank Severinghaus',
-    'Jon Willett',
-    'Chris Willett',
-    'Ben Frizzel',
+    'Chad Larson',
     'Erik Severson',
-    'Matt Simon',
-    'Stacy Smith',
-    'Kyle Phillips',
     'Alex Odle',
     'Matt Hennessey',
+    'Bo Welch',
+    'Rob Phillips',
+    'Jonathan Mullen',
     'Jared Robillard',
-    'Graham Snead'
+    'Matt Simon',
+    'Jon Willett',
+    'Stacy Smith',
+    'Jay Fredlund',
+    'Kyle Phillips',
+    'Frank Severinghaus',
+    'Chris Willett',
+    'Graham Snead',
+    'Ben Frizzel'
   ]
 };
