@@ -7,7 +7,7 @@ var TourneyStore =  _.extend({}, Store.prototype, {
 
   getTourneyName: function () {
     // HACKHACK - hardcode for now
-    return "2015 Masters";
+    return "2015 TPC";
   }
 
 });
