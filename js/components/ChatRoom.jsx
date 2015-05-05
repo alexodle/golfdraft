@@ -124,6 +124,7 @@ var ChatRoom = React.createClass({
                 {body}
               </div>
             </div>
+            {!messages ? null : (<ChatRoomInput />)}
           </div>
           <div className='col-md-3'>
             <div className='panel panel-default'>
@@ -140,7 +141,6 @@ var ChatRoom = React.createClass({
             </div>
           </div>
         </div>
-        {!messages ? null : (<ChatRoomInput />)}
       </GolfDraftPanel>
     );
   },
