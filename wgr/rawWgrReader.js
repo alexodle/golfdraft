@@ -24,7 +24,7 @@ var RawWgrReader = {
             var $tds = $('td', $tr);
 
             var wgr = _.parseInt($($tds.get(0)).text());
-            var golferName = $('td.name', $tr).text();
+            var golferName = $('td.name', $tr).text().trim();
 
             wgrs.push({ wgr: wgr, name: golferName });
           });
