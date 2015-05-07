@@ -74,7 +74,7 @@ var ChatRoom = React.createClass({
 
   componentDidUpdate: function (prevProps) {
     this._forceScroll();
-    if (prevProps.messages) {
+    if (prevProps.messages && this.props.messages && prevProps.messages.length !== this.props.messages.length) {
       newMessageSound.play();
     }
   },
