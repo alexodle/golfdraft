@@ -1,11 +1,10 @@
 'use strict';
 
 var _ = require('lodash');
-var access = require('./access');
-var config = require('./config');
+var access = require('../server/access');
+var config = require('../server/config');
 var constants = require('../common/constants');
 var Promise = require('promise');
-var YahooReader = require('./yahooReader');
 
 var DAYS = constants.NDAYS;
 var MISSED_CUT = constants.MISSED_CUT;
@@ -71,22 +70,22 @@ var UpdateScore = {
     return newScores;
   },
 
-  run: function (yahooUrl) {
-    return YahooReader.run(yahooUrl).then(function (yahooTourney) {
+  run: function (reader, url) {
+    return reader.run(url).then(function (rawTourney) {
       // Quick assertion of data
-      if (!yahooTourney || !UpdateScore.validate(yahooTourney)) {
+      if (!rawTourney || !UpdateScore.validate(rawTourney)) {
         return false;
       }
 
       // Ensure tourney/par
       var mainPromise = access.updateTourney({
-        par: yahooTourney.par,
-        yahooUrl: yahooUrl
+        par: rawTourney.par,
+        pgatourUrl: url
       })
 
       .then(function () {
         // Ensure golfers
-        var golfers = _.map(yahooTourney.golfers, function (g) {
+        var golfers = _.map(rawTourney.golfers, function (g) {
           return { name: g.golfer };
         });
         return access.ensureGolfers(golfers);
@@ -105,7 +104,7 @@ var UpdateScore = {
 
         // Build scores with golfer id
         var golfersByName = _.indexBy(gs, "name");
-        var scores = _.map(yahooTourney.golfers, function (g) {
+        var scores = _.map(rawTourney.golfers, function (g) {
           var golfer = golfersByName[g.golfer]._id;
           return {
             golfer: golfer,

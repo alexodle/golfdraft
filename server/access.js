@@ -203,6 +203,7 @@ _.extend(access, {
 
   updateTourney: promiseizeFn(function (props) {
     props = _.extend({}, props, { lastUpdated: new Date() });
+    console.log('updating tourney: ' + JSON.stringify(props));
     return models.Tourney.update(
       TOURNEY_ID_QUERY,
       props,
@@ -281,7 +282,7 @@ _.extend(access, {
       models.Tourney.update(TOURNEY_ID_QUERY, {
         name: null,
         par: -1,
-        yahooUrl: null
+        sourceUrl: null
       }).exec(),
 
       access.clearPlayers(),

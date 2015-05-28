@@ -24,13 +24,13 @@ function printState() {
   });
 }
 
-function refreshData(pickOrderNames, yahooUrl) {
+function refreshData(pickOrderNames, pgatourUrl) {
   console.log("BEGIN Refreshing all data...");
   console.log("");
   console.log("Pick order:");
   console.log(JSON.stringify(pickOrderNames));
   console.log("");
-  console.log("Yahoo URL: " + yahooUrl);
+  console.log("PGA Tour URL: " + pgatourUrl);
   console.log("");
 
   printState()
@@ -64,7 +64,7 @@ function refreshData(pickOrderNames, yahooUrl) {
   .then(printState)
   .then(function () {
     console.log("BEGIN Updating scores");
-    return updateScore.run(yahooUrl).then(function () {
+    return updateScore.run().then(function () {
       console.log("END Updating scores");
     });
   })
@@ -83,5 +83,5 @@ function refreshData(pickOrderNames, yahooUrl) {
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function callback () {
-  refreshData(poolPlayerConfig.draftOrder, config.yahoo_url);
+  refreshData(poolPlayerConfig.draftOrder, process.argv[0]);
 });

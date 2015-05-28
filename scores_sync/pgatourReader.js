@@ -26,22 +26,9 @@ function getRoundScore(par, currentRound, g, round) {
   return round.strokes - par;
 }
 
-function validateScores(g) {
-  var missedCut = g.status !== PGATOUR_MC;
-  return _.chain(g.scores)
-    .map(function (score) {
-      if (!_.isFinite(score) && score !== MISSED_CUT) {
-        return 'Invalid score';
-      }
-      return null;
-    })
-    .filter()
-    .value();
-}
-
 var PgaTourReader = {
 
-  readUrl: function (pgatourUrl) {
+  run: function (pgatourUrl) {
     return new Promise(function (fulfill, reject) {
       request({ url: pgatourUrl, json: true }, function (error, response, body) {
         if (error) reject(error);
@@ -54,6 +41,7 @@ var PgaTourReader = {
           var bio = g.player_bio;
           var parsedGolfer = {
             golfer: bio.first_name + ' ' + bio.last_name,
+            day: currentRound, // assumes all golfers are on the same day..
             thru: g.thru,
             today: g.today,
             scores: _.chain(g.rounds)
@@ -63,13 +51,6 @@ var PgaTourReader = {
               })
               .value()
           };
-
-          var scoreValidation = validateScores(parsedGolfer);
-          if (scoreValidation.length) {
-            throw new Error(
-              'Invalid score for golfer (' + JSON.stringify(scoreValidation) + '):' +
-               JSON.stringify(g) + ' -> ' + JSON.stringify(parsedGolfer));
-          }
 
           return parsedGolfer;
         });

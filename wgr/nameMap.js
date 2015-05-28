@@ -1,14 +1,6 @@
-// Map names from WGR site to what they are in the Yahoo site
+// Map names from WGR site to what they are in the PGA Tour site
 //
-// <wgr site>: <yahoo site>
+// <wgr site>: <pga tour site>
 //
 module.exports = {
-  'Sangmoon Bae': 'Sang-Moon Bae',
-  'Seungyul Noh': 'Seung-yul Noh',
-  'Jose M Olazabal': 'Jose Maria Olazabal',
-  'Graham Delaet': 'Graham DeLaet',
-  'Gonzalo Fdez-Castano': 'Gonzalo Fernandez-Casta',
-  'Charles Howell-III': 'Charles Howell III',
-  'Billy Hurley-III': 'Billy Hurley III',
-  'Will Mackenzie': 'Will MacKenzie'
 };

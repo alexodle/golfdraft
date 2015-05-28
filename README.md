@@ -2,7 +2,7 @@
 
 App for handling my yearly 18-person PGA tournament pool. Has two main modes, Draft (js/components/DraftApp.jsx) and Tournament (js/components/TourneyApp.jsx).
 
-Draft mode runs a snake draft of all the golfers in the current tournament (specified by `yahoo_url` in server/config.js). Each player gets to select 4 golfers. Uses socket.io to update all web clients as players are picked. Sounds 3 bells when it is your turn to pick.
+Draft mode runs a snake draft of all the golfers in the current tournament (specified by `pgatour_url` in server/config.js). Each player gets to select 4 golfers. Uses socket.io to update all web clients as players are picked. Sounds 3 bells when it is your turn to pick.
 
 Tournament mode shows live scores for all the golfers, as well as the current standings in our pool. By default, only your golfers are shown, but you can view others' golfers by selecting their name in the Pool Standings.
 
@@ -43,7 +43,7 @@ If building, keep in a separate commit in master.
 
 ## Live updating of scores ##
 
-Running the following command will update the scores from Yahoo, based on the URL in server/config.js.
+Running the following command will update the scores from pgatour.com, based on the URL in server/config.js.
 
 ```
 node server/runUpdateScore.js
