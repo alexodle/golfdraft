@@ -6,8 +6,9 @@ var config = require('./config');
 var mongoose = require('mongoose');
 var poolPlayerConfig = require('../poolPlayerConfig');
 var Promise = require('promise');
+var readerConfig = require('../scores_sync/readerConfig');
 var tourneyUtils = require('./tourneyUtils');
-var updateScore = require('./updateScore');
+var updateScore = require('../scores_sync/updateScore');
 
 mongoose.set('debug', true);
 mongoose.connect(config.mongo_url);
@@ -24,13 +25,14 @@ function printState() {
   });
 }
 
-function refreshData(pickOrderNames, pgatourUrl) {
+function refreshData(pickOrderNames, reader, url) {
   console.log("BEGIN Refreshing all data...");
   console.log("");
   console.log("Pick order:");
   console.log(JSON.stringify(pickOrderNames));
   console.log("");
-  console.log("PGA Tour URL: " + pgatourUrl);
+  console.log("Reader: " + reader);
+  console.log("Reader URL: " + url);
   console.log("");
 
   printState()
@@ -64,7 +66,7 @@ function refreshData(pickOrderNames, pgatourUrl) {
   .then(printState)
   .then(function () {
     console.log("BEGIN Updating scores");
-    return updateScore.run().then(function () {
+    return updateScore.run(readerConfig[reader].reader, url).then(function () {
       console.log("END Updating scores");
     });
   })
@@ -83,5 +85,5 @@ function refreshData(pickOrderNames, pgatourUrl) {
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function callback () {
-  refreshData(poolPlayerConfig.draftOrder, process.argv[0]);
+  refreshData(poolPlayerConfig.draftOrder, process.argv[2], process.argv[3]);
 });
