@@ -31,7 +31,10 @@ var PgaTourReader = {
   run: function (pgatourUrl) {
     return new Promise(function (fulfill, reject) {
       request({ url: pgatourUrl, json: true }, function (error, response, body) {
-        if (error) reject(error);
+        if (error) {
+          reject(error);
+          return;
+        }
 
         var par = _.parseInt(body.leaderboard.courses[0].par_total);
         var currentRound = body.leaderboard.current_round;

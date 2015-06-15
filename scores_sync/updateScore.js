@@ -12,7 +12,7 @@ var MISSED_CUT = constants.MISSED_CUT;
 var UpdateScore = {
 
   validate: function (d) {
-    if (!_.contains([70, 71, 72], d.par)) {
+    if (_.has(d, 'par') && !_.contains([70, 71, 72], d.par)) {
       console.log("ERROR - Par invalid:" + d.par);
       return false;
     }
@@ -78,10 +78,11 @@ var UpdateScore = {
       }
 
       // Ensure tourney/par
-      var mainPromise = access.updateTourney({
-        par: rawTourney.par,
-        pgatourUrl: url
-      })
+      var update = { pgatourUrl: url };
+      if (_.has(rawTourney, 'par')) {
+        update.parr = rawTourney.par;
+      }
+      var mainPromise = access.updateTourney(update)
 
       .then(function () {
         // Ensure golfers
