@@ -46,7 +46,7 @@ var tourneySchema = mongoose.Schema({
   name: String,
   par: Number,
   lastUpdated: Date,
-  yahooUrl: String
+  sourceUrl: String
 });
 
 var appStateSchema = mongoose.Schema({

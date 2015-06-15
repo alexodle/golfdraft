@@ -16,9 +16,7 @@ _.extend(config, {
   mongo_url: 'mongodb://localhost:27017/golfdraft_testdb',
   redis_url: 'redis://:@localhost:6379/test',
 
-  tourney_id: testTourney._id,
-
-  yahoo_url: 'http://notaurl.com/notaurl'
+  tourney_id: testTourney._id
 });
 
 function initDb() {
@@ -37,9 +35,8 @@ function initDb() {
       });
     });
   });
-};
+}
 
 module.exports = {
   initDb: _.once(initDb)
-}
-
+};
