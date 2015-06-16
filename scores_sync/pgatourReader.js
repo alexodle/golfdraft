@@ -9,11 +9,8 @@ var NDAYS = constants.NDAYS;
 var PGATOUR_MC = 'cut';
 
 function getRoundScore(par, currentRound, g, round) {
-  if (!round.tee_time) {
-    if (g.status !== PGATOUR_MC) {
-      throw new Error('Invalid MC score: ' + JSON.stringify(g));
-    }
-    return MISSED_CUT;
+  if (!round.tee_time || round.strokes === null) {
+    return g.status === PGATOUR_MC ? MISSED_CUT : 0;
   }
 
   var roundNumber = round.round_number;
