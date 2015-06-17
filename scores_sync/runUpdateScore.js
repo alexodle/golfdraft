@@ -27,14 +27,12 @@ if (!reader || !url) {
   process.exit(1);
 }
 
-var redisCli = redis.pubSubClient;
-
 mongoose.set('debug', true);
 mongoose.connect(config.mongo_url);
 
 function end() {
   mongoose.connection.close();
-  redisCli.unref();
+  redis.unref();
 }
 
 function updateScores() {
@@ -49,7 +47,7 @@ function updateScores() {
   updateScore.run(reader, url).then(function (succeeded) {
     console.log("succeeded: " + succeeded);
     if (succeeded) {
-      redisCli.publish("scores:update", new Date());
+      redis.pubSubClient.publish("scores:update", new Date());
     }
 
     clearTimeout(timeoutId);

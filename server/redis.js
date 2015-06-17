@@ -18,8 +18,17 @@ function createClient() {
   return redisCli;
 }
 
+var pubSubClient = createClient();
+var client = createClient();
+
+function unref() {
+  pubSubClient.unref();
+  client.unref();
+}
+
 module.exports = {
   redis: redis,
-  pubSubClient: createClient(),
-  client: createClient()
+  pubSubClient: pubSubClient,
+  client: client,
+  unref: unref
 };
