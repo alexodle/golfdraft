@@ -9,15 +9,11 @@ var NDAYS = constants.NDAYS;
 var PGATOUR_MC = 'cut';
 
 function getRoundScore(par, currentRound, g, round) {
-  if (!round.tee_time || round.strokes === null) {
-    return g.status === PGATOUR_MC ? MISSED_CUT : 0;
-  }
-
   var roundNumber = round.round_number;
   if (roundNumber > currentRound) {
-    return 0;
+    return g.status === PGATOUR_MC ? MISSED_CUT : 0;
   } else if (roundNumber === currentRound) {
-    return g.today;
+    return g.today || 0; // 0 if they haven't started yet
   }
 
   return round.strokes - par;
