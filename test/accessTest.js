@@ -130,7 +130,8 @@ describe('access', function () {
       .then(expectFailure, function (err) {
         err.message.should.equal('invalid pick: golfer already drafted');
         return access.getDraft().then(function (draft) {
-          draft.picks.should.containDeep([newPicks[0]]);
+          _.pick(draft.picks[0], ['player', 'golfer', 'pickNumber'])
+            .should.eql(newPicks[0]);
         });
       });
     });
