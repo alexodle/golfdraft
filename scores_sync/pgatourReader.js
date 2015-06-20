@@ -7,16 +7,41 @@ var MISSED_CUT = constants.MISSED_CUT;
 var NDAYS = constants.NDAYS;
 
 var PGATOUR_MC = 'cut';
+var CUT_ROUND = 3; // cut starts at round 3
+var N_HOLES = 18;
 
 function getRoundScore(par, currentRound, g, round) {
   var roundNumber = round.round_number;
-  if (roundNumber > currentRound) {
-    return g.status === PGATOUR_MC ? MISSED_CUT : 0;
+
+  if (g.status === PGATOUR_MC && roundNumber >= CUT_ROUND) {
+    return MISSED_CUT;
+  } else if (roundNumber > currentRound && round.strokes === null) {
+    return 0;
   } else if (roundNumber === currentRound) {
     return g.today || 0; // 0 if they haven't started yet
   }
 
   return round.strokes - par;
+}
+
+function parseGolfer(par, g) {
+  var missedCut = g.status === PGATOUR_MC;
+  var bio = g.player_bio;
+  var golferCurrentRound = g.current_round;
+
+  var parsedGolfer = {
+    golfer: bio.first_name + ' ' + bio.last_name,
+    day: golferCurrentRound, // assumes all golfers are on the same day..
+    thru: g.thru,
+    scores: _.chain(g.rounds)
+      .first(NDAYS)
+      .map(function (round) {
+        return getRoundScore(par, golferCurrentRound, g, round);
+      })
+      .value()
+  };
+
+  return parsedGolfer;
 }
 
 var PgaTourReader = {
@@ -31,24 +56,8 @@ var PgaTourReader = {
 
         var par = _.parseInt(body.leaderboard.courses[0].par_total);
         var currentRound = body.leaderboard.current_round;
-
         var golfers = _.map(body.leaderboard.players, function (g) {
-          var missedCut = g.status === PGATOUR_MC;
-          var bio = g.player_bio;
-          var parsedGolfer = {
-            golfer: bio.first_name + ' ' + bio.last_name,
-            day: currentRound, // assumes all golfers are on the same day..
-            thru: g.thru,
-            today: g.today,
-            scores: _.chain(g.rounds)
-              .first(NDAYS)
-              .map(function (round) {
-                return getRoundScore(par, currentRound, g, round);
-              })
-              .value()
-          };
-
-          return parsedGolfer;
+          return parseGolfer(par, g);
         });
 
         fulfill({
@@ -57,7 +66,10 @@ var PgaTourReader = {
         });
       });
     });
-  }
+  },
+
+  // Export for testing
+  parseGolfer: parseGolfer
 
 };
 

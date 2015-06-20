@@ -1,6 +1,6 @@
 require('./initTestConfig');
 
-var reader = require('../server/yahooReader.js');
+var reader = require('../scores_sync/yahooReader.js');
 var should = require('should');
 
 describe('yahooReader', function () {

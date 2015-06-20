@@ -1,5 +1,5 @@
 var constants = require('../common/constants');
-var updater = require('../server/updateScore');
+var updater = require('../scores_sync/updateScore');
 
 var MISSED_CUT = constants.MISSED_CUT;
 
