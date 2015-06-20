@@ -1,3 +1,4 @@
+var _ = require('lodash');
 var constants = require('../common/constants');
 var updater = require('../scores_sync/updateScore');
 
@@ -59,7 +60,7 @@ describe('updateScore', function () {
   describe('mergeOverrides', function () {
 
     it('merges override scores', function () {
-      updater.mergeOverrides(
+      var merged = _.indexBy(updater.mergeOverrides(
         [
           { golfer: 'golferid_1', day: 4, scores: [-1, -20, -30, 0] },
           { golfer: 'golferid_2', day: 4, scores: [-1, 2, -2, 0] },
@@ -71,6 +72,7 @@ describe('updateScore', function () {
         ],
         [
           {
+            _id: 'should be removed',
             golfer: 'golferid_1',
             day: null,
             scores: [-1, MISSED_CUT, MISSED_CUT, MISSED_CUT]
@@ -81,19 +83,23 @@ describe('updateScore', function () {
             scores: [-1, MISSED_CUT, MISSED_CUT, MISSED_CUT]
           }
         ]
-      ).should.eql([
-        {
-          golfer: 'golferid_1',
-          day: 4,
-          scores: [-1, MISSED_CUT, MISSED_CUT, MISSED_CUT]
-        },
-        { golfer: 'golferid_2', day: 4, scores: [-1, 2, -2, 0] },
-        {
-          golfer: 'golferid_3',
-          day: 4,
-          scores: [-1, MISSED_CUT, MISSED_CUT, MISSED_CUT]
-        }
-      ]);
+      ), 'golfer');
+
+      merged.golferid_1.should.eql({
+        golfer: 'golferid_1',
+        day: 4,
+        scores: [-1, MISSED_CUT, MISSED_CUT, MISSED_CUT]
+      });
+      merged.golferid_2.should.eql({
+        golfer: 'golferid_2',
+        day: 4,
+        scores: [-1, 2, -2, 0]
+      });
+      merged.golferid_3.should.eql({
+        golfer: 'golferid_3',
+        day: 4,
+        scores: [-1, MISSED_CUT, MISSED_CUT, MISSED_CUT]
+      });
     });
 
   });

@@ -6,14 +6,15 @@ var request = require('request');
 var MISSED_CUT = constants.MISSED_CUT;
 var NDAYS = constants.NDAYS;
 
-var PGATOUR_MC = 'cut';
+var PGATOUR_MC_TEXTS = ['cut', 'wd'];
 var CUT_ROUND = 3; // cut starts at round 3
 var N_HOLES = 18;
 
 function getRoundScore(par, currentRound, g, round) {
   var roundNumber = round.round_number;
+  var missedCut = _.contains(PGATOUR_MC_TEXTS, g.status);
 
-  if (g.status === PGATOUR_MC && roundNumber >= CUT_ROUND) {
+  if (missedCut && roundNumber >= CUT_ROUND) {
     return MISSED_CUT;
   } else if (roundNumber > currentRound && round.strokes === null) {
     return 0;
@@ -24,14 +25,13 @@ function getRoundScore(par, currentRound, g, round) {
   return round.strokes - par;
 }
 
-function parseGolfer(par, g) {
-  var missedCut = g.status === PGATOUR_MC;
+function parseGolfer(par, tourneyRound, g) {
   var bio = g.player_bio;
   var golferCurrentRound = g.current_round;
 
   var parsedGolfer = {
     golfer: bio.first_name + ' ' + bio.last_name,
-    day: golferCurrentRound, // assumes all golfers are on the same day..
+    day: golferCurrentRound || tourneyRound,
     thru: g.thru,
     scores: _.chain(g.rounds)
       .first(NDAYS)
@@ -57,7 +57,7 @@ var PgaTourReader = {
         var par = _.parseInt(body.leaderboard.courses[0].par_total);
         var currentRound = body.leaderboard.current_round;
         var golfers = _.map(body.leaderboard.players, function (g) {
-          return parseGolfer(par, g);
+          return parseGolfer(par, currentRound, g);
         });
 
         fulfill({

@@ -11,18 +11,18 @@ describe('PgaTourReader', function () {
 
     it('parses for missed cut', function () {
       reader
-        .parseGolfer(70, require('./files/golfer_missedcut'))
+        .parseGolfer(70, 3, require('./files/golfer_missedcut'))
         .should.eql({
           golfer: 'Hunter Mahan',
           scores: [3, 4, MISSED_CUT, MISSED_CUT],
           thru: null,
-          day: null
+          day: 3
         });
     });
 
     it('parses for active mid-tourney player', function () {
       reader
-        .parseGolfer(70, require('./files/golfer_midtourney_active'))
+        .parseGolfer(70, 3, require('./files/golfer_midtourney_active'))
         .should.eql({
           golfer: 'Henrik Stenson',
           scores: [-5, 4, 0, 0],
@@ -33,7 +33,7 @@ describe('PgaTourReader', function () {
 
     it('parses for active mid-tourney mid-day player', function () {
       reader
-        .parseGolfer(70, require('./files/golfer_midtourney_playing'))
+        .parseGolfer(70, 3, require('./files/golfer_midtourney_playing'))
         .should.eql({
           golfer: 'Henrik Stenson',
           scores: [-5, 4, -2, 0],

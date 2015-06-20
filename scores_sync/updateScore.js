@@ -8,6 +8,7 @@ var Promise = require('promise');
 
 var DAYS = constants.NDAYS;
 var MISSED_CUT = constants.MISSED_CUT;
+var OVERRIDE_KEYS = ['golfer', 'day', 'scores'];
 
 var UpdateScore = {
 
@@ -47,11 +48,13 @@ var UpdateScore = {
   mergeOverrides: function (scores, scoreOverrides) {
     var overridesByGolfer = _.chain(scoreOverrides)
       .map(function (o) {
-        // Remove all empty values from scoreOverrides
         return _.chain(o)
-          .pairs()
-          .filter(function (kv) { return kv[1] !== null; })
-          .object()
+
+          // Remove all empty values from scoreOverrides
+          .omit(_.isNull)
+
+          // Whitelist the values we can take
+          .pick(OVERRIDE_KEYS)
           .value();
       })
       .indexBy(function (o) {
