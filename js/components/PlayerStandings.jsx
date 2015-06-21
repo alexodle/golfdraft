@@ -63,7 +63,7 @@ var PlayerStandings = React.createClass({
               <th>Pool Player</th>
               <th>Total</th>
               <th className='hidden-xs'>Shots Back</th>
-              <th className='this.props.hidden-xs'>Day 1</th>
+              <th className='hidden-xs'>Day 1</th>
               <th className='hidden-xs'>Day 2</th>
               <th className='hidden-xs'>Day 3</th>
               <th className='hidden-xs'>Day 4</th>
