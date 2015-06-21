@@ -74,7 +74,9 @@ var TourneyApp = React.createClass({
           </small>
         </p>
 
+        <a name='PlayerDetails' />
         <GolfDraftPanel heading='Score Details'>
+
           <PlayerDetails
             player={this.state.playerDetailsPlayer}
             playerScores={playerScores}
