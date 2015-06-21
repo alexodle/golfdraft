@@ -15,7 +15,7 @@
     "grunt-express-server": "^0.5.1",
     "hiredis": "^0.1.16",
     "jquery": "^2.1.1",
-    "jsdom": "^4.1.0",
+    "jsdom": "<4.0.0",
     "lodash": "^2.4.1",
     "logfmt": "^1.1.2",
     "moment": "^2.6.0",
