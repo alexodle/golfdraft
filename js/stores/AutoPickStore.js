@@ -3,6 +3,7 @@
 var _ = require('lodash');
 var AppConstants = require('../constants/AppConstants');
 var AppDispatcher = require('../dispatcher/AppDispatcher');
+var GolferStore = require('./GolferStore');
 var Store = require('./Store');
 var UserStore = require('./UserStore');
 
@@ -24,6 +25,10 @@ var AutoPickStore =  _.extend({}, Store.prototype, {
 
 });
 
+function initializeAutoPickOrder() {
+  _autoPickOrder = _.sortBy(GolferStore.getAll(), 'wgr');
+}
+
 // Register to handle all updates
 AppDispatcher.register(function (payload) {
   var action = payload.action;
@@ -44,8 +49,9 @@ AppDispatcher.register(function (payload) {
       var newUser = UserStore.getCurrentUser();
       if (newUser !== _autoPickUser) {
         _autoPickUser = newUser;
-        _autoPickOrder = [];
         _isAutoPick = false;
+        initializeAutoPickOrder();
+
         AutoPickStore.emitChange();
       }
       break;
