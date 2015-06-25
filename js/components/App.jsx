@@ -5,6 +5,7 @@ var _ = require("lodash");
 var AdminApp = require("./AdminApp.jsx");
 var AppHeader = require("./AppHeader.jsx");
 var AppSettingsStore = require('../stores/AppSettingsStore');
+var AutoPickStore = require('../stores/AutoPickStore');
 var ChatStore = require("../stores/ChatStore");
 var ChatStore = require("../stores/ChatStore");
 var DraftApp = require("./DraftApp.jsx");
@@ -24,6 +25,7 @@ var RouterState = Router.State;
 
 var RELEVANT_STORES = [
   AppSettingsStore,
+  AutoPickStore,
   ChatStore,
   DraftStore,
   ScoreStore,
@@ -41,7 +43,10 @@ function getAppState() {
       isMyDraftPick: DraftStore.getIsMyDraftPick(),
       currentPick: DraftStore.getCurrentPick(),
       draftPicks: DraftStore.getDraftPicks(),
-      pickingForPlayers: DraftStore.getPickingForPlayers()
+      pickingForPlayers: DraftStore.getPickingForPlayers(),
+
+      autoPickOrder: AutoPickStore.getAutoPickOrder(),
+      isAutoPick: AutoPickStore.getIsAutoPick()
     },
 
     scores: ScoreStore.getScores(),
@@ -135,6 +140,8 @@ var DraftWrapper = React.createClass({
           golfersRemaining={props.golfersRemaining}
           pickingForPlayers={props.draft.pickingForPlayers}
           activeUsers={props.activeUsers}
+          autoPickOrder={props.draft.autoPickOrder}
+          isAutoPick={props.draft.isAutoPick}
         />
       </section>
     );
