@@ -4,6 +4,7 @@
 var _ = require("lodash");
 var AppPausedStatus = require('./AppPausedStatus.jsx');
 var Assets = require("../constants/Assets");
+var AutoPicker = require("./AutoPicker.jsx");
 var BestLeft = require("./BestLeft.jsx");
 var ChatRoom = require("./ChatRoom.jsx");
 var DraftChooser = require("./DraftChooser.jsx");
@@ -43,7 +44,16 @@ var DraftApp = React.createClass({
       statusUi = (<AppPausedStatus />);
     } else {
       if (!isMyPick) {
-        statusUi = (<DraftStatus currentPick={this.props.currentPick} />);
+        statusUi = (
+          <span>
+            <DraftStatus currentPick={this.props.currentPick} />
+            <AutoPicker
+              golfersRemaining={this.props.golfersRemaining}
+              autoPickOrder={this.props.autoPickOrder}
+              isAutoPick={this.props.isAutoPick}
+            />
+          </span>
+        );
       } else {
         statusUi = (
           <DraftChooser
