@@ -25,10 +25,6 @@ var AutoPickStore =  _.extend({}, Store.prototype, {
 
 });
 
-function initializeAutoPickOrder() {
-  _autoPickOrder = _.sortBy(GolferStore.getAll(), 'wgr');
-}
-
 // Register to handle all updates
 AppDispatcher.register(function (payload) {
   var action = payload.action;
@@ -50,7 +46,7 @@ AppDispatcher.register(function (payload) {
       if (newUser !== _autoPickUser) {
         _autoPickUser = newUser;
         _isAutoPick = false;
-        initializeAutoPickOrder();
+        _autoPickOrder = [];
 
         AutoPickStore.emitChange();
       }
