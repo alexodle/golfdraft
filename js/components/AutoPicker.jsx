@@ -6,6 +6,10 @@ var AutoPickActions = require('../actions/AutoPickActions');
 var GolfDraftPanel = require('./GolfDraftPanel.jsx');
 var GolferStore = require('../stores/GolferStore');
 var React = require('react');
+var ReactDnd = require('react-dnd');
+
+var DropTarget = ReactDnd.DropTarget;
+var DragSource = ReactDnd.DragSource;
 
 function getGolferFromClickEvent(ev) {
   ev.preventDefault();
@@ -20,6 +24,43 @@ function safeSwap(arr, iFrom, iTo) {
   arr[iFrom] = temp;
   return arr;
 }
+
+var GolferDnd = React.createClass({
+
+  render: function () {
+    var connectDragSource = this.props.connectDragSource;
+    var connectDropTarget = this.props.connectDropTarget;
+    return connectDragSource(connectDropTarget(
+      <p>{GolferStore.getGolfer(this.props.id).name}</p>
+    ));
+  }
+
+});
+
+GolferDnd = DropTarget('golferdnd', {
+  hover: function (props, monitor) {
+    var draggedId = monitor.getItem().id;
+    if (draggedId !== props.id) {
+      props.onGolferMove(draggedId, props.id);
+    }
+  }
+}, function (connect) {
+  return {
+    connectDropTarget: connect.dropTarget()
+  }
+})(GolferDnd);
+
+GolferDnd = DragSource('golferdnd', {
+  beginDrag: function (props) {
+    return { id: props.id };
+  }
+}, function (connect, monitor) {
+  return {
+    connectDragSource: connect.dragSource(),
+    isDragging: monitor.isDragging()
+  }
+})(GolferDnd);
+
 
 var AutoPicker = React.createClass({
 
@@ -38,6 +79,8 @@ var AutoPicker = React.createClass({
     var movePlayerDown = this._movePlayerDown;
     var moveToAvailable = this._moveToAvailable;
 
+    var onGolferMove = this._onGolferMove;
+
     return (
       <GolfDraftPanel heading='Auto Picking'>
         {!isAutoPick || _.isEmpty(autoPickOrder) ? null : (
@@ -53,21 +96,20 @@ var AutoPicker = React.createClass({
 
           <div className='col-md-6'>
             <GolfDraftPanel heading='Pick Order'>
-              <ol>
-                {_.map(autoPickOrder, function (g) {
-                  return (
-                    <li key={g}>
-                      {GolferStore.getGolfer(g).name}
-                      <span> </span>
-                      <a data-golfer={g} href='#' onClick={movePlayerUp}>Up</a>
-                      <span> </span>
-                      <a data-golfer={g} href='#' onClick={movePlayerDown}>Down</a>
-                      <span> </span>
-                      <a data-golfer={g} href='#' onClick={moveToAvailable}>X</a>
-                    </li>
-                  );
-                })}
-              </ol>
+              {_.map(autoPickOrder, function (g) {
+                /*<li key={g}>
+                  {GolferStore.getGolfer(g).name}
+                  <span> </span>
+                  <a data-golfer={g} href='#' onClick={movePlayerUp}>Up</a>
+                  <span> </span>
+                  <a data-golfer={g} href='#' onClick={movePlayerDown}>Down</a>
+                  <span> </span>
+                  <a data-golfer={g} href='#' onClick={moveToAvailable}>X</a>
+                </li>*/
+                return (
+                  <GolferDnd key={g} id={g} onGolferMove={onGolferMove} />
+                );
+              })}
             </GolfDraftPanel>
           </div>
 
@@ -93,6 +135,18 @@ var AutoPicker = React.createClass({
         </div>
       </GolfDraftPanel>
     );
+  },
+
+  _onGolferMove: function (golferId, afterGolferId) {
+    var autoPickOrder = this.props.autoPickOrder;
+
+    var index = _.indexOf(autoPickOrder, golferId);
+    var afterIndex = _.indexOf(autoPickOrder, afterGolferId);
+
+    autoPickOrder.splice(index, 1);
+    autoPickOrder.splice(afterIndex, 0, golferId);
+
+    AutoPickActions.setAutoPickOrder(autoPickOrder);
   },
 
   _setIsAutoPick: function (ev) {

@@ -10,13 +10,15 @@ var ChatStore = require("../stores/ChatStore");
 var ChatStore = require("../stores/ChatStore");
 var DraftApp = require("./DraftApp.jsx");
 var DraftStore = require("../stores/DraftStore");
+var DragDropContext = require('react-dnd').DragDropContext;
+var GolferStore = require("../stores/GolferStore");
+var HTML5Backend = require('react-dnd/modules/backends/HTML5');
 var React = require("react");
 var Router = require('react-router');
 var ScoreStore = require('../stores/ScoreStore');
 var TourneyApp = require("./TourneyApp.jsx");
 var TourneyStore = require("../stores/TourneyStore");
 var UserStore = require("../stores/UserStore");
-var GolferStore = require("../stores/GolferStore");
 var WhoIsYou = require("./WhoIsYou.jsx");
 
 var RouteHandler = Router.RouteHandler;
@@ -258,7 +260,7 @@ var AppNode = React.createClass({
 
 module.exports = {
   AdminWrapper: AdminWrapper,
-  AppNode: AppNode,
+  AppNode: DragDropContext(HTML5Backend)(AppNode),
   DraftWrapper: DraftWrapper,
   TourneyWrapper: TourneyWrapper,
   WhoIsYouWrapper: WhoIsYouWrapper
