@@ -23,6 +23,7 @@
     "node-schedule": "^0.1.13",
     "promise": "^5.0.0",
     "react": "^0.13.3",
+    "react-dnd": "^1.1.3",
     "react-router": "^0.13.3",
     "redis": "^0.10.3",
     "request": "^2.55.0",
