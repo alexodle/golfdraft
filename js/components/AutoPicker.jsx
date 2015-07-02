@@ -11,6 +11,9 @@ var ReactDnd = require('react-dnd');
 var DropTarget = ReactDnd.DropTarget;
 var DragSource = ReactDnd.DragSource;
 
+var N_COLS = 3; // should be factor of 12
+var COL_WIDTH = 'col-md-' + (12 / N_COLS);
+
 function getGolferFromClickEvent(ev) {
   ev.preventDefault();
   return ev.target.dataset.golfer;
@@ -33,9 +36,11 @@ var GolferDnd = React.createClass({
     var connectDropTarget = props.connectDropTarget;
 
     return connectDragSource(connectDropTarget(
-      <li className='list-group-item'>
-        {props.i + 1}. {GolferStore.getGolfer(this.props.id).name}
-      </li>
+      <div className='golfer-dnd-target panel panel-default'>
+        <div className='panel-body'>
+          {props.i + 1}. {GolferStore.getGolfer(this.props.id).name}
+        </div>
+      </div>
     ));
   }
 
@@ -71,15 +76,19 @@ var AutoPickerEditor = React.createClass({
   render: function () {
     var autoPickOrder = this.props.autoPickOrder;
     var onGolferMove = this._onGolferMove;
+
     return (
       <GolfDraftPanel heading='Pick Order'>
-        <ol className='list-group'>
-          {_.map(autoPickOrder, function (g, i) {
-            return (
-              <GolferDnd key={g} i={i} id={g} onGolferMove={onGolferMove} />
-            );
-          })}
-        </ol>
+        {_.map(autoPickOrder, function (g, i) {
+          return (
+            <GolferDnd
+              key={g}
+              i={i}
+              id={g}
+              onGolferMove={onGolferMove}
+            />
+          );
+        })}
       </GolfDraftPanel>
     );
   },
