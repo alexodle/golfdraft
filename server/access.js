@@ -2,11 +2,13 @@
 
 var _ = require('lodash');
 var config = require('./config');
+var constants = require('../common/constants');
 var models = require('./models');
 var chatModels = require('./chatModels');
 var Promise = require('promise');
 var io = require('./socketIO');
 
+var UNKNOWN_WGR = constants.UNKNOWN_WGR;
 var TOURNEY_ID = config.tourney_id;
 var TOURNEY_ID_QUERY = { _id: TOURNEY_ID };
 var FK_TOURNEY_ID_QUERY = { tourneyId: TOURNEY_ID };
@@ -63,7 +65,7 @@ function mergeWGR(golfer, wgrEntry) {
   golfer = _.pick(golfer, '_id', 'name');
   if (!wgrEntry) {
     console.warn('WGR not found for: ' + golfer.name);
-    golfer.wgr = 1500;
+    golfer.wgr = UNKNOWN_WGR;
   } else {
     golfer.wgr = wgrEntry.wgr;
   }

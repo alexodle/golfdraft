@@ -5,6 +5,7 @@ var _ = require('lodash');
 var ChatRoom = require('./ChatRoom.jsx');
 var constants = require('../../common/constants');
 var GolfDraftPanel = require('./GolfDraftPanel.jsx');
+var GolferLogic = require('../logic/GolferLogic');
 var GolferStore = require('../stores/GolferStore');
 var LogoutButton = require('./LogoutButton.jsx');
 var moment = require('moment');
@@ -90,7 +91,9 @@ var TourneyApp = React.createClass({
               {_.map(worstScoresPerDay, function (s) {
                 return (
                   <li key={s.day} className='list-unstyled'>
-                    <b>Day {s.day + 1}</b>: {utils.toGolferScoreStr(s.score)} {GolferStore.getGolfer(s.golfer).name}
+                    <b>Day {s.day + 1}</b>: {utils.toGolferScoreStr(s.score)}
+                    <span> </span>
+                    {GolferLogic.renderGolfer(GolferStore.getGolfer(s.golfer))}
                   </li>
                 );
               })}

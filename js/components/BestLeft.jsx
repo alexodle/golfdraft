@@ -3,6 +3,7 @@
 
 var _ = require('lodash');
 var GolfDraftPanel = require('./GolfDraftPanel.jsx');
+var GolferLogic = require('../logic/GolferLogic');
 var React = require('react');
 
 var SHOW_N = 20;
@@ -18,7 +19,7 @@ var BestLeft = React.createClass({
       <GolfDraftPanel heading='Golfers Available'>
         <ol>
           {_.map(golfersRemaining, function (g) {
-            return (<li key={g.id}>{g.name} (WGR: {g.wgr})</li>);
+            return (<li key={g.id}>{GolferLogic.renderGolfer(g)}</li>);
           })}
         </ol>
       </GolfDraftPanel>

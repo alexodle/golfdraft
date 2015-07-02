@@ -4,6 +4,7 @@
 var _ = require('lodash');
 var DraftStore = require('../stores/DraftStore');
 var GolfDraftPanel = require('./GolfDraftPanel.jsx');
+var GolferLogic = require('../logic/GolferLogic');
 var GolferStore = require('../stores/GolferStore');
 var PlayerStore = require('../stores/PlayerStore');
 var React = require('react');
@@ -27,7 +28,7 @@ var DraftHistory = React.createClass({
                 <tr key={p.pickNumber}>
                   <td>{p.pickNumber + 1}</td>
                   <td>{PlayerStore.getPlayer(p.player).name}</td>
-                  <td>{GolferStore.getGolfer(p.golfer).name}</td>
+                  <td>{GolferLogic.renderGolfer(GolferStore.getGolfer(p.golfer))}</td>
                 </tr>
               );
             })}

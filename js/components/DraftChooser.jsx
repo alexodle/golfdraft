@@ -5,6 +5,7 @@ var _ = require('lodash');
 var cx = require('react/lib/cx');
 var DraftActions = require('../actions/DraftActions');
 var GolfDraftPanel = require('./GolfDraftPanel.jsx');
+var GolferLogic = require('../logic/GolferLogic');
 var PlayerStore = require('../stores/PlayerStore');
 var React = require('react');
 
@@ -30,7 +31,7 @@ var DraftChooser = React.createClass({
 
     var header = null;
     if (this.props.currentUser.player === currentPick.player) {
-      header = (<h4>It's your turn! Make your pick.</h4>);
+      header = (<h4>It&#8217;s your turn! Make your pick.</h4>);
     } else {
       var playerName = PlayerStore.getPlayer(currentPick.player).name;
       header = (
@@ -82,7 +83,7 @@ var DraftChooser = React.createClass({
               {_.map(sortedGolfers, function (g) {
                 return (
                   <option key={g.id} value={g.id}>
-                    {g.name} (WGR: {g.wgr})
+                    {GolferLogic.renderGolfer(g)}
                   </option>
                 );
               })}
