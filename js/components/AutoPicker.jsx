@@ -4,6 +4,7 @@
 var _ = require('lodash');
 var AutoPickActions = require('../actions/AutoPickActions');
 var GolfDraftPanel = require('./GolfDraftPanel.jsx');
+var GolferLogic = require('../logic/GolferLogic');
 var GolferStore = require('../stores/GolferStore');
 var React = require('react');
 var ReactDnd = require('react-dnd');
@@ -38,7 +39,7 @@ var GolferDnd = React.createClass({
     return connectDragSource(connectDropTarget(
       <div className='golfer-dnd-target panel panel-default'>
         <div className='panel-body'>
-          {props.i + 1}. {GolferStore.getGolfer(this.props.id).name}
+          {props.i + 1}. {GolferLogic.renderGolfer(GolferStore.getGolfer(this.props.id))}
         </div>
       </div>
     ));
@@ -134,9 +135,10 @@ var AutoPicker = React.createClass({
 
     return (
       <GolfDraftPanel heading='Auto Picking'>
-        {(!isAutoPick || _.isEmpty(autoPickOrder)) ? null : (
-          <p>Next pick will be: <b>{GolferStore.getGolfer(autoPickOrder[0]).name}</b></p>
-        )}
+
+        <a href='#' onClick={this._toggleEdit}>
+          {!isEditing ? 'Edit Order' : 'Hide'}
+        </a>
 
         <div className='checkbox'>
           <label>
@@ -144,9 +146,11 @@ var AutoPicker = React.createClass({
           </label>
         </div>
 
-        <a href='#' onClick={this._toggleEdit}>
-          {!isEditing ? 'Edit Order' : 'Hide'}
-        </a>
+        {(!isAutoPick || _.isEmpty(autoPickOrder)) ? null : (
+          <p>Next pick will be: <b>
+            {GolferLogic.renderGolfer(GolferStore.getGolfer(autoPickOrder[0]))}
+          </b></p>
+        )}
 
         {editor}
 
