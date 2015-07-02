@@ -8,7 +8,6 @@ var Store = require('./Store');
 var UserStore = require('./UserStore');
 
 var _autoPickOrder = null;
-var _autoPickUser = null;
 var _isAutoPick = false;
 
 var AutoPickStore =  _.extend({}, Store.prototype, {
@@ -42,14 +41,8 @@ AppDispatcher.register(function (payload) {
       break;
 
     case AppConstants.CURRENT_USER_CHANGE:
-      var newUser = UserStore.getCurrentUser();
-      if (newUser !== _autoPickUser) {
-        _autoPickUser = newUser;
-        _isAutoPick = false;
-        _autoPickOrder = [];
-
-        AutoPickStore.emitChange();
-      }
+      _isAutoPick = false;
+      AutoPickStore.emitChange();
       break;
   }
 

@@ -1,4 +1,8 @@
+'use strict';
+
+var _ = require('lodash');
 var AppActions = require('./actions/AppActions');
+var AutoPickActions = require('./actions/AutoPickActions');
 var DraftActions = require('./actions/DraftActions');
 var PlayerStore = require('./stores/PlayerStore');
 var ScoreActions = require('./actions/ScoreActions');
@@ -25,6 +29,13 @@ function hydrate(seedData) {
     memo[uid] = { id: uid, name: p.name, player: p.id };
   });
   AppActions.setUsers(users);
+
+  // TEMPTEMP - until we start storing this on the server, fake hydrating auto
+  // pick order here
+  AutoPickActions.setAutoPickOrder(_.chain(seedData.golfers)
+    .sortBy('wgr')
+    .pluck('id')
+    .value());
 
   if (seedData.user) {
     UserActions.hydrateCurrentUser(seedData.user.id);

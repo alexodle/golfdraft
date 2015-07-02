@@ -28,11 +28,13 @@ function safeSwap(arr, iFrom, iTo) {
 var GolferDnd = React.createClass({
 
   render: function () {
-    var connectDragSource = this.props.connectDragSource;
-    var connectDropTarget = this.props.connectDropTarget;
+    var props = this.props;
+    var connectDragSource = props.connectDragSource;
+    var connectDropTarget = props.connectDropTarget;
+
     return connectDragSource(connectDropTarget(
       <li className='list-group-item'>
-        {GolferStore.getGolfer(this.props.id).name}
+        {props.i + 1}. {GolferStore.getGolfer(this.props.id).name}
       </li>
     ));
   }
@@ -67,69 +69,19 @@ GolferDnd = DragSource('golferdnd', {
 var AutoPickerEditor = React.createClass({
 
   render: function () {
-    var golfersRemaining = _.chain(this.props.golfersRemaining)
-      .sortBy('wgr')
-      .pluck('id')
-      .value();
-
-    var isAutoPick = this.props.isAutoPick;
-    var autoPickOrder = _.intersection(this.props.autoPickOrder, golfersRemaining);
-    var golfersAvailable = _.difference(golfersRemaining, autoPickOrder);
-
-    var moveToPickOrder = this._moveToPickOrder;
-    var moveToAvailable = this._moveToAvailable;
-
+    var autoPickOrder = this.props.autoPickOrder;
     var onGolferMove = this._onGolferMove;
-
     return (
-      <div className='row'>
-
-        <div className='col-md-6'>
-          <GolfDraftPanel heading='Pick Order'>
-            <ol className='list-group'>
-              {_.map(autoPickOrder, function (g) {
-                /*<li key={g}>
-                  {GolferStore.getGolfer(g).name}
-                  <span> </span>
-                  <a data-golfer={g} href='#' onClick={movePlayerUp}>Up</a>
-                  <span> </span>
-                  <a data-golfer={g} href='#' onClick={movePlayerDown}>Down</a>
-                  <span> </span>
-                  <a data-golfer={g} href='#' onClick={moveToAvailable}>X</a>
-                </li>*/
-                return (
-                  <GolferDnd key={g} id={g} onGolferMove={onGolferMove} />
-                );
-              })}
-            </ol>
-          </GolfDraftPanel>
-        </div>
-
-        <div className='col-md-6'>
-          <GolfDraftPanel heading='Available Players'>
-            <ol>
-              {_.map(golfersAvailable, function (g) {
-                return (
-                  <li key={g}>
-                    <a
-                      data-golfer={g}
-                      href='#'
-                      onClick={moveToPickOrder}
-                    >{GolferStore.getGolfer(g).name}
-                    </a>
-                  </li>
-                );
-              })}
-            </ol>
-          </GolfDraftPanel>
-        </div>
-
-      </div>
+      <GolfDraftPanel heading='Pick Order'>
+        <ol className='list-group'>
+          {_.map(autoPickOrder, function (g, i) {
+            return (
+              <GolferDnd key={g} i={i} id={g} onGolferMove={onGolferMove} />
+            );
+          })}
+        </ol>
+      </GolfDraftPanel>
     );
-  },
-
-  _setIsAutoPick: function (ev) {
-    AutoPickActions.setIsAutoPick(ev.target.checked);
   },
 
   _onGolferMove: function (golferId, afterGolferId) {
@@ -141,18 +93,6 @@ var AutoPickerEditor = React.createClass({
     autoPickOrder.splice(index, 1);
     autoPickOrder.splice(afterIndex, 0, golferId);
 
-    AutoPickActions.setAutoPickOrder(autoPickOrder);
-  },
-
-  _moveToPickOrder: function (ev) {
-    var g = getGolferFromClickEvent(ev);
-    var autoPickOrder = this.props.autoPickOrder.concat([g]);
-    AutoPickActions.setAutoPickOrder(autoPickOrder);
-  },
-
-  _moveToAvailable: function (ev) {
-    var g = getGolferFromClickEvent(ev);
-    var autoPickOrder = _.without(this.props.autoPickOrder, g);
     AutoPickActions.setAutoPickOrder(autoPickOrder);
   }
 
@@ -166,21 +106,26 @@ var AutoPicker = React.createClass({
   },
 
   render: function () {
+    var isEditing = this.state.isEditing;
+
     var props = this.props;
     var isAutoPick = props.isAutoPick;
-
-    var isEditing = this.state.isEditing;
+    var golfersRemaining = props.golfersRemaining;
+    var autoPickOrder = _.intersection(
+      props.autoPickOrder,
+      _.pluck(golfersRemaining, 'id')
+    );
 
     var editor = !isEditing ? null : (
       <AutoPickerEditor
-        golfersRemaining={props.golfersRemaining}
-        autoPickOrder={props.autoPickOrder}
+        golfersRemaining={golfersRemaining}
+        autoPickOrder={autoPickOrder}
       />
     );
 
     return (
       <GolfDraftPanel heading='Auto Picking'>
-        {!isAutoPick || _.isEmpty(autoPickOrder) ? null : (
+        {(!isAutoPick || _.isEmpty(autoPickOrder)) ? null : (
           <p>Next pick will be: <b>{GolferStore.getGolfer(autoPickOrder[0]).name}</b></p>
         )}
 
@@ -191,7 +136,7 @@ var AutoPicker = React.createClass({
         </div>
 
         <a href='#' onClick={this._toggleEdit}>
-          {!isEditing ? 'Edit' : 'Hide'}
+          {!isEditing ? 'Edit Order' : 'Hide'}
         </a>
 
         {editor}
@@ -203,7 +148,11 @@ var AutoPicker = React.createClass({
   _toggleEdit: function (ev) {
     ev.preventDefault();
     this.setState({ isEditing: !this.state.isEditing });
-  }
+  },
+
+  _setIsAutoPick: function (ev) {
+    AutoPickActions.setIsAutoPick(ev.target.checked);
+  },
 
 });
 
