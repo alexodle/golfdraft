@@ -1,5 +1,10 @@
 'use strict';
 
+if (process.argv.length != 4) {
+  console.log('Usage: node refreshData.js <reader> <url>');
+  process.exit(1);
+}
+
 var _ = require('lodash');
 var access = require('./access');
 var config = require('./config');
