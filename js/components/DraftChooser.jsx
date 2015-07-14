@@ -9,6 +9,10 @@ var GolferLogic = require('../logic/GolferLogic');
 var PlayerStore = require('../stores/PlayerStore');
 var React = require('react');
 
+function sortGolfers(golfers, sortKey) {
+  return _.sortBy(golfers, [sortKey, 'name']);
+}
+
 var DraftChooser = React.createClass({
 
   getInitialState: function () {
@@ -27,7 +31,7 @@ var DraftChooser = React.createClass({
     var currentPick = this.props.currentPick;
     var sortKey = this.state.sortKey;
 
-    var sortedGolfers = _.sortBy(golfersRemaining, sortKey);
+    var sortedGolfers = sortGolfers(golfersRemaining, sortKey);
 
     var header = null;
     if (this.props.currentUser.player === currentPick.player) {
@@ -39,7 +43,7 @@ var DraftChooser = React.createClass({
           <h4>Make a pick for: {playerName}</h4>
           <p>
             <a href="#" onClick={this._onStopTakingPick}>
-              I'll stop making picks for {playerName}
+              I&#39;ll stop making picks for {playerName}
             </a>
           </p>
         </section>
@@ -106,11 +110,7 @@ var DraftChooser = React.createClass({
     var sortKey = state.sortKey || 'name';
 
     if (!selectedGolfer || !golfersRemaining[selectedGolfer]) {
-      selectedGolfer = _.chain(golfersRemaining)
-        .sortBy(sortKey)
-        .first()
-        .value()
-        .id;
+      selectedGolfer = _.first(sortGolfers(golfersRemaining, sortKey)).id;
     }
     return {
       selectedGolfer: selectedGolfer
@@ -124,13 +124,10 @@ var DraftChooser = React.createClass({
   _setSortKey: function (sortKey) {
     if (sortKey === this.state.sortKey) return;
 
+    var golfersRemaining = this.props.golfersRemaining;
     this.setState({
       sortKey: sortKey,
-      selectedGolfer: _.chain(this.props.golfersRemaining)
-        .sortBy(sortKey)
-        .first()
-        .value()
-        .id
+      selectedGolfer: _.first(sortGolfers(golfersRemaining, sortKey)).id
     });
   },
 
