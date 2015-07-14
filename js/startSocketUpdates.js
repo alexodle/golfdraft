@@ -1,3 +1,5 @@
+'use strict';
+
 var _ = require('lodash');
 var ChatActions = require('./actions/ChatActions');
 var DraftActions = require('./actions/DraftActions');

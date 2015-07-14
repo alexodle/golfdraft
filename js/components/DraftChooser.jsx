@@ -39,7 +39,7 @@ var DraftChooser = React.createClass({
           <h4>Make a pick for: {playerName}</h4>
           <p>
             <a href="#" onClick={this._onStopTakingPick}>
-              I'll stop making picks for {playerName}
+              I&#8217;ll stop making picks for {playerName}
             </a>
           </p>
         </section>

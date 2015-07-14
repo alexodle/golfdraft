@@ -4,7 +4,8 @@
 var _ = require("lodash");
 var AppPausedStatus = require('./AppPausedStatus.jsx');
 var Assets = require("../constants/Assets");
-var AutoPicker = require("./AutoPicker.jsx");
+var AutoPickEditor = require("./AutoPickEditor.jsx");
+var AutoPickMaker = require("./AutoPickMaker.jsx");
 var BestLeft = require("./BestLeft.jsx");
 var ChatRoom = require("./ChatRoom.jsx");
 var DraftChooser = require("./DraftChooser.jsx");
@@ -35,31 +36,43 @@ var DraftApp = React.createClass({
 
   render: function () {
     var draftView = null;
-    var isMyPick = this.props.isMyDraftPick;
-    var isDraftOver = !this.props.currentPick;
+    var currentUser = this.props.currentUser;
+    var currentPick = this.props.currentPick;
+
+    var isDraftOver = !currentPick;
     var isDraftPaused = this.props.isPaused;
+
+    var showChooser = this.props.isMyDraftPick;
+    var isPickForMyself = showChooser && currentPick.player === currentUser.player;
 
     var statusUi = null;
     if (isDraftPaused) {
       statusUi = (<AppPausedStatus />);
     } else {
-      if (!isMyPick) {
+      if (!showChooser) {
         statusUi = (
           <span>
-            <DraftStatus currentPick={this.props.currentPick} />
-            <AutoPicker
+            <DraftStatus currentPick={currentPick} />
+            <AutoPickEditor
               golfersRemaining={this.props.golfersRemaining}
               autoPickOrder={this.props.autoPickOrder}
               isAutoPick={this.props.isAutoPick}
             />
           </span>
         );
+      } else if (isPickForMyself && this.props.isAutoPick) {
+        statusUi = (
+          <AutoPickMaker
+            golfersRemaining={this.props.golfersRemaining}
+            autoPickOrder={this.props.autoPickOrder}
+          />
+        );
       } else {
         statusUi = (
           <DraftChooser
             currentUser={this.props.currentUser}
             golfersRemaining={this.props.golfersRemaining}
-            currentPick={this.props.currentPick}
+            currentPick={currentPick}
           />
         );
       }
@@ -84,7 +97,7 @@ var DraftApp = React.createClass({
           <div className="col-md-6">
             <DraftPickOrder
               currentUser={this.props.currentUser}
-              currentPick={this.props.currentPick}
+              currentPick={currentPick}
               pickingForPlayers={this.props.pickingForPlayers}
             />
           </div>
