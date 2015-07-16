@@ -38,6 +38,7 @@ var golferScoreSchema = mongoose.Schema({
   tourneyId: mongoose.Schema.ObjectId,
   golfer: mongoose.Schema.ObjectId,
   day: Number,
+  thru: Number,
   scores: [mongoose.Schema.mixed]
 });
 golferScoreSchema.index({ tourneyId: 1, golfer: 1 });

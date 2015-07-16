@@ -113,6 +113,7 @@ var UpdateScore = {
           return {
             golfer: golfer,
             day: g.day,
+            thru: g.thru,
             scores: g.scores
           };
         });
