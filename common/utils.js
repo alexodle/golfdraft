@@ -33,6 +33,16 @@ var utils = {
     } else {
       return '' + n;
     }
+  },
+
+  toThruStr: function (thru) {
+    if (thru === null) {
+      return 'NS';
+    } else if (thru === 18) {
+      return 'F';
+    } else {
+      return 'thru ' + thru;
+    }
   }
 
 };

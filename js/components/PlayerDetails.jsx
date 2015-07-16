@@ -45,6 +45,7 @@ var PlayerDetails = React.createClass({
               .pluck('golfer')
               .contains(gs.golfer)
               .value();
+            var currentDay = gs.day === i + 1;
             return (
               <td
                 className={cx({
@@ -55,6 +56,9 @@ var PlayerDetails = React.createClass({
               >
                 {utils.toGolferScoreStr(s)}
                 <sup className="missed-cut-text"> MC</sup>
+                {!currentDay ? null : (
+                  <sup className="thru-text"> {utils.toThruStr(gs.thru)}</sup>
+                )}
               </td>
             );
           })}
