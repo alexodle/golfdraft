@@ -29,7 +29,13 @@ var PlayerStandings = React.createClass({
       var playerIsSelected = this.props.selectedPlayer === p.id;
       var viewPlayer = _.partial(this._onPlayerSelect, p.id);
       var holesLeft = _.sum(ps.scoresByGolfer, function (gs) {
-        return gs.thru === null ? 18 : 18 - gs.thru;
+        if (_.any(gs.missedCuts)) {
+          return 0;
+        } else if (gs.thru === null) {
+          return 18;
+        } else {
+          return 18 - gs.thru;
+        }
       });
 
       return (
