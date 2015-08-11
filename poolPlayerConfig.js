@@ -1,45 +1,45 @@
 // http://www.pgatour.com/data/r/100/leaderboard-v2.json
 
 /*
-1 - Kyle
-2 - Graham
-3 - Hennessey
-4 - Severson
-5 - Jon M
-6 - Rob
-7 - Odle
-8 - Robes
-9 - Kevin
-10 - Stacy
-11 - Frank
-12 - Ben F
-13 - Jay
-14 - Jon W
-15 - Chad
-16 - Welch
-17 - Matteus
-18 - Chris
+1 - Graham
+2 - Bo
+3 - Matteus
+4 - Stacy
+5 - Robes
+6 - Frank
+7 - Ben
+8 - Kevin
+9 - Severson
+10 - Rob
+11 - Chad
+12 - Chris
+13 - Jon M
+14 - Odle
+15 - Kyle
+16 - Jon W
+17 - Jay
+18 - Henny
 */
 
 module.exports = {
   draftOrder: [
-    'Kyle Phillips',
     'Graham Snead',
-    'Matt Hennessey',
-    'Erik Severson',
-    'Jonathan Mullen',
-    'Rob Phillips',
-    'Alex Odle',
-    'Jared Robillard',
-    'Kevin Phillips',
-    'Stacy Smith',
-    'Frank Severinghaus',
-    'Ben Frizzel',
-    'Jay Fredlund',
-    'Jon Willett',
-    'Chad Larson',
     'Bo Welch',
     'Matt Simon',
+    'Stacy Smith',
+    'Jared Robillard',
+    'Frank Severinghaus',
+    'Ben Frizzel',
+    'Kevin Phillips',
+    'Erik Severson',
+    'Rob Phillips',
+    'Chad Larson',
     'Chris Willett',
+    'Jonathan Mullen',
+    'Alex Odle',
+    'Kyle Phillips',
+    'Jon Willett',
+    'Jay Fredlund',
+    'Matt Hennessey'
   ]
 };
