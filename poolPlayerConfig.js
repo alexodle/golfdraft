@@ -1,4 +1,5 @@
-// http://www.pgatour.com/data/r/100/leaderboard-v2.json
+// 2015 PGA Championship
+// http://www.pgatour.com/data/r/033/leaderboard-v2mini.json
 
 /*
 1 - Graham
