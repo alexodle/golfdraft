@@ -145,6 +145,32 @@ db.once('open', function callback () {
     });
   });
 
+  app.get('/bootstrap', function (req, res) {
+    Promise.all([
+      access.getGolfers(),
+      access.getPlayers(),
+      access.getDraft(),
+      access.getScores(),
+      access.getTourney(),
+      access.getAppState()
+    ])
+    .then(function (results) {
+      res.send({
+        golfers: results[0],
+        players: results[1],
+        draft: results[2],
+        scores: results[3],
+        tourney: results[4],
+        appState: results[5],
+        user: req.session.user
+      });
+    })
+    .catch(function (err) {
+      console.log(err);
+      res.status(500).send(err);
+    });
+  });
+
   app.post('/login', function (req, res) {
     var user = req.body;
     req.session.user = user;

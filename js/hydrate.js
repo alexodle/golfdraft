@@ -1,3 +1,6 @@
+'use strict';
+
+var _ = require('lodash');
 var AppActions = require('./actions/AppActions');
 var DraftActions = require('./actions/DraftActions');
 var PlayerStore = require('./stores/PlayerStore');
