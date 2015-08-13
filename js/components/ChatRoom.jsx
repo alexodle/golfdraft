@@ -18,6 +18,60 @@ var ReactPropTypes = React.PropTypes;
 
 var newMessageSound = new Audio(Assets.NEW_CHAT_MESSAGE_SOUND);
 
+var TEMP_NAMES = [
+  "Alex Odle",
+  "Al Bundy",
+  "Bill James",
+  "Billy Beane"
+];
+
+var NAME_TAG_RE = /@[a-z]* *[a-z]*$/i;
+
+var ENTER_KEY = 13;
+
+var AutoComplete = React.createClass({
+
+  render: function () {
+    var text = this.props.text.toLowerCase();
+    var choices = _.filter(TEMP_NAMES, function (n) {
+      return n.toLowerCase().startsWith(text);
+    });
+
+    if (_.isEmpty(choices)) {
+      return null;
+    }
+
+    return (
+      <form>
+        <select
+          ref='autocomplete'
+          size={3}
+          defaultValue={choices[0]}
+          onClick={this._onClick}
+          onKeyUp={this._onKeyUp}
+        >
+          {_.map(choices, function (ch) {
+            return (
+              <option key={ch} value={ch}>{ch}</option>
+            );
+          })}
+        </select>
+      </form>
+    );
+  },
+
+  _onClick: function (ev) {
+    this.props.onChoose({ value: ev.target.value });
+  },
+
+  _onKeyUp: function (ev) {
+    if (ev.keyCode === ENTER_KEY) {
+      this.props.onChoose({ value: ev.target.value });
+    }
+  }
+
+});
+
 var ChatRoomInput = React.createClass({
   mixins: [PureRenderMixin],
 
@@ -26,25 +80,41 @@ var ChatRoomInput = React.createClass({
   },
 
   render: function () {
+    var text = this.state.text;
+
+    var nameTag = text.match(NAME_TAG_RE);
+
     return (
-      <form onSubmit={this._onSend}>
-        <div className='form-group'>
-          <input
-            ref='input'
-            className='form-control'
-            value={this.state.text}
-            onChange={this._updateText}
-          />
-          <button type='submit' className='btn btn-default'>
-            Send
-          </button>
-        </div>
-      </form>
+      <div>
+        <form onSubmit={this._onSend}>
+          <div className='form-group'>
+            <input
+              ref='input'
+              className='form-control'
+              value={text}
+              onChange={this._updateText}
+            />
+            {!nameTag ? null : (
+              <AutoComplete text={nameTag[0].substr(1)} onChoose={this._onTag} />
+            )}
+            <button type='submit' className='btn btn-default'>
+              Send
+            </button>
+          </div>
+        </form>
+      </div>
     );
   },
 
   _updateText: function (ev) {
     this.setState({ text: ev.target.value });
+  },
+
+  _onTag: function (ev) {
+    var newText = this.state.text.replace(NAME_TAG_RE, "~[" + ev.value + "] ");
+    this.setState({ text: newText });
+
+    $(this.refs.input.getDOMNode()).focus();
   },
 
   _onSend: function (ev) {
