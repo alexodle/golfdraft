@@ -28,25 +28,52 @@ var TEMP_NAMES = [
 var NAME_TAG_RE = /@[a-z]* *[a-z]*$/i;
 
 var ENTER_KEY = 13;
+var DOWN_KEY = 40;
+var UP_KEY = 38;
 
 var AutoComplete = React.createClass({
+  mixins: [PureRenderMixin],
+
+  getInitialState: function () {
+    return {
+      selectedIndex: 0
+    };
+  },
+
+  componentWillUpdate: function (nextProps, nextState) {
+    var currentIndex = this.state.selectedIndex;
+    var newIndex = nextState.selectedIndex;
+    if (currentIndex !== newIndex) {
+      return;
+    }
+
+    var oldChoices = this._getChoices();
+    var newChoices = this._getChoices(nextProps);
+
+    if (
+        _.isEmpty(oldChoices) ||
+        oldChoices[currentIndex] !== newChoices[currentIndex]
+      ) {
+
+      this.setState({ selectedIndex: 0 });
+    }
+  },
 
   render: function () {
-    var text = this.props.text.toLowerCase();
-    var choices = _.filter(TEMP_NAMES, function (n) {
-      return n.toLowerCase().startsWith(text);
-    });
+    var choices = this._getChoices();
 
     if (_.isEmpty(choices)) {
       return null;
     }
 
+    var selection = choices[this.state.selectedIndex];
     return (
       <form>
         <select
           ref='autocomplete'
           size={3}
-          defaultValue={choices[0]}
+          value={selection}
+          onChange={this._onChange}
           onClick={this._onClick}
           onKeyUp={this._onKeyUp}
         >
@@ -60,13 +87,53 @@ var AutoComplete = React.createClass({
     );
   },
 
+  forceSelect: function () {
+    var choices = this._getChoices();
+    this.props.onChoose({ value: choices[this.state.selectedIndex] });
+  },
+
+  forceDown: function () {
+    this._move(1);
+  },
+
+  forceUp: function () {
+    this._move(-1);
+  },
+
+  _onChange: function (ev) {
+    this.setState({ selectedIndex: ev.currentTarget.selectedIndex });
+  },
+
+  _move: function (n) {
+    var choices = this._getChoices();
+    var currentIndex = this.state.selectedIndex;
+    var newIndex = currentIndex + n;
+
+    if (newIndex < 0 || newIndex >= choices.length) {
+      return;
+    }
+
+    this.setState({ selectedIndex: newIndex });
+  },
+
+  _getChoices: function (props) {
+    props = props || this.props;
+
+    var text = props.text.toLowerCase();
+    var choices = _.filter(TEMP_NAMES, function (n) {
+      return n.toLowerCase().startsWith(text);
+    });
+
+    return choices;
+  },
+
   _onClick: function (ev) {
-    this.props.onChoose({ value: ev.target.value });
+    this.forceSelect();
   },
 
   _onKeyUp: function (ev) {
     if (ev.keyCode === ENTER_KEY) {
-      this.props.onChoose({ value: ev.target.value });
+      this.forceSelect();
     }
   }
 
@@ -76,13 +143,12 @@ var ChatRoomInput = React.createClass({
   mixins: [PureRenderMixin],
 
   getInitialState: function () {
-    return { text: '' };
+    return { text: '', taggingText: null };
   },
 
   render: function () {
     var text = this.state.text;
-
-    var nameTag = text.match(NAME_TAG_RE);
+    var nameTag = this.state.taggingText;
 
     return (
       <div>
@@ -93,9 +159,10 @@ var ChatRoomInput = React.createClass({
               className='form-control'
               value={text}
               onChange={this._updateText}
+              onKeyUp={this._onKeyUp}
             />
             {!nameTag ? null : (
-              <AutoComplete text={nameTag[0].substr(1)} onChoose={this._onTag} />
+              <AutoComplete ref='nameTagger' text={nameTag[0].substr(1)} onChoose={this._onTag} />
             )}
             <button type='submit' className='btn btn-default'>
               Send
@@ -106,13 +173,29 @@ var ChatRoomInput = React.createClass({
     );
   },
 
+  _onKeyUp: function (ev) {
+    if (this.state.taggingText) {
+      if (ev.keyCode === UP_KEY) {
+        this.refs.nameTagger.forceUp();
+        ev.preventDefault();
+      } else if (ev.keyCode === DOWN_KEY) {
+        this.refs.nameTagger.forceDown();
+        ev.preventDefault();
+      }
+    }
+  },
+
   _updateText: function (ev) {
-    this.setState({ text: ev.target.value });
+    var newText = ev.target.value;
+    this.setState({
+      text: newText,
+      taggingText: newText.match(NAME_TAG_RE)
+    });
   },
 
   _onTag: function (ev) {
     var newText = this.state.text.replace(NAME_TAG_RE, "~[" + ev.value + "] ");
-    this.setState({ text: newText });
+    this.setState({ text: newText, taggingText: null });
 
     $(this.refs.input.getDOMNode()).focus();
   },
@@ -120,11 +203,16 @@ var ChatRoomInput = React.createClass({
   _onSend: function (ev) {
     ev.preventDefault();
 
+    if (this.state.taggingText) {
+      this.refs.nameTagger.forceSelect();
+      return;
+    }
+
     var text = this.state.text;
     if (_.isEmpty(text)) return;
 
     ChatActions.createMessage(text);
-    this.setState({ text: '' });
+    this.setState({ text: '', taggingText: null });
 
     $(this.refs.input.getDOMNode()).focus();
   }
