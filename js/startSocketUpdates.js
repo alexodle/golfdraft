@@ -12,7 +12,7 @@ var UserActions = require('./actions/UserActions');
 
 var hasConnected = false;
 
-/** Starts listening for app-wide socket.io updates
+/** Start listening for app-wide socket.io updates
 */
 function startSocketUpdates() {
   var io = socketio.connect();
