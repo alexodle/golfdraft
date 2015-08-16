@@ -6,23 +6,44 @@ var request = require('request');
 var MISSED_CUT = constants.MISSED_CUT;
 var NDAYS = constants.NDAYS;
 
-var PGATOUR_MC_TEXTS = ['cut', 'wd'];
+var PGATOUR_WD_TEXT = 'wd';
+var PGATOUR_MC_TEXT = 'cut';
 var CUT_ROUND = 3; // cut starts at round 3
 var N_HOLES = 18;
 
 function getRoundScore(par, currentRound, g, round) {
   var roundNumber = round.round_number;
-  var missedCut = _.contains(PGATOUR_MC_TEXTS, g.status);
+  var missedCut = g.status === PGATOUR_MC_TEXT;
 
   if (missedCut && roundNumber >= CUT_ROUND) {
     return MISSED_CUT;
   } else if (roundNumber > currentRound && round.strokes === null) {
-    return 0;
+    return par;
   } else if (roundNumber === currentRound) {
-    return g.today || 0; // 0 if they haven't started yet
+    return g.today ? g.today + par : par; // par if they haven't started yet
   }
 
-  return round.strokes - par;
+  return round.strokes;
+}
+
+function adjustWdScores(g, scores) {
+  // For WD golfers, "total_strokes" is the only property we can trust
+  var total = g.total_strokes;
+
+  var newScores = [];
+  var strokes = 0;
+  for (var i=0; i<scores.length; i++) {
+    strokes += scores[i];
+    newScores.push(strokes <= total ? scores[i] : MISSED_CUT);
+  }
+
+  return newScores;
+}
+
+function adjustForPar(par, scores) {
+  return _.map(scores, function (s) {
+    return s !== MISSED_CUT ? s - par : MISSED_CUT;
+  });
 }
 
 function parseGolfer(par, tourneyRound, g) {
@@ -40,6 +61,17 @@ function parseGolfer(par, tourneyRound, g) {
       })
       .value()
   };
+
+  console.log("BEFORE: " + JSON.stringify(parsedGolfer.scores));
+
+  var withdrew = g.status === PGATOUR_WD_TEXT;
+  if (withdrew) {
+    parsedGolfer.scores = adjustWdScores(g, parsedGolfer.scores);
+  }
+
+  console.log("AFTER: " + JSON.stringify(parsedGolfer.scores));
+
+  parsedGolfer.scores = adjustForPar(par, parsedGolfer.scores);
 
   return parsedGolfer;
 }

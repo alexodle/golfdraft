@@ -42,5 +42,16 @@ describe('PgaTourReader', function () {
         });
     });
 
+    it('parses for mid-day wd', function () {
+      reader
+        .parseGolfer(72, 3, require('./files/golfer_midround_wd'))
+        .should.eql({
+          golfer: 'Jamie Donaldson',
+          scores: [7, MISSED_CUT, MISSED_CUT, MISSED_CUT],
+          thru: null,
+          day: 3
+        });
+    });
+
   });
 });
