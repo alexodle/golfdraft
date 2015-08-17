@@ -18,13 +18,6 @@ var ReactPropTypes = React.PropTypes;
 
 var newMessageSound = new Audio(Assets.NEW_CHAT_MESSAGE_SOUND);
 
-var TEMP_NAMES = [
-  "Alex Odle",
-  "Al Bundy",
-  "Bill James",
-  "Billy Beane"
-];
-
 var NAME_TAG_RE = /@[a-z]* *[a-z]*$/i;
 
 var ENTER_KEY = 13;
@@ -52,7 +45,9 @@ var AutoComplete = React.createClass({
 
     if (
         _.isEmpty(oldChoices) ||
-        oldChoices[currentIndex] !== newChoices[currentIndex]
+        _.isEmpty(newChoices) ||
+        !newChoices[currentIndex] ||
+        oldChoices[currentIndex].id !== newChoices[currentIndex].id
       ) {
 
       this.setState({ selectedIndex: 0 });
@@ -66,7 +61,7 @@ var AutoComplete = React.createClass({
       return null;
     }
 
-    var selection = choices[this.state.selectedIndex];
+    var selection = choices[this.state.selectedIndex].id;
     return (
       <form>
         <select
@@ -77,9 +72,9 @@ var AutoComplete = React.createClass({
           onClick={this._onClick}
           onKeyUp={this._onKeyUp}
         >
-          {_.map(choices, function (ch) {
+          {_.map(choices, function (u) {
             return (
-              <option key={ch} value={ch}>{ch}</option>
+              <option key={u.id} value={u.id}>{u.name}</option>
             );
           })}
         </select>
@@ -89,7 +84,7 @@ var AutoComplete = React.createClass({
 
   forceSelect: function () {
     var choices = this._getChoices();
-    this.props.onChoose({ value: choices[this.state.selectedIndex] });
+    this.props.onChoose({ value: choices[this.state.selectedIndex].id });
   },
 
   forceDown: function () {
@@ -120,9 +115,11 @@ var AutoComplete = React.createClass({
     props = props || this.props;
 
     var text = props.text.toLowerCase();
-    var choices = _.filter(TEMP_NAMES, function (n) {
-      return n.toLowerCase().startsWith(text);
-    });
+    var choices = _.chain(props.allChoices)
+      .filter(function (u) {
+        return u.name.toLowerCase().startsWith(text);
+      })
+      .value();
 
     return choices;
   },
@@ -162,7 +159,11 @@ var ChatRoomInput = React.createClass({
               onKeyUp={this._onKeyUp}
             />
             {!nameTag ? null : (
-              <AutoComplete ref='nameTagger' text={nameTag[0].substr(1)} onChoose={this._onTag} />
+              <AutoComplete
+                ref='nameTagger'
+                allChoices={_.sortBy(UserStore.getAll(), 'name')}
+                text={nameTag[0].substr(1)}
+                onChoose={this._onTag} />
             )}
             <button type='submit' className='btn btn-default'>
               Send
