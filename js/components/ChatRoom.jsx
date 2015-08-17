@@ -19,6 +19,7 @@ var ReactPropTypes = React.PropTypes;
 var newMessageSound = new Audio(Assets.NEW_CHAT_MESSAGE_SOUND);
 
 var NAME_TAG_RE = /@[a-z]* *[a-z]*$/i;
+var TAG_TO_NAME_RE = /~\[([a-z0-9_]+)\]/ig;
 
 var ENTER_KEY = 13;
 var DOWN_KEY = 40;
@@ -220,6 +221,25 @@ var ChatRoomInput = React.createClass({
 
 });
 
+var Message = React.createClass({
+  mixins: [PureRenderMixin],
+
+  render: function () {
+    var htmlStr = this.props.text.replace(TAG_TO_NAME_RE, function (match, userId) {
+      var user = UserStore.getUser(userId);
+      if (!user) {
+        return match;
+      } else {
+        return '<span class="user-tag label label-default">' + user.name + '</span>';
+      }
+    });
+    return (
+      <span dangerouslySetInnerHTML={{ __html: htmlStr }} />
+    );
+  }
+
+});
+
 var ChatRoom = React.createClass({
   mixins: [PureRenderMixin],
 
@@ -265,7 +285,7 @@ var ChatRoom = React.createClass({
               ),
               (
                 <dd key={'dd' + i} className={className}>
-                  {message.message}
+                  <Message text={message.message} />
                 </dd>
               )
             ];
