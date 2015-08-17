@@ -67,6 +67,7 @@ var AutoComplete = React.createClass({
       <form>
         <select
           ref='autocomplete'
+          className='form-control'
           size={3}
           value={selection}
           onChange={this._onChange}
