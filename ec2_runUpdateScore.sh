@@ -14,7 +14,7 @@ git checkout master
 git pull origin master
 npm install
 source $env_script
-/usr/bin/node ./scores_sync/runUpdateScore.js pgatour http://www.pgatour.com/data/r/100/leaderboard-v2.json > $logfile 2>&1
+/usr/bin/node ./scores_sync/runUpdateScore.js pgatour "<pga tour url>" > $logfile 2>&1
 popd
 
 echo "DONE!"
