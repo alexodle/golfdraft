@@ -1,3 +1,5 @@
+'use strict';
+
 var _ = require('lodash');
 var constants = require('../common/constants');
 var Promise = require('promise');
