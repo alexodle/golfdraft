@@ -10,12 +10,6 @@ module.exports = {
     reader: require('./pgatourReader'),
     nameMap: {
     }
-  },
-
-  pgatourField: {
-    reader: require('./pgatourFieldReader'),
-    nameMap: {
-    }
   }
 
 };
