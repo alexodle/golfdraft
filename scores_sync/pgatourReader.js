@@ -62,14 +62,10 @@ function parseGolfer(par, tourneyRound, g) {
       .value()
   };
 
-  console.log("BEFORE: " + JSON.stringify(parsedGolfer.scores));
-
   var withdrew = g.status === PGATOUR_WD_TEXT;
   if (withdrew) {
     parsedGolfer.scores = adjustWdScores(g, parsedGolfer.scores);
   }
-
-  console.log("AFTER: " + JSON.stringify(parsedGolfer.scores));
 
   parsedGolfer.scores = adjustForPar(par, parsedGolfer.scores);
 
