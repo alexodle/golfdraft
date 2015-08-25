@@ -256,6 +256,9 @@ var ChatRoom = React.createClass({
   componentDidUpdate: function (prevProps) {
     // Don't process these until we have initially loaded messages
     if (!prevProps.messages) {
+      if (this.props.messages) {
+        this._forceScroll();
+      }
       return;
     }
 
