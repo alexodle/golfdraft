@@ -20,6 +20,7 @@ var newMessageSound = new Audio(Assets.NEW_CHAT_MESSAGE_SOUND);
 
 var NAME_TAG_RE = /@[a-z]* *[a-z]*$/i;
 var TAG_TO_NAME_RE = /~\[([a-z0-9_]+)\]/ig;
+var SPECIFIC_TAG = "~[{{id}}]";
 
 var ENTER_KEY = 13;
 var DOWN_KEY = 40;
@@ -253,9 +254,25 @@ var ChatRoom = React.createClass({
   },
 
   componentDidUpdate: function (prevProps) {
-    this._forceScroll();
-    if (prevProps.messages && this.props.messages && prevProps.messages.length !== this.props.messages.length) {
-      newMessageSound.play();
+    // Don't process these until we have initially loaded messages
+    if (!prevProps.messages) {
+      return;
+    }
+
+    var prevMessagesLength = prevProps.messages ? prevProps.messages.length : 0;
+    var newMessagesLength = this.props.messages ? this.props.messages.length : 0;
+
+    if (newMessagesLength > prevMessagesLength) {
+      var myTagStr = SPECIFIC_TAG.replace("{{id}}", this.props.currentUser.id);
+      var addedMessages = this.props.messages.slice(prevMessagesLength, newMessagesLength);
+      var tagsMe = _.some(addedMessages, function (msg) {
+        return msg.message.includes(myTagStr);
+      });
+      if (tagsMe) {
+        newMessageSound.play();
+      }
+
+      this._forceScroll();
     }
   },
 

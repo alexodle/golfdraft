@@ -111,6 +111,7 @@ var TourneyApp = React.createClass({
         </GolfDraftPanel>
 
         <ChatRoom
+          currentUser={this.props.currentUser}
           messages={this.props.chatMessages}
           activeUsers={this.props.activeUsers}
         />
