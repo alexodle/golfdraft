@@ -11,7 +11,11 @@ module.exports = {
       { test: /\.gif($|\?)/, loader: "url?limit=10000&minetype=image/gif" },
       { test: /\.jpg($|\?)/, loader: "url?limit=10000&minetype=image/jpg" },
       { test: /\.json($|\?)/, loader: 'json' },
-      { test: /\.jsx($|\?)/, loader: 'jsx-loader?harmony' },
+      {
+        test: /\.jsx($|\?)/,
+        loader: 'babel?optional[]=runtime',
+        exclude: /(node_modules|bower_components)/
+      },
       {
         test: /\.less($|\?)/,
         loader: ExtractTextPlugin.extract('style-loader', [
