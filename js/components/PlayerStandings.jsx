@@ -1,7 +1,7 @@
 "use strict";
 
 var _ = require("lodash");
-var cx = require('react/lib/cx');
+var cx = require('classnames');
 var GolferStore = require('../stores/GolferStore');
 var PlayerStore = require('../stores/PlayerStore');
 var React = require("react");

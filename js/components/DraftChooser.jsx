@@ -1,7 +1,7 @@
 'use strict';
 
 var _ = require('lodash');
-var cx = require('react/lib/cx');
+var cx = require('classnames');
 var DraftActions = require('../actions/DraftActions');
 var GolfDraftPanel = require('./GolfDraftPanel.jsx');
 var GolferLogic = require('../logic/GolferLogic');

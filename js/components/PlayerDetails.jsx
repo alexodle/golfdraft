@@ -2,7 +2,7 @@
 
 var React = require("react");
 var ReactPropTypes = React.PropTypes;
-var cx = require('react/lib/cx');
+var cx = require('classnames');
 var _ = require("lodash");
 var utils = require("../../common/utils");
 
