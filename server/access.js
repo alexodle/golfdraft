@@ -179,6 +179,7 @@ _.extend(access, {
       }
 
       pick = extendWithTourneyId(pick);
+      pick.timestamp = new Date();
       return promiseize(models.DraftPick.create(pick));
     });
   },
@@ -198,7 +199,8 @@ _.extend(access, {
     .then(function (results) {
       return {
         pickOrder: _.sortBy(results[0], 'pickNumber'),
-        picks: _.sortBy(results[1], 'pickNumber')
+        picks: _.sortBy(results[1], 'pickNumber'),
+        serverTimestamp: new Date()
       };
     });
   },

@@ -29,7 +29,8 @@ var draftPickSchema = mongoose.Schema({
   tourneyId: mongoose.Schema.ObjectId,
   player: mongoose.Schema.ObjectId,
   golfer: mongoose.Schema.ObjectId,
-  pickNumber: Number
+  pickNumber: Number,
+  timestamp: Date
 });
 draftPickSchema.index({ tourneyId: 1, pickNumber: 1 });
 draftPickSchema.index({ tourneyId: 1, golfer: 1 });
