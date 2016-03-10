@@ -8,10 +8,11 @@ require('../less/app.less');
 var $ = require('jquery');
 var ChatActions = require('./actions/ChatActions');
 var React = require('react');
+var ReactDOM = require('react-dom');
 var Router = require('react-router');
 var routes = require('./routes.jsx');
 
-var router = Router.create({
+var router = Router.createRoutes({
   routes: routes,
   location: Router.HistoryLocation
 });
@@ -20,18 +21,17 @@ var router = Router.create({
 require('./hydrate')();
 
 var node = document.getElementById('golfdraftapp');
-router.run(function (Handler, state) {
-  React.render(
-    (<div className="container">
-      <div className="row">
-        <div className="col-md-offset-1 col-md-10">
-          <Handler />
-        </div>
+ReactDOM.render(
+  (<div className="container">
+    <div className="row">
+      <div className="col-md-offset-1 col-md-10">
+        {routes}
       </div>
-    </div>),
-    node
-  );
-});
+    </div>
+  </div>),
+  node
+);
+
 
 // Begin listening for live socket updates
 require('./startSocketUpdates')();

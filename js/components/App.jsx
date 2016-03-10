@@ -9,17 +9,12 @@ var ChatStore = require("../stores/ChatStore");
 var DraftApp = require("./DraftApp.jsx");
 var DraftStore = require("../stores/DraftStore");
 var React = require("react");
-var Router = require('react-router');
 var ScoreStore = require('../stores/ScoreStore');
 var TourneyApp = require("./TourneyApp.jsx");
 var TourneyStore = require("../stores/TourneyStore");
 var UserStore = require("../stores/UserStore");
 var GolferStore = require("../stores/GolferStore");
 var WhoIsYou = require("./WhoIsYou.jsx");
-
-var RouteHandler = Router.RouteHandler;
-var Navigation = Router.Navigation;
-var RouterState = Router.State;
 
 var RELEVANT_STORES = [
   AppSettingsStore,
@@ -55,62 +50,13 @@ function getAppState() {
   };
 }
 
-function shouldTransition(currRoute, newRoute) {
-  return (
-    currRoute !== newRoute && (
-      currRoute === 'whoisyou' || newRoute === 'whoisyou'
-    )
-  );
-}
-
-/**
- Returns route that should app should be in based on state
- */
-function getTransitionRoute(state) {
-  state = state || getAppState();
-  if (!state.currentUser) {
-    return 'whoisyou';
-  } else if (state.draft.currentPick) {
-    return 'draft';
-  } else {
-    return 'tourney';
-  }
-}
-
-function createWillTransitionTo(currRoute) {
-  return function (transition) {
-    var newRoute = getTransitionRoute();
-    if (shouldTransition(currRoute, newRoute)) {
-      transition.redirect(newRoute);
-    }
-  };
-}
-
 function getGolfersRemaining(golfers, draftPicks) {
   var pickedGolfers = _.pluck(draftPicks, "golfer");
   var golfersRemaining = _.omit(golfers, pickedGolfers);
   return golfersRemaining;
 }
 
-var WhoIsYouWrapper = React.createClass({
-
-  statics: {
-    willTransitionTo: createWillTransitionTo('whoisyou')
-  },
-
-  render: function () {
-    return (
-      <WhoIsYou />
-    );
-  }
-
-});
-
 var DraftWrapper = React.createClass({
-
-  statics: {
-    willTransitionTo: createWillTransitionTo('draft')
-  },
 
   render: function () {
     var props = this.props;
@@ -143,10 +89,6 @@ var DraftWrapper = React.createClass({
 
 var TourneyWrapper = React.createClass({
 
-  statics: {
-    willTransitionTo: createWillTransitionTo('tourney')
-  },
-
   render: function () {
     var props = this.props;
     return (
@@ -173,10 +115,6 @@ var TourneyWrapper = React.createClass({
 
 var AdminWrapper = React.createClass({
 
-  statics: {
-    willTransitionTo: createWillTransitionTo('admin')
-  },
-
   render: function () {
     var props = this.props;
     return (
@@ -202,18 +140,9 @@ var AdminWrapper = React.createClass({
 });
 
 var AppNode = React.createClass({
-  mixins: [Navigation, RouterState],
 
   getInitialState: function () {
     return getAppState();
-  },
-
-  componentWillUpdate: function (nextProps, nextState) {
-    var currRoute = _.last(this.getRoutes()).name;
-    var newRoute = getTransitionRoute();
-    if (shouldTransition(currRoute, newRoute)) {
-      this.transitionTo(newRoute);
-    }
   },
 
   componentDidMount: function () {
@@ -237,9 +166,10 @@ var AppNode = React.createClass({
       state.draft.draftPicks
     );
 
-    return (
-      <RouteHandler {...state} golfersRemaining={golfersRemaining} />
-    );
+    return React.cloneElement(this.props.children, {
+      ...state,
+      golfersRemaining: golfersRemaining
+    });
   },
 
   _onChange: function () {
@@ -253,5 +183,5 @@ module.exports = {
   AppNode: AppNode,
   DraftWrapper: DraftWrapper,
   TourneyWrapper: TourneyWrapper,
-  WhoIsYouWrapper: WhoIsYouWrapper
+  WhoIsYou: WhoIsYou
 };

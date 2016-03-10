@@ -13,6 +13,14 @@ function getSortedUsers() {
 
 var WhoIsYou = React.createClass({
 
+  contextTypes: {
+    router: React.PropTypes.object.isRequired
+  },
+
+  childContextTypes: {
+    location: React.PropTypes.object
+  },
+
   getInitialState: function () {
     var selectedUser = getSortedUsers()[0].id;
     return { selectedUser: selectedUser };
@@ -58,6 +66,13 @@ var WhoIsYou = React.createClass({
   _onSubmit: function (ev) {
     ev.preventDefault();
     UserActions.setCurrentUser(this.state.selectedUser);
+
+    var location = this.props.location;
+    if (location.state && location.state.nextPathname) {
+      this.context.router.replace(location.state.nextPathname);
+    } else {
+      this.context.router.replace('/');
+    }
   }
 
 });
