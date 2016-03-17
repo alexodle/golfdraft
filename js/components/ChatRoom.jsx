@@ -200,7 +200,7 @@ var ChatRoomInput = React.createClass({
     var newText = this.state.text.replace(NAME_TAG_RE, "~[" + ev.value + "] ");
     this.setState({ text: newText, taggingText: null });
 
-    $(this.refs.input.getDOMNode()).focus();
+    $(this.refs.input).focus();
   },
 
   _onSend: function (ev) {
@@ -217,7 +217,7 @@ var ChatRoomInput = React.createClass({
     ChatActions.createMessage(text);
     this.setState({ text: '', taggingText: null });
 
-    $(this.refs.input.getDOMNode()).focus();
+    $(this.refs.input).focus();
   }
 
 });
@@ -346,8 +346,8 @@ var ChatRoom = React.createClass({
 
   _forceScroll: function () {
     var refs = this.refs;
-    var $panel = $(refs.chatPanel.getDOMNode());
-    var $body = $(refs.chatPanelBody.getDOMNode());
+    var $panel = $(refs.chatPanel);
+    var $body = $(refs.chatPanelBody);
     $panel.scrollTop($body.height());
   }
 
