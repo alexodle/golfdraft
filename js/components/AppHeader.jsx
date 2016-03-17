@@ -12,7 +12,8 @@ var AppHeader = React.createClass({
     tourneyName: ReactPropTypes.string.isRequired,
     currentUser: ReactPropTypes.object.isRequired,
     playSounds: ReactPropTypes.bool.isRequired,
-    drafting: ReactPropTypes.bool
+    drafting: ReactPropTypes.bool,
+    location: React.PropTypes.object
   },
 
   render: function () {
@@ -24,7 +25,10 @@ var AppHeader = React.createClass({
           <small>{this.props.currentUser.name}</small>
           <span> </span>
           <span className='logout-button'>
-            <LogoutButton currentUser={this.props.currentUser} />
+            <LogoutButton
+              currentUser={this.props.currentUser}
+              location={this.props.location}
+            />
           </span>
           <SoundToggle
             className='global-sound-toggle'

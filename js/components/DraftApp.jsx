@@ -10,7 +10,6 @@ var DraftHistory = require("./DraftHistory.jsx");
 var DraftPickOrder = require("./DraftPickOrder.jsx");
 var DraftStatus = require("./DraftStatus.jsx");
 var GolferStore = require("../stores/GolferStore");
-var LogoutButton = require("./LogoutButton.jsx");
 var React = require("react");
 var SettingsActions = require("../actions/SettingsActions");
 var SoundToggle = require("./SoundToggle.jsx");

@@ -58,6 +58,10 @@ function getGolfersRemaining(golfers, draftPicks) {
 
 var DraftWrapper = React.createClass({
 
+  childContextTypes: {
+    location: React.PropTypes.object
+  },
+
   render: function () {
     var props = this.props;
     return (
@@ -66,6 +70,7 @@ var DraftWrapper = React.createClass({
           tourneyName={props.tourneyName}
           currentUser={props.currentUser}
           playSounds={props.playSounds}
+          location={props.location}
           drafting
         />
         <DraftApp
@@ -89,6 +94,10 @@ var DraftWrapper = React.createClass({
 
 var TourneyWrapper = React.createClass({
 
+  childContextTypes: {
+    location: React.PropTypes.object
+  },
+
   render: function () {
     var props = this.props;
     return (
@@ -97,6 +106,7 @@ var TourneyWrapper = React.createClass({
           tourneyName={props.tourneyName}
           currentUser={props.currentUser}
           playSounds={props.playSounds}
+          location={props.location}
         />
         <TourneyApp
           tourneyName={props.tourneyName}
@@ -115,6 +125,10 @@ var TourneyWrapper = React.createClass({
 
 var AdminWrapper = React.createClass({
 
+  childContextTypes: {
+    location: React.PropTypes.object
+  },
+
   render: function () {
     var props = this.props;
     return (
@@ -123,6 +137,7 @@ var AdminWrapper = React.createClass({
           tourneyName={props.tourneyName}
           currentUser={props.currentUser}
           playSounds={props.playSounds}
+          location={props.location}
         />
         <AdminApp
           isAdmin={props.isAdmin}

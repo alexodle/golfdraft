@@ -6,7 +6,6 @@ var constants = require('../../common/constants');
 var GolfDraftPanel = require('./GolfDraftPanel.jsx');
 var GolferLogic = require('../logic/GolferLogic');
 var GolferStore = require('../stores/GolferStore');
-var LogoutButton = require('./LogoutButton.jsx');
 var moment = require('moment');
 var PlayerDetails = require('./PlayerDetails.jsx');
 var PlayerStandings = require('./PlayerStandings.jsx');
