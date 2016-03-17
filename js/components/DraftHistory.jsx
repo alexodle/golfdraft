@@ -21,6 +21,7 @@ var DraftHistory = React.createClass({
             transitionName="tablerow"
             component="tbody"
             transitionLeave={false}
+            transitionEnterTimeout={100}
           >
             {_.map(draftPicks, function (p) {
               return (
