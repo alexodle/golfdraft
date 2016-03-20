@@ -86,15 +86,7 @@ AppDispatcher.register(function (payload) {
 
     case DraftConstants.DRAFT_UPDATE:
       var draft = action.draft;
-      var currentTime = new Date();
-
-      // Adjust picks to match our own time
-      _picks = _.map(draft.picks, function (p) {
-        p.timestamp = p.timestamp || draft.serverTimestamp;
-        p.clientTimestamp = p.timestamp - (draft.serverTimestamp - currentTime);
-        return p;
-      });
-
+      _picks = draft.picks;
       _pickOrder = draft.pickOrder;
 
       DraftStore.emitChange();

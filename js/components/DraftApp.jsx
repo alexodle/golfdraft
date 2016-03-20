@@ -6,6 +6,7 @@ var Assets = require("../constants/Assets");
 var BestLeft = require("./BestLeft.jsx");
 var ChatRoom = require("./ChatRoom.jsx");
 var DraftChooser = require("./DraftChooser.jsx");
+var DraftClock = require("./DraftClock.jsx");
 var DraftHistory = require("./DraftHistory.jsx");
 var DraftPickOrder = require("./DraftPickOrder.jsx");
 var DraftStatus = require("./DraftStatus.jsx");
@@ -56,7 +57,10 @@ var DraftApp = React.createClass({
     return (
       <section>
         <div className="row">
-          <div className="col-md-12">
+          <div className="col-md-3">
+            <DraftClock draftPicks={this.props.draftPicks} />
+          </div>
+          <div className="col-md-9">
             {statusUi}
           </div>
         </div>
