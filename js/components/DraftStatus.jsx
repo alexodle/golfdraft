@@ -13,7 +13,7 @@ var DraftOver = React.createClass({
     return (
       <div className="jumbotron">
         <h1>The draft is over!</h1>
-        <p><Link to='tourney'>Check out the live leaderboard</Link></p>
+        <p><Link to='/'>Check out the live leaderboard</Link></p>
       </div>
     );
   }
