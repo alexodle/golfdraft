@@ -18,8 +18,8 @@ var ReactPropTypes = React.PropTypes;
 var newMessageSound = new Audio(Assets.NEW_CHAT_MESSAGE_SOUND);
 
 var NAME_TAG_RE = /@[a-z]* *[a-z]*$/i;
-var TAG_TO_NAME_RE = /~\[([a-z0-9_]+)\]/ig;
-var SPECIFIC_TAG = "~[{{id}}]";
+var TAG_TO_NAME_RE = /~\[([^\]]+)\]/ig;
+var SPECIFIC_TAG = "~[{{name}}]";
 
 var ENTER_KEY = 13;
 var DOWN_KEY = 40;
@@ -62,7 +62,7 @@ var AutoComplete = React.createClass({
       return null;
     }
 
-    var selection = choices[this.state.selectedIndex].id;
+    var selection = choices[this.state.selectedIndex].name;
     return (
       <form>
         <select
@@ -76,7 +76,7 @@ var AutoComplete = React.createClass({
         >
           {_.map(choices, function (u) {
             return (
-              <option key={u.id} value={u.id}>{u.name}</option>
+              <option key={u.id} value={u.name}>{u.name}</option>
             );
           })}
         </select>
@@ -86,7 +86,7 @@ var AutoComplete = React.createClass({
 
   forceSelect: function () {
     var choices = this._getChoices();
-    this.props.onChoose({ value: choices[this.state.selectedIndex].id });
+    this.props.onChoose({ value: choices[this.state.selectedIndex].name });
   },
 
   forceDown: function () {
@@ -226,8 +226,8 @@ var Message = React.createClass({
   mixins: [PureRenderMixin],
 
   render: function () {
-    var htmlStr = this.props.text.replace(TAG_TO_NAME_RE, function (match, userId) {
-      var user = UserStore.getUser(userId);
+    var htmlStr = this.props.text.replace(TAG_TO_NAME_RE, function (match, name) {
+      var user = UserStore.getUserByName(name);
       if (!user) {
         return match;
       } else {
@@ -265,7 +265,7 @@ var ChatRoom = React.createClass({
     var newMessagesLength = this.props.messages ? this.props.messages.length : 0;
 
     if (newMessagesLength > prevMessagesLength) {
-      var myTagStr = SPECIFIC_TAG.replace("{{id}}", this.props.currentUser.id);
+      var myTagStr = SPECIFIC_TAG.replace("{{name}}", this.props.currentUser.name);
       var addedMessages = this.props.messages.slice(prevMessagesLength, newMessagesLength);
       var tagsMe = _.some(addedMessages, function (msg) {
         return msg.message.includes(myTagStr);

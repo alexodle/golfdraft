@@ -23,6 +23,10 @@ var UserStore =  _.extend({}, Store.prototype, {
     return _users[user];
   },
 
+  getUserByName: function (name) {
+    return _.find(_users, { name: name });
+  },
+
   isAdmin: function () {
     return _isAdmin;
   },
