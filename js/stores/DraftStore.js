@@ -27,8 +27,11 @@ function getCurrentPick() {
 }
 
 function addPick(golfer) {
+  var timestamp = new Date();
   var pick =  _.extend({}, getCurrentPick(), {
-    golfer: golfer
+    golfer: golfer,
+    timestamp: timestamp,
+    clientTimestamp: timestamp
   });
   _picks.push(pick);
   return pick;
