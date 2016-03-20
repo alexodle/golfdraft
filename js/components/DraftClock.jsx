@@ -1,10 +1,13 @@
 'use strict';
 
 var _ = require('lodash');
+var GolfDraftPanel = require('./GolfDraftPanel.jsx');
 var moment = require('moment');
 var React = require('react');
 
 var TIME_INTERVAL = 1000;
+var WARNING_TIME = 1000 * 60 * 2;
+var OVERTIME = 1000 * 60 * 3;
 
 var DraftClock = React.createClass({
 
@@ -31,14 +34,31 @@ var DraftClock = React.createClass({
   },
 
   render: function () {
+    var body = null;
+
     var totalMillis = this.state.totalMillis;
     if (!totalMillis) {
-      return <div><b>Waiting for first pick...</b></div>
-    };
+      body = (<p className='draft-clock'><b>Waiting...</b></p>);
 
-    var format = moment.utc(totalMillis).format("mm:ss");
+    } else {
+
+      var className = "";
+      if (totalMillis > OVERTIME) {
+        className = "text-danger";
+      } else if (totalMillis > WARNING_TIME) {
+        className = "text-warning";
+      }
+
+      var format = moment.utc(totalMillis).format("mm:ss");
+      body = (
+        <p className='draft-clock'>On the clock: <b className={className}>{format}</b></p>
+      );
+    }
+
     return (
-      <div>On the clock: <b>{format}</b></div>
+      <GolfDraftPanel heading='Draft Clock'>
+        {body}
+      </GolfDraftPanel>
     );
   },
 
