@@ -13,7 +13,6 @@ var DraftStatus = require("./DraftStatus.jsx");
 var GolferStore = require("../stores/GolferStore");
 var React = require("react");
 var SettingsActions = require("../actions/SettingsActions");
-var SoundToggle = require("./SoundToggle.jsx");
 
 var myTurnSound = new Audio(Assets.MY_TURN_SOUND);
 var pickMadeSound = new Audio(Assets.PICK_MADE_SOUND);
