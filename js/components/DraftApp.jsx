@@ -58,7 +58,10 @@ var DraftApp = React.createClass({
       <section>
         <div className="row">
           <div className="col-md-3">
-            <DraftClock draftPicks={this.props.draftPicks} />
+            <DraftClock
+              draftPicks={this.props.draftPicks}
+              isMyPick={this.props.isMyDraftPick}
+            />
           </div>
           <div className="col-md-9">
             {statusUi}
