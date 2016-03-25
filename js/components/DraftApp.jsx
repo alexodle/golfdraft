@@ -6,13 +6,13 @@ var Assets = require("../constants/Assets");
 var BestLeft = require("./BestLeft.jsx");
 var ChatRoom = require("./ChatRoom.jsx");
 var DraftChooser = require("./DraftChooser.jsx");
+var DraftClock = require("./DraftClock.jsx");
 var DraftHistory = require("./DraftHistory.jsx");
 var DraftPickOrder = require("./DraftPickOrder.jsx");
 var DraftStatus = require("./DraftStatus.jsx");
 var GolferStore = require("../stores/GolferStore");
 var React = require("react");
 var SettingsActions = require("../actions/SettingsActions");
-var SoundToggle = require("./SoundToggle.jsx");
 
 var myTurnSound = new Audio(Assets.MY_TURN_SOUND);
 var pickMadeSound = new Audio(Assets.PICK_MADE_SOUND);
@@ -56,7 +56,13 @@ var DraftApp = React.createClass({
     return (
       <section>
         <div className="row">
-          <div className="col-md-12">
+          <div className="col-md-3">
+            <DraftClock
+              draftPicks={this.props.draftPicks}
+              isMyPick={this.props.isMyDraftPick}
+            />
+          </div>
+          <div className="col-md-9">
             {statusUi}
           </div>
         </div>

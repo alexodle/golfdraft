@@ -5,6 +5,7 @@ var _ = require('lodash');
 var AppActions = require('./actions/AppActions');
 var ChatActions = require('./actions/ChatActions');
 var DraftActions = require('./actions/DraftActions');
+var DraftParser = require('./logic/DraftParser');
 var ScoreActions = require('./actions/ScoreActions');
 var SettingsActions = require('./actions/SettingsActions');
 var socketio = require('socket.io-client');
@@ -17,7 +18,8 @@ var hasConnected = false;
 function startSocketUpdates() {
   var io = socketio.connect();
   io.on('change:draft', function (ev) {
-    DraftActions.draftUpdate(ev.data);
+    var draft = DraftParser.parseDraft(ev.data);
+    DraftActions.draftUpdate(draft);
   });
   io.on('change:scores', function (ev) {
     ScoreActions.scoreUpdate(ev.data);

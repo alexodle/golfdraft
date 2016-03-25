@@ -2,7 +2,6 @@
 
 var LogoutButton = require("./LogoutButton.jsx");
 var React = require('react');
-var SoundToggle = require('./SoundToggle.jsx');
 
 var ReactPropTypes = React.PropTypes;
 
@@ -30,10 +29,6 @@ var AppHeader = React.createClass({
               location={this.props.location}
             />
           </span>
-          <SoundToggle
-            className='global-sound-toggle'
-            playSounds={this.props.playSounds}
-          />
         </h1>
       </div>
     );
