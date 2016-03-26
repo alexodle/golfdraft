@@ -117,7 +117,12 @@ db.once('open', function callback () {
   // Include socket server
   require('./socketServer');
 
-  app.get(['/', '/draft', '/tourney', '/admin'], function (req, res) {
+  // Support legacy urls
+  app.get(/\/tourney\/?/, function (req, res) {
+    res.redirect('/');
+  });
+
+  app.get(['/', '/draft', '/admin', '/whoisyou'], function (req, res) {
     Promise.all([
       access.getGolfers(),
       access.getPlayers(),
