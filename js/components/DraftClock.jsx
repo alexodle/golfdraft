@@ -71,24 +71,18 @@ var DraftClock = React.createClass({
   render: function () {
     var body = null;
 
-    var totalMillis = this.state.totalMillis;
-    if (!totalMillis) {
-      body = (<p className='draft-clock'><b>Waiting...</b></p>);
-
-    } else {
-
-      var className = "";
-      if (totalMillis > OVERTIME) {
-        className = "text-danger";
-      } else if (totalMillis > WARNING_TIME) {
-        className = "text-warning";
-      }
-
-      var format = moment.utc(totalMillis).format("mm:ss");
-      body = (
-        <p className='draft-clock'><b className={className}>{format}</b></p>
-      );
+    var totalMillis = this.state.totalMillis || 0;
+    var className = "";
+    if (totalMillis > OVERTIME) {
+      className = "text-danger";
+    } else if (totalMillis > WARNING_TIME) {
+      className = "text-warning";
     }
+
+    var format = moment.utc(totalMillis).format("mm:ss");
+    body = (
+      <p className='draft-clock'><b className={className}>{format}</b></p>
+    );
 
     return (
       <GolfDraftPanel heading='Draft Clock'>
