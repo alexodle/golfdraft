@@ -10,8 +10,7 @@ var TIME_INTERVAL = 1000;
 var WARNING_TIME = 1000 * 60 * 2;
 var OVERTIME = 1000 * 60 * 3;
 var FINAL_COUNTDOWN_THRESHOLD = 1000 * 15;
-var WARNING_SOUND_INTERVAL = 1000 * 15;
-var FINAL_WARNING_SOUND_INTERVAL = 1000 * 1;
+var WARNING_SOUND_INTERVAL_SECONDS = 15;
 
 var pickWarningSound = new Audio(Assets.PICK_WARNING_SOUND);
 
@@ -32,8 +31,6 @@ var DraftClock = React.createClass({
       clearInterval(this._intervalId);
       this._intervalId = null;
     }
-    this._clearWarningInterval();
-    this._clearFinalWarningInterval();
   },
 
   componentWillReceiveProps: function (nextProps) {
@@ -41,30 +38,18 @@ var DraftClock = React.createClass({
   },
 
   componentDidUpdate: function (prevProps, prevState) {
-    var allowSounds = this.props.isMyPick;
+    var displayTimeChanged = this._getDisplayTime(prevState) !== this._getDisplayTime();
+    var isMyPick = this.props.isMyPick;
     var totalMillis = this.state.totalMillis;
 
-    if (!allowSounds || totalMillis < WARNING_TIME) {
-      this._clearWarningInterval();
-      this._clearFinalWarningInterval();
+    if (!displayTimeChanged || !isMyPick || totalMillis < WARNING_TIME) {
       return;
     }
 
-    if (this._finalWarningIntervalId) return;
-
     if (totalMillis + FINAL_COUNTDOWN_THRESHOLD >= OVERTIME) {
       pickWarningSound.play();
-
-      this._clearWarningInterval();
-      this._finalWarningIntervalId = setInterval(function () {
-        pickWarningSound.play();
-      }, FINAL_WARNING_SOUND_INTERVAL);
-
-    } else if (!this._warningIntervalId && totalMillis >= WARNING_TIME) {
-
-      this._warningIntervalId = setInterval(function () {
-        pickWarningSound.play();
-      }, WARNING_SOUND_INTERVAL);
+    } else if (moment.utc(totalMillis).seconds() % WARNING_SOUND_INTERVAL_SECONDS === 0) {
+      pickWarningSound.player();
     }
   },
 
@@ -79,7 +64,7 @@ var DraftClock = React.createClass({
       className = "text-warning";
     }
 
-    var format = moment.utc(totalMillis).format("mm:ss");
+    var format = this._getDisplayTime();
     body = (
       <p className='draft-clock'><b className={className}>{format}</b></p>
     );
@@ -89,6 +74,13 @@ var DraftClock = React.createClass({
         {body}
       </GolfDraftPanel>
     );
+  },
+
+  _getDisplayTime: function (state) {
+    state = state || this.state;
+
+    var totalMillis = state.totalMillis || 0;
+    return moment.utc(totalMillis).format("mm:ss");
   },
 
   _getTotalMillis: function (props) {
@@ -104,20 +96,6 @@ var DraftClock = React.createClass({
     return {
       totalMillis: totalMillis
     };
-  },
-
-  _clearWarningInterval: function () {
-    if (this._warningIntervalId) {
-      clearInterval(this._warningIntervalId);
-      this._warningIntervalId = null;
-    }
-  },
-
-  _clearFinalWarningInterval: function () {
-    if (this._finalWarningIntervalId) {
-      clearInterval(this._finalWarningIntervalId);
-      this._finalWarningIntervalId = null;
-    }
   }
 
 });
