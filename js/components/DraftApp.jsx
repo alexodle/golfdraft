@@ -36,36 +36,29 @@ var DraftApp = React.createClass({
     var isDraftOver = !this.props.currentPick;
     var isDraftPaused = this.props.isPaused;
 
-    var statusUi = null;
-    if (isDraftPaused) {
-      statusUi = (<AppPausedStatus />);
-    } else {
-      if (!isMyPick) {
-        statusUi = (<DraftStatus currentPick={this.props.currentPick} />);
-      } else {
-        statusUi = (
-          <DraftChooser
-            currentUser={this.props.currentUser}
-            golfersRemaining={this.props.golfersRemaining}
-            currentPick={this.props.currentPick}
-          />
-        );
-      }
-    }
-
     return (
       <section>
-        <div className="row">
-          <div className="col-md-9">
-            {statusUi}
+        {isDraftPaused ? (<AppPausedStatus />) : (
+          <div className="row">
+            <div className="col-md-9">
+              {!isMyPick ? (
+                <DraftStatus currentPick={this.props.currentPick} />
+              ) : (
+                <DraftChooser
+                  currentUser={this.props.currentUser}
+                  golfersRemaining={this.props.golfersRemaining}
+                  currentPick={this.props.currentPick}
+                />
+              )}
+            </div>
+            <div className="col-md-3">
+              <DraftClock
+                draftPicks={this.props.draftPicks}
+                isMyPick={this.props.isMyDraftPick}
+              />
+            </div>
           </div>
-          <div className="col-md-3">
-            <DraftClock
-              draftPicks={this.props.draftPicks}
-              isMyPick={this.props.isMyDraftPick}
-            />
-          </div>
-        </div>
+        )}
         <div className="row">
           <div className="col-md-12">
             <ChatRoom
