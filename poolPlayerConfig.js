@@ -41,6 +41,7 @@ module.exports = {
     'Kyle Phillips',
     'Jon Willett',
     'Jay Fredlund',
-    'Matt Hennessey'
+    'Matt Hennessey',
+    'Adam Morrison'
   ]
 };
