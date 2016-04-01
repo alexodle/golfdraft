@@ -24,26 +24,31 @@ var DraftHistory = React.createClass({
     var heading = 'Draft History';
 
     if (selectedPlayerId) {
-      heading = heading + ' - ' + PlayerStore.getPlayer(selectedPlayerId).name;
       draftPicks = _.where(draftPicks, { player: selectedPlayerId });
+      heading = (
+        <span>
+          <a href='#' onClick={this._onDeselectPerson}>Draft History</a>
+          <span> - </span>{PlayerStore.getPlayer(selectedPlayerId).name}
+        </span>
+      );
     }
 
     return (
       <GolfDraftPanel heading={heading}>
-        {!selectedPlayerId ? null : (
-          <p><a href='#' onClick={this._onDeselectPerson}>View all</a></p>
-        )}
         <table className='table'>
           <thead><tr><th>#</th><th>Pool Player</th><th>Golfer</th></tr></thead>
           <tbody>
             {_.map(draftPicks, function (p) {
+              var playerName = PlayerStore.getPlayer(p.player).name;
               return (
                 <tr key={p.pickNumber}>
                   <td>{p.pickNumber + 1}</td>
                   <td>
-                    <a href='#' onClick={_.partial(onPersonClick, p.player)}>
-                      {PlayerStore.getPlayer(p.player).name}
-                    </a>
+                    {selectedPlayerId ? playerName : (
+                      <a href='#' onClick={_.partial(onPersonClick, p.player)}>
+                        {playerName}
+                      </a>
+                    )}
                   </td>
                   <td>{GolferLogic.renderGolfer(GolferStore.getGolfer(p.golfer))}</td>
                 </tr>
