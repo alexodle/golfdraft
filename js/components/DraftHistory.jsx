@@ -31,6 +31,11 @@ var DraftHistory = React.createClass({
       <div>
         <a name='DraftHistory' />
         <GolfDraftPanel heading={heading}>
+          {!selectedPlayerId ? null : (
+            <p><small>
+              <b>Tip:</b> click "Draft History" (above) to view all picks again
+            </small></p>
+          )}
           <table className='table'>
             <thead><tr><th>#</th><th>Pool Player</th><th>Golfer</th></tr></thead>
             <tbody>

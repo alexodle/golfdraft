@@ -33,6 +33,9 @@ var DraftPickOrder = React.createClass({
         <p><small>
           <b>Tip:</b> your are picking for all players in bold
         </small></p>
+        <p><small>
+          <b>Pro Tip:</b> click on a player to see their picks
+        </small></p>
         <ol className='pick-order-list'>
           {_.map(pickOrder, function (pick, i) {
             var player = pick.player;
