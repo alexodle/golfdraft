@@ -7,7 +7,7 @@ var moment = require('moment');
 var React = require('react');
 
 var TIME_INTERVAL = 1000;
-var WARNING_TIME = 1000 * 60 * 0.25;
+var WARNING_TIME = 1000 * 60 * 2;
 var OVERTIME = 1000 * 60 * 3;
 var FINAL_COUNTDOWN_THRESHOLD = 1000 * 15;
 var WARNING_SOUND_INTERVAL_SECONDS = 10;
