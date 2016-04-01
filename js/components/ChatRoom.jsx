@@ -226,7 +226,11 @@ var Message = React.createClass({
   mixins: [PureRenderMixin],
 
   render: function () {
-    var htmlStr = this.props.text.replace(TAG_TO_NAME_RE, function (match, name) {
+    // Escape html BEFORE adding tags
+    var text = _.escape(this.props.text);
+
+    // Add tag html
+    var htmlStr = text.replace(TAG_TO_NAME_RE, function (match, name) {
       var user = UserStore.getUserByName(name);
       if (!user) {
         return match;
@@ -234,6 +238,7 @@ var Message = React.createClass({
         return '<span class="user-tag label label-default">' + user.name + '</span>';
       }
     });
+
     return (
       <span dangerouslySetInnerHTML={{ __html: htmlStr }} />
     );
