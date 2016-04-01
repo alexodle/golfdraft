@@ -11,31 +11,58 @@ var ReactCSSTransitionGroup = require('react/lib/ReactCSSTransitionGroup');
 
 var DraftHistory = React.createClass({
 
+  getInitialState: function () {
+    return {
+      selectedPlayerId: null
+    };
+  },
+
   render: function () {
     var draftPicks = _.clone(this.props.draftPicks).reverse();
+    var selectedPlayerId = this.state.selectedPlayerId;
+    var onPersonClick = this._onPersonClick;
+    var heading = 'Draft History';
+
+    if (selectedPlayerId) {
+      heading = heading + ' - ' + PlayerStore.getPlayer(selectedPlayerId).name;
+      draftPicks = _.where(draftPicks, { player: selectedPlayerId });
+    }
+
     return (
-      <GolfDraftPanel heading='Draft History'>
+      <GolfDraftPanel heading={heading}>
+        {!selectedPlayerId ? null : (
+          <p><a href='#' onClick={this._onDeselectPerson}>View all</a></p>
+        )}
         <table className='table'>
           <thead><tr><th>#</th><th>Pool Player</th><th>Golfer</th></tr></thead>
-          <ReactCSSTransitionGroup
-            transitionName="tablerow"
-            component="tbody"
-            transitionLeave={false}
-            transitionEnterTimeout={100}
-          >
+          <tbody>
             {_.map(draftPicks, function (p) {
               return (
                 <tr key={p.pickNumber}>
                   <td>{p.pickNumber + 1}</td>
-                  <td>{PlayerStore.getPlayer(p.player).name}</td>
+                  <td>
+                    <a href='#' onClick={_.partial(onPersonClick, p.player)}>
+                      {PlayerStore.getPlayer(p.player).name}
+                    </a>
+                  </td>
                   <td>{GolferLogic.renderGolfer(GolferStore.getGolfer(p.golfer))}</td>
                 </tr>
               );
             })}
-          </ReactCSSTransitionGroup>
+          </tbody>
         </table>
       </GolfDraftPanel>
     );
+  },
+
+  _onPersonClick: function (pid, ev) {
+    ev.preventDefault();
+    this.setState({ selectedPlayerId: pid });
+  },
+
+  _onDeselectPerson: function (ev) {
+    ev.preventDefault();
+    this.setState({ selectedPlayerId: null });
   }
 
 });
