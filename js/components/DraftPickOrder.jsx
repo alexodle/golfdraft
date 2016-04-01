@@ -14,6 +14,8 @@ var DraftPickOrder = React.createClass({
 
   propTypes: {
     currentUser: ReactPropTypes.object.isRequired,
+    pickingForPlayers: ReactPropTypes.array.isRequired,
+    onPlayerSelected: ReactPropTypes.func.isRequired,
     currentPick: ReactPropTypes.object
   },
 
@@ -45,11 +47,19 @@ var DraftPickOrder = React.createClass({
                   ),
                   'current-player': currentPlayer === player
                 })}
-              >{text}</li>);
-          })}
+              >
+                <a href='#DraftHistory' onClick={_.partial(this._onSelect, player)}>
+                  {text}
+                </a>
+              </li>);
+          }, this)}
         </ol>
       </GolfDraftPanel>
     );
+  },
+
+  _onSelect: function (pid) {
+    this.props.onPlayerSelected(pid);
   }
 
 });

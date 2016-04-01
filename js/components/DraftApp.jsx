@@ -19,6 +19,10 @@ var pickMadeSound = new Audio(Assets.PICK_MADE_SOUND);
 
 var DraftApp = React.createClass({
 
+  getInitialState: function () {
+    return { draftHistoryPlayerId: null };
+  },
+
   componentWillReceiveProps: function (nextProps) {
     var props = this.props;
     if (!props.playSounds) return;
@@ -74,6 +78,7 @@ var DraftApp = React.createClass({
               currentUser={this.props.currentUser}
               currentPick={this.props.currentPick}
               pickingForPlayers={this.props.pickingForPlayers}
+              onPlayerSelected={this._onDraftHistorySelectionChange}
             />
           </div>
           <div className="col-md-6">
@@ -82,11 +87,19 @@ var DraftApp = React.createClass({
         </div>
         <div className="row">
           <div className="col-md-12">
-            <DraftHistory draftPicks={this.props.draftPicks} />
+            <DraftHistory
+              draftPicks={this.props.draftPicks}
+              selectedPlayerId={this.state.draftHistoryPlayerId}
+              onSelectionChange={this._onDraftHistorySelectionChange}
+            />
           </div>
         </div>
       </section>
     );
+  },
+
+  _onDraftHistorySelectionChange: function (playerId) {
+    this.setState({ draftHistoryPlayerId: playerId });
   }
 
 });
