@@ -13,7 +13,7 @@ describe('PgaTourFieldReader', function () {
       var baseGolfer = {
         scores: [0, 0, 0, 0],
         thru: 0,
-        today: 0
+        day: 0
       };
 
       reader.parseHtml(html).should.eql([
