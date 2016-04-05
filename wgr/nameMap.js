@@ -9,5 +9,8 @@ module.exports = {
   'Miguel A Jimenez': 'Miguel Angel Jimenez',
   'Liang Wen-chong': 'Wen-Chong Liang',
   'Rafael Cabrera Bello': 'Rafa Cabrera-Bello',
-  'Charles Howell-III': 'Charles Howell III'
+  'Charles Howell-III': 'Charles Howell III',
+  'Byeong Hun An': 'Byeong-Hun An',
+  'Rafael Cabrera Bello': 'Rafa Cabrera Bello',
+  'Jin Cheng': 'Cheng Jin'
 };
