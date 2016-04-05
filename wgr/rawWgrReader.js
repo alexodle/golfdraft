@@ -3,6 +3,8 @@ var constants = require('../common/constants');
 var jsdom = require('jsdom');
 var Promise = require('promise');
 
+var AMATEUR_REGEX = /\(Am\)$/i;
+
 var RawWgrReader = {
 
   readRawWgr: function (fileName) {
@@ -24,7 +26,10 @@ var RawWgrReader = {
             var $tds = $('td', $tr);
 
             var wgr = _.parseInt($($tds.get(0)).text());
-            var golferName = $('td.name', $tr).text().trim();
+            var golferName = $('td.name', $tr)
+              .text()
+              .trim()
+              .replace(AMATEUR_REGEX, '');
 
             wgrs.push({ wgr: wgr, name: golferName });
           });
