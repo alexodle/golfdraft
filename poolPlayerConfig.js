@@ -1,5 +1,5 @@
 // 2016 Masters
-// scores: TBD
+// scores: http://www.pgatour.com/data/r/014/leaderboard-v2mini.json
 // field: http://www.pgatour.com/tournaments/masters-tournament/field.html
 //
 // Order:
