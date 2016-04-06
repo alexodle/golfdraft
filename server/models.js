@@ -53,7 +53,8 @@ var tourneySchema = mongoose.Schema({
 
 var appStateSchema = mongoose.Schema({
   tourneyId: mongoose.Schema.ObjectId,
-  isDraftPaused: Boolean
+  isDraftPaused: Boolean,
+  allowClock: Boolean
 });
 appStateSchema.index({ tourneyId: 1 });
 

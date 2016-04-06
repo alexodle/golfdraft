@@ -59,6 +59,7 @@ var DraftApp = React.createClass({
               <DraftClock
                 draftPicks={this.props.draftPicks}
                 isMyPick={this.props.isMyDraftPick}
+                allowClock={this.props.allowClock}
               />
             </div>
           </div>

@@ -30,6 +30,9 @@ function startSocketUpdates() {
   io.on('change:ispaused', function (ev) {
     SettingsActions.setIsPaused(ev.data.isPaused);
   });
+  io.on('change:allowclock', function (ev) {
+    SettingsActions.setAllowClock(ev.data.allowClock);
+  });
   io.on('change:activeusers', function (ev) {
     UserActions.setActiveUsers(ev.data.userCounts);
   });

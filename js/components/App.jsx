@@ -46,7 +46,8 @@ function getAppState() {
     chatMessages: ChatStore.getMessages(),
 
     isAdmin: UserStore.isAdmin(),
-    isPaused: AppSettingsStore.getIsPaused()
+    isPaused: AppSettingsStore.getIsPaused(),
+    allowClock: AppSettingsStore.getAllowClock()
   };
 }
 
@@ -85,6 +86,7 @@ var DraftWrapper = React.createClass({
           golfersRemaining={props.golfersRemaining}
           pickingForPlayers={props.draft.pickingForPlayers}
           activeUsers={props.activeUsers}
+          allowClock={props.allowClock}
         />
       </section>
     );
@@ -147,6 +149,7 @@ var AdminWrapper = React.createClass({
           isPaused={props.isPaused}
           golfersRemaining={props.golfersRemaining}
           activeUsers={props.activeUsers}
+          allowClock={props.allowClock}
         />
       </section>
     );

@@ -17,7 +17,14 @@ var SettingsActions = {
       actionType: AppConstants.SET_IS_PAUSED,
       isPaused: isPaused
     });
-  }
+  },
+
+  setAllowClock: function (allowClock) {
+    AppDispatcher.handleServerAction({
+      actionType: AppConstants.SET_ALLOW_CLOCK,
+      allowClock: allowClock
+    });
+  },
 
 };
 

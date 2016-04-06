@@ -42,7 +42,7 @@ var DraftClock = React.createClass({
     var isMyPick = this.props.isMyPick;
     var totalMillis = this.state.totalMillis;
 
-    if (!displayTimeChanged || !isMyPick || totalMillis < WARNING_TIME) {
+    if (!displayTimeChanged || !isMyPick || !totalMillis || totalMillis < WARNING_TIME) {
       return;
     }
 
@@ -79,6 +79,10 @@ var DraftClock = React.createClass({
   _getDisplayTime: function (state) {
     state = state || this.state;
 
+    if (state.totalMillis === null) {
+      return 'NS';
+    }
+
     var totalMillis = state.totalMillis || 0;
     return moment.utc(totalMillis).format("mm:ss");
   },
@@ -86,7 +90,7 @@ var DraftClock = React.createClass({
   _getTotalMillis: function (props) {
     props = props || this.props;
 
-    if (_.isEmpty(props.draftPicks)) {
+    if (_.isEmpty(props.draftPicks) || !this.props.allowClock) {
       return { totalMillis: null };
     }
 

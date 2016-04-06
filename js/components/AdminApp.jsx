@@ -18,6 +18,15 @@ function togglePause(isPaused) {
   });
 }
 
+function toggleAllowClock(allowClock) {
+  $.ajax({
+    url: '/admin/allowClock',
+    type: 'PUT',
+    contentType: 'application/json',
+    data: JSON.stringify({ allowClock: allowClock })
+  });
+}
+
 var PasswordInput = React.createClass({
 
   getInitialState: function () {
@@ -108,6 +117,18 @@ var AdminApp = React.createClass({
           </div>
         </div>
 
+
+        {!props.allowClock ? null : (
+          <h2>Allowing clock!</h2>
+        )}
+        <div className='panel'>
+          <div className='panel-body'>
+            <button className='btn' onClick={this._onAllowClock}>Allow clock</button>
+            <span> </span>
+            <button className='btn' onClick={this._onStopClock}>Pause clock</button>
+          </div>
+        </div>
+
         <div className='panel'>
           <div className='panel-body'>
             <button className='btn' onClick={this._onPickBestWGR}>
@@ -159,6 +180,14 @@ var AdminApp = React.createClass({
 
   _onUnpause: function () {
     togglePause(false);
+  },
+
+  _onAllowClock: function () {
+    toggleAllowClock(true);
+  },
+
+  _onStopClock: function () {
+    toggleAllowClock(false);
   },
 
   _undoLastPick: function () {

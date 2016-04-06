@@ -296,6 +296,24 @@ db.once('open', function callback () {
     });
   });
 
+  app.put('/admin/allowClock', function (req, res) {
+    if (!req.session.isAdmin) {
+      res.status(401).send('Only can admin can toggle clock');
+      return;
+    }
+
+    var allowClock = !!req.body.allowClock;
+    access.updateAppState({
+      allowClock: allowClock
+    })
+    .then(function () {
+      io.sockets.emit('change:allowclock', {
+        data: { allowClock: allowClock }
+      });
+      res.sendStatus(200);
+    });
+  });
+
   app.delete('/admin/lastpick', function (req, res) {
     if (!req.session.isAdmin) {
       res.status(401).send('Only can admin can undo picks');
