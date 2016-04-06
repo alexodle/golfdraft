@@ -126,7 +126,7 @@ _.extend(access, {
   getAppState: function () {
     return promiseize(models.AppState.findOne(FK_TOURNEY_ID_QUERY).exec())
       .then(function (appState) {
-        return appState || { isDraftPause: false };
+        return appState || { isDraftPause: false, allowClock: true };
       });
   },
 
