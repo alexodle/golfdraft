@@ -7,7 +7,7 @@ var TourneyStore =  _.extend({}, Store.prototype, {
 
   getTourneyName: function () {
     // HACKHACK - hardcode for now
-    return "2015 PGA Championship";
+    return "2016 Masters";
   }
 
 });
