@@ -3,14 +3,15 @@
 // <wgr site>: <pga tour site>
 //
 module.exports = {
-  'Tjaart Van Der Walt': 'Tjaart van der Walt',
-  'Seukhyun Baek': 'Seuk Hyun Baek',
   'Billy Hurley-III': 'Billy Hurley III',
-  'Miguel A Jimenez': 'Miguel Angel Jimenez',
-  'Liang Wen-chong': 'Wen-Chong Liang',
-  'Rafael Cabrera Bello': 'Rafa Cabrera-Bello',
-  'Charles Howell-III': 'Charles Howell III',
   'Byeong Hun An': 'Byeong-Hun An',
+  'Charles Howell-III': 'Charles Howell III',
+  'Graham Delaet': 'Graham DeLaet',
+  'Jin Cheng': 'Cheng Jin',
+  'Liang Wen-chong': 'Wen-Chong Liang',
+  'Miguel A Jimenez': 'Miguel Angel Jimenez',
   'Rafael Cabrera Bello': 'Rafa Cabrera Bello',
-  'Jin Cheng': 'Cheng Jin'
+  'Seukhyun Baek': 'Seuk Hyun Baek',
+  'Siwoo Kim': 'Si Woo Kim',
+  'Tjaart Van Der Walt': 'Tjaart van der Walt'
 };
