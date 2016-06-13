@@ -1,50 +1,50 @@
-// 2016 TPC
-// scores: http://www.pgatour.com/data/r/011/2016/leaderboard-v2mini.json
+// 2016 US Open
+// scores: http://www.pgatour.com/data/r/026/leaderboard-v2mini.json
 // field:
 //
 // Order:
 /*
-1 - Robes
-2 - Chad
-3 - Graham
-4 - Jon M
-5 - Kyle
-6 - Adam
-7 - Rob
-8 - Chris
-9 - Odle
-10 - Severson
-11 - Bo
-12 - Jay
-13 - Jon W
-14 - Henny
-15 - Frank
-16 - Ben
-17 - Kevin
-18 - Stacy
-19 - Matt S
+1 - Matt S
+2 - Adam
+3 - Severson
+4 - Chad
+5 - Henny
+6 - Chris W
+7 - Odle
+8 - Jon W
+9 - Ben
+10 - Jon M
+11 - Kevin
+12 - Rob
+13 - Robes
+14 - Frank
+15 - Stacy
+16 - Jay
+17 - Graham
+18 - Bo
+19 - Kyle
 */
 
 module.exports = {
   draftOrder: [
-    'Jared Robillard',
-    'Chad Larson',
-    'Graham Snead',
-    'Jonathan Mullen',
-    'Kyle Phillips',
+    'Matt Simon',
     'Adam Morrison',
-    'Rob Phillips',
+    'Erik Severson',
+    'Chad Larson',
+    'Matt Hennessey',
     'Chris Willett',
     'Alex Odle',
-    'Erik Severson',
-    'Bo Welch',
-    'Jay Fredlund',
     'Jon Willett',
-    'Matt Hennessey',
-    'Frank Severinghaus',
     'Ben Frizzel',
+    'Jonathan Mullen',
     'Kevin Phillips',
+    'Rob Phillips',
+    'Jared Robillard',
+    'Frank Severinghaus',
     'Stacy Smith',
-    'Matt Simon'
+    'Jay Fredlund',
+    'Graham Snead',
+    'Bo Welch',
+    'Kyle Phillips'
   ]
 };
