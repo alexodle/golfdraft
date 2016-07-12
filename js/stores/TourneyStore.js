@@ -7,7 +7,7 @@ var TourneyStore =  _.extend({}, Store.prototype, {
 
   getTourneyName: function () {
     // HACKHACK - hardcode for now
-    return "2016 U.S. Open";
+    return "2016 British Open";
   }
 
 });
