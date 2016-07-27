@@ -335,11 +335,18 @@ var ChatRoom = React.createClass({
               <div className='panel-body'>
                 <b>Online:</b>
                 <ul className='list-unstyled'>
-                  {_.map(this.props.activeUsers, function (count, user) {
-                    return (
-                      <li key={user}>{UserStore.getUser(user).name}</li>
-                    );
-                  })}
+                  {_.chain(this.props.activeUsers)
+                    .map(function (count, user) {
+                      return UserStore.getUser(user).name;
+                    })
+                    .sort()
+                    .map(function (userName) {
+                      return (
+                        <li key={userName}>{userName}</li>
+                      );
+                    })
+                    .value()
+                  }
                 </ul>
               </div>
             </div>
