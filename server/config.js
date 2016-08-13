@@ -1,8 +1,8 @@
 var cfg = {
   prod: !process.env.DEBUG,
 
-  mongo_url: process.env.MONGO_URI || "mongodb://localhost:27017/test",
-  redis_url: process.env.REDISTOGO_URL || "redis://:@localhost:6379/0",
+  mongo_url: process.env.MONGO_URI || "mongodb://127.0.0.1:27017/test",
+  redis_url: process.env.REDISTOGO_URL || "redis://:@127.0.0.1:6379/0",
 
   tourney_id: process.env.TOURNEY_ID || '5376879322ed79dd19a07148',
 

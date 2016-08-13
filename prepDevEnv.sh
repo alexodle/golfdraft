@@ -1,5 +1,5 @@
-#!/bin/sh
+#!/bin/bash
 
-redis-server $(pwd)/redis.conf
-mongod --fork --syslog
 export DEBUG=true
+brew services start redis
+brew services start mongodb
