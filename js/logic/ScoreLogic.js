@@ -79,12 +79,12 @@ var ScoreLogic = {
    * If the either of the top 2 scores contains a MISSED_CUT, then the worst
    * score of all golfers for the particular day will be used instead.
    */
-  calcPlayerScores: function (draftPicks, playerScores) {
+  calcPlayerScores: function (draftPicks, golferScores) {
     var golfersByPlayer = getGolfersByPlayer(draftPicks);
 
-    playerScores = _.chain(golfersByPlayer)
+    var playerScores = _.chain(golfersByPlayer)
       .map(function (golfers, player) {
-        return playerScore(golfers, playerScores, player);
+        return playerScore(golfers, golferScores, player);
       })
       .indexBy('player')
       .value();
