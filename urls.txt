@@ -1,0 +1,3 @@
+2015 US Open - http://www.pgatour.com/data/r/026/2015/leaderboard-v2mini.json
+2015 British Open - http://www.pgatour.com/data/r/100/2015/leaderboard-v2mini.json
+2015 PGA - http://www.pgatour.com/data/r/033/2015/leaderboard-v2mini.json

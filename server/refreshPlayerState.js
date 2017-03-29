@@ -10,9 +10,6 @@ var poolPlayerConfig = require('../poolPlayerConfig');
 var Promise = require('promise');
 var tourneyUtils = require('./tourneyUtils');
 
-mongoose.set('debug', true);
-mongoose.connect(config.mongo_url);
-
 function refreshPlayerState(pickOrderNames) {
   return Promise.all([
     access.clearPlayers(),
@@ -36,14 +33,20 @@ function refreshPlayerState(pickOrderNames) {
   .then(function (sortedPlayers) {
     var pickOrder = tourneyUtils.snakeDraftOrder(sortedPlayers);
     return access.setPickOrder(pickOrder);
-  })
-  .then(function () {
-    process.exit(0);
-  })
+  });
 }
 
-var db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function callback () {
-  refreshPlayerState(poolPlayerConfig.draftOrder);
-});
+if (require.main === module) {
+  mongoose.set('debug', true);
+  mongoose.connect(config.mongo_url);
+
+  var db = mongoose.connection;
+  db.on('error', console.error.bind(console, 'connection error:'));
+  db.once('open', function callback () {
+    refreshPlayerState(poolPlayerConfig.draftOrder).then(function () {
+      process.exit(0);
+    });
+  });
+}
+
+module.exports = refreshPlayerState;

@@ -138,7 +138,7 @@ _.extend(access, {
     ).exec();
   }),
 
-  makePick: function (pick) {
+  makePick: function (pick, ignoreOrder) {
     var pickOrderQuery = _.extend({}, FK_TOURNEY_ID_QUERY, {
       pickNumber: pick.pickNumber,
       player: pick.player
@@ -164,13 +164,13 @@ _.extend(access, {
     ])
     .then(function (result) {
       var nPicks = result[0];
-      var playerIsUp = !!result[1];
+      var playerIsUp = !!result[1] || true;
       var golferAlreadyDrafted = result[2];
       var golferExists = !!result[3];
 
-      if (nPicks !== _.parseInt(pick.pickNumber)) {
+      if (nPicks !== _.parseInt(pick.pickNumber) && !ignoreOrder) {
         throw new Error('invalid pick: pick order out of sync');
-      } else if (!playerIsUp) {
+      } else if (!playerIsUp && !ignoreOrder) {
         throw new Error('invalid pick: player picked out of order');
       } else if (golferAlreadyDrafted) {
         throw new Error('invalid pick: golfer already drafted');
