@@ -48,6 +48,7 @@ var PlayerStandings = React.createClass({
           <td>{_.sortedIndex(playerTotals, ps.total) + 1}</td>
           <td>{playerIsMe ? (<b>{p.name}</b>) : p.name}</td>
           <td>{utils.toGolferScoreStr(ps.total)}</td>
+          <td>{ps.pickNumber + 1}</td>
           <td className='hidden-xs'>{holesLeft > 0 ? holesLeft : 'F'}</td>
           {_.map(ps.scoresByDay, function (ds) {
             return (<td className='hidden-xs' key={ds.day}>{utils.toGolferScoreStr(ds.total)}</td>);
@@ -70,6 +71,7 @@ var PlayerStandings = React.createClass({
               <th>#</th>
               <th>Pool Player</th>
               <th>Total</th>
+              <th>Pick Number</th>
               <th className='hidden-xs'>Holes Left Today</th>
               <th className='hidden-xs'>Day 1</th>
               <th className='hidden-xs'>Day 2</th>

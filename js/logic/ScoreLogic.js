@@ -81,10 +81,21 @@ var ScoreLogic = {
    */
   calcPlayerScores: function (draftPicks, golferScores) {
     var golfersByPlayer = getGolfersByPlayer(draftPicks);
+    var draftPosByPlayer = _(draftPicks)
+      .groupBy('player')
+      .mapValues(function (dps) {
+        return _.min(dps, function (dp) {
+          return dp.pickNumber;
+        })
+        .pickNumber;
+      })
+      .value();
 
     var playerScores = _.chain(golfersByPlayer)
       .map(function (golfers, player) {
-        return playerScore(golfers, golferScores, player);
+        return _.extend({},
+          playerScore(golfers, golferScores, player),
+          { pickNumber: draftPosByPlayer[player] });
       })
       .indexBy('player')
       .value();
