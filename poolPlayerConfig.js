@@ -1,50 +1,50 @@
-// 2016 PGA Championship
-// scores: http://www.pgatour.com/data/r/033/leaderboard-v2mini.json
-// field:
+// 2017 Masters
+// scores:
+// field: http://www.pgatour.com/data/r/014/field.json
 //
 // Order:
 /*
-1 - Jon W
-2 - Severson
-3 - Frank
-4 - Rob
-5 - Graham
-6 - Jon M
-7 - Chad
-8 - Henny
+1 - Henny
+2 - Kyle
+3 - Jon W
+4 - Kevin
+5 - Robes
+6 - Frank
+7 - Rob
+8 - Chad
 9 - Bo
-10 - Kyle
-11 - Adam
-12 - Stacy
-13 - Kevin
+10 - Stacy
+11 - Matt S
+12 - Adam
+13 - Severson
 14 - Odle
-15 - Ben
-16 - Robes
-17 - Chris
-18 - Matt S
-19 - Jay
+15 - Jon M
+16 - Jay
+17 - Graham
+18 - Chris W
+19 - Ben
 */
 
 module.exports = {
   draftOrder: [
+    'Matt Hennessey',
+    'Kyle Phillips',
     'Jon Willett',
-    'Erik Severson',
+    'Kevin Phillips',
+    'Jared Robillard',
     'Frank Severinghaus',
     'Rob Phillips',
-    'Graham Snead',
-    'Jonathan Mullen',
     'Chad Larson',
-    'Matt Hennessey',
     'Bo Welch',
-    'Kyle Phillips',
-    'Adam Morrison',
     'Stacy Smith',
-    'Kevin Phillips',
-    'Alex Odle',
-    'Ben Frizzel',
-    'Jared Robillard',
-    'Chris Willett',
     'Matt Simon',
-    'Jay Fredlund'
+    'Adam Morrison',
+    'Erik Severson',
+    'Alex Odle',
+    'Jonathan Mullen',
+    'Jay Fredlund',
+    'Graham Snead',
+    'Chris Willett',
+    'Ben Frizzel'
   ]
 };
