@@ -6,20 +6,20 @@ var should = require('should');
 var fs = require('fs');
 
 describe('PgaTourFieldReader', function () {
-  describe('parseHtml', function () {
+  describe('parseJson', function () {
 
     it('parses field', function () {
-      var html = fs.readFileSync(__dirname + '/files/pgatour_field.html', 'utf8');
+      var json = fs.readFileSync(__dirname + '/files/pgatour_field.json', 'utf8');
       var baseGolfer = {
         scores: [0, 0, 0, 0],
         thru: 0,
         day: 0
       };
 
-      reader.parseHtml(html).should.eql([
-        _.extend({ golfer: 'Byeong-Hun An' }, baseGolfer),
-        _.extend({ golfer: 'Kiradech Aphibarnrat' }, baseGolfer),
-        _.extend({ golfer: 'Derek Bard' }, baseGolfer)
+      reader.parseJson(json).should.eql([
+        _.extend({ golfer: 'Gary Woodland' }, baseGolfer),
+        _.extend({ golfer: 'Tiger Woods' }, baseGolfer),
+        _.extend({ golfer: 'Ian Woosnam' }, baseGolfer)
       ]);
     });
 
