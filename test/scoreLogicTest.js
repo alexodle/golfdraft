@@ -25,6 +25,7 @@ describe('ScoreLogic', function () {
         Player1: {
           player: 'Player1',
           total: -3 + -4,
+          pickNumber: 0,
           scoresByDay: [
             {
               day: 0,
