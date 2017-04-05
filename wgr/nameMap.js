@@ -3,7 +3,6 @@
 // <wgr site>: <pga tour site>
 //
 module.exports = {
-  'Alex Noren': 'Alexander Noren',
   'Billy Hurley-III': 'Billy Hurley III',
   'Charles Howell-III': 'Charles Howell III',
   'Graham Delaet': 'Graham DeLaet',
@@ -19,12 +18,13 @@ module.exports = {
   'Steven Alker': 'Steve Alker',
   'Sunghoon Kang': 'Sung Kang',
   'Tjaart Van Der Walt': 'Tjaart van der Walt',
-  'Younghan Song': 'Young-han Song'
+  'Younghan Song': 'Young-han Song',
+  'Byeong Hun An': 'Byeong-Hun An',
+  'Jeunghun Wang': 'Jeung-hun Wang'
 
-  // No longer valid for 2016 PGA Championship
+  // No longer valid for 2017 Masters
+  // 'Alex Noren': 'Alexander Noren',
   // 'Andy Sullivan': 'Andrew Sullivan',
   // 'Matthew Fitzpatrick': 'Matt Fitzpatrick',
   // 'Alexander Noren': 'Alex Noren',
-  // 'Byeong Hun An': 'Byeong-Hun An',
-  // 'Jeunghun Wang': 'Jeung-hun Wang',
 };
