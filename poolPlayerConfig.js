@@ -1,5 +1,5 @@
 // 2017 Masters
-// scores:
+// scores: http://www.pgatour.com/data/r/014/2017/leaderboard-v2mini.json
 // field: http://www.pgatour.com/data/r/014/field.json
 //
 // Order:
