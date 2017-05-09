@@ -13,18 +13,20 @@ module.exports = {
   'Rafael Cabrera Bello': 'Rafa Cabrera Bello',
   'Sanghee Lee': 'Sang-hee Lee',
   'Seukhyun Baek': 'Seuk Hyun Baek',
-  'Seungyul Noh': 'Seung-yul Noh',
   'Siwoo Kim': 'Si Woo Kim',
   'Steven Alker': 'Steve Alker',
   'Sunghoon Kang': 'Sung Kang',
   'Tjaart Van Der Walt': 'Tjaart van der Walt',
   'Younghan Song': 'Young-han Song',
   'Byeong Hun An': 'Byeong-Hun An',
-  'Jeunghun Wang': 'Jeung-hun Wang'
+  'Jeunghun Wang': 'Jeung-hun Wang',
+  'Tyrone van Aswegen': 'Tyrone Van Aswegen',
+  'Seungyul Noh': 'Seung-Yul Noh'
 
-  // No longer valid for 2017 Masters
+  // No longer valid for 2017 TPC
   // 'Alex Noren': 'Alexander Noren',
   // 'Andy Sullivan': 'Andrew Sullivan',
   // 'Matthew Fitzpatrick': 'Matt Fitzpatrick',
   // 'Alexander Noren': 'Alex Noren',
+  // 'Seungyul Noh': 'Seung-yul Noh',
 };
