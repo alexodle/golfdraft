@@ -1,50 +1,50 @@
-// 2017 Masters
-// scores: http://www.pgatour.com/data/r/014/2017/leaderboard-v2mini.json
-// field: http://www.pgatour.com/data/r/014/field.json
+// 2017 TPC
+// scores: http://www.pgatour.com/data/r/011/2017/leaderboard-v2mini.json
+// field: --
 //
 // Order:
 /*
-1 - Henny
-2 - Kyle
-3 - Jon W
-4 - Kevin
-5 - Robes
-6 - Frank
-7 - Rob
-8 - Chad
-9 - Bo
-10 - Stacy
-11 - Matt S
-12 - Adam
-13 - Severson
-14 - Odle
-15 - Jon M
-16 - Jay
-17 - Graham
-18 - Chris W
+1 - Jon W
+2 - Henny
+3 - Kyle
+4 - Chris W
+5 - Graham
+6 - Rob
+7 - Stacy
+8 - Robes
+9 - Odle
+10 - Jon M
+11 - Severson
+12 - Frank
+13 - Jay
+14 - Adam
+15 - `Bo
+16 - Kevin
+17 - Matt S
+18 - Chad
 19 - Ben
 */
 
 module.exports = {
   draftOrder: [
+    'Jon Willett',
     'Matt Hennessey',
     'Kyle Phillips',
-    'Jon Willett',
-    'Kevin Phillips',
-    'Jared Robillard',
-    'Frank Severinghaus',
+    'Chris Willett',
+    'Graham Snead',
     'Rob Phillips',
-    'Chad Larson',
-    'Bo Welch',
     'Stacy Smith',
-    'Matt Simon',
-    'Adam Morrison',
-    'Erik Severson',
+    'Jared Robillard',
     'Alex Odle',
     'Jonathan Mullen',
+    'Erik Severson',
+    'Frank Severinghaus',
     'Jay Fredlund',
-    'Graham Snead',
-    'Chris Willett',
+    'Adam Morrison',
+    'Bo Welch',
+    'Kevin Phillips',
+    'Matt Simon',
+    'Chad Larson',
     'Ben Frizzel'
   ]
 };
