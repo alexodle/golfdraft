@@ -18,12 +18,12 @@ module.exports = {
   'Sunghoon Kang': 'Sung Kang',
   'Tjaart Van Der Walt': 'Tjaart van der Walt',
   'Younghan Song': 'Young-han Song',
-  'Byeong Hun An': 'Byeong-Hun An',
   'Jeunghun Wang': 'Jeung-hun Wang',
   'Tyrone van Aswegen': 'Tyrone Van Aswegen',
   'Seungyul Noh': 'Seung-Yul Noh'
 
-  // No longer valid for 2017 TPC
+  // No longer valid for 2017 US Open
+  // 'Byeong Hun An': 'Byeong-Hun An',
   // 'Alex Noren': 'Alexander Noren',
   // 'Andy Sullivan': 'Andrew Sullivan',
   // 'Matthew Fitzpatrick': 'Matt Fitzpatrick',
