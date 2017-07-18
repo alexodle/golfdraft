@@ -10,6 +10,7 @@ date=`date +%Y-%m-%d:%H:%M:%S`
 logdir=/var/log/golfdraft
 logfile="${logdir}/log.${date}.log"
 
+cd golfdraft
 git checkout master
 git pull origin master
 npm install
