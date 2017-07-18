@@ -22,7 +22,8 @@ module.exports = {
   'Sunghoon Kang': 'Sung Kang',
   'Tjaart Van Der Walt': 'Tjaart van der Walt',
   'Tyrone van Aswegen': 'Tyrone Van Aswegen',
-  'Yikeun Chang': 'Yi Keun Chang'
+  'Yikeun Chang': 'Yi Keun Chang',
+  'Younghan Song': 'Young-Han Song'
 
   // No longer valid for 2017 British Open
   // 'Byeong Hun An': 'Byeong-Hun An',
