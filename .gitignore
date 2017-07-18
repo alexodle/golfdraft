@@ -6,3 +6,4 @@ node_modules
 npm-*.log
 server/*.sh
 mongolog.txt*
+package-lock.json
