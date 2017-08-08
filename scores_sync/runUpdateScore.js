@@ -3,7 +3,7 @@
 var config = require('../server/config');
 var mongoose = require('mongoose');
 var redis = require("../server/redis");
-var tourneyConfigReader = require('./tourneyConfigReader');
+var tourneyConfigReader = require('../server/tourneyConfigReader');
 var updateScore = require('./updateScore');
 
 var TIMEOUT = 30 * 1000; // 30 seconds
