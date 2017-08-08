@@ -14,6 +14,6 @@ cd golfdraft
 git checkout master
 git pull origin master
 npm install
-/usr/bin/node ./scores_sync/runUpdateScore.js $SCORES_URL_TYPE $SCORES_URL > $logfile 2>&1
+/usr/bin/node ./scores_sync/runUpdateScore.js > $logfile 2>&1
 
 echo "DONE!"

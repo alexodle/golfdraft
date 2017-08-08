@@ -1,13 +1,13 @@
+'use strict';
+
 // Simple one off script that we should only have to run manually once in a while
 
 var _ = require('lodash');
 var access = require('../server/access');
 var config = require('../server/config');
 var mongoose = require('mongoose');
-var nameMap = require('./nameMap');
 var rawWgrReader = require('./rawWgrReader');
-
-var FILE_NAME = './wgr_raw.html';
+var tourneyConfigReader = require('../server/tourneyConfigReader');
 
 mongoose.set('debug', true);
 mongoose.connect(config.mongo_url);
@@ -17,10 +17,15 @@ function end() {
 }
 
 function updateWGR() {
-  console.log("attempting update...");
+  var tourneyCfg = tourneyConfigReader.loadConfig();
 
-  console.log("parsing");
-  rawWgrReader.readRawWgr(FILE_NAME)
+  var url = tourneyCfg.wgr.url;
+  var nameMap = tourneyCfg.wgr.nameMap;
+
+  console.log("attempting update from url: " + url);
+
+  console.log("downloading and parsing");
+  rawWgrReader.readRawWgr(url)
     .then(function (wgrEntries) {
       console.log("parsed %d entries", wgrEntries.length);
       console.log("running name map");

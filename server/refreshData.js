@@ -1,17 +1,12 @@
 'use strict';
 
-if (process.argv.length != 4) {
-  console.log('Usage: node refreshData.js <reader> <url>');
-  process.exit(1);
-}
-
 var _ = require('lodash');
 var access = require('./access');
 var config = require('./config');
 var mongoose = require('mongoose');
-var poolPlayerConfig = require('../poolPlayerConfig');
 var Promise = require('promise');
 var readerConfig = require('../scores_sync/readerConfig');
+var tourneyConfigReader = require('./tourneyConfigReader');
 var tourneyUtils = require('./tourneyUtils');
 var updateScore = require('../scores_sync/updateScore');
 
@@ -90,5 +85,6 @@ function refreshData(pickOrderNames, reader, url) {
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function callback () {
-  refreshData(poolPlayerConfig.draftOrder, process.argv[2], process.argv[3]);
+  var tourneyCfg = tourneyConfigReader.loadConfig();
+  refreshData(tourneyCfg.draftOrder, tourneyCfg.scores.type, tourneyCfg.scores.url);
 });

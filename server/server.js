@@ -18,6 +18,7 @@ var mongoose = require('mongoose');
 var Promise = require('promise');
 var redis = require("./redis");
 var session = require('express-session');
+var tourneyConfigReader = require('./tourneyConfigReader');
 var UserAccess = require('./userAccess');
 
 var RedisStore = require('connect-redis')(session);
@@ -92,6 +93,8 @@ function logSessionState(req, res, next) {
 }
 app.use(logSessionState);
 
+var tourneyCfg = tourneyConfigReader.loadConfig();
+
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function callback () {
@@ -140,6 +143,7 @@ db.once('open', function callback () {
         tourney: JSON.stringify(results[4]),
         appState: JSON.stringify(results[5]),
         user: JSON.stringify(req.session.user),
+        tourneyName: tourneyCfg.name,
         prod: config.prod,
         cdnUrl: config.cdn_url
       });
@@ -167,6 +171,7 @@ db.once('open', function callback () {
         scores: results[3],
         tourney: results[4],
         appState: results[5],
+        tourneyName: tourneyCfg.name,
         user: req.session.user
       });
     })

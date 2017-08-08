@@ -22,6 +22,7 @@ function hydrate(seedData) {
     lastUpdated: seedData.tourney.lastUpdated
   });
   SettingsActions.setIsPaused(seedData.appState.isDraftPaused);
+  AppActions.setTourneyName(seedData.tourneyName);
 
   // HACKHACK - For now users are just wrappers around players. I may or may
   // not need to differentiate the two in the future, so just keep the
