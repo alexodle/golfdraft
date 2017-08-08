@@ -3,8 +3,6 @@
 cd ~/
 source config.sh
 
-codedir=$(pwd)/golfdraft
-
 date=`date +%Y%m%d%H%M%S`
 
 logdir=/var/log/golfdraft
