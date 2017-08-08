@@ -2,6 +2,7 @@
 
 var config = require('../server/config');
 var mongoose = require('mongoose');
+var readerConfig = require('./readerConfig');
 var redis = require("../server/redis");
 var tourneyConfigReader = require('../server/tourneyConfigReader');
 var updateScore = require('./updateScore');
@@ -10,7 +11,7 @@ var TIMEOUT = 30 * 1000; // 30 seconds
 
 var tourneyCfg = tourneyConfigReader.loadConfig();
 
-var reader = tourneyCfg.scores.type;
+var reader = readerConfig[tourneyCfg.scores.type];
 var url = tourneyCfg.scores.url;
 
 mongoose.set('debug', true);
