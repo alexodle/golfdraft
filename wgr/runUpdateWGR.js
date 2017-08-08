@@ -9,7 +9,7 @@ var mongoose = require('mongoose');
 var Promise = require('promise');
 var rawWgrReader = require('./rawWgrReader');
 var request = require('request');
-var tourneyConfigReader = require('./tourneyConfigReader');
+var tourneyConfigReader = require('../server/tourneyConfigReader');
 
 mongoose.set('debug', true);
 mongoose.connect(config.mongo_url);
@@ -20,7 +20,7 @@ function end() {
 
 function updateWGR() {
   var tourney_cfg = tourneyConfigReader.loadConfig();
-  
+
   var url = tourney_cfg.wgr.url;
   var nameMap = tourneyConfigReader.wgr.nameMap;
 
