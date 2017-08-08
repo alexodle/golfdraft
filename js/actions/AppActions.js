@@ -24,6 +24,13 @@ var AppActions = {
       actionType: AppConstants.SET_USERS,
       users: users
     });
+  },
+
+  setTourneyName: function (tourneyName) {
+    AppDispatcher.handleViewAction({
+      actionType: AppConstants.SET_TOURNEY_NAME,
+      tourneyName: tourneyName
+    });
   }
 
 };
