@@ -2,6 +2,8 @@
 
 var _ = require('lodash');
 var Store = require('./Store');
+var AppConstants = require('../constants/AppConstants');
+var AppDispatcher = require('../dispatcher/AppDispatcher');
 
 var _tourneyName = null;
 
@@ -18,7 +20,7 @@ AppDispatcher.register(function (payload) {
   var action = payload.action;
 
   switch(action.actionType) {
-    case ScoreConstants.SET_TOURNEY_NAME:
+    case AppConstants.SET_TOURNEY_NAME:
       _tourneyName = action.tourneyName;
       TourneyStore.emitChange();
       break;
