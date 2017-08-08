@@ -12,6 +12,8 @@ var TIMEOUT = 30 * 1000; // 30 seconds
 var tourneyCfg = tourneyConfigReader.loadConfig();
 
 var reader = readerConfig[tourneyCfg.scores.type];
+console.log(tourneyCfg.scores.type);
+console.log(reader);
 var url = tourneyCfg.scores.url;
 
 mongoose.set('debug', true);
