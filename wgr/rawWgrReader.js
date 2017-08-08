@@ -2,6 +2,7 @@ var _ = require('lodash');
 var constants = require('../common/constants');
 var jsdom = require('jsdom');
 var Promise = require('promise');
+var request = require('request');
 
 var AMATEUR_REGEX = /\(Am\)$/i;
 

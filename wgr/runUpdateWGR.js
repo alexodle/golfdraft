@@ -6,9 +6,7 @@ var _ = require('lodash');
 var access = require('../server/access');
 var config = require('../server/config');
 var mongoose = require('mongoose');
-var Promise = require('promise');
 var rawWgrReader = require('./rawWgrReader');
-var request = require('request');
 var tourneyConfigReader = require('../server/tourneyConfigReader');
 
 mongoose.set('debug', true);
