@@ -12,4 +12,6 @@ function loadConfig() {
   return cfg;
 }
 
-module.exports = _.once(loadConfig);
+module.exports = {
+  loadConfig: _.once(loadConfig)
+};
