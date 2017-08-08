@@ -7,12 +7,15 @@ var AMATEUR_REGEX = /\(Am\)$/i;
 
 var RawWgrReader = {
 
-  readRawWgr: function (fileName) {
+  readRawWgr: function (url) {
     return new Promise(function (fulfill, reject) {
-      jsdom.env(
-        fileName,
-        ['http://code.jquery.com/jquery.js'],
-        function (errors, window) {
+      request({ url: url }, function (error, response, body) {
+        if (error) {
+          reject(error);
+          return;
+        }
+
+        jsdom.env(body, ['http://code.jquery.com/jquery.js'], function (errors, window) {
           if (errors) {
             console.log('Error retrieving: ' + fileName);
             reject(new Error(JSON.stringify(errors)));
@@ -35,8 +38,8 @@ var RawWgrReader = {
           });
 
           fulfill(wgrs);
-        }
-      );
+        });
+      });
     });
   }
 
