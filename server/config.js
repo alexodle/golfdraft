@@ -9,7 +9,9 @@ var cfg = {
   cdn_url: process.env.CDN_URL || '',
 
   // Unsafe not to hash. But who cares in this case? Matt Simon cares.
-  admin_password: process.env.ADMIN_PASS || 'admin'
+  admin_password: process.env.ADMIN_PASS || 'admin',
+
+  tourney_cfg: process.env.TOURNEY_CFG || 'tourney_cfg.json'
 };
 cfg.debug = !cfg.prod;
 

@@ -6,8 +6,8 @@ var _ = require('lodash');
 var access = require('./access');
 var config = require('./config');
 var mongoose = require('mongoose');
-var poolPlayerConfig = require('../poolPlayerConfig');
 var Promise = require('promise');
+var tourneyConfigReader = require('./tourneyConfigReader');
 var tourneyUtils = require('./tourneyUtils');
 
 function refreshPlayerState(pickOrderNames) {
@@ -43,7 +43,8 @@ if (require.main === module) {
   var db = mongoose.connection;
   db.on('error', console.error.bind(console, 'connection error:'));
   db.once('open', function callback () {
-    refreshPlayerState(poolPlayerConfig.draftOrder).then(function () {
+    var tourneyCfg = tourneyConfigReader.loadConfig();
+    refreshPlayerState(tourneyCfg.draftOrder).then(function () {
       process.exit(0);
     });
   });
