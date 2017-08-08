@@ -19,10 +19,10 @@ function end() {
 }
 
 function updateWGR() {
-  var tourney_cfg = tourneyConfigReader.loadConfig();
+  var tourneyCfg = tourneyConfigReader.loadConfig();
 
-  var url = tourney_cfg.wgr.url;
-  var nameMap = tourneyConfigReader.wgr.nameMap;
+  var url = tourneyCfg.wgr.url;
+  var nameMap = tourneyCfg.wgr.nameMap;
 
   console.log("attempting update from url: " + url);
 
