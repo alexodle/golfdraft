@@ -136,6 +136,9 @@ db.once('open', function callback () {
       access.getAppState()
     ])
     .then(function (results) {
+      var tcfg = _.pick(tourneyCfg, function(value, key) {
+          return key !== "wgr" && key !== "draftOrder"
+        });
       res.render('index', {
         golfers: JSON.stringify(results[0]),
         players: JSON.stringify(results[1]),
@@ -144,7 +147,7 @@ db.once('open', function callback () {
         tourney: JSON.stringify(results[4]),
         appState: JSON.stringify(results[5]),
         user: JSON.stringify(req.session.user),
-        tourneyName: tourneyCfg.name,
+        tourneyCfg: JSON.stringify(tcfg),
         prod: config.prod,
         cdnUrl: config.cdn_url
       });
@@ -165,6 +168,9 @@ db.once('open', function callback () {
       access.getAppState()
     ])
     .then(function (results) {
+      var tcfg = _.pick(tourneyCfg, function(value, key) {
+          return key !== "wgr" && key !== "draftOrder"
+        });
       res.send({
         golfers: results[0],
         players: results[1],
@@ -172,7 +178,7 @@ db.once('open', function callback () {
         scores: results[3],
         tourney: results[4],
         appState: results[5],
-        tourneyName: tourneyCfg.name,
+        tourneyCfg: tcfg,
         user: req.session.user
       });
     })
@@ -366,7 +372,7 @@ db.once('open', function callback () {
   redisPubSubClient.subscribe("scores:update");
 
   if (tourneyCfg.scores.refreshRate) {
-    updateScore.run(tourneyCfg.scores.type, tourneyCfg.scores.url);
+    setTimeout(function() { updateScore.run(tourneyCfg.scores.type, tourneyCfg.scores.url); },500);
     var id = setInterval(function() {
       updateScore.run(tourneyCfg.scores.type, tourneyCfg.scores.url);
 

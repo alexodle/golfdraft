@@ -3,10 +3,9 @@
 var _ = require('lodash');
 var constants = require('../../common/constants');
 var utils = require('../../common/utils');
+var TourneyStore = require("../stores/TourneyStore");
 
-var NDAYS = constants.NDAYS;
 var MISSED_CUT = constants.MISSED_CUT;
-var NSCORES_PER_DAY = constants.NSCORES_PER_DAY;
 
 function getGolfersByPlayer(draftPicks) {
   return _.chain(draftPicks)
@@ -27,7 +26,7 @@ function playerScore(playerGolfers, scores, player) {
     .indexBy('golfer')
     .value();
 
-  var scoresByDay = _.times(NDAYS, function (day) {
+  var scoresByDay = _.times(TourneyStore.getNumberOfDays(), function (day) {
     var dayScores = _.chain(playerGolfers)
       .map(function (g) {
         return scores[g];
@@ -37,7 +36,7 @@ function playerScore(playerGolfers, scores, player) {
       })
       .value();
 
-    var usedScores = _.first(dayScores, NSCORES_PER_DAY);
+    var usedScores = _.first(dayScores, TourneyStore.getScoresPerDay());
     return {
       day: day,
       allScores: dayScores,
@@ -54,6 +53,31 @@ function playerScore(playerGolfers, scores, player) {
     scoresByGolfer: scoresByGolfer,
     total: _.sum(scoresByDay, 'total')
   };
+}
+function worstScoresPerDay(scores) {
+    var result = _.chain(TourneyStore.getNumberOfDays())
+      .times(function (day) {
+        var worstScore = _.chain(scores)
+          .reject(function (s) {
+            return s.missedCuts[day];
+          })
+          .max(function (s) {
+            return s.scores[day];
+          })
+          .value();
+        return {
+          day: day,
+          golfer: worstScore.golfer,
+          score: worstScore.scores[day]
+        };
+      })
+      .first(function (s) {
+        // Assume 0 means they haven't started playing this day yet
+        return s.score > 0;
+      })
+      .value();
+      return result;
+
 }
 
 function worstScoreForDay(playerScores, day) {
@@ -114,7 +138,7 @@ var ScoreLogic = {
    * golfer actually shooting that particular score.
    */
   fillMissedCutScores: function (playerScores) {
-    var worstScores = _.chain(NDAYS)
+    var worstScores = _.chain(TourneyStore.getNumberOfDays())
       .range()
       .map(_.partial(worstScoreForDay, playerScores))
       .value();
@@ -127,7 +151,8 @@ var ScoreLogic = {
       });
     });
     return playerScores;
-  }
+  },
+  worstScoresPerDay: worstScoresPerDay
 
 };
 

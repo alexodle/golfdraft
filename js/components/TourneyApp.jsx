@@ -2,7 +2,6 @@
 
 var _ = require('lodash');
 var ChatRoom = require('./ChatRoom.jsx');
-var constants = require('../../common/constants');
 var GolfDraftPanel = require('./GolfDraftPanel.jsx');
 var GolferLogic = require('../logic/GolferLogic');
 var GolferStore = require('../stores/GolferStore');
@@ -14,8 +13,6 @@ var ScoreLogic = require('../logic/ScoreLogic');
 var utils = require('../../common/utils');
 
 var ReactPropTypes = React.PropTypes;
-
-var NDAYS = constants.NDAYS;
 
 function getState(state, props) {
   return {
@@ -43,27 +40,7 @@ var TourneyApp = React.createClass({
     );
 
     var scores = this.props.scores;
-    var worstScoresPerDay = _.chain(NDAYS)
-      .times(function (day) {
-        var worstScore = _.chain(scores)
-          .reject(function (s) {
-            return s.missedCuts[day];
-          })
-          .max(function (s) {
-            return s.scores[day];
-          })
-          .value();
-        return {
-          day: day,
-          golfer: worstScore.golfer,
-          score: worstScore.scores[day]
-        };
-      })
-      .first(function (s) {
-        // Assume 0 means they haven't started playing this day yet
-        return s.score > 0;
-      })
-      .value();
+    var worstScoresPerDay = ScoreLogic.worstScoresPerDay(scores);
 
     return (
       <section>
