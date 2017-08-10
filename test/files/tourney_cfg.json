@@ -1,0 +1,43 @@
+{
+  "name": "2017 PGA Championship",
+
+  "scores": {
+    "type": "pgatour",
+    "url": "https://statdata.pgatour.com/r/033/leaderboard-v2mini.json?ts=1502222493324"
+  },
+
+  "draftOrder": [
+    "Nathan Jones",
+    "Scott Childress",
+    "Mike Martin",
+    "Andrew Maurer"
+  ],
+
+  "wgr": {
+    "url": "http://www.owgr.com/en/Ranking.aspx?pageNo=1&pageSize=1000&country=All",
+    "nameMap": {
+      "Billy Hurley-III": "Billy Hurley III",
+      "Charles Howell-III": "Charles Howell III",
+      "Giwhan Kim": "Gi-whan Kim",
+      "Graham Delaet": "Graham DeLaet",
+      "Jin Cheng": "Cheng Jin",
+      "Joseph Dean": "Joe Dean",
+      "Juan Sebastian Munoz": "Sebastian Munoz",
+      "Li Haotong": "Hao Tong Li",
+      "Liang Wen-chong": "Wen-Chong Liang",
+      "Maximilian Kieffer": "Max Kieffer",
+      "Miguel A Jimenez": "Miguel Angel Jimenez",
+      "Rafael Cabrera Bello": "Rafa Cabrera Bello",
+      "Sanghee Lee": "Sang-hee Lee",
+      "Seukhyun Baek": "Seuk Hyun Baek",
+      "Seungyul Noh": "Seung-Yul Noh",
+      "Siwoo Kim": "Si Woo Kim",
+      "Steven Alker": "Steve Alker",
+      "Sunghoon Kang": "Sung Kang",
+      "Tjaart Van Der Walt": "Tjaart van der Walt",
+      "Tyrone van Aswegen": "Tyrone Van Aswegen",
+      "Yikeun Chang": "Yi Keun Chang",
+      "Younghan Song": "Young-han Song"
+    }
+}
+}

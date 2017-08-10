@@ -7,11 +7,19 @@ var models = require('./models');
 var chatModels = require('./chatModels');
 var Promise = require('promise');
 var io = require('./socketIO');
+var tourneyCfg = require('./tourneyConfigReader').loadConfig();
 
 var UNKNOWN_WGR = constants.UNKNOWN_WGR;
-var TOURNEY_ID = config.tourney_id;
+var TOURNEY_ID = tourneyCfg.tourney_id || config.tourney_id;
 var TOURNEY_ID_QUERY = { _id: TOURNEY_ID };
 var FK_TOURNEY_ID_QUERY = { tourneyId: TOURNEY_ID };
+
+function setTourneyId(id) {
+  TOURNEY_ID = id;
+  TOURNEY_ID_QUERY = { _id: TOURNEY_ID };
+  FK_TOURNEY_ID_QUERY = { tourneyId: TOURNEY_ID };
+
+}
 
 function extendWithTourneyId(obj) {
   return _.extend({}, obj, FK_TOURNEY_ID_QUERY);
@@ -281,7 +289,9 @@ _.extend(access, {
 
   clearChatMessages: createBasicClearer(chatModels.Message),
 
-  resetTourney: function () {
+  resetTourney: function (newId) {
+    if (newId)
+      setTourneyId(newId);
     return Promise.all(_.map([
       models.Tourney.update(TOURNEY_ID_QUERY, {
         name: null,

@@ -8,6 +8,7 @@ var Promise = require('promise');
 var readerConfig = require('../scores_sync/readerConfig');
 var tourneyConfigReader = require('./tourneyConfigReader');
 var tourneyUtils = require('./tourneyUtils');
+var utils = require('../common/utils');
 var updateScore = require('../scores_sync/updateScore');
 
 mongoose.set('debug', true);
@@ -25,7 +26,10 @@ function printState() {
   });
 }
 
-function refreshData(pickOrderNames, reader, url) {
+function refreshData(tourneyCfg) {
+  var pickOrderNames = tourneyCfg.draftOrder;
+  var reader = tourneyCfg.scores.type;
+  var url = tourneyCfg.scores.url;
   console.log("BEGIN Refreshing all data...");
   console.log("");
   console.log("Pick order:");
@@ -38,7 +42,7 @@ function refreshData(pickOrderNames, reader, url) {
   printState()
   .then(function () {
     console.log("Clearing current state");
-    return access.resetTourney();
+    return access.resetTourney(tourneyCfg.tourney_id);
   })
   .then(function () {
     console.log("Adding players");
@@ -57,7 +61,7 @@ function refreshData(pickOrderNames, reader, url) {
   })
   .then(function (sortedPlayers) {
     console.log("Updating pickOrder");
-    var pickOrder = tourneyUtils.snakeDraftOrder(sortedPlayers);
+    var pickOrder = tourneyUtils.snakeDraftOrder(sortedPlayers, tourneyCfg.draftRounds);
     return access.setPickOrder(pickOrder);
   })
   .then(function () {
@@ -78,6 +82,12 @@ function refreshData(pickOrderNames, reader, url) {
     }
   })
   .then(function () {
+    if (tourneyCfg.initialized) {
+      console.log("Initialized new tourney.");
+      console.log("TOURNEY_CFG=" + process.env.TOURNEY_CFG + " TOURNEY_ID="+ tourneyCfg.tourney_id);
+      console.log("Draft Order: " + tourneyCfg.draftOrder);
+    }
+    
     process.exit(0);
   });
 }
@@ -86,5 +96,12 @@ var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function callback () {
   var tourneyCfg = tourneyConfigReader.loadConfig();
-  refreshData(tourneyCfg.draftOrder, tourneyCfg.scores.type, tourneyCfg.scores.url);
+  if (process.argv.length > 2)
+  {
+    // initialize a new tourney
+    tourneyCfg.tourney_id = mongoose.Types.ObjectId().toHexString();
+    tourneyCfg.draftOrder = utils.shuffle(tourneyCfg.draftOrder);
+    tourneyCfg.initialized = true;
+  }
+  refreshData(tourneyCfg);
 });

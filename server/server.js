@@ -361,7 +361,7 @@ db.once('open', function callback () {
     });
   }
 
-  require('./expressServer').listen(port);
+  require('./expressServer').listen(port,"0.0.0.0");
   redisPubSubClient.subscribe("scores:update");
 
   console.log('I am fully running now!');

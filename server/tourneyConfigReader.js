@@ -9,6 +9,7 @@ var fs = require('fs');
 
 function loadConfig() {
   var cfg = JSON.parse(fs.readFileSync(config.tourney_cfg, 'utf8'));
+  cfg.draftRounds = cfg.draftRounds || 4;
   return cfg;
 }
 

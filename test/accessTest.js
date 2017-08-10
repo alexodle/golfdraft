@@ -99,7 +99,7 @@ describe('access', function () {
       });
     });
 
-    it('registers valid pick', function () {
+    it.only('registers valid pick', function () {
       var newPick = {
         player: players['Player1']._id,
         golfer: golfers['Golfer1']._id,

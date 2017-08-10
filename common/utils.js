@@ -43,8 +43,22 @@ var utils = {
     } else {
       return 'thru ' + thru;
     }
-  }
+  },
 
+  shuffle: function (arr) {
+    var i = arr.length;
+    var t, r;
+    while (0 !== i) {
+      r = Math.floor(Math.random() * i);
+      i -= 1;
+      t = arr[i];
+      arr[i] = arr[r];
+      arr[r] = t;
+    }
+
+    return arr;
+
+  }
 };
 
 module.exports = utils;

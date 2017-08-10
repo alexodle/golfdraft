@@ -9,8 +9,10 @@ var mongoose = require('mongoose');
 var Promise = require('promise');
 var tourneyConfigReader = require('./tourneyConfigReader');
 var tourneyUtils = require('./tourneyUtils');
+var utils = require('../common/utils');
 
-function refreshPlayerState(pickOrderNames) {
+function refreshPlayerState(tourneyCfg) {
+  var pickOrderNames = tourneyCfg.draftOrder;
   return Promise.all([
     access.clearPlayers(),
     access.clearPickOrder(),
@@ -31,7 +33,7 @@ function refreshPlayerState(pickOrderNames) {
     });
   })
   .then(function (sortedPlayers) {
-    var pickOrder = tourneyUtils.snakeDraftOrder(sortedPlayers);
+    var pickOrder = tourneyUtils.snakeDraftOrder(sortedPlayers, tourneyCfg.draftRounds);
     return access.setPickOrder(pickOrder);
   });
 }
@@ -44,7 +46,14 @@ if (require.main === module) {
   db.on('error', console.error.bind(console, 'connection error:'));
   db.once('open', function callback () {
     var tourneyCfg = tourneyConfigReader.loadConfig();
-    refreshPlayerState(tourneyCfg.draftOrder).then(function () {
+    if (process.argv.length > 2)
+    {
+      // initialize a new tourney
+      tourneyCfg.draftOrder = utils.shuffle(tourneyCfg.draftOrder);
+      tourneyCfg.initialized = true;
+    }
+
+    refreshPlayerState(tourneyCfg).then(function () {
       process.exit(0);
     });
   });
