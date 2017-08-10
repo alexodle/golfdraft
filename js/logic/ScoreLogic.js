@@ -3,7 +3,6 @@
 var _ = require('lodash');
 var constants = require('../../common/constants');
 var utils = require('../../common/utils');
-var TourneyStore = require("../stores/TourneyStore");
 
 var MISSED_CUT = constants.MISSED_CUT;
 
@@ -16,7 +15,7 @@ function getGolfersByPlayer(draftPicks) {
     .value();
 }
 
-function playerScore(playerGolfers, scores, player) {
+function playerScore(playerGolfers, scores, player, numberOfDays, scoresPerDay) {
   var scoresByGolfer = _.chain(playerGolfers)
     .map(function (g) {
       return _.extend({}, scores[g], {
@@ -26,7 +25,7 @@ function playerScore(playerGolfers, scores, player) {
     .indexBy('golfer')
     .value();
 
-  var scoresByDay = _.times(TourneyStore.getNumberOfDays(), function (day) {
+  var scoresByDay = _.times(numberOfDays, function (day) {
     var dayScores = _.chain(playerGolfers)
       .map(function (g) {
         return scores[g];
@@ -36,7 +35,7 @@ function playerScore(playerGolfers, scores, player) {
       })
       .value();
 
-    var usedScores = _.first(dayScores, TourneyStore.getScoresPerDay());
+    var usedScores = _.first(dayScores, scoresPerDay);
     return {
       day: day,
       allScores: dayScores,
@@ -54,8 +53,8 @@ function playerScore(playerGolfers, scores, player) {
     total: _.sum(scoresByDay, 'total')
   };
 }
-function worstScoresPerDay(scores) {
-    var result = _.chain(TourneyStore.getNumberOfDays())
+function worstScoresPerDay(scores, numberOfDays) {
+    var result = _.chain(numberOfDays)
       .times(function (day) {
         var worstScore = _.chain(scores)
           .reject(function (s) {
@@ -103,7 +102,7 @@ var ScoreLogic = {
    * If the either of the top 2 scores contains a MISSED_CUT, then the worst
    * score of all golfers for the particular day will be used instead.
    */
-  calcPlayerScores: function (draftPicks, golferScores) {
+  calcPlayerScores: function (draftPicks, golferScores, numberOfDays, scoresPerDay) {
     var golfersByPlayer = getGolfersByPlayer(draftPicks);
     var draftPosByPlayer = _(draftPicks)
       .groupBy('player')
@@ -118,7 +117,7 @@ var ScoreLogic = {
     var playerScores = _.chain(golfersByPlayer)
       .map(function (golfers, player) {
         return _.extend({},
-          playerScore(golfers, golferScores, player),
+          playerScore(golfers, golferScores, player, numberOfDays, scoresPerDay),
           { pickNumber: draftPosByPlayer[player] });
       })
       .indexBy('player')
@@ -137,8 +136,8 @@ var ScoreLogic = {
    * which scores were actually the result of a missed cut instead of the
    * golfer actually shooting that particular score.
    */
-  fillMissedCutScores: function (playerScores) {
-    var worstScores = _.chain(TourneyStore.getNumberOfDays())
+  fillMissedCutScores: function (playerScores, numberOfDays) {
+    var worstScores = _.chain(numberOfDays)
       .range()
       .map(_.partial(worstScoreForDay, playerScores))
       .value();

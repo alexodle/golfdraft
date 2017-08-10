@@ -41,6 +41,8 @@ function getAppState() {
     scores: ScoreStore.getScores(),
     lastScoresUpdate: ScoreStore.getLastUpdated(),
     refreshRate: TourneyStore.getRefreshRate(),
+    scoresPerDay: TourneyStore.getScoresPerDay(),
+    numberOfDays: TourneyStore.getNumberOfDays(),
 
     playSounds: AppSettingsStore.getPlaySounds(),
 
@@ -120,6 +122,8 @@ var TourneyWrapper = React.createClass({
           refreshRate={props.refreshRate}
           chatMessages={props.chatMessages}
           activeUsers={props.activeUsers}
+          scoresPerDay={props.scoresPerDay}
+          numberOfDays={props.numberOfDays}
         />
       </section>
     );

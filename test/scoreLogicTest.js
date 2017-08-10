@@ -1,10 +1,11 @@
 var _ = require('lodash');
 var constants = require('../common/constants');
+var tourneyCfg = require('../server/tourneyConfigReader').loadConfig();
 var ScoreLogic = require('../js/logic/ScoreLogic');
 
 var MISSED_CUT = constants.MISSED_CUT;
 
-describe('ScoreLogic', function () {
+describe.only('ScoreLogic', function () {
 
   describe('calcPlayerScores', function () {
 
@@ -21,7 +22,7 @@ describe('ScoreLogic', function () {
         Golfer1_2: { golfer: 'Golfer1_2', day: 1, scores: [0,  -1,  0,  0] },
         Golfer1_3: { golfer: 'Golfer1_3', day: 1, scores: [0,  -3,  0,  0] },
       };
-      ScoreLogic.calcPlayerScores(draftPicks, scores).should.eql({
+      ScoreLogic.calcPlayerScores(draftPicks, scores, tourneyCfg.numDays, tourneyCfg.scores.perDay).should.eql({
         Player1: {
           player: 'Player1',
           total: -3 + -4,
@@ -82,7 +83,7 @@ describe('ScoreLogic', function () {
         { scores: [0, MISSED_CUT, 2, 0] },
         { scores: [0, 0, MISSED_CUT, 3] },
         { scores: [4, 0, 0, MISSED_CUT] }
-      ])
+      ],tourneyCfg.numDays)
       .should.eql([
         { scores: [4, 1, 0, 0], missedCuts: [true, false, false, false] },
         { scores: [0, 1, 2, 0], missedCuts: [false, true, false, false] },
