@@ -7,6 +7,7 @@ var GolfDraftPanel = require('./GolfDraftPanel.jsx');
 var PlayerStore = require('../stores/PlayerStore');
 var React = require('react');
 var UserStore = require('../stores/UserStore');
+var TourneyStore = require('../stores/TourneyStore');
 
 var ReactPropTypes = React.PropTypes;
 
@@ -27,7 +28,7 @@ var DraftPickOrder = React.createClass({
 
     var myPlayer = this.props.currentUser.player;
     var pickOrder = DraftStore.getPickOrder();
-    pickOrder = _.first(pickOrder, pickOrder.length / 4);
+    pickOrder = _.first(pickOrder, pickOrder.length / TourneyStore.get);
     return (
       <GolfDraftPanel heading='Pick Order'>
         <p><small>

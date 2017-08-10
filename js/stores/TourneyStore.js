@@ -8,6 +8,7 @@ var AppDispatcher = require('../dispatcher/AppDispatcher');
 var _tourneyName = null;
 var _numDays = 0;
 var _scoresPerDay = 0;
+var _numDraftRounds = 0;
 
 var TourneyStore =  _.extend({}, Store.prototype, {
 
@@ -19,7 +20,10 @@ var TourneyStore =  _.extend({}, Store.prototype, {
   },
   getScoresPerDay: function() {
     return _scoresPerDay;
-  }
+  },
+  getNumberOfDraftRounds: function() {
+    return _numDraftRounds;
+  },
 
 });
 
@@ -32,6 +36,7 @@ AppDispatcher.register(function (payload) {
       _tourneyName = action.tourneyCfg.name;
       _numDays = action.tourneyCfg.numDays;
       _scoresPerDay = action.tourneyCfg.scores.perDay;
+      _numDraftRounds = action.tourneyCfg.draftRounds;
       TourneyStore.emitChange();
       break;
   }
