@@ -10,6 +10,10 @@ var Promise = require('promise');
 var tourneyConfigReader = require('./tourneyConfigReader');
 var tourneyUtils = require('./tourneyUtils');
 var utils = require('../common/utils');
+var opt = require('node-getopt').create([
+  ['i','init','Initializes a new Tourney'],
+  ['s','save','Writes change back to the tourney_cfg file']
+]).parseSystem();
 
 function refreshPlayerState(tourneyCfg) {
   var pickOrderNames = tourneyCfg.draftOrder;
@@ -46,14 +50,16 @@ if (require.main === module) {
   db.on('error', console.error.bind(console, 'connection error:'));
   db.once('open', function callback () {
     var tourneyCfg = tourneyConfigReader.loadConfig();
-    if (process.argv.length > 2)
+    if (opt.options.init)
     {
-      // initialize a new tourney
       tourneyCfg.draftOrder = utils.shuffle(tourneyCfg.draftOrder);
       tourneyCfg.initialized = true;
     }
 
     refreshPlayerState(tourneyCfg).then(function () {
+      if (opt.options.save) {
+        tourneyCfg.save();
+      }
       process.exit(0);
     });
   });
