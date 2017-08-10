@@ -61,4 +61,31 @@ var utils = {
   }
 };
 
+function isObject(item) {
+    return (item && typeof item === 'object' && !Array.isArray(item));
+}
+
+// TODO: arrays?
+function mergeDeep(target, source) {
+  var output = _.assign({}, target);
+  if (isObject(target) && isObject(source)) {
+    Object.keys(source).forEach(function(key) {
+      if (isObject(source[key])) {
+        if (!(key in target))
+          output[key] = source[key];
+        else
+          output[key] = mergeDeep(target[key], source[key]);
+      } else {
+        output[key] = source[key];
+      }
+    });
+  }
+  return output;
+}
+
+_.extend(utils, {
+  isObject: isObject,
+  mergeDeep: mergeDeep
+});
+
 module.exports = utils;

@@ -74,7 +74,7 @@ function refreshData(tourneyCfg) {
   .then(printState)
   .then(function () {
     console.log("BEGIN Updating scores");
-    return updateScore.run(readerConfig[reader].reader, url).then(function () {
+    return updateScore.run(reader, url).then(function () {
       console.log("END Updating scores");
     });
   })

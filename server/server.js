@@ -27,6 +27,7 @@ var MAX_AGE = 1000 * 60 * 60 * 24 * 365;
 
 var redisPubSubClient = redis.pubSubClient;
 var ObjectId = mongoose.Types.ObjectId;
+var updateScore = require('../scores_sync/updateScore');
 
 mongoose.connect(config.mongo_url);
 
@@ -364,5 +365,13 @@ db.once('open', function callback () {
   require('./expressServer').listen(port,"0.0.0.0");
   redisPubSubClient.subscribe("scores:update");
 
+  if (tourneyCfg.scores.refreshRate) {
+    updateScore.run(tourneyCfg.scores.type, tourneyCfg.scores.url);
+    var id = setInterval(function() {
+      updateScore.run(tourneyCfg.scores.type, tourneyCfg.scores.url);
+
+    }, tourneyCfg.scores.refreshRate*60*1000);
+
+  }
   console.log('I am fully running now!');
 });

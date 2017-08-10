@@ -24,8 +24,17 @@
             "request": "launch",
             "name": "New Tournament",
             "program": "${workspaceRoot}/server/refreshData.js",
-            "env": {"TOURNEY_CFG":"${workspaceRoot}/2017_pga.json"},
-            "args": ["-a"]
+            "env": {"TOURNEY_CFG":"${workspaceRoot}/test_conf.json"},
+            "args": ["-i","-s"]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Update Scores",
+            "program": "${workspaceRoot}/scores_sync/runUpdateScore.js",
+            "env": {
+                "TOURNEY_CFG":"${workspaceRoot}/2017_pga.json"
+            }
         },
         {
             "type": "node",
@@ -42,9 +51,9 @@
             "request": "launch",
             "name": "Launch Server",
             "program": "${workspaceRoot}/server/server.js",
+            "cwd": "${workspaceRoot}",
             "env": {"DEBUG":"true", 
-                "TOURNEY_CFG":"${workspaceRoot}/2017_pga.json",
-                "TOURNEY_ID":"598b7d1de2554600007aeef8"
+                "PORT": "3001"
             }
         }
     ]

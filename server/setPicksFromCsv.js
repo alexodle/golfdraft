@@ -7,7 +7,7 @@ var mongoose = require('mongoose');
 var fs = require('fs');
 var Promise = require('promise');
 var refreshPlayerState = require('./refreshPlayerState');
-var constants = require('../common/constants');
+NGOLFERS = require('./tourneyConfigReader').loadConfig().draftRounds;
 
 function cleanName(n) {
   return n.toLowerCase().replace("-", "").replace("'", "");
@@ -33,7 +33,7 @@ function setPicksFromCsv(csvPicks) {
         .value();
 
       var pickOrder = _(picks)
-        .take(picks.length / constants.NGOLFERS)
+        .take(picks.length / NGOLFERS)
         .pluck(0)
         .value();
 

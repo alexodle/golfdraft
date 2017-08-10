@@ -4,9 +4,11 @@ var _ = require('lodash');
 var access = require('../server/access');
 var config = require('../server/config');
 var constants = require('../common/constants');
+var readerCfg = require('./readerConfig');
 var Promise = require('promise');
+var tourneyCfg = require('../server/tourneyConfigReader').loadConfig();
 
-var DAYS = constants.NDAYS;
+var DAYS = tourneyCfg.numDays;
 var MISSED_CUT = constants.MISSED_CUT;
 var OVERRIDE_KEYS = ['golfer', 'day', 'scores'];
 
@@ -73,7 +75,8 @@ var UpdateScore = {
     return newScores;
   },
 
-  run: function (reader, url) {
+  run: function (type, url) {
+    var reader = readerCfg[type].reader;
     return reader.run(url).then(function (rawTourney) {
       // Quick assertion of data
       if (!rawTourney || !UpdateScore.validate(rawTourney)) {

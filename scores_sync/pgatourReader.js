@@ -4,9 +4,11 @@ var _ = require('lodash');
 var constants = require('../common/constants');
 var Promise = require('promise');
 var request = require('request');
+var tourneyCfg = require('../server/tourneyConfigReader').loadConfig();
+
 
 var MISSED_CUT = constants.MISSED_CUT;
-var NDAYS = constants.NDAYS;
+var NDAYS = tourneyCfg.numDays;
 
 var PGATOUR_WD_TEXT = 'wd';
 var PGATOUR_MC_TEXT = 'cut';
