@@ -10,6 +10,10 @@ var tourneyConfigReader = require('./tourneyConfigReader');
 var tourneyUtils = require('./tourneyUtils');
 var utils = require('../common/utils');
 var updateScore = require('../scores_sync/updateScore');
+var opt = require('node-getopt').create([
+  ['i','init','Initializes a new Tourney'],
+  ['s','save','Writes change back to the tourney_cfg file']
+]).parseSystem();
 
 mongoose.set('debug', true);
 mongoose.connect(config.mongo_url);
@@ -82,10 +86,14 @@ function refreshData(tourneyCfg) {
     }
   })
   .then(function () {
-    if (tourneyCfg.initialized) {
+    if (opt.options.init) {
       console.log("Initialized new tourney.");
       console.log("TOURNEY_CFG=" + process.env.TOURNEY_CFG + " TOURNEY_ID="+ tourneyCfg.tourney_id);
       console.log("Draft Order: " + tourneyCfg.draftOrder);
+      if(opt.options.save) {
+        tourneyCfg.save();
+        console.log("Updated config file with tourney_id and draftOrder.");
+      }
     }
     
     process.exit(0);
@@ -96,12 +104,11 @@ var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function callback () {
   var tourneyCfg = tourneyConfigReader.loadConfig();
-  if (process.argv.length > 2)
+  if (opt.options.init)
   {
     // initialize a new tourney
     tourneyCfg.tourney_id = mongoose.Types.ObjectId().toHexString();
     tourneyCfg.draftOrder = utils.shuffle(tourneyCfg.draftOrder);
-    tourneyCfg.initialized = true;
   }
   refreshData(tourneyCfg);
 });
