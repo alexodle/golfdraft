@@ -19,7 +19,10 @@ function hydrate(seedData) {
   DraftActions.draftUpdate(draft);
   ScoreActions.scoreUpdate({
     scores: seedData.scores,
-    lastUpdated: seedData.tourney.lastUpdated
+    lastUpdated: seedData.tourney.lastUpdated,
+    startDay: seedData.tourneyCfg.scores.startDay,
+    numDays: seedData.tourneyCfg.scores.numDays,
+    scoresPerDay: seedData.tourneyCfg.scores.perDay
   });
   SettingsActions.setIsPaused(seedData.appState.isDraftPaused);
   AppActions.setTourney(seedData.tourneyCfg);

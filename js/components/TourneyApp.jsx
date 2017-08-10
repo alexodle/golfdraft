@@ -37,13 +37,14 @@ var TourneyApp = React.createClass({
     var playerScores = ScoreLogic.calcPlayerScores(
       this.props.draft.draftPicks,
       this.props.scores,
+      this.props.startDay,
       this.props.numberOfDays,
       this.props.scoresPerDay
 
     );
 
     var scores = this.props.scores;
-    var worstScoresPerDay = ScoreLogic.worstScoresPerDay(scores, this.props.numberOfDays);
+    var worstScoresPerDay = ScoreLogic.worstScoresPerDay(scores, this.props.startDay, this.props.numberOfDays);
 
     return (
       <section>

@@ -9,6 +9,9 @@ var Store = require('./Store');
 // Indexed by golfer id
 var _scores = {};
 var _lastUpdated = null;
+var _numDays = 0;
+var _startDay = 0;
+var _perDay = 0;
 
 var ScoreStore =  _.extend({}, Store.prototype, {
 
@@ -20,6 +23,18 @@ var ScoreStore =  _.extend({}, Store.prototype, {
 
   getLastUpdated: function () {
     return _lastUpdated;
+  },
+
+  getNumberOfDays: function() {
+    return _numDays;
+  },
+
+  getStartDay: function() {
+    return _startDay;
+  },
+
+  getScoresPerDay: function() {
+    return _perDay;
   }
 
 });
@@ -30,10 +45,14 @@ AppDispatcher.register(function (payload) {
 
   switch(action.actionType) {
     case ScoreConstants.SCORE_UPDATE:
-      var scores = ScoreLogic.fillMissedCutScores(action.scores);
+      _lastUpdated = action.lastUpdated;
+      _startDay = action.startDay;
+      _numDays = action.numDays;
+      _perDay = action.scoresPerDay;
+
+      var scores = ScoreLogic.fillMissedCutScores(action.scores,_startDay, _numDays);
 
       _scores = _.indexBy(scores, "golfer");
-      _lastUpdated = action.lastUpdated;
 
       ScoreStore.emitChange();
       break;
