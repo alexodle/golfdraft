@@ -374,7 +374,14 @@ db.once('open', function callback () {
   if (tourneyCfg.scores.refreshRate) {
     setTimeout(function() { updateScore.run(tourneyCfg.scores.type, tourneyCfg.scores.url); },500);
     var id = setInterval(function() {
-      updateScore.run(tourneyCfg.scores.type, tourneyCfg.scores.url);
+      updateScore.run(tourneyCfg.scores.type, tourneyCfg.scores.url)
+      .then(function(succeded) {
+        console.log("refresh succeeded: " + succeeded);
+        if (succeeded) {
+          redis.pubSubClient.publish("scores:update", new Date());
+        }
+      });
+
 
     }, tourneyCfg.scores.refreshRate*60*1000);
 
