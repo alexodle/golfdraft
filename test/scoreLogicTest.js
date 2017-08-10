@@ -1,28 +1,64 @@
 var _ = require('lodash');
 var constants = require('../common/constants');
-var tourneyCfg = require('../server/tourneyConfigReader').loadConfig();
 var ScoreLogic = require('../js/logic/ScoreLogic');
 
 var MISSED_CUT = constants.MISSED_CUT;
 
 describe.only('ScoreLogic', function () {
 
-  describe('calcPlayerScores', function () {
+  var draftPicks, scores;
+
+  before(function() {
+    draftPicks = [
+      { pickNumber: 0, player: 'Player1', golfer: 'Golfer1_0' },
+      { pickNumber: 1, player: 'Player1', golfer: 'Golfer1_1' },
+      { pickNumber: 2, player: 'Player1', golfer: 'Golfer1_2' },
+      { pickNumber: 3, player: 'Player1', golfer: 'Golfer1_3' }
+    ];
+    scores = {
+      Golfer1_0: { golfer: 'Golfer1_0', day: 1, scores: [-1,  0,  0,  0] },
+      Golfer1_1: { golfer: 'Golfer1_1', day: 1, scores: [-2,  0,  0,  0] },
+      Golfer1_2: { golfer: 'Golfer1_2', day: 1, scores: [0,  -1,  0,  0] },
+      Golfer1_3: { golfer: 'Golfer1_3', day: 1, scores: [0,  -3,  0,  0] },
+    };
+
+  });
+
+  describe('calcPlayerScores for partial', function () {
+    var startDay = 1, numDays = 1, perDay = 2;
+    it.only('calculates scores for each day', function () {
+      ScoreLogic.calcPlayerScores(draftPicks, scores, startDay, numDays, perDay).should.eql({
+        Player1: {
+          player: 'Player1',
+          total: -4,
+          pickNumber: 0,
+          scoresByDay: [
+            {
+              day: 1,
+              allScores: [
+                scores['Golfer1_3'],
+                scores['Golfer1_2'],
+                scores['Golfer1_0'],
+                scores['Golfer1_1']
+              ],
+              usedScores: [scores['Golfer1_3'], scores['Golfer1_2']],
+              total: -4
+            }          ],
+          scoresByGolfer: {
+            Golfer1_0: _.extend({ total: -1 }, scores['Golfer1_0']),
+            Golfer1_1: _.extend({ total: -2 }, scores['Golfer1_1']),
+            Golfer1_2: _.extend({ total: -1 }, scores['Golfer1_2']),
+            Golfer1_3: _.extend({ total: -3 }, scores['Golfer1_3'])
+          }
+        }
+      });
+    });
+
+  });
 
     it('calculates scores for each day', function () {
-      var draftPicks = [
-        { pickNumber: 0, player: 'Player1', golfer: 'Golfer1_0' },
-        { pickNumber: 1, player: 'Player1', golfer: 'Golfer1_1' },
-        { pickNumber: 2, player: 'Player1', golfer: 'Golfer1_2' },
-        { pickNumber: 3, player: 'Player1', golfer: 'Golfer1_3' }
-      ];
-      var scores = {
-        Golfer1_0: { golfer: 'Golfer1_0', day: 1, scores: [-1,  0,  0,  0] },
-        Golfer1_1: { golfer: 'Golfer1_1', day: 1, scores: [-2,  0,  0,  0] },
-        Golfer1_2: { golfer: 'Golfer1_2', day: 1, scores: [0,  -1,  0,  0] },
-        Golfer1_3: { golfer: 'Golfer1_3', day: 1, scores: [0,  -3,  0,  0] },
-      };
-      ScoreLogic.calcPlayerScores(draftPicks, scores, tourneyCfg.numDays, tourneyCfg.scores.perDay).should.eql({
+      var startDay = 0, numDays = 4, perDay = 2;
+      ScoreLogic.calcPlayerScores(draftPicks, scores, numDays, perDay).should.eql({
         Player1: {
           player: 'Player1',
           total: -3 + -4,
@@ -73,17 +109,16 @@ describe.only('ScoreLogic', function () {
       });
     });
 
-  });
-
   describe('fillMissedCutScores', function () {
 
     it('replaces "MC" scores with the worst score for that day', function () {
+      var startDay = 0, numDays = 4;
       ScoreLogic.fillMissedCutScores([
         { scores: [MISSED_CUT, 1, 0, 0] },
         { scores: [0, MISSED_CUT, 2, 0] },
         { scores: [0, 0, MISSED_CUT, 3] },
         { scores: [4, 0, 0, MISSED_CUT] }
-      ],tourneyCfg.numDays)
+      ],startDay, numDays)
       .should.eql([
         { scores: [4, 1, 0, 0], missedCuts: [true, false, false, false] },
         { scores: [0, 1, 2, 0], missedCuts: [false, true, false, false] },

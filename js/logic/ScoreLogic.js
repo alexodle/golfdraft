@@ -15,7 +15,7 @@ function getGolfersByPlayer(draftPicks) {
     .value();
 }
 
-function playerScore(playerGolfers, scores, player, numberOfDays, scoresPerDay) {
+function playerScore(playerGolfers, scores, player, startDay, numberOfDays, scoresPerDay) {
   var scoresByGolfer = _.chain(playerGolfers)
     .map(function (g) {
       return _.extend({}, scores[g], {
@@ -26,6 +26,7 @@ function playerScore(playerGolfers, scores, player, numberOfDays, scoresPerDay) 
     .value();
 
   var scoresByDay = _.times(numberOfDays, function (day) {
+    day += startDay;
     var dayScores = _.chain(playerGolfers)
       .map(function (g) {
         return scores[g];
@@ -102,7 +103,7 @@ var ScoreLogic = {
    * If the either of the top 2 scores contains a MISSED_CUT, then the worst
    * score of all golfers for the particular day will be used instead.
    */
-  calcPlayerScores: function (draftPicks, golferScores, numberOfDays, scoresPerDay) {
+  calcPlayerScores: function (draftPicks, golferScores, startDay, numberOfDays, scoresPerDay) {
     var golfersByPlayer = getGolfersByPlayer(draftPicks);
     var draftPosByPlayer = _(draftPicks)
       .groupBy('player')
@@ -117,7 +118,7 @@ var ScoreLogic = {
     var playerScores = _.chain(golfersByPlayer)
       .map(function (golfers, player) {
         return _.extend({},
-          playerScore(golfers, golferScores, player, numberOfDays, scoresPerDay),
+          playerScore(golfers, golferScores, player, startDay, numberOfDays, scoresPerDay),
           { pickNumber: draftPosByPlayer[player] });
       })
       .indexBy('player')
@@ -136,9 +137,9 @@ var ScoreLogic = {
    * which scores were actually the result of a missed cut instead of the
    * golfer actually shooting that particular score.
    */
-  fillMissedCutScores: function (playerScores, numberOfDays) {
-    var worstScores = _.chain(numberOfDays)
-      .range()
+  fillMissedCutScores: function (playerScores, startDay, numberOfDays) {
+    var worstScores = _.chain(startDay)
+      .range(startDay+numberOfDays)
       .map(_.partial(worstScoreForDay, playerScores))
       .value();
     _.each(playerScores, function (ps) {

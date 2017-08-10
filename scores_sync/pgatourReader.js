@@ -8,7 +8,7 @@ var tourneyCfg = require('../server/tourneyConfigReader').loadConfig();
 
 
 var MISSED_CUT = constants.MISSED_CUT;
-var NDAYS = tourneyCfg.numDays;
+var NDAYS = tourneyCfg.scores.numDays;
 
 var PGATOUR_WD_TEXT = 'wd';
 var PGATOUR_MC_TEXT = 'cut';

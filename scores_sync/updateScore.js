@@ -8,13 +8,13 @@ var readerCfg = require('./readerConfig');
 var Promise = require('promise');
 var tourneyCfg = require('../server/tourneyConfigReader').loadConfig();
 
-var DAYS = tourneyCfg.numDays;
 var MISSED_CUT = constants.MISSED_CUT;
 var OVERRIDE_KEYS = ['golfer', 'day', 'scores'];
 
 var UpdateScore = {
 
   validate: function (d) {
+    var DAYS = tourneyCfg.scores.numDays;
     if (_.has(d, 'par') && !_.contains([70, 71, 72], d.par)) {
       console.log("ERROR - Par invalid:" + d.par);
       return false;

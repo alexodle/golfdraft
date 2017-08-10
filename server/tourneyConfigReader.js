@@ -16,11 +16,13 @@ function saveConfig(fileName) {
 var _defaults = {
   // Four golfers per player
   draftRounds:4,
-  // Tournaments are typically 4 days
-  numDays:4,
   scores: {
     // Only count top two scores
     perDay: 2,
+    // Usually start on first day
+    startDay: 0,
+    // Tournaments are typically 4 days
+    numDays:4,
     // refresh scores from reader in minutes
     refreshRate: 10
   }
