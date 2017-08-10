@@ -4,7 +4,7 @@ var ScoreLogic = require('../js/logic/ScoreLogic');
 
 var MISSED_CUT = constants.MISSED_CUT;
 
-describe.only('ScoreLogic', function () {
+describe('ScoreLogic', function () {
 
   var draftPicks, scores;
 
@@ -26,7 +26,7 @@ describe.only('ScoreLogic', function () {
 
   describe('calcPlayerScores for partial', function () {
     var startDay = 1, numDays = 1, perDay = 2;
-    it.only('calculates scores for each day', function () {
+    it('calculates scores for each day', function () {
       ScoreLogic.calcPlayerScores(draftPicks, scores, startDay, numDays, perDay).should.eql({
         Player1: {
           player: 'Player1',
@@ -58,7 +58,7 @@ describe.only('ScoreLogic', function () {
 
     it('calculates scores for each day', function () {
       var startDay = 0, numDays = 4, perDay = 2;
-      ScoreLogic.calcPlayerScores(draftPicks, scores, numDays, perDay).should.eql({
+      ScoreLogic.calcPlayerScores(draftPicks, scores, startDay, numDays, perDay).should.eql({
         Player1: {
           player: 'Player1',
           total: -3 + -4,
