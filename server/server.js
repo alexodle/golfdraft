@@ -1,7 +1,7 @@
 'use strict';
 
 var port = Number(process.env.PORT || 3000);
-
+var exec = require('child_process').exec;
 var _ = require('lodash');
 var access = require('./access');
 var app = require('./expressApp');
@@ -95,6 +95,18 @@ function logSessionState(req, res, next) {
 app.use(logSessionState);
 
 var tourneyCfg = tourneyConfigReader.loadConfig();
+
+function updateScoreCallout() {
+  //exec('node scores_sync/runUpdateScore.js', function (err, stdout, stderr) {
+  exec('TOURNEY_CFG='+config.tourney_cfg+' node scores_sync/runUpdateScore.js', function (err, stdout, stderr) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+      console.log('scores updated');
+    }
+  })
+}
 
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
@@ -372,18 +384,8 @@ db.once('open', function callback () {
   redisPubSubClient.subscribe("scores:update");
 
   if (tourneyCfg.scores.refreshRate) {
-    setTimeout(function() { updateScore.run(tourneyCfg.scores.type, tourneyCfg.scores.url); },500);
-    var id = setInterval(function() {
-      updateScore.run(tourneyCfg.scores.type, tourneyCfg.scores.url)
-      .then(function(succeded) {
-        console.log("refresh succeeded: " + succeeded);
-        if (succeeded) {
-          redis.pubSubClient.publish("scores:update", new Date());
-        }
-      });
-
-
-    }, tourneyCfg.scores.refreshRate*60*1000);
+    setTimeout(updateScoreCallout,500);
+    var id = setInterval(updateScoreCallout, tourneyCfg.scores.refreshRate*60*1000);
 
   }
   console.log('I am fully running now!');

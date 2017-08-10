@@ -27,6 +27,8 @@ function updateScores() {
     process.exit(1);
   }, TIMEOUT);
 
+  var reader = tourneyCfg.scores.type;
+  var url = tourneyCfg.scores.url;
   updateScore.run(reader, url).then(function (succeeded) {
     console.log("succeeded: " + succeeded);
     if (succeeded) {
