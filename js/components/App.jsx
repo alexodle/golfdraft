@@ -40,6 +40,7 @@ function getAppState() {
 
     scores: ScoreStore.getScores(),
     lastScoresUpdate: ScoreStore.getLastUpdated(),
+    refreshRate: TourneyStore.getRefreshRate(),
 
     playSounds: AppSettingsStore.getPlaySounds(),
 
@@ -116,6 +117,7 @@ var TourneyWrapper = React.createClass({
           scores={props.scores}
           draft={props.draft}
           lastScoresUpdate={props.lastScoresUpdate}
+          refreshRate={props.refreshRate}
           chatMessages={props.chatMessages}
           activeUsers={props.activeUsers}
         />

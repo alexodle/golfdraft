@@ -9,6 +9,7 @@ var _tourneyName = null;
 var _numDays = 0;
 var _scoresPerDay = 0;
 var _numDraftRounds = 0;
+var _refreshRate = 0;
 
 var TourneyStore =  _.extend({}, Store.prototype, {
 
@@ -24,6 +25,9 @@ var TourneyStore =  _.extend({}, Store.prototype, {
   getNumberOfDraftRounds: function() {
     return _numDraftRounds;
   },
+  getRefreshRate: function() {
+    return _refreshRate;
+  }
 
 });
 
@@ -37,6 +41,7 @@ AppDispatcher.register(function (payload) {
       _numDays = action.tourneyCfg.numDays;
       _scoresPerDay = action.tourneyCfg.scores.perDay;
       _numDraftRounds = action.tourneyCfg.draftRounds;
+      _refreshRate = action.tourneyCfg.scores.refreshRate;
       TourneyStore.emitChange();
       break;
   }
