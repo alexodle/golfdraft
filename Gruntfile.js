@@ -56,7 +56,7 @@ module.exports = function (grunt) {
           path: './distd/',
           filename: 'bundle.js'
         },
-        //devtool: 'eval', // Fast rebuild
+        devtool: 'eval', // Fast rebuild
         watch: true,
         keepalive: true,
         failOnError: false
