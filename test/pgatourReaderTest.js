@@ -14,6 +14,7 @@ describe('PgaTourReader', function () {
         .parseGolfer(70, 3, require('./files/golfer_missedcut'))
         .should.eql({
           golfer: 'Hunter Mahan',
+          player_id: '24781',
           scores: [3, 4, MISSED_CUT, MISSED_CUT],
           thru: null,
           day: 3
@@ -25,6 +26,7 @@ describe('PgaTourReader', function () {
         .parseGolfer(70, 3, require('./files/golfer_midtourney_active'))
         .should.eql({
           golfer: 'Henrik Stenson',
+          player_id: '21528',
           scores: [-5, 4, 0, 0],
           thru: 18,
           day: 2
@@ -36,6 +38,7 @@ describe('PgaTourReader', function () {
         .parseGolfer(70, 3, require('./files/golfer_midtourney_playing'))
         .should.eql({
           golfer: 'Henrik Stenson',
+          player_id: '21528',
           scores: [-5, 4, -2, 0],
           thru: 7,
           day: 3
@@ -47,6 +50,7 @@ describe('PgaTourReader', function () {
         .parseGolfer(72, 3, require('./files/golfer_midround_wd'))
         .should.eql({
           golfer: 'Jamie Donaldson',
+          player_id: '25369',
           scores: [7, MISSED_CUT, MISSED_CUT, MISSED_CUT],
           thru: null,
           day: 3
