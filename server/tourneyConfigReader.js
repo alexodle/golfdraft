@@ -25,11 +25,20 @@ var _defaults = {
     numDays:4,
     // refresh scores from reader in minutes
     refreshRate: 10
-  }
+  },
+  commands: {},
+  notifications: {}
 }
+
 function loadConfig() {
   var cfg = JSON.parse(fs.readFileSync(config.tourney_cfg, 'utf8'));
   var mcfg = utils.mergeDeep(_defaults,cfg);
+
+  _.map(mcfg.commands, function (v,k) {
+    if (Array.isArray(v))
+      mcfg.commands[k] = v.join(' ');
+  });
+
   mcfg.save = saveConfig.bind(mcfg);
   return mcfg;
 }

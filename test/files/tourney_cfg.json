@@ -6,11 +6,16 @@
     "url": "https://statdata.pgatour.com/r/033/leaderboard-v2mini.json?ts=1502222493324"
   },
 
+  "commands": {
+    "concat": ["command","to","run"],
+    "str": "string to run"
+  },
+
   "draftOrder": [
-    "Nathan Jones",
-    "Scott Childress",
-    "Mike Martin",
-    "Andrew Maurer"
+    "Steve Stevenson",
+    "Greg Gregory",
+    "Marty Martin",
+    "Andrew Anderson"
   ],
 
   "wgr": {
