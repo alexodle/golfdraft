@@ -45,10 +45,10 @@ AppDispatcher.register(function (payload) {
 
   switch(action.actionType) {
     case ScoreConstants.SCORE_UPDATE:
-      _lastUpdated = action.lastUpdated;
-      _startDay = action.startDay;
-      _numDays = action.numDays;
-      _perDay = action.scoresPerDay;
+      if (action.lastUpdated) _lastUpdated = action.lastUpdated;
+      if (action.startDay) _startDay = action.startDay;
+      if (action.numDays) _numDays = action.numDays;
+      if (action.scoresPerDay) _perDay = action.scoresPerDay;
 
       var scores = ScoreLogic.fillMissedCutScores(action.scores,_startDay, _numDays);
 
