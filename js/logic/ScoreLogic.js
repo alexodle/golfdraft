@@ -25,7 +25,8 @@ function playerScore(playerGolfers, scores, player, startDay, numberOfDays, scor
     .indexBy('golfer')
     .value();
 
-  var scoresByDay = _.times(numberOfDays, function (day) {
+  var scoresByDay = {};
+  _.times(numberOfDays, function (day) {
     day += startDay;
     var dayScores = _.chain(playerGolfers)
       .map(function (g) {
@@ -37,7 +38,7 @@ function playerScore(playerGolfers, scores, player, startDay, numberOfDays, scor
       .value();
 
     var usedScores = _.first(dayScores, scoresPerDay);
-    return {
+    scoresByDay[day] = {
       day: day,
       allScores: dayScores,
       usedScores: usedScores,
@@ -54,8 +55,8 @@ function playerScore(playerGolfers, scores, player, startDay, numberOfDays, scor
     total: _.sum(scoresByDay, 'total')
   };
 }
-function worstScoresPerDay(scores, numberOfDays) {
-    var result = _.chain(numberOfDays)
+function worstScoresPerDay(scores, startDay, numberOfDays) {
+    var result = _.chain(startDay+numberOfDays)
       .times(function (day) {
         var worstScore = _.chain(scores)
           .reject(function (s) {

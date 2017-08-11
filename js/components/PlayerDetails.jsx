@@ -40,7 +40,7 @@ var PlayerDetails = React.createClass({
           <td>{utils.toGolferScoreStr(gs.total)}</td>
           {_.map(gs.scores, function (s, i) {
             var missedCut = gs.missedCuts[i];
-            var scoreUsed = _.chain(scoresByDay[i].usedScores)
+            var scoreUsed = !!scoresByDay[i] && _.chain(scoresByDay[i].usedScores)
               .pluck('golfer')
               .contains(gs.golfer)
               .value();

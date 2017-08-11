@@ -32,7 +32,7 @@ describe('ScoreLogic', function () {
           player: 'Player1',
           total: -4,
           pickNumber: 0,
-          scoresByDay: [
+          scoresByDay: { 1:
             {
               day: 1,
               allScores: [
@@ -43,7 +43,7 @@ describe('ScoreLogic', function () {
               ],
               usedScores: [scores['Golfer1_3'], scores['Golfer1_2']],
               total: -4
-            }          ],
+            }          },
           scoresByGolfer: {
             Golfer1_0: _.extend({ total: -1 }, scores['Golfer1_0']),
             Golfer1_1: _.extend({ total: -2 }, scores['Golfer1_1']),
@@ -63,7 +63,7 @@ describe('ScoreLogic', function () {
           player: 'Player1',
           total: -3 + -4,
           pickNumber: 0,
-          scoresByDay: [
+          scoresByDay: { 0:
             {
               day: 0,
               allScores: [
@@ -74,7 +74,7 @@ describe('ScoreLogic', function () {
               ],
               usedScores: [scores['Golfer1_1'], scores['Golfer1_0']],
               total: -3
-            },
+            }, 1:
             {
               day: 1,
               allScores: [
@@ -85,20 +85,20 @@ describe('ScoreLogic', function () {
               ],
               usedScores: [scores['Golfer1_3'], scores['Golfer1_2']],
               total: -4
-            },
+            }, 2:
             {
               day: 2,
               allScores: _.values(scores),
               usedScores: [scores['Golfer1_0'], scores['Golfer1_1']],
               total: 0
-            },
+            },3:
             {
               day: 3,
               allScores: _.values(scores),
               usedScores: [scores['Golfer1_0'], scores['Golfer1_1']],
               total: 0
             }
-          ],
+          },
           scoresByGolfer: {
             Golfer1_0: _.extend({ total: -1 }, scores['Golfer1_0']),
             Golfer1_1: _.extend({ total: -2 }, scores['Golfer1_1']),

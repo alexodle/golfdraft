@@ -14,7 +14,7 @@ var OVERRIDE_KEYS = ['golfer', 'day', 'scores'];
 var UpdateScore = {
 
   validate: function (d) {
-    var DAYS = tourneyCfg.scores.numDays;
+    var DAYS = tourneyCfg.scores.numDays + tourneyCfg.scores.startDay;
     if (_.has(d, 'par') && !_.contains([70, 71, 72], d.par)) {
       console.log("ERROR - Par invalid:" + d.par);
       return false;
@@ -90,6 +90,12 @@ var UpdateScore = {
       }
       var mainPromise = access.updateTourney(update)
 
+      .then(function() {
+        var stillPlaying = _.filter(rawTourney.golfers, function(g) {
+          return !(g.scores[tourneyCfg.scores.startDay] === "MC");
+        })
+        rawTourney.golfers = stillPlaying;
+      })
       .then(function () {
         // Ensure golfers
         var golfers = _.map(rawTourney.golfers, function (g) {

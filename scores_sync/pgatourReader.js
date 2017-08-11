@@ -8,7 +8,6 @@ var tourneyCfg = require('../server/tourneyConfigReader').loadConfig();
 
 
 var MISSED_CUT = constants.MISSED_CUT;
-var NDAYS = tourneyCfg.scores.numDays;
 
 var PGATOUR_WD_TEXT = 'wd';
 var PGATOUR_MC_TEXT = 'cut';
@@ -51,6 +50,7 @@ function adjustForPar(par, scores) {
 }
 
 function parseGolfer(par, tourneyRound, g) {
+  var NDAYS = tourneyCfg.scores.startDay + tourneyCfg.scores.numDays;
   var bio = g.player_bio;
   var golferCurrentRound = g.current_round;
 
