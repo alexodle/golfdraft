@@ -97,14 +97,19 @@ app.use(logSessionState);
 var tourneyCfg = tourneyConfigReader.loadConfig();
 
 function updateScoreCallout() {
-  //exec('node scores_sync/runUpdateScore.js', function (err, stdout, stderr) {
-  exec('TOURNEY_CFG='+config.tourney_cfg+' node scores_sync/runUpdateScore.js', function (err, stdout, stderr) {
-    if (err) {
-      console.log(err);
-    }
-    else {
-      console.log('scores updated');
-    }
+  access.getDraft()
+  .then(function(draft) {
+    // only do this if the draft is over. A better way to tell?
+    if (draft.picks.length > 0 && draft.picks.length == draft.pickOrder.length)
+      exec('TOURNEY_CFG=' + config.tourney_cfg + ' node scores_sync/runUpdateScore.js', function (err, stdout, stderr) {
+        if (err) {
+          console.log(err);
+        }
+        else {
+          console.log('scores updated');
+        }
+      });
+
   })
 }
 
