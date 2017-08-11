@@ -56,6 +56,7 @@ function parseGolfer(par, tourneyRound, g) {
 
   var parsedGolfer = {
     golfer: bio.first_name + ' ' + bio.last_name,
+    player_id: g.player_id,
     day: golferCurrentRound || tourneyRound,
     thru: g.thru,
     scores: _.chain(g.rounds)
@@ -87,14 +88,24 @@ var PgaTourReader = {
         }
 
         var par = _.parseInt(body.leaderboard.courses[0].par_total);
+        var id = body.leaderboard.tournament_id;
+        var year = new Date(body.leaderboard.start_date).getFullYear();
+        var name = body.leaderboard.tournament_name;
         var currentRound = body.leaderboard.current_round;
+        var course = body.leaderboard.courses[0].course_name;
         var golfers = _.map(body.leaderboard.players, function (g) {
           return parseGolfer(par, currentRound, g);
         });
 
         fulfill({
           par: par,
-          golfers: golfers
+          golfers: golfers,
+          tournament_id: id,
+          tournament_name: name,
+          tournament_year: year,
+          course_name: course,
+          url: pgatourUrl,
+          reader: 'pgatour'
         });
       });
     });

@@ -84,9 +84,12 @@ var UpdateScore = {
       }
 
       // Ensure tourney/par
-      var update = { pgatourUrl: url };
+      var update = { sourceUrl: url };
       if (_.has(rawTourney, 'par')) {
-        update.parr = rawTourney.par;
+        update.par = rawTourney.par;
+      }
+      if (_.has(rawTourney, 'tournament_name')) {
+        update.name = rawTourney.tournament_name;
       }
       var mainPromise = access.updateTourney(update)
 
