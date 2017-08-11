@@ -25,7 +25,7 @@ function hydrate(seedData) {
     scoresPerDay: seedData.tourneyCfg.scores.perDay
   });
   SettingsActions.setIsPaused(seedData.appState.isDraftPaused);
-  AppActions.setTourney(seedData.tourneyCfg);
+  AppActions.setTourney({cfg: seedData.tourneyCfg, state: seedData.tourney});
 
   // HACKHACK - For now users are just wrappers around players. I may or may
   // not need to differentiate the two in the future, so just keep the

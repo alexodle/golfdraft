@@ -85,12 +85,7 @@ var UpdateScore = {
 
       // Ensure tourney/par
       var update = { sourceUrl: url };
-      if (_.has(rawTourney, 'par')) {
-        update.par = rawTourney.par;
-      }
-      if (_.has(rawTourney, 'tournament_name')) {
-        update.name = rawTourney.tournament_name;
-      }
+      _.extend(update, rawTourney.tourney);
       var mainPromise = access.updateTourney(update)
 
       .then(function() {

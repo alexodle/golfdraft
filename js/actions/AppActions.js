@@ -26,10 +26,10 @@ var AppActions = {
     });
   },
 
-  setTourney: function (tourneyCfg) {
+  setTourney: function (tourney) {
     AppDispatcher.handleViewAction({
       actionType: AppConstants.SET_TOURNEY,
-      tourneyCfg: tourneyCfg
+      tourney: tourney
     });
   }
 

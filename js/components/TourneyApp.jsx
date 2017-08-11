@@ -26,7 +26,8 @@ var TourneyApp = React.createClass({
     currentUser: ReactPropTypes.object.isRequired,
     scores: ReactPropTypes.object.isRequired,
     draft: ReactPropTypes.object.isRequired,
-    chatMessages: ReactPropTypes.array
+    chatMessages: ReactPropTypes.array,
+    state: ReactPropTypes.object.isRequired
   },
 
   getInitialState: function () {
@@ -45,11 +46,14 @@ var TourneyApp = React.createClass({
 
     var scores = this.props.scores;
     var worstScoresPerDay = ScoreLogic.worstScoresPerDay(scores, this.props.startDay, this.props.numberOfDays);
+    var statusClass = this.props.state.status == 'In Progress' ? 'status-good' : 'status-warning';
 
     return (
       <section>
         <p>
           <small>
+            Round: {this.props.state.currentRound}.
+            Status: <span className={statusClass}>{this.props.state.status}</span>. 
             Scores sync every {this.props.refreshRate} minutes. Last sync: <b>{moment(this.props.lastScoresUpdate).calendar()}</b>
           </small>
         </p>

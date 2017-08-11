@@ -87,23 +87,23 @@ var PgaTourReader = {
           return;
         }
 
-        var par = _.parseInt(body.leaderboard.courses[0].par_total);
-        var id = body.leaderboard.tournament_id;
-        var year = new Date(body.leaderboard.start_date).getFullYear();
-        var name = body.leaderboard.tournament_name;
-        var currentRound = body.leaderboard.current_round;
-        var course = body.leaderboard.courses[0].course_name;
+        var tourney = {
+          par : _.parseInt(body.leaderboard.courses[0].par_total),
+          id : body.leaderboard.tournament_id,
+          year : new Date(body.leaderboard.start_date).getFullYear(),
+          name : body.leaderboard.tournament_name,
+          currentRound : body.leaderboard.current_round,
+          course : body.leaderboard.courses[0].course_name,
+          status : body.leaderboard.round_state
+        }
+
         var golfers = _.map(body.leaderboard.players, function (g) {
-          return parseGolfer(par, currentRound, g);
+          return parseGolfer(tourney.par, tourney.currentRound, g);
         });
 
         fulfill({
-          par: par,
           golfers: golfers,
-          tournament_id: id,
-          tournament_name: name,
-          tournament_year: year,
-          course_name: course,
+          tourney: tourney,
           url: pgatourUrl,
           reader: 'pgatour'
         });

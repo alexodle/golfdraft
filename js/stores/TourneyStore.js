@@ -6,8 +6,8 @@ var AppConstants = require('../constants/AppConstants');
 var AppDispatcher = require('../dispatcher/AppDispatcher');
 
 var _tourneyName = null;
-var _numDraftRounds = 0;
-var _refreshRate = 0;
+var _cfg = null;
+var _state = null;
 
 var TourneyStore =  _.extend({}, Store.prototype, {
 
@@ -15,10 +15,13 @@ var TourneyStore =  _.extend({}, Store.prototype, {
     return _tourneyName;
   },
   getNumberOfDraftRounds: function() {
-    return _numDraftRounds;
+    return _cfg.draftRounds;
   },
   getRefreshRate: function() {
-    return _refreshRate;
+    return _cfg.scores.refreshRate;
+  },
+  getState: function() {
+    return _.extend({},_state);
   }
 
 });
@@ -29,9 +32,12 @@ AppDispatcher.register(function (payload) {
 
   switch(action.actionType) {
     case AppConstants.SET_TOURNEY:
-      _tourneyName = action.tourneyCfg.name;
-      _numDraftRounds = action.tourneyCfg.draftRounds;
-      _refreshRate = action.tourneyCfg.scores.refreshRate;
+      _cfg = action.tourney.cfg;
+      _state = action.tourney.state;
+      _tourneyName = [_state.year,
+          _state.name,
+          "at",
+          _state.course].join(' ');
       TourneyStore.emitChange();
       break;
   }
