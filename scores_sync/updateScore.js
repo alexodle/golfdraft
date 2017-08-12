@@ -90,7 +90,9 @@ var UpdateScore = {
 
       .then(function() {
         var stillPlaying = _.filter(rawTourney.golfers, function(g) {
-          return !(g.scores[tourneyCfg.scores.startDay] === "MC");
+          var strokes = rawTourney.tourney.par * tourneyCfg.scores.startDay;
+          return _.sum(g.scores) <= rawTourney.tourney.cutLineScore;
+          //return !(g.scores[tourneyCfg.scores.startDay] === "MC");
         })
         rawTourney.golfers = stillPlaying;
       })

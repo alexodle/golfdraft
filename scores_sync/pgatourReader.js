@@ -94,7 +94,8 @@ var PgaTourReader = {
           name : body.leaderboard.tournament_name,
           currentRound : body.leaderboard.current_round,
           course : body.leaderboard.courses[0].course_name,
-          status : body.leaderboard.round_state
+          status : body.leaderboard.round_state,
+          cutLineScore: body.leaderboard.cut_line.cut_line_score
         }
 
         var golfers = _.map(body.leaderboard.players, function (g) {
