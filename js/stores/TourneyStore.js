@@ -36,8 +36,7 @@ AppDispatcher.register(function (payload) {
       _state = action.tourney.state;
       _tourneyName = [_state.year,
           _state.name,
-          "at",
-          _state.course].join(' ');
+        ].join(' ');
       TourneyStore.emitChange();
       break;
   }

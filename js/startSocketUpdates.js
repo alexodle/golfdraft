@@ -36,6 +36,9 @@ function startSocketUpdates() {
   io.on('change:activeusers', function (ev) {
     UserActions.setActiveUsers(ev.data.userCounts);
   });
+  io.on('change:tourney', function (ev) {
+    AppActions.setTourney(ev.data);
+  });
 
   // ADMIN power
   io.on('action:forcerefresh', function (ev) {

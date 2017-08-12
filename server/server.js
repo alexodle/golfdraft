@@ -120,6 +120,19 @@ db.once('open', function callback () {
   redisPubSubClient.on("message", function (channel, message) {
     // Scores updated, alert clients
     console.log("redis message: channel " + channel + ": " + message);
+    access.getTourney().then(function(tourney) {
+      var tcfg = _.pick(tourneyCfg, function(value, key) {
+          return key !== "wgr" && key !== "draftOrder"
+        });
+      io.sockets.emit('change:tourney', {
+        data: {
+          cfg: tcfg,
+          state: tourney
+        },
+        evType: 'change:tourney',
+        action: 'tourney:periodic_update'
+      });
+    });
     access.getScores().then(function (scores) {
       io.sockets.emit('change:scores', {
         data: {

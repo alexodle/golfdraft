@@ -51,9 +51,12 @@ var TourneyApp = React.createClass({
     return (
       <section>
         <p>
-          <small>
+            Course: {this.props.state.course}.
             Round: {this.props.state.currentRound}.
             Status: <span className={statusClass}>{this.props.state.status}</span>. 
+        </p>
+        <p>
+          <small>
             Scores sync every {this.props.refreshRate} minutes. Last sync: <b>{moment(this.props.lastScoresUpdate).calendar()}</b>
           </small>
         </p>
