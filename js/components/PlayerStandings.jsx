@@ -53,7 +53,8 @@ var PlayerStandings = React.createClass({
           <td>{utils.toGolferScoreStr(ps.total)}</td>
           <td>{ps.pickNumber + 1}</td>
           <td className='hidden-xs'>{holesLeft > 0 ? holesLeft : 'F'}</td>
-          {_.map(ps.scoresByDay, function (ds) {
+          {_.map(_.range(numDays), function(d) {
+            var ds = ps.scoresByDay[d+startDay];
             return (<td className='hidden-xs' key={ds.day}>{utils.toGolferScoreStr(ds.total)}</td>);
           })}
           <td className='visible-xs'><a href='#PlayerDetails' onClick={viewPlayer}>Details</a></td>
@@ -78,7 +79,6 @@ var PlayerStandings = React.createClass({
               <th className='hidden-xs'>Holes Left Today</th>
               {_.map(_.range(numDays), function(d) {
                 return (<th className='hidden-xs'>Day {startDay+d}</th>)
-
               })}
               <th className='visible-xs'></th>
             </tr>
