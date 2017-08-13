@@ -78,7 +78,7 @@ var PlayerStandings = React.createClass({
               <th>Pick Number</th>
               <th className='hidden-xs'>Holes Left Today</th>
               {_.map(_.range(numDays), function(d) {
-                return (<th className='hidden-xs'>Day {startDay+d}</th>)
+                return (<th className='hidden-xs'>Day {startDay+d+1}</th>)
               })}
               <th className='visible-xs'></th>
             </tr>
