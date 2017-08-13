@@ -22,6 +22,9 @@ var TourneyStore =  _.extend({}, Store.prototype, {
   },
   getState: function() {
     return _.extend({},_state);
+  },
+  getConfig: function() {
+    return _.extend({},_cfg);
   }
 
 });

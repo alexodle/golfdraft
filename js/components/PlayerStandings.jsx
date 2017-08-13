@@ -4,6 +4,7 @@ var _ = require("lodash");
 var cx = require('classnames');
 var GolferStore = require('../stores/GolferStore');
 var PlayerStore = require('../stores/PlayerStore');
+var TourneyStore = require('../stores/TourneyStore');
 var React = require("react");
 var utils = require('../../common/utils');
 
@@ -21,6 +22,8 @@ var PlayerStandings = React.createClass({
     var playerScores = _.sortBy(this.props.playerScores, 'total');
     var playerTotals = _.pluck(playerScores, 'total');
     var topScore = playerTotals[0];
+    var startDay = TourneyStore.getConfig().scores.startDay;
+    var numDays = TourneyStore.getConfig().scores.numDays;
 
     var trs = _.map(playerScores, function (ps) {
       var p = PlayerStore.getPlayer(ps.player);
@@ -73,10 +76,10 @@ var PlayerStandings = React.createClass({
               <th>Total</th>
               <th>Pick Number</th>
               <th className='hidden-xs'>Holes Left Today</th>
-              <th className='hidden-xs'>Day 1</th>
-              <th className='hidden-xs'>Day 2</th>
-              <th className='hidden-xs'>Day 3</th>
-              <th className='hidden-xs'>Day 4</th>
+              {_.map(_.range(numDays), function(d) {
+                return (<th className='hidden-xs'>Day {startDay+d}</th>)
+
+              })}
               <th className='visible-xs'></th>
             </tr>
           </thead>
