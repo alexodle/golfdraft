@@ -111,7 +111,7 @@ db.once('open', function callback () {
   {
     // initialize a new tourney
     tourneyCfg.tourney_id = mongoose.Types.ObjectId().toHexString();
-    tourneyCfg.draftOrder = utils.shuffle(tourneyCfg.draftOrder);
+    tourneyCfg.draftOrder = _.shuffle(tourneyCfg.draftOrder);
   }
   refreshData(tourneyCfg);
 });

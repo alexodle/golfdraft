@@ -52,7 +52,7 @@ if (require.main === module) {
     var tourneyCfg = tourneyConfigReader.loadConfig();
     if (opt.options.init)
     {
-      tourneyCfg.draftOrder = utils.shuffle(tourneyCfg.draftOrder);
+      tourneyCfg.draftOrder = _.shuffle(tourneyCfg.draftOrder);
       tourneyCfg.initialized = true;
     }
 

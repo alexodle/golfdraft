@@ -45,20 +45,6 @@ var utils = {
     }
   },
 
-  shuffle: function (arr) {
-    var i = arr.length;
-    var t, r;
-    while (0 !== i) {
-      r = Math.floor(Math.random() * i);
-      i -= 1;
-      t = arr[i];
-      arr[i] = arr[r];
-      arr[r] = t;
-    }
-
-    return arr;
-
-  }
 };
 
 function isObject(item) {
