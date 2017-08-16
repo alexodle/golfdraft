@@ -12,8 +12,12 @@ var updateScore = require('../scores_sync/updateScore');
 var opt = require('node-getopt').create([
   ['i','init','Initializes a new Tourney'],
   ['s','save','Writes change back to the tourney_cfg file'],
-  ['c','clone=','Clones and writes changes to a new tourney_cfg file']
-]).parseSystem();
+  ['c','clone=','Clones and writes changes to a new tourney_cfg file'],
+  ['u','url=','Tournament URL (requires -r)'],
+  ['r','reader=','Tournament Reader'],
+  ['h','help','display this help']
+
+]).bindHelp().parseSystem();
 
 mongoose.set('debug', true);
 mongoose.connect(config.mongo_url);
@@ -32,15 +36,15 @@ function printState() {
 
 function refreshData(tourneyCfg) {
   var pickOrderNames = tourneyCfg.draftOrder;
-  var reader = tourneyCfg.scores.type;
-  var url = tourneyCfg.scores.url;
+  tourneyCfg.scores.reader = opt.options.reader || tourneyCfg.scores.type;
+  tourneyCfg.scores.url = opt.options.url || tourneyCfg.scores.url;
   console.log("BEGIN Refreshing all data...");
   console.log("");
   console.log("Pick order:");
   console.log(JSON.stringify(pickOrderNames));
   console.log("");
-  console.log("Reader: " + reader);
-  console.log("Reader URL: " + url);
+  console.log("Reader: " + tourneyCfg.scores.reader);
+  console.log("Reader URL: " + tourneyCfg.scores.url);
   console.log("");
 
   printState()
@@ -74,7 +78,7 @@ function refreshData(tourneyCfg) {
   .then(printState)
   .then(function () {
     console.log("BEGIN Updating scores");
-    return updateScore.run(reader, url).then(function () {
+    return updateScore.run(tourneyCfg.scores.reader, tourneyCfg.scores.url).then(function () {
       console.log("END Updating scores");
     });
   })
@@ -103,6 +107,10 @@ function refreshData(tourneyCfg) {
   });
 }
 
+if (opt.options.help) {
+  opt.showHelp();
+  exit(0);
+}
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function callback () {

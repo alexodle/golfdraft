@@ -31,7 +31,9 @@ var _defaults = {
 }
 
 function loadConfig() {
-  var cfg = JSON.parse(fs.readFileSync(config.tourney_cfg, 'utf8'));
+  var cfg = {};
+  if (fs.existsSync(config.tourney_cfg))
+    cfg = JSON.parse(fs.readFileSync(config.tourney_cfg, 'utf8'));
   var mcfg = utils.mergeDeep(_defaults,cfg);
 
   _.map(mcfg.commands, function (v,k) {
