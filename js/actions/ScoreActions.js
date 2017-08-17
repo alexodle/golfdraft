@@ -9,7 +9,10 @@ var ScoreActions = {
     AppDispatcher.handleViewAction({
       actionType: ScoreConstants.SCORE_UPDATE,
       scores: result.scores,
-      lastUpdated: result.lastUpdated
+      lastUpdated: result.lastUpdated,
+      startDay: result.startDay,
+      numDays: result.numDays,
+      scoresPerDay: result.scoresPerDay
     });
   }
 

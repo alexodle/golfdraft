@@ -9,8 +9,14 @@ var mongoose = require('mongoose');
 var Promise = require('promise');
 var tourneyConfigReader = require('./tourneyConfigReader');
 var tourneyUtils = require('./tourneyUtils');
+var utils = require('../common/utils');
+var opt = require('node-getopt').create([
+  ['i','init','Initializes a new Tourney'],
+  ['s','save','Writes change back to the tourney_cfg file']
+]).parseSystem();
 
-function refreshPlayerState(pickOrderNames) {
+function refreshPlayerState(tourneyCfg) {
+  var pickOrderNames = tourneyCfg.draftOrder;
   return Promise.all([
     access.clearPlayers(),
     access.clearPickOrder(),
@@ -31,7 +37,7 @@ function refreshPlayerState(pickOrderNames) {
     });
   })
   .then(function (sortedPlayers) {
-    var pickOrder = tourneyUtils.snakeDraftOrder(sortedPlayers);
+    var pickOrder = tourneyUtils.snakeDraftOrder(sortedPlayers, tourneyCfg.draftRounds);
     return access.setPickOrder(pickOrder);
   });
 }
@@ -44,7 +50,16 @@ if (require.main === module) {
   db.on('error', console.error.bind(console, 'connection error:'));
   db.once('open', function callback () {
     var tourneyCfg = tourneyConfigReader.loadConfig();
-    refreshPlayerState(tourneyCfg.draftOrder).then(function () {
+    if (opt.options.init)
+    {
+      tourneyCfg.draftOrder = _.shuffle(tourneyCfg.draftOrder);
+      tourneyCfg.initialized = true;
+    }
+
+    refreshPlayerState(tourneyCfg).then(function () {
+      if (opt.options.save) {
+        tourneyCfg.save();
+      }
       process.exit(0);
     });
   });

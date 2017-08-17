@@ -11,6 +11,6 @@ module.exports = keyMirror({
   SET_IS_PAUSED: null,
   SET_PLAY_SOUNDS: null,
   SET_PLAYERS: null,
-  SET_TOURNEY_NAME: null,
+  SET_TOURNEY: null,
   SET_USERS: null
 });

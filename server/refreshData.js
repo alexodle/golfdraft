@@ -5,10 +5,19 @@ var access = require('./access');
 var config = require('./config');
 var mongoose = require('mongoose');
 var Promise = require('promise');
-var readerConfig = require('../scores_sync/readerConfig');
 var tourneyConfigReader = require('./tourneyConfigReader');
 var tourneyUtils = require('./tourneyUtils');
+var utils = require('../common/utils');
 var updateScore = require('../scores_sync/updateScore');
+var opt = require('node-getopt').create([
+  ['i','init','Initializes a new Tourney'],
+  ['s','save','Writes change back to the tourney_cfg file'],
+  ['c','clone=','Clones and writes changes to a new tourney_cfg file'],
+  ['u','url=','Tournament URL (requires -r)'],
+  ['r','reader=','Tournament Reader'],
+  ['h','help','display this help']
+
+]).bindHelp().parseSystem();
 
 mongoose.set('debug', true);
 mongoose.connect(config.mongo_url);
@@ -25,20 +34,23 @@ function printState() {
   });
 }
 
-function refreshData(pickOrderNames, reader, url) {
+function refreshData(tourneyCfg) {
+  var pickOrderNames = tourneyCfg.draftOrder;
+  tourneyCfg.scores.reader = opt.options.reader || tourneyCfg.scores.type;
+  tourneyCfg.scores.url = opt.options.url || tourneyCfg.scores.url;
   console.log("BEGIN Refreshing all data...");
   console.log("");
   console.log("Pick order:");
   console.log(JSON.stringify(pickOrderNames));
   console.log("");
-  console.log("Reader: " + reader);
-  console.log("Reader URL: " + url);
+  console.log("Reader: " + tourneyCfg.scores.reader);
+  console.log("Reader URL: " + tourneyCfg.scores.url);
   console.log("");
 
   printState()
   .then(function () {
     console.log("Clearing current state");
-    return access.resetTourney();
+    return access.resetTourney(tourneyCfg.tourney_id);
   })
   .then(function () {
     console.log("Adding players");
@@ -57,7 +69,7 @@ function refreshData(pickOrderNames, reader, url) {
   })
   .then(function (sortedPlayers) {
     console.log("Updating pickOrder");
-    var pickOrder = tourneyUtils.snakeDraftOrder(sortedPlayers);
+    var pickOrder = tourneyUtils.snakeDraftOrder(sortedPlayers, tourneyCfg.draftRounds);
     return access.setPickOrder(pickOrder);
   })
   .then(function () {
@@ -66,7 +78,7 @@ function refreshData(pickOrderNames, reader, url) {
   .then(printState)
   .then(function () {
     console.log("BEGIN Updating scores");
-    return updateScore.run(readerConfig[reader].reader, url).then(function () {
+    return updateScore.run(tourneyCfg.scores.reader, tourneyCfg.scores.url).then(function () {
       console.log("END Updating scores");
     });
   })
@@ -78,13 +90,36 @@ function refreshData(pickOrderNames, reader, url) {
     }
   })
   .then(function () {
+    if (opt.options.init) {
+      console.log("Initialized new tourney.");
+      console.log("TOURNEY_CFG=" + process.env.TOURNEY_CFG + " TOURNEY_ID="+ tourneyCfg.tourney_id);
+      console.log("Draft Order: " + tourneyCfg.draftOrder);
+      if(opt.options.save) {
+        tourneyCfg.save();
+        console.log("Updated config file with tourney_id and draftOrder.");
+      }
+      if (opt.options.clone) {
+        tourneyCfg.save(opt.options.clone);
+        console.log("Cloned config file with tourney_id and draftOrder.");
+      }
+    }
     process.exit(0);
   });
 }
 
+if (opt.options.help) {
+  opt.showHelp();
+  exit(0);
+}
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function callback () {
   var tourneyCfg = tourneyConfigReader.loadConfig();
-  refreshData(tourneyCfg.draftOrder, tourneyCfg.scores.type, tourneyCfg.scores.url);
+  if (opt.options.init)
+  {
+    // initialize a new tourney
+    tourneyCfg.tourney_id = mongoose.Types.ObjectId().toHexString();
+    tourneyCfg.draftOrder = _.shuffle(tourneyCfg.draftOrder);
+  }
+  refreshData(tourneyCfg);
 });

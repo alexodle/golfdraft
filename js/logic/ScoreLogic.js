@@ -4,9 +4,7 @@ var _ = require('lodash');
 var constants = require('../../common/constants');
 var utils = require('../../common/utils');
 
-var NDAYS = constants.NDAYS;
 var MISSED_CUT = constants.MISSED_CUT;
-var NSCORES_PER_DAY = constants.NSCORES_PER_DAY;
 
 function getGolfersByPlayer(draftPicks) {
   return _.chain(draftPicks)
@@ -17,7 +15,7 @@ function getGolfersByPlayer(draftPicks) {
     .value();
 }
 
-function playerScore(playerGolfers, scores, player) {
+function playerScore(playerGolfers, scores, player, startDay, numberOfDays, scoresPerDay) {
   var scoresByGolfer = _.chain(playerGolfers)
     .map(function (g) {
       return _.extend({}, scores[g], {
@@ -27,7 +25,9 @@ function playerScore(playerGolfers, scores, player) {
     .indexBy('golfer')
     .value();
 
-  var scoresByDay = _.times(NDAYS, function (day) {
+  var scoresByDay = {};
+  _.times(numberOfDays, function (day) {
+    day += startDay;
     var dayScores = _.chain(playerGolfers)
       .map(function (g) {
         return scores[g];
@@ -37,8 +37,8 @@ function playerScore(playerGolfers, scores, player) {
       })
       .value();
 
-    var usedScores = _.first(dayScores, NSCORES_PER_DAY);
-    return {
+    var usedScores = _.first(dayScores, scoresPerDay);
+    scoresByDay[day] = {
       day: day,
       allScores: dayScores,
       usedScores: usedScores,
@@ -54,6 +54,31 @@ function playerScore(playerGolfers, scores, player) {
     scoresByGolfer: scoresByGolfer,
     total: _.sum(scoresByDay, 'total')
   };
+}
+function worstScoresPerDay(scores, startDay, numberOfDays) {
+    var result = _.chain(startDay+numberOfDays)
+      .times(function (day) {
+        var worstScore = _.chain(scores)
+          .reject(function (s) {
+            return s.missedCuts[day];
+          })
+          .max(function (s) {
+            return s.scores[day];
+          })
+          .value();
+        return {
+          day: day,
+          golfer: worstScore.golfer,
+          score: worstScore.scores[day]
+        };
+      })
+      .first(function (s) {
+        // Assume 0 means they haven't started playing this day yet
+        return s.score > 0;
+      })
+      .value();
+      return result;
+
 }
 
 function worstScoreForDay(playerScores, day) {
@@ -79,7 +104,7 @@ var ScoreLogic = {
    * If the either of the top 2 scores contains a MISSED_CUT, then the worst
    * score of all golfers for the particular day will be used instead.
    */
-  calcPlayerScores: function (draftPicks, golferScores) {
+  calcPlayerScores: function (draftPicks, golferScores, startDay, numberOfDays, scoresPerDay) {
     var golfersByPlayer = getGolfersByPlayer(draftPicks);
     var draftPosByPlayer = _(draftPicks)
       .groupBy('player')
@@ -94,7 +119,7 @@ var ScoreLogic = {
     var playerScores = _.chain(golfersByPlayer)
       .map(function (golfers, player) {
         return _.extend({},
-          playerScore(golfers, golferScores, player),
+          playerScore(golfers, golferScores, player, startDay, numberOfDays, scoresPerDay),
           { pickNumber: draftPosByPlayer[player] });
       })
       .indexBy('player')
@@ -113,9 +138,9 @@ var ScoreLogic = {
    * which scores were actually the result of a missed cut instead of the
    * golfer actually shooting that particular score.
    */
-  fillMissedCutScores: function (playerScores) {
-    var worstScores = _.chain(NDAYS)
-      .range()
+  fillMissedCutScores: function (playerScores, startDay, numberOfDays) {
+    var worstScores = _.chain(startDay)
+      .range(startDay+numberOfDays)
       .map(_.partial(worstScoreForDay, playerScores))
       .value();
     _.each(playerScores, function (ps) {
@@ -127,7 +152,8 @@ var ScoreLogic = {
       });
     });
     return playerScores;
-  }
+  },
+  worstScoresPerDay: worstScoresPerDay
 
 };
 

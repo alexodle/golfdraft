@@ -2,7 +2,6 @@
 
 var _ = require('lodash');
 var ChatRoom = require('./ChatRoom.jsx');
-var constants = require('../../common/constants');
 var GolfDraftPanel = require('./GolfDraftPanel.jsx');
 var GolferLogic = require('../logic/GolferLogic');
 var GolferStore = require('../stores/GolferStore');
@@ -14,8 +13,6 @@ var ScoreLogic = require('../logic/ScoreLogic');
 var utils = require('../../common/utils');
 
 var ReactPropTypes = React.PropTypes;
-
-var NDAYS = constants.NDAYS;
 
 function getState(state, props) {
   return {
@@ -29,7 +26,8 @@ var TourneyApp = React.createClass({
     currentUser: ReactPropTypes.object.isRequired,
     scores: ReactPropTypes.object.isRequired,
     draft: ReactPropTypes.object.isRequired,
-    chatMessages: ReactPropTypes.array
+    chatMessages: ReactPropTypes.array,
+    state: ReactPropTypes.object.isRequired
   },
 
   getInitialState: function () {
@@ -39,37 +37,27 @@ var TourneyApp = React.createClass({
   render: function () {
     var playerScores = ScoreLogic.calcPlayerScores(
       this.props.draft.draftPicks,
-      this.props.scores
+      this.props.scores,
+      this.props.startDay,
+      this.props.numberOfDays,
+      this.props.scoresPerDay
+
     );
 
     var scores = this.props.scores;
-    var worstScoresPerDay = _.chain(NDAYS)
-      .times(function (day) {
-        var worstScore = _.chain(scores)
-          .reject(function (s) {
-            return s.missedCuts[day];
-          })
-          .max(function (s) {
-            return s.scores[day];
-          })
-          .value();
-        return {
-          day: day,
-          golfer: worstScore.golfer,
-          score: worstScore.scores[day]
-        };
-      })
-      .first(function (s) {
-        // Assume 0 means they haven't started playing this day yet
-        return s.score > 0;
-      })
-      .value();
+    var worstScoresPerDay = ScoreLogic.worstScoresPerDay(scores, this.props.startDay, this.props.numberOfDays);
+    var statusClass = this.props.state.status == 'In Progress' ? 'status-good' : 'status-warning';
 
     return (
       <section>
         <p>
+            Course: {this.props.state.course}.
+            Round: {this.props.state.currentRound}.
+            Status: <span className={statusClass}>{this.props.state.status}</span>. 
+        </p>
+        <p>
           <small>
-            Scores sync every 10 minutes. Last sync: <b>{moment(this.props.lastScoresUpdate).calendar()}</b>
+            Scores sync every {this.props.refreshRate} minutes. Last sync: <b>{moment(this.props.lastScoresUpdate).calendar()}</b>
           </small>
         </p>
 

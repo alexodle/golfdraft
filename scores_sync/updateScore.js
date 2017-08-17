@@ -4,15 +4,17 @@ var _ = require('lodash');
 var access = require('../server/access');
 var config = require('../server/config');
 var constants = require('../common/constants');
+var readerCfg = require('./readerConfig');
 var Promise = require('promise');
+var tourneyCfg = require('../server/tourneyConfigReader').loadConfig();
 
-var DAYS = constants.NDAYS;
 var MISSED_CUT = constants.MISSED_CUT;
 var OVERRIDE_KEYS = ['golfer', 'day', 'scores'];
 
 var UpdateScore = {
 
   validate: function (d) {
+    var DAYS = tourneyCfg.scores.numDays + tourneyCfg.scores.startDay;
     if (_.has(d, 'par') && !_.contains([70, 71, 72], d.par)) {
       console.log("ERROR - Par invalid:" + d.par);
       return false;
@@ -73,7 +75,8 @@ var UpdateScore = {
     return newScores;
   },
 
-  run: function (reader, url) {
+  run: function (type, url) {
+    var reader = readerCfg[type].reader;
     return reader.run(url).then(function (rawTourney) {
       // Quick assertion of data
       if (!rawTourney || !UpdateScore.validate(rawTourney)) {
@@ -81,12 +84,18 @@ var UpdateScore = {
       }
 
       // Ensure tourney/par
-      var update = { pgatourUrl: url };
-      if (_.has(rawTourney, 'par')) {
-        update.parr = rawTourney.par;
-      }
+      var update = { sourceUrl: url };
+      _.extend(update, rawTourney.tourney);
       var mainPromise = access.updateTourney(update)
 
+      .then(function() {
+        var stillPlaying = _.filter(rawTourney.golfers, function(g) {
+          var strokes = rawTourney.tourney.par * tourneyCfg.scores.startDay;
+          return _.sum(g.scores) <= rawTourney.tourney.cutLineScore;
+          //return !(g.scores[tourneyCfg.scores.startDay] === "MC");
+        })
+        rawTourney.golfers = stillPlaying;
+      })
       .then(function () {
         // Ensure golfers
         var golfers = _.map(rawTourney.golfers, function (g) {

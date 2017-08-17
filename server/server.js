@@ -1,7 +1,7 @@
 'use strict';
 
 var port = Number(process.env.PORT || 3000);
-
+var exec = require('child_process').exec;
 var _ = require('lodash');
 var access = require('./access');
 var app = require('./expressApp');
@@ -27,6 +27,7 @@ var MAX_AGE = 1000 * 60 * 60 * 24 * 365;
 
 var redisPubSubClient = redis.pubSubClient;
 var ObjectId = mongoose.Types.ObjectId;
+var updateScore = require('../scores_sync/updateScore');
 
 mongoose.connect(config.mongo_url);
 
@@ -95,6 +96,23 @@ app.use(logSessionState);
 
 var tourneyCfg = tourneyConfigReader.loadConfig();
 
+function updateScoreCallout() {
+  access.getDraft()
+  .then(function(draft) {
+    // only do this if the draft is over. A better way to tell?
+    if (draft.picks.length > 0 && draft.picks.length == draft.pickOrder.length)
+      exec('TOURNEY_CFG=' + config.tourney_cfg + ' node scores_sync/runUpdateScore.js', function (err, stdout, stderr) {
+        if (err) {
+          console.log(err);
+        }
+        else {
+          console.log('scores updated');
+        }
+      });
+
+  })
+}
+
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function callback () {
@@ -102,6 +120,19 @@ db.once('open', function callback () {
   redisPubSubClient.on("message", function (channel, message) {
     // Scores updated, alert clients
     console.log("redis message: channel " + channel + ": " + message);
+    access.getTourney().then(function(tourney) {
+      var tcfg = _.pick(tourneyCfg, function(value, key) {
+          return key !== "wgr" && key !== "draftOrder"
+        });
+      io.sockets.emit('change:tourney', {
+        data: {
+          cfg: tcfg,
+          state: tourney
+        },
+        evType: 'change:tourney',
+        action: 'tourney:periodic_update'
+      });
+    });
     access.getScores().then(function (scores) {
       io.sockets.emit('change:scores', {
         data: {
@@ -135,6 +166,9 @@ db.once('open', function callback () {
       access.getAppState()
     ])
     .then(function (results) {
+      var tcfg = _.pick(tourneyCfg, function(value, key) {
+          return key !== "wgr" && key !== "draftOrder"
+        });
       res.render('index', {
         golfers: JSON.stringify(results[0]),
         players: JSON.stringify(results[1]),
@@ -143,7 +177,7 @@ db.once('open', function callback () {
         tourney: JSON.stringify(results[4]),
         appState: JSON.stringify(results[5]),
         user: JSON.stringify(req.session.user),
-        tourneyName: tourneyCfg.name,
+        tourneyCfg: JSON.stringify(tcfg),
         prod: config.prod,
         cdnUrl: config.cdn_url
       });
@@ -164,6 +198,9 @@ db.once('open', function callback () {
       access.getAppState()
     ])
     .then(function (results) {
+      var tcfg = _.pick(tourneyCfg, function(value, key) {
+          return key !== "wgr" && key !== "draftOrder"
+        });
       res.send({
         golfers: results[0],
         players: results[1],
@@ -171,7 +208,7 @@ db.once('open', function callback () {
         scores: results[3],
         tourney: results[4],
         appState: results[5],
-        tourneyName: tourneyCfg.name,
+        tourneyCfg: tcfg,
         user: req.session.user
       });
     })
@@ -361,8 +398,13 @@ db.once('open', function callback () {
     });
   }
 
-  require('./expressServer').listen(port);
+  require('./expressServer').listen(port,"0.0.0.0");
   redisPubSubClient.subscribe("scores:update");
 
+  if (tourneyCfg.scores.refreshRate) {
+    setTimeout(updateScoreCallout,500);
+    var id = setInterval(updateScoreCallout, tourneyCfg.scores.refreshRate*60*1000);
+
+  }
   console.log('I am fully running now!');
 });

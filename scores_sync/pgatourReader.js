@@ -4,9 +4,10 @@ var _ = require('lodash');
 var constants = require('../common/constants');
 var Promise = require('promise');
 var request = require('request');
+var tourneyCfg = require('../server/tourneyConfigReader').loadConfig();
+
 
 var MISSED_CUT = constants.MISSED_CUT;
-var NDAYS = constants.NDAYS;
 
 var PGATOUR_WD_TEXT = 'wd';
 var PGATOUR_MC_TEXT = 'cut';
@@ -49,11 +50,13 @@ function adjustForPar(par, scores) {
 }
 
 function parseGolfer(par, tourneyRound, g) {
+  var NDAYS = tourneyCfg.scores.startDay + tourneyCfg.scores.numDays;
   var bio = g.player_bio;
   var golferCurrentRound = g.current_round;
 
   var parsedGolfer = {
     golfer: bio.first_name + ' ' + bio.last_name,
+    player_id: g.player_id,
     day: golferCurrentRound || tourneyRound,
     thru: g.thru,
     scores: _.chain(g.rounds)
@@ -84,15 +87,26 @@ var PgaTourReader = {
           return;
         }
 
-        var par = _.parseInt(body.leaderboard.courses[0].par_total);
-        var currentRound = body.leaderboard.current_round;
+        var tourney = {
+          par : _.parseInt(body.leaderboard.courses[0].par_total),
+          id : body.leaderboard.tournament_id,
+          year : new Date(body.leaderboard.start_date).getFullYear(),
+          name : body.leaderboard.tournament_name,
+          currentRound : body.leaderboard.current_round,
+          course : body.leaderboard.courses[0].course_name,
+          status : body.leaderboard.round_state,
+          cutLineScore: body.leaderboard.cut_line.cut_line_score
+        }
+
         var golfers = _.map(body.leaderboard.players, function (g) {
-          return parseGolfer(par, currentRound, g);
+          return parseGolfer(tourney.par, tourney.currentRound, g);
         });
 
         fulfill({
-          par: par,
-          golfers: golfers
+          golfers: golfers,
+          tourney: tourney,
+          url: pgatourUrl,
+          reader: 'pgatour'
         });
       });
     });

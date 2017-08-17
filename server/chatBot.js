@@ -3,6 +3,8 @@
 var _ = require('lodash');
 var access = require('./access');
 var Promise = require('promise');
+var exec = require('child_process').exec;
+var tourneyCfg = require('./tourneyConfigReader').loadConfig();
 
 module.exports = {
 
@@ -38,6 +40,28 @@ module.exports = {
           message: 'Draft is complete!'
         });
       }
+    })
+    .then(function() {
+      // externalized notifications
+      if (nextPlayer) {
+        var notify = tourneyCfg.notifications[nextPlayer.name];
+        if (notify && tourneyCfg.commands[notify[0]]) {
+          var cmd = tourneyCfg.commands[notify[0]];
+          cmd = cmd.replace("{{email}}",notify[1]);
+          cmd = cmd.replace("{{subject}}", "You are up.");
+          cmd = cmd.replace("{{text}}", "Make it a good one.");
+          exec(cmd, function (err, stdout, stderr) {
+            if (err) {
+              console.log(err);
+            }
+            else {
+              console.log('player notified');
+            }
+            return true;
+          });
+        }
+      }
+      return true;
     });
   }
 

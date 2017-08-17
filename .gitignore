@@ -7,3 +7,7 @@ npm-*.log
 server/*.sh
 mongolog.txt*
 package-lock.json
+.history/*
+server/config.js
+.vscode/*
+tourney_cfg.json
