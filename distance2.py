@@ -20,7 +20,7 @@ def word_permutations(w):
 
 
 def clean_word(w):
-  return w.replace('IIII', '').replace('III', '').replace('II', '').lower()
+  return w.lower()
 
 
 def without_non_chars(w):
@@ -57,30 +57,40 @@ def calc_cost(w1, w2, i1, i2):
   return cost
 
 
-if __name__ == '__main__':
-  import sys
-
-  w1 = clean_word(sys.argv[1])
-  w2 = clean_word(sys.argv[2])
-
+def all_word_permuations(w1, w2):
   wc1 = len(w1.split(' '))
   wc2 = len(w2.split(' '))
 
   wtoperm = w1 if wc1 > wc2 else w2
   wnonperm = without_non_chars(w1 if wtoperm != w1 else w2)
 
-  best_cost = None
-  best_combo = None
   for wperm in word_permutations(wtoperm):
     wperm = without_non_chars(wperm)
+    yield wperm, wnonperm
 
+
+if __name__ == '__main__':
+  import sys
+
+  w1 = clean_word(sys.argv[1])
+  w2 = clean_word(sys.argv[2])
+
+  best_cost = None
+  best_combo = None
+  complexity = 0
+  for testw1, testw2 in all_word_permuations(w1, w2):
     memo_costs = {}
-    cost = memoized_calc_cost(wperm, wnonperm, 0, 0)
+    cost = memoized_calc_cost(testw1, testw2, 0, 0)
+    complexity += len(memo_costs)
 
     if best_cost == None or cost < best_cost:
       best_cost = cost
-      best_combo = (wperm, wnonperm)
+      best_combo = (testw1, testw2)
       if best_cost == 0:
         break
   
+  print 'Complexity: %s' % complexity
   print 'Cost: %s, %s' % (best_cost, best_combo)
+
+  total_len = len(best_combo[0]) + len(best_combo[1])
+  print 'Likeness coefficient: %s' % ((total_len - best_cost * 1.0) / total_len)
