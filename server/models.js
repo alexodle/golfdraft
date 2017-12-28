@@ -1,9 +1,10 @@
 'use strict';
 
 var mongoose = require('mongoose');
+var SchemaTypes = mongoose.Schema.Types;
 
 var golferSchema = mongoose.Schema({
-  tourneyId: mongoose.Schema.ObjectId,
+  tourneyId: SchemaTypes.ObjectId,
   name: String
 });
 golferSchema.index({ name: 1, tourneyId: 1 });
@@ -19,16 +20,16 @@ wgrSchema.index({ name: 1 });
 var playerSchema = golferSchema;
 
 var draftPickOrderSchema = mongoose.Schema({
-  tourneyId: mongoose.Schema.ObjectId,
+  tourneyId: SchemaTypes.ObjectId,
   pickNumber: Number,
-  player: mongoose.Schema.ObjectId
+  player: SchemaTypes.ObjectId
 });
 draftPickOrderSchema.index({ pickNumber: 1, tourneyId: 1 });
 
 var draftPickSchema = mongoose.Schema({
-  tourneyId: mongoose.Schema.ObjectId,
-  player: mongoose.Schema.ObjectId,
-  golfer: mongoose.Schema.ObjectId,
+  tourneyId: SchemaTypes.ObjectId,
+  player: SchemaTypes.ObjectId,
+  golfer: SchemaTypes.ObjectId,
   pickNumber: Number,
   timestamp: Date
 });
@@ -36,11 +37,11 @@ draftPickSchema.index({ tourneyId: 1, pickNumber: 1 });
 draftPickSchema.index({ tourneyId: 1, golfer: 1 });
 
 var golferScoreSchema = mongoose.Schema({
-  tourneyId: mongoose.Schema.ObjectId,
-  golfer: mongoose.Schema.ObjectId,
+  tourneyId: SchemaTypes.ObjectId,
+  golfer: SchemaTypes.ObjectId,
   day: Number,
   thru: Number,
-  scores: [mongoose.Schema.mixed]
+  scores: [SchemaTypes.Mixed]
 });
 golferScoreSchema.index({ tourneyId: 1, golfer: 1 });
 
@@ -52,7 +53,7 @@ var tourneySchema = mongoose.Schema({
 });
 
 var appStateSchema = mongoose.Schema({
-  tourneyId: mongoose.Schema.ObjectId,
+  tourneyId: SchemaTypes.ObjectId,
   isDraftPaused: Boolean,
   allowClock: Boolean
 });
