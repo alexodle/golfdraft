@@ -87,6 +87,7 @@ var DraftWrapper = React.createClass({
           pickingForPlayers={props.draft.pickingForPlayers}
           activeUsers={props.activeUsers}
           allowClock={props.allowClock}
+          golfers={props.golfers}
         />
       </section>
     );
