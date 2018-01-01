@@ -35,7 +35,8 @@ function getAppState() {
       isMyDraftPick: DraftStore.getIsMyDraftPick(),
       currentPick: DraftStore.getCurrentPick(),
       draftPicks: DraftStore.getDraftPicks(),
-      pickingForPlayers: DraftStore.getPickingForPlayers()
+      pickingForPlayers: DraftStore.getPickingForPlayers(),
+      priority: DraftStore.getPriority()
     },
 
     scores: ScoreStore.getScores(),
@@ -87,7 +88,7 @@ var DraftWrapper = React.createClass({
           pickingForPlayers={props.draft.pickingForPlayers}
           activeUsers={props.activeUsers}
           allowClock={props.allowClock}
-          golfers={props.golfers}
+          draftPriority={props.draft.priority}
         />
       </section>
     );

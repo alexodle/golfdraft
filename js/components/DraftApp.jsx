@@ -56,7 +56,7 @@ var DraftApp = React.createClass({
     var tabSelection = this.state.tabSelection;
 
     return (
-      <section>
+      <div>
         <div className="row">
           <div className="col-md-12">
             <ul className="nav nav-tabs" style={{marginBottom: "20px"}}>
@@ -76,7 +76,7 @@ var DraftApp = React.createClass({
           </div>
         </div>
         {this._renderTabSubview()}
-      </section>
+      </div>
     );
   },
 
@@ -87,7 +87,7 @@ var DraftApp = React.createClass({
 
     if (tabSelection == TABS.DRAFT_HQ) {
       return (
-        <section>
+        <div>
           {isDraftPaused ? (<AppPausedStatus />) : (
             <div className="row">
               <div className="col-md-9">
@@ -141,17 +141,19 @@ var DraftApp = React.createClass({
               />
             </div>
           </div>
-        </section>
+        </div>
       );
     } else { // if (tabSelection == TABS.PICK_LIST_EDITOR) {
       return (
-        <section>
+        <div>
           <div className="row">
             <div className="col-md-12">
-              <PickListEditor golfers={this.props.golfers} />
+              <PickListEditor
+                draftPriority={this.props.draftPriority}
+              />
             </div>
           </div>
-        </section>
+        </div>
       );
     }
   },

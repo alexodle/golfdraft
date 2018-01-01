@@ -5,6 +5,7 @@ var _ = require('lodash');
 var AppConstants = require('../constants/AppConstants');
 var AppDispatcher = require('../dispatcher/AppDispatcher');
 var Store = require('./Store');
+var UserActions = require('../actions/UserActions');
 
 var _currentUser = null;
 var _users = null;
@@ -65,6 +66,9 @@ AppDispatcher.register(function (payload) {
         }
         xhr.fail(function () {
           window.location.reload();
+        });
+        xhr.done(function () {
+          UserActions.setCurrentUserSynced();
         });
       }
 

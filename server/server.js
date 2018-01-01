@@ -207,6 +207,46 @@ db.once('open', function callback () {
     });
   });
 
+  app.get('/draft/priority', function (req, res) {
+    var user = req.session.user;
+
+    if (!user || !user.id) {
+      res.status(401).send('Must be logged in to get draft priority');
+      return;
+    }
+
+    access.getPriority(user.id)
+    .then(function (priority) {
+      res.status(200).send({
+        playerId: user.id,
+        priority: priority
+      });
+    })
+    .catch(function (err) {
+      res.status(500).send(err);
+      return;
+    });
+  });
+
+  app.post('/draft/priority', function (req, res) {
+    var body = req.body;
+    var user = req.session.user;
+
+    if (!user || !user.id) {
+      res.status(401).send('Must be logged in to set draft priority');
+      return;
+    }
+
+    var priority = body.priority;
+    access.updatePriority(user.id, priority)
+    .catch(function (err) {
+      res.status(500).send(err);
+    })
+    .then(function () {
+      res.status(200).send({ playerId: user.id });
+    });
+  });
+
   app.post('/draft/picks', function (req, res) {
     var body = req.body;
     var user = req.session.user;

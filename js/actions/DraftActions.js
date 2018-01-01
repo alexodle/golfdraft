@@ -1,5 +1,6 @@
 'use strict';
 
+var _ = require("lodash");
 var AppDispatcher = require('../dispatcher/AppDispatcher');
 var DraftConstants = require('../constants/DraftConstants');
 
@@ -30,6 +31,13 @@ var DraftActions = {
     AppDispatcher.handleViewAction({
       actionType: DraftConstants.STOP_DRAFT_FOR_PLAYER,
       player: player
+    });
+  },
+
+  updatePriority: function (priority) {
+    AppDispatcher.handleViewAction({
+      actionType: DraftConstants.UPDATE_PRIORITY,
+      priority: priority
     });
   }
 

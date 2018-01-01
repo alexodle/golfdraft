@@ -3,6 +3,7 @@
 var $ = require('jquery');
 var _ = require('lodash');
 var AppDispatcher = require('../dispatcher/AppDispatcher');
+var AppConstants = require('../constants/AppConstants');
 var DraftConstants = require('../constants/DraftConstants');
 var Store = require('./Store');
 var UserStore = require('./UserStore');
@@ -10,6 +11,7 @@ var UserStore = require('./UserStore');
 var _picks = [];
 var _pickOrder = [];
 var _pickForPlayers = [];
+var _priority = null;
 
 function getCurrentPickNumber() {
   return _picks.length;
@@ -64,6 +66,10 @@ var DraftStore =  _.extend({}, Store.prototype, {
 
   getPickingForPlayers: function () {
     return _pickForPlayers;
+  },
+
+  getPriority: function () {
+    return _priority;
   }
 
 });
@@ -102,6 +108,38 @@ AppDispatcher.register(function (payload) {
 
     case DraftConstants.STOP_DRAFT_FOR_PLAYER:
       _pickForPlayers = _.without(_pickForPlayers, action.player);
+      DraftStore.emitChange();
+      break;
+
+    case AppConstants.CURRENT_USER_CHANGE:
+      _priority = null;
+      DraftStore.emitChange();
+      break;
+
+    case AppConstants.CURRENT_USER_CHANGE_SYNCED:
+      var currentUser = UserStore.getCurrentUser();
+      if (currentUser !== null) {
+        // TODO - Move to separate server sync
+        $.get('/draft/priority', pick)
+        .done(function (data) {
+          if (data.playerId === currentUser.id) {
+            _priority = data.priority;
+            DraftStore.emitChange();
+          }
+        });
+      }
+      break;
+
+    case DraftConstants.UPDATE_PRIORITY:
+      var data = { priority: action.priority };
+      _priority = action.priority;
+
+      // TODO - Move to separate server sync
+      $.post('/draft/priority', data)
+      .fail(function () {
+        //window.location.reload();
+      });
+
       DraftStore.emitChange();
       break;
   }

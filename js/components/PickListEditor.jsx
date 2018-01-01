@@ -1,6 +1,7 @@
 "use strict";
 
 var _ = require("lodash");
+var DraftActions = require("../actions/DraftActions");
 var GolferStore = require("../stores/GolferStore");
 var React = require("react");
 
@@ -10,59 +11,96 @@ var PickListEditor = React.createClass({
     return {
       draggingIndex: null,
       draggingHoverIndex: null,
-      tempTempPriorityOrder: _.chain(this.props.golfers)
-        .values()
-        .sortBy('wgr')
-        .value()
+      currentPriority: this.props.draftPriority,
+      savingId: null
     };
   },
 
+  componentWillReceiveProps: function (nextProps) {
+    if (this.props.draftPriority == null && nextProps.draftPriority != null) {
+      this.setState({ currentPriority: nextProps.draftPriority });
+    }
+  },
+
   render: function () {
+    var priority = this._getPriority();
+    if (priority == null) {
+      return this._renderLoading();
+    }
+
     var draggingIndex = this.state.draggingIndex;
     var draggingHoverIndex = this.state.draggingHoverIndex;
-    var golfers = this.state.tempTempPriorityOrder;
-    var draggingGolfer = golfers[draggingIndex];
+    var draggingGolferId = priority[draggingIndex];
+    var saveCancelButtonsEnabled = !_.isEqual(this.props.draftPriority, priority);
 
     if (draggingHoverIndex != null) {
-      golfers = this._newOrder(draggingIndex, draggingHoverIndex);
+      priority = this._newOrder(draggingIndex, draggingHoverIndex);
     }
 
     return (
-      <div className="row">
-        <div className="col-md-12">
-          <table className="table table-condensed table-striped">
-            <thead></thead>
-            <tbody>
-              {_.map(golfers, function (g, i) {
-                return (
-                  <tr
-                    key={g.id}
-                    className={draggingGolfer == null || draggingGolfer.id !== g.id ? "" : "info"}
-                  >
-                    <td
-                      draggable
-                      onDragStart={this._onDragStart.bind(this, i)}
-                      onDrop={this._onDrop.bind(this, i)}
-                      onDragEnd={this._onDragEnd}
-                      onDragOver={this._onDragOver.bind(this, i)}
-                      onDragLeave={this._onDragLeave}
+      <div>
+        <div className="row" style={{marginBottom: "1em"}}>
+          <div className="col-md-12 text-right">
+            <button
+              className="btn btn-default"
+              disabled={!saveCancelButtonsEnabled} 
+              type="button"
+              onClick={this._onReset}
+            >Reset</button>
+            <span> </span>
+            <button
+              className="btn btn-default btn-primary"
+              disabled={!saveCancelButtonsEnabled}
+              type="button"
+              onClick={this._onSave}
+            >Save</button>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-md-12">
+            <table className="table table-condensed table-striped">
+              <thead></thead>
+              <tbody>
+                {_.map(priority, function (gid, i) {
+                  var g = GolferStore.getGolfer(gid);
+                  return (
+                    <tr
+                      key={g.id}
+                      className={draggingGolferId == null || draggingGolferId !== g.id ? "" : "info"}
                     >
-                      <span className="glyphicon glyphicon-menu-hamburger text-muted">&nbsp;&nbsp;</span>
-                      <span>{i+1}.&nbsp;&nbsp;</span>
-                      {g.name}
-                    </td>
-                  </tr>
-                );
-              }, this)}
-            </tbody>
-          </table>
+                      <td
+                        draggable
+                        onDragStart={this._onDragStart.bind(this, i)}
+                        onDrop={this._onDrop.bind(this, i)}
+                        onDragEnd={this._onDragEnd}
+                        onDragOver={this._onDragOver.bind(this, i)}
+                        onDragLeave={this._onDragLeave}
+                      >
+                        <span className="glyphicon glyphicon-menu-hamburger text-muted">&nbsp;&nbsp;</span>
+                        <span>{i+1}.&nbsp;&nbsp;</span>
+                        {g.name}
+                      </td>
+                    </tr>
+                  );
+                }, this)}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     );
   },
 
+  _renderLoading: function () {
+    return (<span>Loading...</span>);
+  },
+
+  _getPriority: function () {
+    return this.state.currentPriority;
+  },
+
   _newOrder: function (fromIndex, toIndex) {
-    var currentOrder = this.state.tempTempPriorityOrder;
+    var currentOrder = this._getPriority();
     var movingGolfer = currentOrder[fromIndex];
     var newOrder = currentOrder.slice();
     newOrder.splice(fromIndex, 1);
@@ -70,15 +108,24 @@ var PickListEditor = React.createClass({
     return newOrder;
   },
 
+  _onReset: function () {
+    this.setState({ currentPriority: this.props.draftPriority });
+  },
+
+  _onSave: function () {
+    DraftActions.updatePriority(this.state.currentPriority);
+  },
+
   _onDrop: function (toIndex, e) {
     e.preventDefault();
 
     var fromIndex = this.state.draggingIndex;
     var newOrder = this._newOrder(fromIndex, toIndex);
+
     this.setState({
       draggingIndex: null,
       draggingHoverIndex: null,
-      tempTempPriorityOrder: newOrder
+      currentPriority: newOrder
     });
   },
 
