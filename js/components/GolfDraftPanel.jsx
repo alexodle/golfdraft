@@ -6,7 +6,10 @@ var GolfDraftPanel = React.createClass({
 
   render: function () {
     return (
-      <div className='panel panel-default'>
+      <div
+        className='panel panel-default golfdraft-panel'
+        style={{height: this.props.height || "100%"}}
+      >
         {!this.props.heading ? null : (
           <div className='panel-heading'>
             <h3 className='panel-title'>{this.props.heading}</h3>

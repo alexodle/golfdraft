@@ -2,6 +2,7 @@
 
 var _ = require("lodash");
 var DraftActions = require("../actions/DraftActions");
+var GolfDraftPanel = require('./GolfDraftPanel.jsx');
 var GolferStore = require("../stores/GolferStore");
 var React = require("react");
 
@@ -38,7 +39,7 @@ var PickListEditor = React.createClass({
     }
 
     return (
-      <div>
+      <GolfDraftPanel heading={this.props.panelHeader}>
         <div className="row" style={{marginBottom: "1em"}}>
           <div className="col-md-12 text-right">
             <button
@@ -56,7 +57,10 @@ var PickListEditor = React.createClass({
             >Save</button>
           </div>
         </div>
-        <div className="row">
+        <div className="row" style={{
+          height: this.props.height || "100%",
+          overflowY: "scroll"
+        }}>
           <div className="col-md-12">
             <table className="table table-condensed table-striped">
               <thead></thead>
@@ -87,7 +91,7 @@ var PickListEditor = React.createClass({
             </table>
           </div>
         </div>
-      </div>
+      </GolfDraftPanel>
     );
   },
 

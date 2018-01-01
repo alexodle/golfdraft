@@ -129,7 +129,11 @@ var DraftApp = React.createClass({
               />
             </div>
             <div className="col-md-6">
-              <BestLeft golfersRemaining={this.props.golfersRemaining} />
+              <PickListEditor
+                panelHeader={this._renderPickListEditorPanelHeader()}
+                draftPriority={this.props.draftPriority}
+                height="29em"
+              />
             </div>
           </div>
           <div className="row">
@@ -149,6 +153,7 @@ var DraftApp = React.createClass({
           <div className="row">
             <div className="col-md-12">
               <PickListEditor
+                panelHeader="Priority Editor"
                 draftPriority={this.props.draftPriority}
               />
             </div>
@@ -156,6 +161,12 @@ var DraftApp = React.createClass({
         </div>
       );
     }
+  },
+
+  _renderPickListEditorPanelHeader: function () {
+    return (
+      <span><a href='#' onClick={this._onTabClick.bind(this, TABS.PICK_LIST_EDITOR)}>Priority Editor</a></span>
+    );
   },
 
   _onDraftHistorySelectionChange: function (playerId) {
