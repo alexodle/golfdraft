@@ -40,6 +40,17 @@ function addPick(golfer) {
   return pick;
 }
 
+function filterPicksFromPriorities() {
+  var pickedGids = _.pluck(_picks, 'golfer');
+  if (_priority !== _pendingPriority) {
+    _priority = _.difference(_priority, pickedGids);
+    _pendingPriority = _.difference(_pendingPriority, pickedGids);
+  } else {
+    _priority = _.difference(_priority, pickedGids);
+    _pendingPriority = _priority;
+  }
+}
+
 var DraftStore =  _.extend({}, Store.prototype, {
 
   changeEvent: 'DraftStore:change',
@@ -86,6 +97,7 @@ AppDispatcher.register(function (payload) {
   switch(action.actionType) {
     case DraftConstants.DRAFT_PICK:
       var pick = addPick(action.golfer);
+      filterPicksFromPriorities();
 
       // TODO - Move to separate server sync
       $.post('/draft/picks', pick)
@@ -102,6 +114,7 @@ AppDispatcher.register(function (payload) {
       var draft = action.draft;
       _picks = draft.picks;
       _pickOrder = draft.pickOrder;
+      filterPicksFromPriorities();
 
       DraftStore.emitChange();
       break;
@@ -118,6 +131,7 @@ AppDispatcher.register(function (payload) {
 
     case AppConstants.CURRENT_USER_CHANGE:
       _priority = null;
+      _pendingPriority = null;
       DraftStore.emitChange();
       break;
 
@@ -130,6 +144,7 @@ AppDispatcher.register(function (payload) {
           if (data.playerId === currentUser.id) {
             _priority = data.priority;
             _pendingPriority = _priority;
+            filterPicksFromPriorities();
             DraftStore.emitChange();
           }
         });
