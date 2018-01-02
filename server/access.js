@@ -146,6 +146,8 @@ _.extend(access, {
 
   getScores: createBasicGetter(models.GolferScore),
 
+  getPicks: createBasicGetter(models.DraftPick),
+
   getScoreOverrides: createBasicGetter(models.GolferScoreOverrides),
 
   getAppState: function () {
@@ -162,6 +164,34 @@ _.extend(access, {
       {upsert: true}
     ).exec();
   }),
+
+  makeHighestPriorityPick: function (playerId, pickNumber) {
+    return Promise.all([
+      access.getPriority(playerId),
+      access.getPicks()
+    ])
+    .then(function (results) {
+      var priority = results[0];
+      var picks = results[1];
+      var pickedGolfers = _.chain(picks)
+        .pluck('golfer')
+        .indexBy()
+        .value();
+
+      var golferToPick = _.chain(priority)
+      .filter(function (gid) {
+        return !pickedGolfers[gid];
+      })
+      .first()
+      .value();
+
+      return access.makePick({
+        pickNumber: pickNumber,
+        player: playerId,
+        golfer: golferToPick
+      });
+    });
+  },
 
   makePick: function (pick, ignoreOrder) {
     var pickOrderQuery = _.extend({}, FK_TOURNEY_ID_QUERY, {
@@ -206,6 +236,9 @@ _.extend(access, {
       pick = extendWithTourneyId(pick);
       pick.timestamp = new Date();
       return promiseize(models.DraftPick.create(pick));
+    })
+    .then(function () {
+      return pick;
     });
   },
 
@@ -219,7 +252,7 @@ _.extend(access, {
   getDraft: function () {
     return Promise.all([
       promiseize(models.DraftPickOrder.find(FK_TOURNEY_ID_QUERY).exec()),
-      promiseize(models.DraftPick.find(FK_TOURNEY_ID_QUERY).exec()),
+      access.getPicks()
     ])
     .then(function (results) {
       return {

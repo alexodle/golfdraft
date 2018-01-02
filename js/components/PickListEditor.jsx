@@ -2,6 +2,7 @@
 
 var _ = require("lodash");
 var DraftActions = require("../actions/DraftActions");
+var GolferLogic = require("../logic/GolferLogic");
 var GolferStore = require("../stores/GolferStore");
 var React = require("react");
 
@@ -16,7 +17,7 @@ var PickListEditor = React.createClass({
 
   render: function () {
     var priority = this._getPriority();
-    if (priority == null) {
+    if (!priority) {
       return this._renderLoading();
     }
 
@@ -66,7 +67,7 @@ var PickListEditor = React.createClass({
                   return (
                     <tr
                       key={g.id}
-                      className={draggingGolferId == null || draggingGolferId !== g.id ? "" : "info"}
+                      className={!draggingGolferId || draggingGolferId !== g.id ? "" : "info"}
                     >
                       <td
                         draggable
@@ -78,7 +79,7 @@ var PickListEditor = React.createClass({
                       >
                         <span className="glyphicon glyphicon-menu-hamburger text-muted">&nbsp;&nbsp;</span>
                         <span>{i+1}.&nbsp;&nbsp;</span>
-                        {g.name}
+                        {GolferLogic.renderGolfer(g)}
                       </td>
                     </tr>
                   );

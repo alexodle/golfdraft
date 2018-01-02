@@ -95,6 +95,7 @@ AppDispatcher.register(function (payload) {
   var action = payload.action;
 
   switch(action.actionType) {
+
     case DraftConstants.DRAFT_PICK:
       var pick = addPick(action.golfer);
       filterPicksFromPriorities();
@@ -108,6 +109,18 @@ AppDispatcher.register(function (payload) {
       });
 
       DraftStore.emitChange();
+      break;
+
+    case DraftConstants.DRAFT_PICK_HIGHEST_PRI:
+      var partialPick = getCurrentPick();
+
+      // TODO - Move to separate server sync
+      $.post('/draft/pickHighestPriGolfer', partialPick)
+      .fail(function () {
+        // No real error handling here, just reload the page to make sure we
+        // don't get people in a weird state.
+        window.location.reload();
+      });
       break;
 
     case DraftConstants.DRAFT_UPDATE:
@@ -137,7 +150,7 @@ AppDispatcher.register(function (payload) {
 
     case AppConstants.CURRENT_USER_CHANGE_SYNCED:
       var currentUser = UserStore.getCurrentUser();
-      if (currentUser !== null) {
+      if (!!currentUser) {
         // TODO - Move to separate server sync
         $.get('/draft/priority', pick)
         .done(function (data) {

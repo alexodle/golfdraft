@@ -25,8 +25,9 @@ var RedisStore = require('connect-redis')(session);
 
 var MAX_AGE = 1000 * 60 * 60 * 24 * 365;
 
+var NOT_AN_ERROR = {};
+
 var redisPubSubClient = redis.pubSubClient;
-var ObjectId = mongoose.Types.ObjectId;
 
 mongoose.connect(config.mongo_url);
 
@@ -224,7 +225,6 @@ db.once('open', function callback () {
     })
     .catch(function (err) {
       res.status(500).send(err);
-      return;
     });
   });
 
@@ -247,41 +247,26 @@ db.once('open', function callback () {
     });
   });
 
-  app.post('/draft/picks', function (req, res) {
-    var body = req.body;
-    var user = req.session.user;
-
-    if (!user || !user.id) {
-      res.status(401).send('Must be logged in to make a pick');
-      return;
-    }
-
-    var pick = {
-      pickNumber: body.pickNumber,
-      player: new ObjectId(body.player),
-      golfer: new ObjectId(body.golfer)
-    };
-
-    var notAnError = {};
-
-    // Ensure not paused
-    access.getAppState()
+  function ensureNotPaused(req, res) {
+    return access.getAppState()
     .then(function (appState) {
       if (appState && appState.isDraftPaused) {
         res.status(400).status('Admin has paused the app');
-        throw notAnError;
+        throw NOT_AN_ERROR;
       }
-    })
+    });
+  }
 
-    // Make the pick
-    .then(function () {
-      return access.makePick(pick);
-    })
-    .then(function () {
+  function handlePick(req, res, pickPromise, highestPriPick) {
+    var user = req.session.user;
+    var pick = null;
+
+    return pickPromise.then(function (_pick) {
+      pick = _pick;
       res.sendStatus(200);
     })
     .catch(function (err) {
-      if (err === notAnError) throw err;
+      if (err === NOT_AN_ERROR) throw err;
 
       if (err.message.indexOf('invalid pick') !== -1) {
         res.status(400).send(err.message);
@@ -295,15 +280,55 @@ db.once('open', function callback () {
       updateClients(draft);
 
       // Do this second, since it's least important
-      chatBot.broadcastPickMessage(user, pick, draft);
+      chatBot.broadcastPickMessage(user, pick, draft, highestPriPick);
     })
     .catch(function (err) {
-      if (err === notAnError) throw err;
+      if (err === NOT_AN_ERROR) throw err;
 
       // The main functionality finished,
       // so don't return a failed response code
       console.log('err: ' + err);
     });
+  }
+
+  app.post('/draft/picks', function (req, res) {
+    var body = req.body;
+    var user = req.session.user;
+
+    if (!user || !user.id) {
+      res.status(401).send('Must be logged in to make a pick');
+      return;
+    }
+
+    var pick = {
+      pickNumber: body.pickNumber,
+      player: body.player,
+      golfer: body.golfer
+    };
+
+    var pickPromise = ensureNotPaused(req, res)
+    .then(function () {
+      return access.makePick(pick);
+    });
+
+    handlePick(req, res, pickPromise, false /* highestPriPick */);
+  });
+
+  app.post('/draft/pickHighestPriGolfer', function (req, res) {
+    var body = req.body;
+    var user = req.session.user;
+
+    if (!user || !user.id) {
+      res.status(401).send('Must be logged in to make a pick');
+      return;
+    }
+
+    var pickPromise = ensureNotPaused(req, res)
+    .then(function () {
+      return access.makeHighestPriorityPick(body.player, body.pickNumber);
+    });
+    
+    handlePick(req, res, pickPromise, true /* highestPriPick */);
   });
 
   // ADMIN FUNCTIONALITY

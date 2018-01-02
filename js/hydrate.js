@@ -28,8 +28,7 @@ function hydrate(seedData) {
   // not need to differentiate the two in the future, so just keep the
   // abstraction for now.
   var users = _.transform(PlayerStore.getAll(), function (memo, p) {
-    var uid = 'user_' + p.id;
-    memo[uid] = { id: uid, name: p.name, player: p.id };
+    memo[p.id] = { id: p.id, name: p.name, player: p.id };
   });
   AppActions.setUsers(users);
 

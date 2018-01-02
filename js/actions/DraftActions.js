@@ -13,6 +13,12 @@ var DraftActions = {
     });
   },
 
+  makeHighestPriorityPick: function () {
+    AppDispatcher.handleViewAction({
+      actionType: DraftConstants.DRAFT_PICK_HIGHEST_PRI
+    });
+  },
+
   draftUpdate: function (draft) {
     AppDispatcher.handleServerAction({
       actionType: DraftConstants.DRAFT_UPDATE,

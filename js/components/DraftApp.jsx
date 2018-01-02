@@ -109,6 +109,7 @@ var DraftApp = React.createClass({
                     currentUser={this.props.currentUser}
                     golfersRemaining={this.props.golfersRemaining}
                     currentPick={this.props.currentPick}
+                    syncedPriority={this.props.syncedPriority}
                   />
                 )}
               </div>
