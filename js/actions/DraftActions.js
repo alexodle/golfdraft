@@ -34,10 +34,22 @@ var DraftActions = {
     });
   },
 
-  updatePriority: function (priority) {
+  updatePendingPriority: function (pendingPriority) {
     AppDispatcher.handleViewAction({
-      actionType: DraftConstants.UPDATE_PRIORITY,
-      priority: priority
+      actionType: DraftConstants.UPDATE_PENDING_PRIORITY,
+      pendingPriority: pendingPriority
+    });
+  },
+
+  resetPendingPriority: function () {
+    AppDispatcher.handleViewAction({
+      actionType: DraftConstants.RESET_PENDING_PRIORITY
+    });
+  },
+
+  savePriority: function () {
+    AppDispatcher.handleViewAction({
+      actionType: DraftConstants.SAVE_PRIORITY
     });
   }
 

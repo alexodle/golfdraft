@@ -89,8 +89,12 @@ var DraftApp = React.createClass({
     if (tabSelection == TABS.DRAFT_HQ) {
       var priorityPanelHeader = (
         <span>
-          <span>Pick Priorities - {this.props.currentUser.name}</span>
-          <span className="text-right">Edit</span>
+          <span>Pick Priorities</span>
+          <span className="pull-right">
+            <a href="#" onClick={this._onTabClick.bind(this, TABS.PICK_LIST_EDITOR)}>
+              <span className="glyphicon glyphicon-fullscreen"/>
+            </a>
+          </span>
         </span>
       );
       return (
@@ -138,8 +142,8 @@ var DraftApp = React.createClass({
             <div className="col-md-6">
               <GolfDraftPanel heading={priorityPanelHeader}>
                 <PickListEditor
-                  readOnly
-                  draftPriority={this.props.draftPriority}
+                  syncedPriority={this.props.syncedPriority}
+                  pendingPriority={this.props.pendingPriority}
                   height="32em"
                 />
               </GolfDraftPanel>
@@ -163,7 +167,8 @@ var DraftApp = React.createClass({
             <div className="col-md-12">
               <GolfDraftPanel heading="Pick Priorities">
                 <PickListEditor
-                  draftPriority={this.props.draftPriority}
+                  syncedPriority={this.props.syncedPriority}
+                  pendingPriority={this.props.pendingPriority}
                 />
               </GolfDraftPanel>
             </div>

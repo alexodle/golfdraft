@@ -10,15 +10,8 @@ var PickListEditor = React.createClass({
   getInitialState: function () {
     return {
       draggingIndex: null,
-      draggingHoverIndex: null,
-      currentPriority: this.props.draftPriority
+      draggingHoverIndex: null
     };
-  },
-
-  componentWillReceiveProps: function (nextProps) {
-    if (this.props.draftPriority == null && nextProps.draftPriority != null) {
-      this.setState({ currentPriority: nextProps.draftPriority });
-    }
   },
 
   render: function () {
@@ -30,8 +23,7 @@ var PickListEditor = React.createClass({
     var draggingIndex = this.state.draggingIndex;
     var draggingHoverIndex = this.state.draggingHoverIndex;
     var draggingGolferId = priority[draggingIndex];
-    var readOnly = !!this.props.readOnly;
-    var unsavedChanges = !_.isEqual(this.props.draftPriority, priority);
+    var unsavedChanges = this.props.syncedPriority !== priority;
 
     if (draggingHoverIndex != null) {
       priority = this._newOrder(draggingIndex, draggingHoverIndex);
@@ -39,27 +31,25 @@ var PickListEditor = React.createClass({
 
     return (
       <div>
-        {readOnly ? null : (
-          <div className="row" style={{marginBottom: "1em"}}>
-            <div className="col-md-12 text-right">
-              <span>
-                <button
-                  className="btn btn-default"
-                  disabled={!unsavedChanges} 
-                  type="button"
-                  onClick={this._onCancel}
-                >Cancel</button>
-                <span> </span>
-                <button
-                  className="btn btn-default btn-primary"
-                  disabled={!unsavedChanges}
-                  type="button"
-                  onClick={this._onSave}
-                >Save</button>
-              </span>
-            </div>
+        <div className="row" style={{marginBottom: "1em"}}>
+          <div className="col-md-12 text-right">
+            <span>
+              <button
+                className="btn btn-default"
+                disabled={!unsavedChanges} 
+                type="button"
+                onClick={this._onReset}
+              >Reset</button>
+              <span> </span>
+              <button
+                className="btn btn-default btn-primary"
+                disabled={!unsavedChanges}
+                type="button"
+                onClick={this._onSave}
+              >Save</button>
+            </span>
           </div>
-        )}
+        </div>
         <div className="row" style={{
           height: this.props.height || "100%",
           overflowY: "scroll"
@@ -79,16 +69,14 @@ var PickListEditor = React.createClass({
                       className={draggingGolferId == null || draggingGolferId !== g.id ? "" : "info"}
                     >
                       <td
-                        draggable={!readOnly}
+                        draggable
                         onDragStart={this._onDragStart.bind(this, i)}
                         onDrop={this._onDrop.bind(this, i)}
                         onDragEnd={this._onDragEnd}
                         onDragOver={this._onDragOver.bind(this, i)}
                         onDragLeave={this._onDragLeave}
                       >
-                        {readOnly ? null : (
-                          <span className="glyphicon glyphicon-menu-hamburger text-muted">&nbsp;&nbsp;</span>
-                        )}
+                        <span className="glyphicon glyphicon-menu-hamburger text-muted">&nbsp;&nbsp;</span>
                         <span>{i+1}.&nbsp;&nbsp;</span>
                         {g.name}
                       </td>
@@ -108,7 +96,7 @@ var PickListEditor = React.createClass({
   },
 
   _getPriority: function () {
-    return this.state.currentPriority;
+    return this.props.pendingPriority;
   },
 
   _newOrder: function (fromIndex, toIndex) {
@@ -121,11 +109,11 @@ var PickListEditor = React.createClass({
   },
 
   _onReset: function () {
-    this.setState({ currentPriority: this.props.draftPriority });
+    DraftActions.resetPendingPriority();
   },
 
   _onSave: function () {
-    DraftActions.updatePriority(this.state.currentPriority);
+    DraftActions.savePriority();
   },
 
   _onDrop: function (toIndex, e) {
@@ -134,11 +122,7 @@ var PickListEditor = React.createClass({
     var fromIndex = this.state.draggingIndex;
     var newOrder = this._newOrder(fromIndex, toIndex);
 
-    this.setState({
-      draggingIndex: null,
-      draggingHoverIndex: null,
-      currentPriority: newOrder
-    });
+    DraftActions.updatePendingPriority(newOrder);
   },
 
   _onDragStart: function (i, e) {

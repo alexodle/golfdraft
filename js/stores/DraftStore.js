@@ -12,6 +12,7 @@ var _picks = [];
 var _pickOrder = [];
 var _pickForPlayers = [];
 var _priority = null;
+var _pendingPriority = null;
 
 function getCurrentPickNumber() {
   return _picks.length;
@@ -70,6 +71,10 @@ var DraftStore =  _.extend({}, Store.prototype, {
 
   getPriority: function () {
     return _priority;
+  },
+
+  getPendingPriority: function () {
+    return _pendingPriority;
   }
 
 });
@@ -124,20 +129,31 @@ AppDispatcher.register(function (payload) {
         .done(function (data) {
           if (data.playerId === currentUser.id) {
             _priority = data.priority;
+            _pendingPriority = _priority;
             DraftStore.emitChange();
           }
         });
       }
       break;
 
-    case DraftConstants.UPDATE_PRIORITY:
-      var data = { priority: action.priority };
-      _priority = action.priority;
+    case DraftConstants.UPDATE_PENDING_PRIORITY:
+      _pendingPriority = action.pendingPriority;
+      DraftStore.emitChange();
+      break;
+
+    case DraftConstants.RESET_PENDING_PRIORITY:
+      _pendingPriority = _priority;
+      DraftStore.emitChange();
+      break;
+
+    case DraftConstants.SAVE_PRIORITY:
+      _priority = _pendingPriority;
 
       // TODO - Move to separate server sync
+      var data = { priority: _priority };
       $.post('/draft/priority', data)
       .fail(function () {
-        //window.location.reload();
+        window.location.reload();
       });
 
       DraftStore.emitChange();

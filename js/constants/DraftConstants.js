@@ -6,6 +6,8 @@ module.exports = keyMirror({
   DRAFT_FOR_PLAYER: null,
   DRAFT_PICK: null,
   DRAFT_UPDATE: null,
+  RESET_PENDING_PRIORITY: null,
+  SAVE_PRIORITY: null,
   STOP_DRAFT_FOR_PLAYER: null,
-  UPDATE_PRIORITY: null
+  UPDATE_PENDING_PRIORITY: null
 });
