@@ -237,14 +237,33 @@ db.once('open', function callback () {
       return;
     }
 
-    var priority = body.priority;
-    access.updatePriority(user.id, priority)
-    .catch(function (err) {
-      res.status(500).send(err);
-    })
-    .then(function () {
-      res.status(200).send({ playerId: user.id });
-    });
+    if (body.priority) {
+      access.updatePriority(user.id, body.priority)
+      .then(function () {
+        res.status(200).send({ playerId: user.id, priority: body.priority });
+      })
+      .catch(function (err) {
+        res.status(500).send(err);
+      });
+      
+    } else {
+      access.updatePriorityFromNames(user.id, body.priorityNames)
+      .then(function (result) {
+        console.log('hihi.2');
+        if (result.completed) {
+        console.log('hihi.3');
+          res.status(200).send({ playerId: user.id, priority: result.priority });
+        } else {
+        console.log('hihi.4');
+          res.status(422).send({ playerId: user.id, suggestions: result.suggestions });
+        }
+      })
+      .catch(function (err) {
+        console.log('hihi.5');
+        console.dir(err);
+        res.status(500).send(err);
+      });
+    }
   });
 
   function ensureNotPaused(req, res) {

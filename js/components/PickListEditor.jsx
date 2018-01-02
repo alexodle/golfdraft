@@ -2,6 +2,7 @@
 
 var _ = require("lodash");
 var DraftActions = require("../actions/DraftActions");
+var FreeTextPickListEditor = require("./FreeTextPickListEditor.jsx");
 var GolferLogic = require("../logic/GolferLogic");
 var GolferStore = require("../stores/GolferStore");
 var React = require("react");
@@ -11,7 +12,8 @@ var PickListEditor = React.createClass({
   getInitialState: function () {
     return {
       draggingIndex: null,
-      draggingHoverIndex: null
+      draggingHoverIndex: null,
+      isFreeTextMode: false
     };
   },
 
@@ -19,6 +21,10 @@ var PickListEditor = React.createClass({
     var priority = this._getPriority();
     if (!priority) {
       return this._renderLoading();
+    }
+
+    if (this.state.isFreeTextMode) {
+      return (<FreeTextPickListEditor onCancel={this._onFreeTextCancel} />);
     }
 
     var draggingIndex = this.state.draggingIndex;
@@ -33,8 +39,15 @@ var PickListEditor = React.createClass({
     return (
       <div>
         <div className="row" style={{marginBottom: "1em"}}>
-          <div className="col-md-12 text-right">
+          <div className="col-md-12">
             <span>
+              <button
+                className="btn btn-default"
+                type="button"
+                onClick={this._onFreeTextClick}
+              >Paste list</button>
+            </span>
+            <span className="pull-right">
               <button
                 className="btn btn-default"
                 disabled={!unsavedChanges} 
@@ -175,6 +188,14 @@ var PickListEditor = React.createClass({
     if (this.state.draggingHoverIndex !== i) {
       this.setState({ draggingHoverIndex: i });
     }
+  },
+
+  _onFreeTextClick: function () {
+    this.setState({ isFreeTextMode: true });
+  },
+
+  _onFreeTextCancel: function () {
+    this.setState({ isFreeTextMode: false });
   }
 
 });
