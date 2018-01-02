@@ -77,9 +77,19 @@ var PickListEditor = React.createClass({
                         onDragOver={this._onDragOver.bind(this, i)}
                         onDragLeave={this._onDragLeave}
                       >
-                        <span className="glyphicon glyphicon-menu-hamburger text-muted">&nbsp;&nbsp;</span>
-                        <span>{i+1}.&nbsp;&nbsp;</span>
-                        {GolferLogic.renderGolfer(g)}
+
+                        <span className="hidden-xs">
+                          <span className="hidden-xs glyphicon glyphicon-menu-hamburger text-muted" />
+                          &nbsp;&nbsp;{i+1}.&nbsp;&nbsp;{GolferLogic.renderGolfer(g)}
+                        </span>
+                        
+                        <span className="visible-xs">
+                          {this._renderArrowLink("glyphicon-arrow-up", this._onUpOne.bind(this, i), i === 0)}
+                          <span>&nbsp;</span>
+                          {this._renderArrowLink("glyphicon-arrow-down", this._onDownOne.bind(this, i), i + 1 === priority.length)}
+                          &nbsp;&nbsp;{i+1}.&nbsp;&nbsp;{GolferLogic.renderGolfer(g)}
+                        </span>
+
                       </td>
                     </tr>
                   );
@@ -89,6 +99,17 @@ var PickListEditor = React.createClass({
           </div>
         </div>
       </div>
+    );
+  },
+
+  _renderArrowLink: function (arrowClass, onClick, isDisabled) {
+    if (isDisabled) {
+      return (<span className={"text-muted glyphicon " + arrowClass} />);
+    }
+    return (
+      <a href="#" onClick={onClick}>
+        <span className={"glyphicon " + arrowClass} />
+      </a>
     );
   },
 
@@ -107,6 +128,18 @@ var PickListEditor = React.createClass({
     newOrder.splice(fromIndex, 1);
     newOrder.splice(toIndex, 0, movingGolfer);
     return newOrder;
+  },
+
+  _onUpOne: function (i, e) {
+    e.preventDefault();
+    var newOrder = this._newOrder(i, i - 1);
+    DraftActions.updatePendingPriority(newOrder);
+  },
+
+  _onDownOne: function (i, e) {
+    e.preventDefault();
+    var newOrder = this._newOrder(i, i + 1);
+    DraftActions.updatePendingPriority(newOrder);
   },
 
   _onReset: function () {
