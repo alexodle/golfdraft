@@ -145,7 +145,7 @@ var DraftApp = React.createClass({
                 <PickListEditor
                   syncedPriority={this.props.syncedPriority}
                   pendingPriority={this.props.pendingPriority}
-                  height="32em"
+                  height="29em"
                 />
               </GolfDraftPanel>
             </div>
