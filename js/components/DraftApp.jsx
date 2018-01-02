@@ -89,12 +89,12 @@ var DraftApp = React.createClass({
     if (tabSelection == TABS.DRAFT_HQ) {
       var priorityPanelHeader = (
         <span>
+          <a href="#" onClick={this._onTabClick.bind(this, TABS.PICK_LIST_EDITOR)}>
+            <span className="glyphicon glyphicon-new-window"/>
+          </a>
+          <span>&nbsp;&nbsp;</span>
           <span>Pick Priorities</span>
-          <span className="pull-right">
-            <a href="#" onClick={this._onTabClick.bind(this, TABS.PICK_LIST_EDITOR)}>
-              <span className="glyphicon glyphicon-fullscreen"/>
-            </a>
-          </span>
+          <span className="pull-right"><em>NEW!</em></span>
         </span>
       );
       return (
