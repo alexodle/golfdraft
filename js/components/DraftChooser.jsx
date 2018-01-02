@@ -5,18 +5,15 @@ var cx = require('classnames');
 var DraftActions = require('../actions/DraftActions');
 var GolfDraftPanel = require('./GolfDraftPanel.jsx');
 var GolferLogic = require('../logic/GolferLogic');
+var GolferStore = require('../stores/GolferStore');
 var PlayerStore = require('../stores/PlayerStore');
 var React = require('react');
-
-function sortGolfers(golfers, sortKey) {
-  return _.sortBy(golfers, [sortKey, 'name']);
-}
 
 var DraftChooser = React.createClass({
 
   getInitialState: function () {
     return _.extend(this._getSelectionState(this.props.golfersRemaining), {
-      sortKey: 'name'
+      sortKey: 'priority'
     });
   },
 
@@ -29,11 +26,11 @@ var DraftChooser = React.createClass({
     var golfersRemaining = this.props.golfersRemaining;
     var currentPick = this.props.currentPick;
     var sortKey = this.state.sortKey;
-
-    var sortedGolfers = sortGolfers(golfersRemaining, sortKey);
+    var isProxyPick = this._isProxyPick();
+    var sortedGolfers = this._sortedGolfers(golfersRemaining, sortKey);
 
     var header = null;
-    if (this.props.currentUser.player === currentPick.player) {
+    if (!isProxyPick) {
       header = (<h4>It&#8217;s your turn! Make your pick.</h4>);
     } else {
       var playerName = PlayerStore.getPlayer(currentPick.player).name;
@@ -59,6 +56,14 @@ var DraftChooser = React.createClass({
             type="button"
             className={cx({
               "btn btn-default": true,
+              "active": sortKey === 'priority'
+            })}
+            onClick={_.partial(this._setSortKey, 'priority')}
+          >User Priority</button>
+          <button
+            type="button"
+            className={cx({
+              "btn btn-default": true,
               "active": sortKey === 'name'
             })}
             onClick={_.partial(this._setSortKey, 'name')}
@@ -74,42 +79,74 @@ var DraftChooser = React.createClass({
         </div>
 
         <form role="form">
-          <div className="form-group">
-            <label labelFor="golfersRemaining">Select your player:</label>
-            <select
-              id="golfersRemaining"
-              value={this.state.selectedGolfer}
-              onChange={this._onChange}
-              size="10"
-              className="form-control"
-            >
-              {_.map(sortedGolfers, function (g) {
-                return (
-                  <option key={g.id} value={g.id}>
-                    {GolferLogic.renderGolfer(g)}
-                  </option>
-                );
-              })}
-            </select>
+        {isProxyPick && sortKey === 'priority' ? (
+          <div>
+            <button
+              style={{marginTop: "2em"}}
+              className="btn btn-default btn-primary"
+              onClick={this._onProxyPriorityPick}
+            >Auto-pick next player on priority list</button>
           </div>
-          <button
-            className="btn btn-default btn-primary"
-            onClick={this._onSubmit}
-          >
-            Pick
-          </button>
+        ) : (
+          <div>
+            <div className="form-group">
+              <label labelFor="golfersRemaining">Select your player:</label>
+              <select
+                id="golfersRemaining"
+                value={this.state.selectedGolfer}
+                onChange={this._onChange}
+                size="10"
+                className="form-control"
+              >
+                {_.map(sortedGolfers, function (g) {
+                  return (
+                    <option key={g.id} value={g.id}>
+                      {GolferLogic.renderGolfer(g)}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+            <button
+              className="btn btn-default btn-primary"
+              onClick={this._onSubmit}
+            >
+              Pick
+            </button>
+          </div>
+        )}
         </form>
       </GolfDraftPanel>
     );
   },
 
+  _isProxyPick: function () {
+    return this.props.currentUser.player !== this.props.currentPick.player;
+  },
+
+  _sortedGolfers: function (golfers, sortKey) {
+    var isProxyPick = this._isProxyPick();
+    if (sortKey === 'priority') {
+      if (isProxyPick) {
+        // special case, we cannot show the full list if this a proxy pick
+        return null;
+      } else {
+        return _.chain(this.props.syncedPriority)
+        .map(GolferStore.getGolfer)
+        .value();
+      }
+    }
+    return _.sortBy(golfers, [sortKey, 'name']);
+  },
+
   _getSelectionState: function (golfersRemaining) {
     var state = this.state || {};
     var selectedGolfer = state.selectedGolfer;
-    var sortKey = state.sortKey || 'name';
+    var sortKey = state.sortKey || 'priority';
 
     if (!selectedGolfer || !golfersRemaining[selectedGolfer]) {
-      selectedGolfer = _.first(sortGolfers(golfersRemaining, sortKey)).id;
+      var firstGolfer = _.first(this._sortedGolfers(golfersRemaining, sortKey));
+      selectedGolfer = firstGolfer ? firstGolfer.id : null;
     }
     return {
       selectedGolfer: selectedGolfer
@@ -124,10 +161,17 @@ var DraftChooser = React.createClass({
     if (sortKey === this.state.sortKey) return;
 
     var golfersRemaining = this.props.golfersRemaining;
+    var firstGolfer = _.first(this._sortedGolfers(golfersRemaining, sortKey));
+    var selectedGolfer = firstGolfer ? firstGolfer.id : null;
     this.setState({
       sortKey: sortKey,
-      selectedGolfer: _.first(sortGolfers(golfersRemaining, sortKey)).id
+      selectedGolfer: selectedGolfer
     });
+  },
+
+  _onProxyPriorityPick: function (ev) {
+    ev.preventDefault();
+    DraftActions.makeHighestPriorityPick();
   },
 
   _onSubmit: function (ev) {

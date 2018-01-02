@@ -12,6 +12,12 @@ var UserActions = {
     });
   },
 
+  setCurrentUserSynced: function () {
+    AppDispatcher.handleServerAction({
+      actionType: AppConstants.CURRENT_USER_CHANGE_SYNCED
+    });
+  },
+
   /**
    Same as setting the current user, except that this is specifically
    reserved for app startup
@@ -22,6 +28,7 @@ var UserActions = {
       currentUser: user,
       doNotSync: true
     });
+    UserActions.setCurrentUserSynced();
   },
 
   setIsAdmin: function (isAdmin) {
