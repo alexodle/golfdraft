@@ -29,7 +29,7 @@ var DraftPickOrder = React.createClass({
     var pickOrder = DraftStore.getPickOrder();
     pickOrder = _.first(pickOrder, pickOrder.length / 4);
     return (
-      <GolfDraftPanel heading='Pick Order'>
+      <div>
         <p><small>
           <b>Tip:</b> your are picking for all players in bold
         </small></p>
@@ -57,7 +57,7 @@ var DraftPickOrder = React.createClass({
               </li>);
           }, this)}
         </ol>
-      </GolfDraftPanel>
+      </div>
     );
   },
 

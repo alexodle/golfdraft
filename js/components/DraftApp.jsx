@@ -56,15 +56,9 @@ var DraftApp = React.createClass({
             <div className="row">
               <div className="col-md-9">
                 {!isMyPick ? (
-                  <div>
+                  <GolfDraftPanel heading='Draft Status'>
                     <DraftStatus currentPick={this.props.currentPick} />
-                    <DraftPickOrder
-                      currentUser={this.props.currentUser}
-                      currentPick={this.props.currentPick}
-                      pickingForPlayers={this.props.pickingForPlayers}
-                      onPlayerSelected={this._onDraftHistorySelectionChange}
-                    />
-                  </div>
+                  </GolfDraftPanel>
                 ) : (
                   <DraftChooser
                     currentUser={this.props.currentUser}
@@ -84,7 +78,17 @@ var DraftApp = React.createClass({
             </div>
           )}
           <div className="row">
-            <div className="col-md-12">
+            <div className="col-md-4">
+              <GolfDraftPanel heading='Draft Order'>
+                <DraftPickOrder
+                  currentUser={this.props.currentUser}
+                  currentPick={this.props.currentPick}
+                  pickingForPlayers={this.props.pickingForPlayers}
+                  onPlayerSelected={this._onDraftHistorySelectionChange}
+                />
+              </GolfDraftPanel>
+            </div>
+            <div className="col-md-8">
               <GolfDraftPanel heading={priorityPanelHeader}>
                 <PickListEditor
                   syncedPriority={this.props.syncedPriority}
