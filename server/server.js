@@ -224,6 +224,7 @@ db.once('open', function callback () {
       });
     })
     .catch(function (err) {
+      console.log(err);
       res.status(500).send(err);
     });
   });
@@ -243,24 +244,21 @@ db.once('open', function callback () {
         res.status(200).send({ playerId: user.id, priority: body.priority });
       })
       .catch(function (err) {
+        console.log(err);
         res.status(500).send(err);
       });
       
     } else {
       access.updatePriorityFromNames(user.id, body.priorityNames)
       .then(function (result) {
-        console.log('hihi.2');
         if (result.completed) {
-        console.log('hihi.3');
           res.status(200).send({ playerId: user.id, priority: result.priority });
         } else {
-        console.log('hihi.4');
-          res.status(422).send({ playerId: user.id, suggestions: result.suggestions });
+          res.status(300).send({ playerId: user.id, suggestions: result.suggestions });
         }
       })
       .catch(function (err) {
-        console.log('hihi.5');
-        console.dir(err);
+        console.log(err);
         res.status(500).send(err);
       });
     }
@@ -306,7 +304,7 @@ db.once('open', function callback () {
 
       // The main functionality finished,
       // so don't return a failed response code
-      console.log('err: ' + err);
+      console.log(err);
     });
   }
 
@@ -360,6 +358,7 @@ db.once('open', function callback () {
     req.session.isAdmin = true;
     req.session.save(function (err) {
       if (err) {
+        console.log(err);
         res.status(500).send(err);
         return;
       }
@@ -422,7 +421,7 @@ db.once('open', function callback () {
     .then(access.getDraft)
     .then(updateClients)
     .catch(function (err) {
-      console.log('err: ' + err);
+      console.log(err);
     });
 
   });
