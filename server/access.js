@@ -83,7 +83,7 @@ _.extend(access, {
     var query = _.extend({ userId: playerId }, FK_TOURNEY_ID_QUERY);
     return promiseize(models.DraftPriority.findOne(query).exec())
     .then(function (priority) {
-      if (priority != null) {
+      if (!!priority) {
         return priority.golferPriority;
       }
       return access.getGolfers().then(function (golfers) {
