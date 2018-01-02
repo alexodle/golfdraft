@@ -10,6 +10,7 @@ var DraftClock = require("./DraftClock.jsx");
 var DraftHistory = require("./DraftHistory.jsx");
 var DraftPickOrder = require("./DraftPickOrder.jsx");
 var DraftStatus = require("./DraftStatus.jsx");
+var GolfDraftPanel = require("./GolfDraftPanel.jsx");
 var keyMirror = require('fbjs/lib/keyMirror');
 var PickListEditor = require("./PickListEditor.jsx");
 var React = require("react");
@@ -86,6 +87,12 @@ var DraftApp = React.createClass({
     var isDraftPaused = this.props.isPaused;
 
     if (tabSelection == TABS.DRAFT_HQ) {
+      var priorityPanelHeader = (
+        <span>
+          <span>Pick Priorities - {this.props.currentUser.name}</span>
+          <span className="text-right">Edit</span>
+        </span>
+      );
       return (
         <div>
           {isDraftPaused ? (<AppPausedStatus />) : (
@@ -129,11 +136,13 @@ var DraftApp = React.createClass({
               />
             </div>
             <div className="col-md-6">
-              <PickListEditor
-                panelHeader={this._renderPickListEditorPanelHeader()}
-                draftPriority={this.props.draftPriority}
-                height="29em"
-              />
+              <GolfDraftPanel heading={priorityPanelHeader}>
+                <PickListEditor
+                  readOnly
+                  draftPriority={this.props.draftPriority}
+                  height="32em"
+                />
+              </GolfDraftPanel>
             </div>
           </div>
           <div className="row">
@@ -152,10 +161,11 @@ var DraftApp = React.createClass({
         <div>
           <div className="row">
             <div className="col-md-12">
-              <PickListEditor
-                panelHeader="Priority Editor"
-                draftPriority={this.props.draftPriority}
-              />
+              <GolfDraftPanel heading="Pick Priorities">
+                <PickListEditor
+                  draftPriority={this.props.draftPriority}
+                />
+              </GolfDraftPanel>
             </div>
           </div>
         </div>
@@ -163,10 +173,9 @@ var DraftApp = React.createClass({
     }
   },
 
-  _renderPickListEditorPanelHeader: function () {
-    return (
-      <span><a href='#' onClick={this._onTabClick.bind(this, TABS.PICK_LIST_EDITOR)}>Priority Editor</a></span>
-    );
+  _onPriorityEdit: function () {
+    window.scrollTo(0, 0);
+    this.setState({ draftHistoryPlayerId: playerId, requestAutoPriorityEdit: true });
   },
 
   _onDraftHistorySelectionChange: function (playerId) {

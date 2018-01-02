@@ -2,7 +2,6 @@
 
 var _ = require("lodash");
 var DraftActions = require("../actions/DraftActions");
-var GolfDraftPanel = require('./GolfDraftPanel.jsx');
 var GolferStore = require("../stores/GolferStore");
 var React = require("react");
 
@@ -12,8 +11,7 @@ var PickListEditor = React.createClass({
     return {
       draggingIndex: null,
       draggingHoverIndex: null,
-      currentPriority: this.props.draftPriority,
-      savingId: null
+      currentPriority: this.props.draftPriority
     };
   },
 
@@ -32,36 +30,44 @@ var PickListEditor = React.createClass({
     var draggingIndex = this.state.draggingIndex;
     var draggingHoverIndex = this.state.draggingHoverIndex;
     var draggingGolferId = priority[draggingIndex];
-    var saveCancelButtonsEnabled = !_.isEqual(this.props.draftPriority, priority);
+    var readOnly = !!this.props.readOnly;
+    var unsavedChanges = !_.isEqual(this.props.draftPriority, priority);
 
     if (draggingHoverIndex != null) {
       priority = this._newOrder(draggingIndex, draggingHoverIndex);
     }
 
     return (
-      <GolfDraftPanel heading={this.props.panelHeader}>
-        <div className="row" style={{marginBottom: "1em"}}>
-          <div className="col-md-12 text-right">
-            <button
-              className="btn btn-default"
-              disabled={!saveCancelButtonsEnabled} 
-              type="button"
-              onClick={this._onReset}
-            >Reset</button>
-            <span> </span>
-            <button
-              className="btn btn-default btn-primary"
-              disabled={!saveCancelButtonsEnabled}
-              type="button"
-              onClick={this._onSave}
-            >Save</button>
+      <div>
+        {readOnly ? null : (
+          <div className="row" style={{marginBottom: "1em"}}>
+            <div className="col-md-12 text-right">
+              <span>
+                <button
+                  className="btn btn-default"
+                  disabled={!unsavedChanges} 
+                  type="button"
+                  onClick={this._onCancel}
+                >Cancel</button>
+                <span> </span>
+                <button
+                  className="btn btn-default btn-primary"
+                  disabled={!unsavedChanges}
+                  type="button"
+                  onClick={this._onSave}
+                >Save</button>
+              </span>
+            </div>
           </div>
-        </div>
+        )}
         <div className="row" style={{
           height: this.props.height || "100%",
           overflowY: "scroll"
         }}>
           <div className="col-md-12">
+            {!unsavedChanges ? null : (
+              <small>* Unsaved changes</small>
+            )}
             <table className="table table-condensed table-striped">
               <thead></thead>
               <tbody>
@@ -73,14 +79,16 @@ var PickListEditor = React.createClass({
                       className={draggingGolferId == null || draggingGolferId !== g.id ? "" : "info"}
                     >
                       <td
-                        draggable
+                        draggable={!readOnly}
                         onDragStart={this._onDragStart.bind(this, i)}
                         onDrop={this._onDrop.bind(this, i)}
                         onDragEnd={this._onDragEnd}
                         onDragOver={this._onDragOver.bind(this, i)}
                         onDragLeave={this._onDragLeave}
                       >
-                        <span className="glyphicon glyphicon-menu-hamburger text-muted">&nbsp;&nbsp;</span>
+                        {readOnly ? null : (
+                          <span className="glyphicon glyphicon-menu-hamburger text-muted">&nbsp;&nbsp;</span>
+                        )}
                         <span>{i+1}.&nbsp;&nbsp;</span>
                         {g.name}
                       </td>
@@ -91,7 +99,7 @@ var PickListEditor = React.createClass({
             </table>
           </div>
         </div>
-      </GolfDraftPanel>
+      </div>
     );
   },
 
