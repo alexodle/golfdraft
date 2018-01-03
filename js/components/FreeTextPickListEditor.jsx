@@ -41,6 +41,7 @@ var SuggestionSelector = React.createClass({
     var selectedValue = this.props.selectedValue;
     var suggestionList = this._getSuggestionList();
     var isViewingAll = this.state.isViewingAll;
+    var disabled = this.props.disabled;
 
     if (!isViewingAll) {
       return (
@@ -51,6 +52,7 @@ var SuggestionSelector = React.createClass({
               <div key={targetName} className="radio">
                 <label>
                   <input
+                    disabled={disabled}
                     type="radio"
                     name={suggestion.source}
                     id={radioId}
@@ -67,7 +69,7 @@ var SuggestionSelector = React.createClass({
     } else {
 
       return (
-        <select className="form-control" value={selectedValue} onChange={this._onSelectValueChange}>
+        <select disabled={disabled} className="form-control" value={selectedValue} onChange={this._onSelectValueChange}>
           {_.map(suggestionList, function (targetName, i) {
             return (
               <option key={targetName} value={targetName}>{targetName}</option>
@@ -112,7 +114,7 @@ var FreeTextPickListEditor = React.createClass({
 
   getInitialState: function () {
     return {
-      text: "Chris Wood2\nJohnny Miller\nJason Gay",
+      text: "",
       isPosting: false,
       suggestions: null,
       suggestionSelections: {}
@@ -131,12 +133,22 @@ var FreeTextPickListEditor = React.createClass({
   _renderSuggestions: function () {
     var suggestions = this.state.suggestions;
     var suggestionSelections = this.state.suggestionSelections;
+    var isPosting = this.state.isPosting;
     return (
       <div>
-        <div className="alert alert-warning">Could not get an exact name match on the following golfers.</div>
+        <div className="text-right" style={{marginBottom: "1em"}}>
+          <button
+            className="btn btn-default"
+            type="button"
+            onClick={this.props.onCancel}
+            disabled={isPosting}
+          >Cancel</button>
+        </div>
+        <div className="alert alert-warning">Could not get an exact name match on the following golfers:</div>
         {_.map(suggestions, function (suggestion) {
           return (
             <SuggestionSelector
+              disabled={isPosting}
               key={suggestion.source}
               suggestion={suggestion}
               selectedValue={suggestionSelections[suggestion.source]}
@@ -144,7 +156,21 @@ var FreeTextPickListEditor = React.createClass({
             />
           );
         }, this)}
-        <button className="btn btn-primary" type="button" onClick={this._onSave}>Looks good</button>
+        <div className="text-right">
+          <button
+            className="btn btn-default"
+            type="button"
+            onClick={this.props.onCancel}
+            disabled={isPosting}
+          >Cancel</button>
+          <span> </span>
+          <button
+            className="btn btn-primary"
+            type="button"
+            onClick={this._onSave}
+            disabled={isPosting}
+          >Save</button>
+        </div>
       </div>
     );
   },
@@ -163,7 +189,7 @@ var FreeTextPickListEditor = React.createClass({
           >Cancel</button>
           <span> </span>
           <button
-            className="btn btn-default btn-primary"
+            className="btn btn-primary"
             type="button"
             onClick={this._onSave}
             disabled={isPosting}
