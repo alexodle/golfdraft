@@ -224,6 +224,7 @@ db.once('open', function callback () {
       });
     })
     .catch(function (err) {
+      console.log(err);
       res.status(500).send(err);
     });
   });
@@ -237,14 +238,30 @@ db.once('open', function callback () {
       return;
     }
 
-    var priority = body.priority;
-    access.updatePriority(user.id, priority)
-    .catch(function (err) {
-      res.status(500).send(err);
-    })
-    .then(function () {
-      res.status(200).send({ playerId: user.id });
-    });
+    if (body.priority) {
+      access.updatePriority(user.id, body.priority)
+      .then(function () {
+        res.status(200).send({ playerId: user.id, priority: body.priority });
+      })
+      .catch(function (err) {
+        console.log(err);
+        res.status(500).send(err);
+      });
+      
+    } else {
+      access.updatePriorityFromNames(user.id, body.priorityNames)
+      .then(function (result) {
+        if (result.completed) {
+          res.status(200).send({ playerId: user.id, priority: result.priority });
+        } else {
+          res.status(300).send({ playerId: user.id, suggestions: result.suggestions });
+        }
+      })
+      .catch(function (err) {
+        console.log(err);
+        res.status(500).send(err);
+      });
+    }
   });
 
   function ensureNotPaused(req, res) {
@@ -287,7 +304,7 @@ db.once('open', function callback () {
 
       // The main functionality finished,
       // so don't return a failed response code
-      console.log('err: ' + err);
+      console.log(err);
     });
   }
 
@@ -341,6 +358,7 @@ db.once('open', function callback () {
     req.session.isAdmin = true;
     req.session.save(function (err) {
       if (err) {
+        console.log(err);
         res.status(500).send(err);
         return;
       }
@@ -403,7 +421,7 @@ db.once('open', function callback () {
     .then(access.getDraft)
     .then(updateClients)
     .catch(function (err) {
-      console.log('err: ' + err);
+      console.log(err);
     });
 
   });

@@ -1,12 +1,13 @@
 'use strict';
 
 var _ = require('lodash');
+var chatModels = require('./chatModels');
 var config = require('./config');
 var constants = require('../common/constants');
-var models = require('./models');
-var chatModels = require('./chatModels');
-var Promise = require('promise');
 var io = require('./socketIO');
+var levenshteinDistance = require('./levenshteinDistance');
+var models = require('./models');
+var Promise = require('promise');
 
 var UNKNOWN_WGR = constants.UNKNOWN_WGR;
 var TOURNEY_ID = config.tourney_id;
@@ -103,6 +104,41 @@ _.extend(access, {
       {upsert: true}
     ).exec();
   }),
+
+  updatePriorityFromNames: function (playerId, priorityNames) {
+    return access.getGolfers()
+    .then(function (golfers) {
+      var golfersByLcName = _.indexBy(golfers, function (g) {
+        return g.name.toLowerCase();
+      });
+
+      var notFoundGolferNames = [];
+      var priority = _.map(priorityNames, function (n) {
+        var g = golfersByLcName[n.toLowerCase()];
+        if (!g) {
+          notFoundGolferNames.push(n);
+          return null;
+        }
+        return g._id;
+      });
+
+      if (_.isEmpty(notFoundGolferNames)) {
+        return access.updatePriority(playerId, priority)
+        .then(function () {
+          return {
+            completed: true,
+            priority: priority
+          };
+        });
+      }
+
+      var suggestions = levenshteinDistance.runAll(notFoundGolferNames, _.pluck(golfers, 'name'));
+      return {
+        completed: false,
+        suggestions: suggestions
+      };
+    });
+  },
 
   getGolfer: function (golferId) {
     var query = _.extend({ _id: golferId }, FK_TOURNEY_ID_QUERY);
