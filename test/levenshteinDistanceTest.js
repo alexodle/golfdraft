@@ -35,6 +35,13 @@ describe('levenshteinDistance', function () {
       });
     });
 
+    it('ignores case', function () {
+      levenshteinDistance.run('A', 'a').should.eql({
+        dist: 0,
+        coeff: 1
+      });
+    });
+
   });
 
   describe('runAll', function () {
@@ -52,6 +59,15 @@ describe('levenshteinDistance', function () {
           { target: 'alxx1', dist: 2, coeff: (5 + 5 - 2) / (5 + 5) },
           { target: 'test2', dist: 8, coeff: (5 + 5 - 8) / (5 + 5) }
         ]},
+      ]);
+    });
+
+    it('preserves original casing', function () {
+      levenshteinDistance.runAll(['Ac'], ['a', 'B']).should.eql([
+        { source: 'Ac', results: [
+          { target: 'a', dist: 1, coeff: (2 + 1 - 1) / (2 + 1) },
+          { target: 'B', dist: 3, coeff: 0 }
+        ]}
       ]);
     });
 

@@ -24,7 +24,7 @@ var PickListEditor = React.createClass({
     }
 
     if (this.state.isFreeTextMode) {
-      return (<FreeTextPickListEditor onCancel={this._onFreeTextCancel} />);
+      return (<FreeTextPickListEditor onCancel={this._onFreeTextComplete} onComplete={this._onFreeTextComplete} />);
     }
 
     var draggingIndex = this.state.draggingIndex;
@@ -194,7 +194,7 @@ var PickListEditor = React.createClass({
     this.setState({ isFreeTextMode: true });
   },
 
-  _onFreeTextCancel: function () {
+  _onFreeTextComplete: function () {
     this.setState({ isFreeTextMode: false });
   }
 

@@ -10,6 +10,10 @@ function _memoKey(i1, i2) {
     (i2 + "::" + i1);
 }
 
+function _normalize(s) {
+  return s.trim().toLowerCase();
+}
+
 function _calc(s1, s2, i1, i2) {
   var key = _memoKey(i1, i2);
   if (memo[key]) return memo[key];
@@ -59,10 +63,13 @@ function runAll(sourceList, targetList) {
 }
 
 function run(s1, s2) {
+  var norms1 = _normalize(s1);
+  var norms2 = _normalize(s2);
+
   var bestDist = Number.MAX_VALUE;
-  _forEachWordPermutation(s1.split(" "), function (s1perm) {
+  _forEachWordPermutation(norms1.split(" "), function (s1perm) {
     memo = {};
-    var dist = _calc(s1perm, s2, 0, 0);
+    var dist = _calc(s1perm, norms2, 0, 0);
 
     bestDist = Math.min(bestDist, dist);
     return bestDist > 0;
@@ -71,7 +78,7 @@ function run(s1, s2) {
   memo = {};
   return {
     dist: bestDist,
-    coeff: (s1.length + s2.length - bestDist) / (s1.length + s2.length)
+    coeff: (norms1.length + norms2.length - bestDist) / (norms1.length + norms2.length)
   };
 }
 

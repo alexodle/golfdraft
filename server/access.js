@@ -108,20 +108,18 @@ _.extend(access, {
   updatePriorityFromNames: function (playerId, priorityNames) {
     return access.getGolfers()
     .then(function (golfers) {
-      var normalizedGivenNames = _.invoke(priorityNames, 'toLowerCase')
-
-      var golfersByName = _.indexBy(golfers, function (g) {
+      var golfersByLcName = _.indexBy(golfers, function (g) {
         return g.name.toLowerCase();
       });
 
       var notFoundGolferNames = [];
-      var priority = _.map(normalizedGivenNames, function (n) {
-        var g = golfersByName[n];
+      var priority = _.map(priorityNames, function (n) {
+        var g = golfersByLcName[n.toLowerCase()];
         if (!g) {
           notFoundGolferNames.push(n);
           return null;
         }
-        return g.id;
+        return g._id;
       });
 
       if (_.isEmpty(notFoundGolferNames)) {
@@ -134,11 +132,10 @@ _.extend(access, {
         });
       }
 
-      var golferNames = _.keys(golfersByName);
-      var levenshteinResults = levenshteinDistance.runAll(notFoundGolferNames, golferNames);
+      var suggestions = levenshteinDistance.runAll(notFoundGolferNames, _.pluck(golfers, 'name'));
       return {
         completed: false,
-        suggestions: levenshteinResults
+        suggestions: suggestions
       };
     });
   },
