@@ -57,6 +57,13 @@ var DraftActions = {
     AppDispatcher.handleViewAction({
       actionType: DraftConstants.SAVE_PRIORITY
     });
+  },
+
+  setPriority: function (priority) {
+    AppDispatcher.handleViewAction({
+      actionType: DraftConstants.SET_PRIORITY,
+      priority: priority
+    });
   }
 
 };

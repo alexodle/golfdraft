@@ -2,6 +2,7 @@
 
 var $ = require("jquery");
 var _ = require("lodash");
+var DraftActions = require("../actions/DraftActions");
 var GolferLogic = require("../logic/GolferLogic");
 var GolferStore = require("../stores/GolferStore");
 var React = require("react");
@@ -218,6 +219,7 @@ var FreeTextPickListEditor = React.createClass({
     var data = { priorityNames: this._cleanedGolfers() };
     $.post('/draft/priority', data)
     .done(function (result) {
+      DraftActions.setPriority(result.priority);
       that.props.onComplete();
     })
     .fail(function (err) {

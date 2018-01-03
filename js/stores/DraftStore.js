@@ -186,6 +186,14 @@ AppDispatcher.register(function (payload) {
 
       DraftStore.emitChange();
       break;
+
+    case DraftConstants.SET_PRIORITY:
+      _priority = action.priority;
+      _pendingPriority = _priority;
+      
+      DraftStore.emitChange();
+      break;
+
   }
 
   return true; // No errors.  Needed by promise in Dispatcher.
