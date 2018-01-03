@@ -117,7 +117,8 @@ var FreeTextPickListEditor = React.createClass({
       text: "",
       isPosting: false,
       suggestions: null,
-      suggestionSelections: {}
+      suggestionSelections: {},
+      errorMessage: null
     };
   },
 
@@ -134,6 +135,7 @@ var FreeTextPickListEditor = React.createClass({
     var suggestions = this.state.suggestions;
     var suggestionSelections = this.state.suggestionSelections;
     var isPosting = this.state.isPosting;
+    var errorMessage = this.state.errorMessage;
     return (
       <div>
         <div className="text-right" style={{marginBottom: "1em"}}>
@@ -144,6 +146,9 @@ var FreeTextPickListEditor = React.createClass({
             disabled={isPosting}
           >Cancel</button>
         </div>
+        {!errorMessage ? null : (
+          <div className="alert alert-danger">{errorMessage}</div>
+        )}
         <div className="alert alert-warning">Could not get an exact name match on the following golfers:</div>
         {_.map(suggestions, function (suggestion) {
           return (
@@ -241,21 +246,26 @@ var FreeTextPickListEditor = React.createClass({
   _onSave: function () {
     this.setState({ isPosting: true });
 
-    var that = this;
     var data = { priorityNames: this._cleanedGolfers() };
     $.post('/draft/priority', data)
+
     .done(function (result) {
       DraftActions.setPriority(result.priority);
-      that.props.onComplete();
-    })
+      this.props.onComplete();
+      window.location.href = "#InlineDraftPriorityEditor";
+    }.bind(this))
+
     .fail(function (err) {
       if (err.status === 300) {
-        that._setSuggestions(err.responseJSON.suggestions);
+        this._setSuggestions(err.responseJSON.suggestions);
       } else {
-        // Not really handled
-        window.location.reload();
+        this.setState({
+          isPosting: false,
+          errorMessage: "Failed to save priority. Try again in a minute. If that doesn't work, contact Odle."
+        });
       }
-    })
+      window.location.href = "#InlineDraftPriorityEditor";
+    }.bind(this));
   }
 
 });

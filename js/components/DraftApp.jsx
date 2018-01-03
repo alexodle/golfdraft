@@ -80,6 +80,7 @@ var DraftApp = React.createClass({
           <div className="row">
             <div className="col-md-4">
               <GolfDraftPanel heading='Draft Order'>
+                <a name='InlineDraftPriorityEditor' />
                 <DraftPickOrder
                   currentUser={this.props.currentUser}
                   currentPick={this.props.currentPick}
