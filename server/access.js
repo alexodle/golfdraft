@@ -97,12 +97,19 @@ _.extend(access, {
   },
 
   updatePriority: promiseizeFn(function (playerId, priority) {
+    priority = _.uniq(priority);
     var query = _.extend({ userId: playerId }, FK_TOURNEY_ID_QUERY);
     return models.DraftPriority.update(
       query,
       {$set: {golferPriority: priority}},
       {upsert: true}
-    ).exec();
+    ).exec()
+    .then(function () {
+      return {
+        completed: true,
+        priority: priority
+      };
+    });
   }),
 
   updatePriorityFromNames: function (playerId, priorityNames) {
@@ -119,19 +126,16 @@ _.extend(access, {
           notFoundGolferNames.push(n);
           return null;
         }
-        return g._id;
+        return g._id.toString();
       });
 
       if (_.isEmpty(notFoundGolferNames)) {
-        return access.updatePriority(playerId, priority)
-        .then(function () {
-          return {
-            completed: true,
-            priority: priority
-          };
-        });
+        // SUCCESS! Found all golfers by name, so go ahead and save them.
+        return access.updatePriority(playerId, priority);
       }
 
+      // Did not find at at least one golfer by name. Calculate closest matches and provide those
+      // suggestions to the client.
       var suggestions = levenshteinDistance.runAll(notFoundGolferNames, _.pluck(golfers, 'name'));
       return {
         completed: false,
