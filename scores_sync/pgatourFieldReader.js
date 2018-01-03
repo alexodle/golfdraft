@@ -1,12 +1,12 @@
-var _ = require('lodash');
-var Promise = require('promise');
-var request = require('request');
+const _ = require('lodash');
+const Promise = require('promise');
+const request = require('request');
 
-var JQUERY_URL = 'file://' + __dirname + '/../assets/jquery.js';
+const JQUERY_URL = 'file://' + __dirname + '/../assets/jquery.js';
 
 function parseJson(json) {
-  var golfers = _.map(JSON.parse(json).Tournament.Players, function (p) {
-    var lastFirst = p.PlayerName.split(', ');
+  const golfers = _.map(JSON.parse(json).Tournament.Players, function (p) {
+    const lastFirst = p.PlayerName.split(', ');
     return {
       golfer: lastFirst[1] + ' ' + lastFirst[0],
       scores: [0, 0, 0, 0],
@@ -17,7 +17,7 @@ function parseJson(json) {
   return golfers;
 }
 
-var PgaTourFieldReader = {
+const PgaTourFieldReader = {
 
   // expose for testing
   parseJson: parseJson,
@@ -31,7 +31,7 @@ var PgaTourFieldReader = {
           return;
         }
 
-        var golfers = parseJson(body);
+        const golfers = parseJson(body);
         fulfill({
           par: 72, // hack for now
           golfers: golfers

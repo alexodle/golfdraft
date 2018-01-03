@@ -1,22 +1,22 @@
 'use strict';
 
-var App = require('./components/App.jsx');
-var DraftStore = require('./stores/DraftStore');
-var React = require('react');
-var ReactRouter = require('react-router');
-var UserStore = require('./stores/UserStore');
+const App = require('./components/App.jsx');
+const DraftStore = require('./stores/DraftStore');
+const React = require('react');
+const ReactRouter = require('react-router');
+const UserStore = require('./stores/UserStore');
 
-var Router = ReactRouter.Router;
-var Route = ReactRouter.Route;
-var NotFoundRoute = ReactRouter.NotFoundRoute;
-var IndexRoute = ReactRouter.IndexRoute;
-var browserHistory = ReactRouter.browserHistory;
+const Router = ReactRouter.Router;
+const Route = ReactRouter.Route;
+const NotFoundRoute = ReactRouter.NotFoundRoute;
+const IndexRoute = ReactRouter.IndexRoute;
+const browserHistory = ReactRouter.browserHistory;
 
-var AdminWrapper = App.AdminWrapper;
-var AppNode = App.AppNode;
-var DraftWrapper = App.DraftWrapper;
-var TourneyWrapper = App.TourneyWrapper;
-var WhoIsYou = App.WhoIsYou;
+const AdminWrapper = App.AdminWrapper;
+const AppNode = App.AppNode;
+const DraftWrapper = App.DraftWrapper;
+const TourneyWrapper = App.TourneyWrapper;
+const WhoIsYou = App.WhoIsYou;
 
 function requireAuth(nextState, replace) {
   if (!UserStore.getCurrentUser()) {
@@ -37,7 +37,7 @@ function requireDraftDone(nextState, replace) {
   return true;
 }
 
-var routes = (
+const routes = (
   <Router history={browserHistory}>
     <Route component={AppNode} path="/">
       <IndexRoute

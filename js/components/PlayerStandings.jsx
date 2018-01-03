@@ -1,15 +1,15 @@
 "use strict";
 
-var _ = require("lodash");
-var cx = require('classnames');
-var GolferStore = require('../stores/GolferStore');
-var PlayerStore = require('../stores/PlayerStore');
-var React = require("react");
-var utils = require('../../common/utils');
+const _ = require("lodash");
+const cx = require('classnames');
+const GolferStore = require('../stores/GolferStore');
+const PlayerStore = require('../stores/PlayerStore');
+const React = require("react");
+const utils = require('../../common/utils');
 
-var ReactPropTypes = React.PropTypes;
+const ReactPropTypes = React.PropTypes;
 
-var PlayerStandings = React.createClass({
+const PlayerStandings = React.createClass({
 
   propTypes: {
     currentUser: ReactPropTypes.object.isRequired,
@@ -18,16 +18,16 @@ var PlayerStandings = React.createClass({
   },
 
   render: function () {
-    var playerScores = _.sortBy(this.props.playerScores, 'total');
-    var playerTotals = _.pluck(playerScores, 'total');
-    var topScore = playerTotals[0];
+    const playerScores = _.sortBy(this.props.playerScores, 'total');
+    const playerTotals = _.pluck(playerScores, 'total');
+    const topScore = playerTotals[0];
 
-    var trs = _.map(playerScores, function (ps) {
-      var p = PlayerStore.getPlayer(ps.player);
-      var playerIsMe = this.props.currentUser.player === p.id;
-      var playerIsSelected = this.props.selectedPlayer === p.id;
-      var viewPlayer = _.partial(this._onPlayerSelect, p.id);
-      var holesLeft = _.sum(ps.scoresByGolfer, function (gs) {
+    const trs = _.map(playerScores, function (ps) {
+      const p = PlayerStore.getPlayer(ps.player);
+      const playerIsMe = this.props.currentUser.player === p.id;
+      const playerIsSelected = this.props.selectedPlayer === p.id;
+      const viewPlayer = _.partial(this._onPlayerSelect, p.id);
+      const holesLeft = _.sum(ps.scoresByGolfer, function (gs) {
         if (_.any(gs.missedCuts)) {
           return 0;
         } else if (gs.thru === null) {

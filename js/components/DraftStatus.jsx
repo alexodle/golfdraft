@@ -1,12 +1,12 @@
 'use strict';
 
-var _ = require('lodash');
-var DraftActions = require('../actions/DraftActions');
-var Link = require('react-router').Link;
-var PlayerStore = require('../stores/PlayerStore');
-var React = require('react');
+const _ = require('lodash');
+const DraftActions = require('../actions/DraftActions');
+const Link = require('react-router').Link;
+const PlayerStore = require('../stores/PlayerStore');
+const React = require('react');
 
-var DraftOver = React.createClass({
+const DraftOver = React.createClass({
 
   render: function () {
     return (
@@ -19,15 +19,15 @@ var DraftOver = React.createClass({
 
 });
 
-var DraftStatus = React.createClass({
+const DraftStatus = React.createClass({
 
   render: function () {
-    var currentPick = this.props.currentPick;
+    const currentPick = this.props.currentPick;
     if (!currentPick) {
       return (<DraftOver />);
     }
 
-    var playerName = PlayerStore.getPlayer(currentPick.player).name;
+    const playerName = PlayerStore.getPlayer(currentPick.player).name;
     return (
       <div>
         <p className='draft-status'>

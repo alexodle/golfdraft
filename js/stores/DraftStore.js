@@ -1,25 +1,25 @@
 'use strict';
 
-var $ = require('jquery');
-var _ = require('lodash');
-var AppDispatcher = require('../dispatcher/AppDispatcher');
-var AppConstants = require('../constants/AppConstants');
-var DraftConstants = require('../constants/DraftConstants');
-var Store = require('./Store');
-var UserStore = require('./UserStore');
+const $ = require('jquery');
+const _ = require('lodash');
+const AppDispatcher = require('../dispatcher/AppDispatcher');
+const AppConstants = require('../constants/AppConstants');
+const DraftConstants = require('../constants/DraftConstants');
+const Store = require('./Store');
+const UserStore = require('./UserStore');
 
-var _picks = [];
-var _pickOrder = [];
-var _pickForPlayers = [];
-var _priority = null;
-var _pendingPriority = null;
+let _picks = [];
+let _pickOrder = [];
+let _pickForPlayers = [];
+let _priority = null;
+let _pendingPriority = null;
 
 function getCurrentPickNumber() {
   return _picks.length;
 }
 
 function getCurrentPick() {
-  var pickNumber = getCurrentPickNumber();
+  const pickNumber = getCurrentPickNumber();
   if (pickNumber === _pickOrder.length) {
     return null;
   }
@@ -30,8 +30,8 @@ function getCurrentPick() {
 }
 
 function addPick(golfer) {
-  var timestamp = new Date();
-  var pick =  _.extend({}, getCurrentPick(), {
+  const timestamp = new Date();
+  const pick =  _.extend({}, getCurrentPick(), {
     golfer: golfer,
     timestamp: timestamp,
     clientTimestamp: timestamp
@@ -41,7 +41,7 @@ function addPick(golfer) {
 }
 
 function filterPicksFromPriorities() {
-  var pickedGids = _.pluck(_picks, 'golfer');
+  const pickedGids = _.pluck(_picks, 'golfer');
   if (_priority !== _pendingPriority) {
     _priority = _.difference(_priority, pickedGids);
     _pendingPriority = _.difference(_pendingPriority, pickedGids);
@@ -51,7 +51,7 @@ function filterPicksFromPriorities() {
   }
 }
 
-var DraftStore =  _.extend({}, Store.prototype, {
+const DraftStore =  _.extend({}, Store.prototype, {
 
   changeEvent: 'DraftStore:change',
 
@@ -66,8 +66,8 @@ var DraftStore =  _.extend({}, Store.prototype, {
   },
 
   getIsMyDraftPick: function () {
-    var currentPick = getCurrentPick();
-    var currentUser = UserStore.getCurrentUser();
+    const currentPick = getCurrentPick();
+    const currentUser = UserStore.getCurrentUser();
     if (!currentPick || !currentUser) return false;
 
     return (
@@ -92,12 +92,12 @@ var DraftStore =  _.extend({}, Store.prototype, {
 
 // Register to handle all updates
 AppDispatcher.register(function (payload) {
-  var action = payload.action;
+  const action = payload.action;
 
   switch(action.actionType) {
 
     case DraftConstants.DRAFT_PICK:
-      var pick = addPick(action.golfer);
+      const pick = addPick(action.golfer);
       filterPicksFromPriorities();
 
       // TODO - Move to separate server sync
@@ -112,7 +112,7 @@ AppDispatcher.register(function (payload) {
       break;
 
     case DraftConstants.DRAFT_PICK_HIGHEST_PRI:
-      var partialPick = getCurrentPick();
+      const partialPick = getCurrentPick();
 
       // TODO - Move to separate server sync
       $.post('/draft/pickHighestPriGolfer', partialPick)
@@ -124,7 +124,7 @@ AppDispatcher.register(function (payload) {
       break;
 
     case DraftConstants.DRAFT_UPDATE:
-      var draft = action.draft;
+      const draft = action.draft;
       _picks = draft.picks;
       _pickOrder = draft.pickOrder;
       filterPicksFromPriorities();
@@ -149,7 +149,7 @@ AppDispatcher.register(function (payload) {
       break;
 
     case AppConstants.CURRENT_USER_CHANGE_SYNCED:
-      var currentUser = UserStore.getCurrentUser();
+      const currentUser = UserStore.getCurrentUser();
       if (!!currentUser) {
         // TODO - Move to separate server sync
         $.get('/draft/priority', pick)
@@ -178,7 +178,7 @@ AppDispatcher.register(function (payload) {
       _priority = _pendingPriority;
 
       // TODO - Move to separate server sync
-      var data = { priority: _priority };
+      const data = { priority: _priority };
       $.post('/draft/priority', data)
       .fail(function () {
         window.location.reload();

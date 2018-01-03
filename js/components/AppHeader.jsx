@@ -1,11 +1,11 @@
 'use strict';
 
-var LogoutButton = require("./LogoutButton.jsx");
-var React = require('react');
+const LogoutButton = require("./LogoutButton.jsx");
+const React = require('react');
 
-var ReactPropTypes = React.PropTypes;
+const ReactPropTypes = React.PropTypes;
 
-var AppHeader = React.createClass({
+const AppHeader = React.createClass({
 
   propTypes: {
     tourneyName: ReactPropTypes.string.isRequired,

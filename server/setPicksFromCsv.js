@@ -1,13 +1,13 @@
 'use strict';
 
-var _ = require('lodash');
-var access = require('./access');
-var config = require('./config');
-var mongoose = require('mongoose');
-var fs = require('fs');
-var Promise = require('promise');
-var refreshPlayerState = require('./refreshPlayerState');
-var constants = require('../common/constants');
+const _ = require('lodash');
+const access = require('./access');
+const config = require('./config');
+const mongoose = require('mongoose');
+const fs = require('fs');
+const Promise = require('promise');
+const refreshPlayerState = require('./refreshPlayerState');
+const constants = require('../common/constants');
 
 function cleanName(n) {
   return n.toLowerCase().replace("-", "").replace("'", "");
@@ -22,7 +22,7 @@ function setPicksFromCsv(csvPicks) {
         return reject(err);
       }
 
-      var picks = _(data.split("\n"))
+      const picks = _(data.split("\n"))
         .map(function (l) {
           return l.trim().split(",");
         })
@@ -32,12 +32,12 @@ function setPicksFromCsv(csvPicks) {
         //.reverse()
         .value();
 
-      var pickOrder = _(picks)
+      const pickOrder = _(picks)
         .take(picks.length / constants.NGOLFERS)
         .pluck(0)
         .value();
 
-      var playerLookup, golferLookup;
+      const playerLookup, golferLookup;
       return refreshPlayerState(pickOrder)
         .then(function () {
           return access.getPlayers();
@@ -53,13 +53,13 @@ function setPicksFromCsv(csvPicks) {
             return cleanName(g.name);
           });
 
-          var curr = null;
+          let curr = null;
           return Promise.all(_.map(picks, function (p, i) {
-            var playerName = p[0];
-            var golferName = cleanName(p[1]);
+            const playerName = p[0];
+            const golferName = cleanName(p[1]);
 
-            var player = playerLookup[playerName];
-            var golfer = golferLookup[golferName];
+            const player = playerLookup[playerName];
+            const golfer = golferLookup[golferName];
 
             if (!player) {
               console.log("Cannot find player: " + playerName);
@@ -96,7 +96,7 @@ if (require.main === module) {
   //mongoose.set('debug', true);
   mongoose.connect(config.mongo_url);
 
-  var db = mongoose.connection;
+  const db = mongoose.connection;
   db.on('error', console.error.bind(console, 'connection error:'));
   db.once('open', function callback () {
     setPicksFromCsv(process.argv[2])

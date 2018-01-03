@@ -1,7 +1,7 @@
 require('../common/utils');
 
-var _ = require('lodash');
-var levenshteinDistance = require('../server/levenshteinDistance');
+const _ = require('lodash');
+const levenshteinDistance = require('../server/levenshteinDistance');
 
 describe('levenshteinDistance', function () {
 
@@ -17,13 +17,13 @@ describe('levenshteinDistance', function () {
     it('returns 1 for almost equal strings', function () {
       levenshteinDistance.run('string', 'string1').should.eql({
         dist: 1,
-        coeff: (6 + 7 - 1) / (6 + 7)
+        coeff: (7 - 1) / 7
       });
     });
 
     it('returns correctly for fully unequal strings', function () {
       levenshteinDistance.run('a', 'b').should.eql({
-        dist: 2,
+        dist: 1,
         coeff: 0
       });
     });
@@ -42,6 +42,13 @@ describe('levenshteinDistance', function () {
       });
     });
 
+    it('uses longest string to calc coeff', function () {
+      levenshteinDistance.run('aaab', 'b').should.eql({
+        dist: 3,
+        coeff: (4 - 3) / 4
+      });
+    });
+
   });
 
   describe('runAll', function () {
@@ -52,12 +59,12 @@ describe('levenshteinDistance', function () {
         ['alxx1', 'test2']
       ).should.eql([
         { source: 'test1', results: [
-          { target: 'test2', dist: 2, coeff: (5 + 5 - 2) / (5 + 5) },
-          { target: 'alxx1', dist: 8, coeff: (5 + 5 - 8) / (5 + 5) }
+          { target: 'test2', dist: 1, coeff: (5 - 1) / 5 },
+          { target: 'alxx1', dist: 4, coeff: (5 - 4) / 5 }
         ]},
         { source: 'alxx2', results: [
-          { target: 'alxx1', dist: 2, coeff: (5 + 5 - 2) / (5 + 5) },
-          { target: 'test2', dist: 8, coeff: (5 + 5 - 8) / (5 + 5) }
+          { target: 'alxx1', dist: 1, coeff: (5 - 1) / 5 },
+          { target: 'test2', dist: 4, coeff: (5 - 4) / 5 }
         ]},
       ]);
     });
@@ -65,8 +72,18 @@ describe('levenshteinDistance', function () {
     it('preserves original casing', function () {
       levenshteinDistance.runAll(['Ac'], ['a', 'B']).should.eql([
         { source: 'Ac', results: [
-          { target: 'a', dist: 1, coeff: (2 + 1 - 1) / (2 + 1) },
-          { target: 'B', dist: 3, coeff: 0 }
+          { target: 'a', dist: 1, coeff: (2 - 1) / 2 },
+          { target: 'B', dist: 2, coeff: 0 }
+        ]}
+      ]);
+    });
+
+    it('sorts by [coeff, target]', function () {
+      levenshteinDistance.runAll(['a'], ['d', 'c', 'b']).should.eql([
+        { source: 'a', results: [
+          { target: 'b', dist: 1, coeff: 0 },
+          { target: 'c', dist: 1, coeff: 0 },
+          { target: 'd', dist: 1, coeff: 0 }
         ]}
       ]);
     });

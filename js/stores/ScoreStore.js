@@ -1,16 +1,16 @@
 'use strict';
 
-var _ = require('lodash');
-var AppDispatcher = require('../dispatcher/AppDispatcher');
-var ScoreConstants = require('../constants/ScoreConstants');
-var ScoreLogic = require('../logic/ScoreLogic');
-var Store = require('./Store');
+const _ = require('lodash');
+const AppDispatcher = require('../dispatcher/AppDispatcher');
+const ScoreConstants = require('../constants/ScoreConstants');
+const ScoreLogic = require('../logic/ScoreLogic');
+const Store = require('./Store');
 
 // Indexed by golfer id
-var _scores = {};
-var _lastUpdated = null;
+let _scores = {};
+let _lastUpdated = null;
 
-var ScoreStore =  _.extend({}, Store.prototype, {
+const ScoreStore =  _.extend({}, Store.prototype, {
 
   changeEvent: 'ScoreStore:change',
 
@@ -26,11 +26,11 @@ var ScoreStore =  _.extend({}, Store.prototype, {
 
 // Register to handle all updates
 AppDispatcher.register(function (payload) {
-  var action = payload.action;
+  const action = payload.action;
 
   switch(action.actionType) {
     case ScoreConstants.SCORE_UPDATE:
-      var scores = ScoreLogic.fillMissedCutScores(action.scores);
+      const scores = ScoreLogic.fillMissedCutScores(action.scores);
 
       _scores = _.indexBy(scores, "golfer");
       _lastUpdated = action.lastUpdated;

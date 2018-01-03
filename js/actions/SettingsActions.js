@@ -1,9 +1,9 @@
 'use strict';
 
-var AppDispatcher = require('../dispatcher/AppDispatcher');
-var AppConstants = require('../constants/AppConstants');
+const AppDispatcher = require('../dispatcher/AppDispatcher');
+const AppConstants = require('../constants/AppConstants');
 
-var SettingsActions = {
+const SettingsActions = {
 
   setPlaySounds: function (playSounds) {
     AppDispatcher.handleViewAction({

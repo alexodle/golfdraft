@@ -1,13 +1,13 @@
 'use strict';
 
-var _ = require('lodash');
-var AppConstants = require('../constants/AppConstants');
-var AppDispatcher = require('../dispatcher/AppDispatcher');
-var Store = require('./Store');
+const _ = require('lodash');
+const AppConstants = require('../constants/AppConstants');
+const AppDispatcher = require('../dispatcher/AppDispatcher');
+const Store = require('./Store');
 
-var _players = {};
+let _players = {};
 
-var PlayerStore =  _.extend({}, Store.prototype, {
+const PlayerStore =  _.extend({}, Store.prototype, {
 
   changeEvent: 'PlayerStore:change',
 
@@ -23,7 +23,7 @@ var PlayerStore =  _.extend({}, Store.prototype, {
 
 // Register to handle all updates
 AppDispatcher.register(function (payload) {
-  var action = payload.action;
+  const action = payload.action;
 
   switch(action.actionType) {
     case AppConstants.SET_PLAYERS:

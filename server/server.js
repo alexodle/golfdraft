@@ -1,33 +1,33 @@
 'use strict';
 
-var port = Number(process.env.PORT || 3000);
+const port = Number(process.env.PORT || 3000);
 
-var _ = require('lodash');
-var access = require('./access');
-var app = require('./expressApp');
-var bodyParser = require('body-parser');
-var chatBot = require('./chatBot');
-var compression = require('compression');
-var config = require('./config');
-var cookieParser = require('cookie-parser');
-var exphbs  = require('express-handlebars');
-var express = require('express');
-var io = require('./socketIO');
-var logfmt = require("logfmt");
-var mongoose = require('mongoose');
-var Promise = require('promise');
-var redis = require("./redis");
-var session = require('express-session');
-var tourneyConfigReader = require('./tourneyConfigReader');
-var UserAccess = require('./userAccess');
+const _ = require('lodash');
+const access = require('./access');
+const app = require('./expressApp');
+const bodyParser = require('body-parser');
+const chatBot = require('./chatBot');
+const compression = require('compression');
+const config = require('./config');
+const cookieParser = require('cookie-parser');
+const exphbs  = require('express-handlebars');
+const express = require('express');
+const io = require('./socketIO');
+const logfmt = require("logfmt");
+const mongoose = require('mongoose');
+const Promise = require('promise');
+const redis = require("./redis");
+const session = require('express-session');
+const tourneyConfigReader = require('./tourneyConfigReader');
+const UserAccess = require('./userAccess');
 
-var RedisStore = require('connect-redis')(session);
+const RedisStore = require('connect-redis')(session);
 
-var MAX_AGE = 1000 * 60 * 60 * 24 * 365;
+const MAX_AGE = 1000 * 60 * 60 * 24 * 365;
 
-var NOT_AN_ERROR = {};
+const NOT_AN_ERROR = {};
 
-var redisPubSubClient = redis.pubSubClient;
+const redisPubSubClient = redis.pubSubClient;
 
 mongoose.connect(config.mongo_url);
 
@@ -38,7 +38,7 @@ UserAccess.refresh();
 app.use(logfmt.requestLogger());
 
 // Middlewares
-var sessionMiddleware = session({
+const sessionMiddleware = session({
   store: new RedisStore({ url: config.redis_url }),
   secret: 'odle rules'
 });
@@ -80,7 +80,7 @@ app.use(bodyParser());
 // Log session state on every request
 function logSessionState(req, res, next) {
   try {
-    var session = req.session;
+    const session = req.session;
     console.log(
       'ip=%s user=%j isAdmin=%s',
       req.connection.remoteAddress,
@@ -94,9 +94,9 @@ function logSessionState(req, res, next) {
 }
 app.use(logSessionState);
 
-var tourneyCfg = tourneyConfigReader.loadConfig();
+const tourneyCfg = tourneyConfigReader.loadConfig();
 
-var db = mongoose.connection;
+const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function callback () {
 
@@ -183,7 +183,7 @@ db.once('open', function callback () {
   });
 
   app.post('/login', function (req, res) {
-    var user = req.body;
+    const user = req.body;
     req.session.user = user;
     req.session.save(function (err) {
       if (err) {
@@ -209,7 +209,7 @@ db.once('open', function callback () {
   });
 
   app.get('/draft/priority', function (req, res) {
-    var user = req.session.user;
+    const user = req.session.user;
 
     if (!user || !user.id) {
       res.status(401).send('Must be logged in to get draft priority');
@@ -230,8 +230,8 @@ db.once('open', function callback () {
   });
 
   app.post('/draft/priority', function (req, res) {
-    var body = req.body;
-    var user = req.session.user;
+    const body = req.body;
+    const user = req.session.user;
 
     if (!user || !user.id) {
       res.status(401).send('Must be logged in to set draft priority');
@@ -275,8 +275,8 @@ db.once('open', function callback () {
   }
 
   function handlePick(req, res, pickPromise, highestPriPick) {
-    var user = req.session.user;
-    var pick = null;
+    const user = req.session.user;
+    let pick = null;
 
     return pickPromise.then(function (_pick) {
       pick = _pick;
@@ -309,21 +309,21 @@ db.once('open', function callback () {
   }
 
   app.post('/draft/picks', function (req, res) {
-    var body = req.body;
-    var user = req.session.user;
+    const body = req.body;
+    const user = req.session.user;
 
     if (!user || !user.id) {
       res.status(401).send('Must be logged in to make a pick');
       return;
     }
 
-    var pick = {
+    const pick = {
       pickNumber: body.pickNumber,
       player: body.player,
       golfer: body.golfer
     };
 
-    var pickPromise = ensureNotPaused(req, res)
+    const pickPromise = ensureNotPaused(req, res)
     .then(function () {
       return access.makePick(pick);
     });
@@ -332,15 +332,15 @@ db.once('open', function callback () {
   });
 
   app.post('/draft/pickHighestPriGolfer', function (req, res) {
-    var body = req.body;
-    var user = req.session.user;
+    const body = req.body;
+    const user = req.session.user;
 
     if (!user || !user.id) {
       res.status(401).send('Must be logged in to make a pick');
       return;
     }
 
-    var pickPromise = ensureNotPaused(req, res)
+    const pickPromise = ensureNotPaused(req, res)
     .then(function () {
       return access.makeHighestPriorityPick(body.player, body.pickNumber);
     });
@@ -372,7 +372,7 @@ db.once('open', function callback () {
       return;
     }
 
-    var isDraftPaused = !!req.body.isPaused;
+    const isDraftPaused = !!req.body.isPaused;
     access.updateAppState({
       isDraftPaused: isDraftPaused
     })
@@ -390,7 +390,7 @@ db.once('open', function callback () {
       return;
     }
 
-    var allowClock = !!req.body.allowClock;
+    const allowClock = !!req.body.allowClock;
     access.updateAppState({
       allowClock: allowClock
     })

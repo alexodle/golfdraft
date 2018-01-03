@@ -2,12 +2,12 @@
 
 // Simple one off script that we should only have to run manually once in a while
 
-var _ = require('lodash');
-var access = require('../server/access');
-var config = require('../server/config');
-var mongoose = require('mongoose');
-var rawWgrReader = require('./rawWgrReader');
-var tourneyConfigReader = require('../server/tourneyConfigReader');
+const _ = require('lodash');
+const access = require('../server/access');
+const config = require('../server/config');
+const mongoose = require('mongoose');
+const rawWgrReader = require('./rawWgrReader');
+const tourneyConfigReader = require('../server/tourneyConfigReader');
 
 mongoose.set('debug', true);
 mongoose.connect(config.mongo_url);
@@ -17,10 +17,10 @@ function end() {
 }
 
 function updateWGR() {
-  var tourneyCfg = tourneyConfigReader.loadConfig();
+  const tourneyCfg = tourneyConfigReader.loadConfig();
 
-  var url = tourneyCfg.wgr.url;
-  var nameMap = tourneyCfg.wgr.nameMap;
+  const url = tourneyCfg.wgr.url;
+  const nameMap = tourneyCfg.wgr.nameMap;
 
   console.log("attempting update from url: " + url);
 
@@ -48,6 +48,6 @@ function updateWGR() {
     });
 }
 
-var db = mongoose.connection;
+const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', updateWGR);

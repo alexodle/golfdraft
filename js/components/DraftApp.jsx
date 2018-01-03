@@ -1,25 +1,25 @@
 "use strict";
 
-var _ = require("lodash");
-var AppPausedStatus = require('./AppPausedStatus.jsx');
-var Assets = require("../constants/Assets");
-var BestLeft = require("./BestLeft.jsx");
-var ChatRoom = require("./ChatRoom.jsx");
-var DraftChooser = require("./DraftChooser.jsx");
-var DraftClock = require("./DraftClock.jsx");
-var DraftHistory = require("./DraftHistory.jsx");
-var DraftPickOrder = require("./DraftPickOrder.jsx");
-var DraftStatus = require("./DraftStatus.jsx");
-var GolfDraftPanel = require("./GolfDraftPanel.jsx");
-var keyMirror = require('fbjs/lib/keyMirror');
-var PickListEditor = require("./PickListEditor.jsx");
-var React = require("react");
-var SettingsActions = require("../actions/SettingsActions");
+const _ = require("lodash");
+const AppPausedStatus = require('./AppPausedStatus.jsx');
+const Assets = require("../constants/Assets");
+const BestLeft = require("./BestLeft.jsx");
+const ChatRoom = require("./ChatRoom.jsx");
+const DraftChooser = require("./DraftChooser.jsx");
+const DraftClock = require("./DraftClock.jsx");
+const DraftHistory = require("./DraftHistory.jsx");
+const DraftPickOrder = require("./DraftPickOrder.jsx");
+const DraftStatus = require("./DraftStatus.jsx");
+const GolfDraftPanel = require("./GolfDraftPanel.jsx");
+const keyMirror = require('fbjs/lib/keyMirror');
+const PickListEditor = require("./PickListEditor.jsx");
+const React = require("react");
+const SettingsActions = require("../actions/SettingsActions");
 
-var myTurnSound = new Audio(Assets.MY_TURN_SOUND);
-var pickMadeSound = new Audio(Assets.PICK_MADE_SOUND);
+const myTurnSound = new Audio(Assets.MY_TURN_SOUND);
+const pickMadeSound = new Audio(Assets.PICK_MADE_SOUND);
 
-var DraftApp = React.createClass({
+const DraftApp = React.createClass({
 
   getInitialState: function () {
     return {
@@ -28,7 +28,7 @@ var DraftApp = React.createClass({
   },
 
   componentWillReceiveProps: function (nextProps) {
-    var props = this.props;
+    const props = this.props;
     if (!props.playSounds) return;
 
     if (!props.isMyDraftPick && nextProps.isMyDraftPick) {
@@ -39,10 +39,10 @@ var DraftApp = React.createClass({
   },
 
   render: function () {
-    var isMyPick = this.props.isMyDraftPick;
-    var isDraftPaused = this.props.isPaused;
+    const isMyPick = this.props.isMyDraftPick;
+    const isDraftPaused = this.props.isPaused;
 
-    var priorityPanelHeader = (
+    const priorityPanelHeader = (
       <span>
         <span>Pick Priorities</span>
         <span className="pull-right"><em>NEW!</em></span>

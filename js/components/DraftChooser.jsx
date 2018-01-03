@@ -1,15 +1,15 @@
 'use strict';
 
-var _ = require('lodash');
-var cx = require('classnames');
-var DraftActions = require('../actions/DraftActions');
-var GolfDraftPanel = require('./GolfDraftPanel.jsx');
-var GolferLogic = require('../logic/GolferLogic');
-var GolferStore = require('../stores/GolferStore');
-var PlayerStore = require('../stores/PlayerStore');
-var React = require('react');
+const _ = require('lodash');
+const cx = require('classnames');
+const DraftActions = require('../actions/DraftActions');
+const GolfDraftPanel = require('./GolfDraftPanel.jsx');
+const GolferLogic = require('../logic/GolferLogic');
+const GolferStore = require('../stores/GolferStore');
+const PlayerStore = require('../stores/PlayerStore');
+const React = require('react');
 
-var DraftChooser = React.createClass({
+const DraftChooser = React.createClass({
 
   getInitialState: function () {
     return _.extend(this._getSelectionState(this.props.golfersRemaining), {
@@ -18,22 +18,22 @@ var DraftChooser = React.createClass({
   },
 
   componentWillReceiveProps: function (nextProps) {
-    var newState = this._getSelectionState(nextProps.golfersRemaining);
+    const newState = this._getSelectionState(nextProps.golfersRemaining);
     this.setState(newState);
   },
 
   render: function () {
-    var golfersRemaining = this.props.golfersRemaining;
-    var currentPick = this.props.currentPick;
-    var sortKey = this.state.sortKey;
-    var isProxyPick = this._isProxyPick();
-    var sortedGolfers = this._sortedGolfers(golfersRemaining, sortKey);
+    const golfersRemaining = this.props.golfersRemaining;
+    const currentPick = this.props.currentPick;
+    const sortKey = this.state.sortKey;
+    const isProxyPick = this._isProxyPick();
+    const sortedGolfers = this._sortedGolfers(golfersRemaining, sortKey);
 
-    var header = null;
+    let header = null;
     if (!isProxyPick) {
       header = (<h4>It&#8217;s your turn! Make your pick.</h4>);
     } else {
-      var playerName = PlayerStore.getPlayer(currentPick.player).name;
+      const playerName = PlayerStore.getPlayer(currentPick.player).name;
       header = (
         <section>
           <h4>Make a pick for: {playerName}</h4>
@@ -125,7 +125,7 @@ var DraftChooser = React.createClass({
   },
 
   _sortedGolfers: function (golfers, sortKey) {
-    var isProxyPick = this._isProxyPick();
+    const isProxyPick = this._isProxyPick();
     if (sortKey === 'priority') {
       if (isProxyPick) {
         // special case, we cannot show the full list if this a proxy pick
@@ -140,12 +140,12 @@ var DraftChooser = React.createClass({
   },
 
   _getSelectionState: function (golfersRemaining) {
-    var state = this.state || {};
-    var selectedGolfer = state.selectedGolfer;
-    var sortKey = state.sortKey || 'priority';
+    const state = this.state || {};
+    const sortKey = state.sortKey || 'priority';
+    let selectedGolfer = state.selectedGolfer;
 
     if (!selectedGolfer || !golfersRemaining[selectedGolfer]) {
-      var firstGolfer = _.first(this._sortedGolfers(golfersRemaining, sortKey));
+      const firstGolfer = _.first(this._sortedGolfers(golfersRemaining, sortKey));
       selectedGolfer = firstGolfer ? firstGolfer.id : null;
     }
     return {
@@ -160,9 +160,9 @@ var DraftChooser = React.createClass({
   _setSortKey: function (sortKey) {
     if (sortKey === this.state.sortKey) return;
 
-    var golfersRemaining = this.props.golfersRemaining;
-    var firstGolfer = _.first(this._sortedGolfers(golfersRemaining, sortKey));
-    var selectedGolfer = firstGolfer ? firstGolfer.id : null;
+    const golfersRemaining = this.props.golfersRemaining;
+    const firstGolfer = _.first(this._sortedGolfers(golfersRemaining, sortKey));
+    const selectedGolfer = firstGolfer ? firstGolfer.id : null;
     this.setState({
       sortKey: sortKey,
       selectedGolfer: selectedGolfer

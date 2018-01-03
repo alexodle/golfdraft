@@ -1,8 +1,8 @@
 'use strict';
 
-var _ = require('lodash');
-var app = require('./expressApp');
-var access = require('./access');
+const _ = require('lodash');
+const app = require('./expressApp');
+const access = require('./access');
 
 app.get('/chat/messages', function (req, res) {
   access.getChatMessages()
@@ -15,8 +15,8 @@ app.get('/chat/messages', function (req, res) {
 });
 
 app.post('/chat/messages', function (req, res) {
-  var body = req.body;
-  var user = req.session.user;
+  const body = req.body;
+  const user = req.session.user;
 
   if (!user) {
     res.status(401).send('Must be logged in to post');
@@ -26,7 +26,7 @@ app.post('/chat/messages', function (req, res) {
     return;
   }
 
-  var message = {
+  const message = {
     player: user.player,
     message: body.message
   };

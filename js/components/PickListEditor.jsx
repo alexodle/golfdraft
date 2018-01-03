@@ -1,13 +1,13 @@
 "use strict";
 
-var _ = require("lodash");
-var DraftActions = require("../actions/DraftActions");
-var FreeTextPickListEditor = require("./FreeTextPickListEditor.jsx");
-var GolferLogic = require("../logic/GolferLogic");
-var GolferStore = require("../stores/GolferStore");
-var React = require("react");
+const _ = require("lodash");
+const DraftActions = require("../actions/DraftActions");
+const FreeTextPickListEditor = require("./FreeTextPickListEditor.jsx");
+const GolferLogic = require("../logic/GolferLogic");
+const GolferStore = require("../stores/GolferStore");
+const React = require("react");
 
-var PickListEditor = React.createClass({
+const PickListEditor = React.createClass({
 
   getInitialState: function () {
     return {
@@ -18,7 +18,7 @@ var PickListEditor = React.createClass({
   },
 
   render: function () {
-    var priority = this._getPriority();
+    let priority = this._getPriority();
     if (!priority) {
       return this._renderLoading();
     }
@@ -27,10 +27,10 @@ var PickListEditor = React.createClass({
       return (<FreeTextPickListEditor onCancel={this._onFreeTextComplete} onComplete={this._onFreeTextComplete} />);
     }
 
-    var draggingIndex = this.state.draggingIndex;
-    var draggingHoverIndex = this.state.draggingHoverIndex;
-    var draggingGolferId = priority[draggingIndex];
-    var unsavedChanges = this.props.syncedPriority !== priority;
+    const draggingIndex = this.state.draggingIndex;
+    const draggingHoverIndex = this.state.draggingHoverIndex;
+    const draggingGolferId = priority[draggingIndex];
+    const unsavedChanges = this.props.syncedPriority !== priority;
 
     if (draggingHoverIndex != null) {
       priority = this._newOrder(draggingIndex, draggingHoverIndex);
@@ -76,7 +76,7 @@ var PickListEditor = React.createClass({
               <thead></thead>
               <tbody>
                 {_.map(priority, function (gid, i) {
-                  var g = GolferStore.getGolfer(gid);
+                  const g = GolferStore.getGolfer(gid);
                   return (
                     <tr
                       key={g.id}
@@ -135,9 +135,9 @@ var PickListEditor = React.createClass({
   },
 
   _newOrder: function (fromIndex, toIndex) {
-    var currentOrder = this._getPriority();
-    var movingGolfer = currentOrder[fromIndex];
-    var newOrder = currentOrder.slice();
+    const currentOrder = this._getPriority();
+    const movingGolfer = currentOrder[fromIndex];
+    const newOrder = currentOrder.slice();
     newOrder.splice(fromIndex, 1);
     newOrder.splice(toIndex, 0, movingGolfer);
     return newOrder;
@@ -145,13 +145,13 @@ var PickListEditor = React.createClass({
 
   _onUpOne: function (i, e) {
     e.preventDefault();
-    var newOrder = this._newOrder(i, i - 1);
+    const newOrder = this._newOrder(i, i - 1);
     DraftActions.updatePendingPriority(newOrder);
   },
 
   _onDownOne: function (i, e) {
     e.preventDefault();
-    var newOrder = this._newOrder(i, i + 1);
+    const newOrder = this._newOrder(i, i + 1);
     DraftActions.updatePendingPriority(newOrder);
   },
 
@@ -166,8 +166,8 @@ var PickListEditor = React.createClass({
   _onDrop: function (toIndex, e) {
     e.preventDefault();
 
-    var fromIndex = this.state.draggingIndex;
-    var newOrder = this._newOrder(fromIndex, toIndex);
+    const fromIndex = this.state.draggingIndex;
+    const newOrder = this._newOrder(fromIndex, toIndex);
 
     DraftActions.updatePendingPriority(newOrder);
   },

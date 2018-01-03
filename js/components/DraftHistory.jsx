@@ -1,21 +1,21 @@
 'use strict';
 
-var _ = require('lodash');
-var DraftStore = require('../stores/DraftStore');
-var GolfDraftPanel = require('./GolfDraftPanel.jsx');
-var GolferLogic = require('../logic/GolferLogic');
-var GolferStore = require('../stores/GolferStore');
-var PlayerStore = require('../stores/PlayerStore');
-var React = require('react');
-var ReactCSSTransitionGroup = require('react/lib/ReactCSSTransitionGroup');
+const _ = require('lodash');
+const DraftStore = require('../stores/DraftStore');
+const GolfDraftPanel = require('./GolfDraftPanel.jsx');
+const GolferLogic = require('../logic/GolferLogic');
+const GolferStore = require('../stores/GolferStore');
+const PlayerStore = require('../stores/PlayerStore');
+const React = require('react');
+const ReactCSSTransitionGroup = require('react/lib/ReactCSSTransitionGroup');
 
-var DraftHistory = React.createClass({
+const DraftHistory = React.createClass({
 
   render: function () {
-    var draftPicks = _.clone(this.props.draftPicks).reverse();
-    var selectedPlayerId = this.props.selectedPlayerId;
-    var onPersonClick = this._onPersonClick;
-    var heading = 'Draft History';
+    const selectedPlayerId = this.props.selectedPlayerId;
+    const onPersonClick = this._onPersonClick;
+    let heading = 'Draft History';
+    let draftPicks = _.clone(this.props.draftPicks).reverse();
 
     if (selectedPlayerId) {
       draftPicks = _.where(draftPicks, { player: selectedPlayerId });
@@ -40,7 +40,7 @@ var DraftHistory = React.createClass({
             <thead><tr><th>#</th><th>Pool Player</th><th>Golfer</th></tr></thead>
             <tbody>
               {_.map(draftPicks, function (p) {
-                var playerName = PlayerStore.getPlayer(p.player).name;
+                const playerName = PlayerStore.getPlayer(p.player).name;
                 return (
                   <tr key={p.pickNumber}>
                     <td>{p.pickNumber + 1}</td>

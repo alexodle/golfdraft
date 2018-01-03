@@ -1,13 +1,13 @@
 'use strict';
 
-var $ = require('jquery');
-var _ = require('lodash');
-var DraftActions = require('../actions/DraftActions');
-var DraftHistory = require('./DraftHistory.jsx');
-var DraftStatus = require('./DraftStatus.jsx');
-var DraftStore = require('../stores/DraftStore');
-var React = require('react');
-var UserActions = require('../actions/UserActions');
+const $ = require('jquery');
+const _ = require('lodash');
+const DraftActions = require('../actions/DraftActions');
+const DraftHistory = require('./DraftHistory.jsx');
+const DraftStatus = require('./DraftStatus.jsx');
+const DraftStore = require('../stores/DraftStore');
+const React = require('react');
+const UserActions = require('../actions/UserActions');
 
 function togglePause(isPaused) {
   $.ajax({
@@ -27,7 +27,7 @@ function toggleAllowClock(allowClock) {
   });
 }
 
-var PasswordInput = React.createClass({
+const PasswordInput = React.createClass({
 
   getInitialState: function () {
     return {
@@ -69,7 +69,7 @@ var PasswordInput = React.createClass({
   _onSubmit: function (ev) {
     ev.preventDefault();
 
-    var that = this;
+    const that = this;
     this.setState({ busy: true });
     $.ajax({
       url: '/admin/login',
@@ -86,7 +86,7 @@ var PasswordInput = React.createClass({
 
 });
 
-var AdminApp = React.createClass({
+const AdminApp = React.createClass({
 
   getInitialState: function () {
     return {
@@ -95,8 +95,8 @@ var AdminApp = React.createClass({
   },
 
   render: function () {
-    var props = this.props;
-    var confirmingUndo = this.state.confirmingUndo;
+    const props = this.props;
+    const confirmingUndo = this.state.confirmingUndo;
 
     if (!props.isAdmin) {
       return (<PasswordInput />);
@@ -215,7 +215,7 @@ var AdminApp = React.createClass({
   },
 
   _onPickBestWGR: function () {
-    var nextBestGolfer = _.chain(this.props.golfersRemaining)
+    const nextBestGolfer = _.chain(this.props.golfersRemaining)
       .sortBy('wgr')
       .first()
       .value()

@@ -1,6 +1,6 @@
 require('./initTestConfig');
 
-var tourneyUtils = require('../server/tourneyUtils');
+const tourneyUtils = require('../server/tourneyUtils');
 
 describe('tourneyUtils', function () {
 

@@ -1,16 +1,16 @@
 require('./initTestConfig');
 
-var _ = require('lodash');
-var reader = require('../scores_sync/pgatourFieldReader');
-var should = require('should');
-var fs = require('fs');
+const _ = require('lodash');
+const reader = require('../scores_sync/pgatourFieldReader');
+const should = require('should');
+const fs = require('fs');
 
 describe('PgaTourFieldReader', function () {
   describe('parseJson', function () {
 
     it('parses field', function () {
-      var json = fs.readFileSync(__dirname + '/files/pgatour_field.json', 'utf8');
-      var baseGolfer = {
+      const json = fs.readFileSync(__dirname + '/files/pgatour_field.json', 'utf8');
+      const baseGolfer = {
         scores: [0, 0, 0, 0],
         thru: 0,
         day: 0

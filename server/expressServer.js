@@ -1,6 +1,6 @@
 'use strict';
 
-var app = require('./expressApp');
-var server = require("http").createServer(app);
+const app = require('./expressApp');
+const server = require("http").createServer(app);
 
 module.exports = server;

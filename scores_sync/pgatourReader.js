@@ -1,21 +1,21 @@
 'use strict';
 
-var _ = require('lodash');
-var constants = require('../common/constants');
-var Promise = require('promise');
-var request = require('request');
+const _ = require('lodash');
+const constants = require('../common/constants');
+const Promise = require('promise');
+const request = require('request');
 
-var MISSED_CUT = constants.MISSED_CUT;
-var NDAYS = constants.NDAYS;
+const MISSED_CUT = constants.MISSED_CUT;
+const NDAYS = constants.NDAYS;
 
-var PGATOUR_WD_TEXT = 'wd';
-var PGATOUR_MC_TEXT = 'cut';
-var CUT_ROUND = 3; // cut starts at round 3
-var N_HOLES = 18;
+const PGATOUR_WD_TEXT = 'wd';
+const PGATOUR_MC_TEXT = 'cut';
+const CUT_ROUND = 3; // cut starts at round 3
+const N_HOLES = 18;
 
 function getRoundScore(par, currentRound, g, round) {
-  var roundNumber = round.round_number;
-  var missedCut = g.status === PGATOUR_MC_TEXT;
+  const roundNumber = round.round_number;
+  const missedCut = g.status === PGATOUR_MC_TEXT;
 
   if (missedCut && roundNumber >= CUT_ROUND) {
     return MISSED_CUT;
@@ -30,11 +30,11 @@ function getRoundScore(par, currentRound, g, round) {
 
 function adjustWdScores(g, scores) {
   // For WD golfers, "total_strokes" is the only property we can trust
-  var total = g.total_strokes;
+  const total = g.total_strokes;
 
-  var newScores = [];
-  var strokes = 0;
-  for (var i=0; i<scores.length; i++) {
+  const newScores = [];
+  let strokes = 0;
+  for (let i = 0; i < scores.length; i++) {
     strokes += scores[i];
     newScores.push(strokes <= total ? scores[i] : MISSED_CUT);
   }
@@ -49,10 +49,10 @@ function adjustForPar(par, scores) {
 }
 
 function parseGolfer(par, tourneyRound, g) {
-  var bio = g.player_bio;
-  var golferCurrentRound = g.current_round;
+  const bio = g.player_bio;
+  const golferCurrentRound = g.current_round;
 
-  var parsedGolfer = {
+  const parsedGolfer = {
     golfer: bio.first_name + ' ' + bio.last_name,
     day: golferCurrentRound || tourneyRound,
     thru: g.thru,
@@ -64,7 +64,7 @@ function parseGolfer(par, tourneyRound, g) {
       .value()
   };
 
-  var withdrew = g.status === PGATOUR_WD_TEXT;
+  const withdrew = g.status === PGATOUR_WD_TEXT;
   if (withdrew) {
     parsedGolfer.scores = adjustWdScores(g, parsedGolfer.scores);
   }
@@ -74,7 +74,7 @@ function parseGolfer(par, tourneyRound, g) {
   return parsedGolfer;
 }
 
-var PgaTourReader = {
+const PgaTourReader = {
 
   run: function (pgatourUrl) {
     return new Promise(function (fulfill, reject) {
@@ -84,9 +84,9 @@ var PgaTourReader = {
           return;
         }
 
-        var par = _.parseInt(body.leaderboard.courses[0].par_total);
-        var currentRound = body.leaderboard.current_round;
-        var golfers = _.map(body.leaderboard.players, function (g) {
+        const par = _.parseInt(body.leaderboard.courses[0].par_total);
+        const currentRound = body.leaderboard.current_round;
+        const golfers = _.map(body.leaderboard.players, function (g) {
           return parseGolfer(par, currentRound, g);
         });
 

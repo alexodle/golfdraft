@@ -1,21 +1,21 @@
-var _ = require('lodash');
-var constants = require('../common/constants');
-var jsdom = require('jsdom');
-var Promise = require('promise');
+const _ = require('lodash');
+const constants = require('../common/constants');
+const jsdom = require('jsdom');
+const Promise = require('promise');
 
-var DEFAULT_YSURL = "http://sports.yahoo.com/golf/pga/leaderboard";
-var MISSED_CUT = constants.MISSED_CUT;
+const DEFAULT_YSURL = "http://sports.yahoo.com/golf/pga/leaderboard";
+const MISSED_CUT = constants.MISSED_CUT;
 
 function eachGolferCb(callback) {
   return function (tourney) {
-    var newGolfers = _.map(tourney.golfers, function (g) {
+    const newGolfers = _.map(tourney.golfers, function (g) {
       callback(g, tourney);
     });
     return tourney;
   };
 }
 
-var YahooReader = {
+const YahooReader = {
 
   readUrl: function (yahooUrl) {
     yahooUrl = yahooUrl || DEFAULT_YSURL;
@@ -30,26 +30,26 @@ var YahooReader = {
             reject(new Error(JSON.stringify(errors)));
             return;
           }
-          var $ = window.$;
-          var par = parseInt($("li.par span").text(), 10);
-          var golfers = [];
+          const $ = window.$;
+          const par = parseInt($("li.par span").text(), 10);
+          const golfers = [];
 
           $("#leaderboardtable table.sportsTable tbody tr").each(function () {
-            var $tr = $(this);
-            var $td = $("td.player", $tr);
+            const $tr = $(this);
+            const $td = $("td.player", $tr);
 
-            var golfer = $("a", $td).text().trim()
+            const golfer = $("a", $td).text().trim()
               .replace("*", "")
               .replace("x-", "");
             if (!golfer) {
               return;
             }
 
-            var scores = _.times(4, function () {
+            const scores = _.times(4, function () {
               return $($td = $td.next()).text().trim();
             });
-            var today = $($td = $td.next()).text().trim();
-            var thru = $($td = $td.next()).text().trim();
+            const today = $($td = $td.next()).text().trim();
+            const thru = $($td = $td.next()).text().trim();
 
             golfers.push({
               golfer: golfer,
@@ -69,7 +69,7 @@ var YahooReader = {
   },
 
   parseScores: function (g) {
-    var day = 0;
+    let day = 0;
     g.scores = _.map(g.scores, function (s) {
       if (
         s.toLowerCase().indexOf("pm") !== -1 ||
@@ -85,7 +85,7 @@ var YahooReader = {
       }
     });
 
-    var missedCut = _.contains(g.scores, MISSED_CUT);
+    const missedCut = _.contains(g.scores, MISSED_CUT);
     if (missedCut) {
       g.day = g.scores.length;
     } else {
@@ -96,8 +96,8 @@ var YahooReader = {
   },
 
   relativeToPar: function (g, tourney) {
-    var par = tourney.par;
-    var missedCut = _.contains(g.scores, MISSED_CUT);
+    const par = tourney.par;
+    const missedCut = _.contains(g.scores, MISSED_CUT);
     if (g.today === "E") {
       g.today = 0;
     }

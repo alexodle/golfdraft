@@ -1,11 +1,11 @@
 "use strict";
 
-var React = require("react");
-var _ = require("lodash");
+const React = require("react");
+const _ = require("lodash");
 
-var UserActions = require("../actions/UserActions");
+const UserActions = require("../actions/UserActions");
 
-var LogoutButton = React.createClass({
+const LogoutButton = React.createClass({
 
   contextTypes: {
     router: React.PropTypes.object.isRequired

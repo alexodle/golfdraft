@@ -7,7 +7,7 @@ module.exports = function (grunt) {
   // Time how long tasks take. Can help when optimizing build times
   require('time-grunt')(grunt);
 
-  var webpack = require('webpack');
+  const webpack = require('webpack');
 
   grunt.initConfig({
     express: {

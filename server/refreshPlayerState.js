@@ -2,13 +2,13 @@
 
 // Refreshes players, pick order, draft picks, and chat
 
-var _ = require('lodash');
-var access = require('./access');
-var config = require('./config');
-var mongoose = require('mongoose');
-var Promise = require('promise');
-var tourneyConfigReader = require('./tourneyConfigReader');
-var tourneyUtils = require('./tourneyUtils');
+const _ = require('lodash');
+const access = require('./access');
+const config = require('./config');
+const mongoose = require('mongoose');
+const Promise = require('promise');
+const tourneyConfigReader = require('./tourneyConfigReader');
+const tourneyUtils = require('./tourneyUtils');
 
 function refreshPlayerState(pickOrderNames) {
   return Promise.all([
@@ -18,7 +18,7 @@ function refreshPlayerState(pickOrderNames) {
     access.clearChatMessages()
   ])
   .then(function () {
-    var players = _.map(pickOrderNames, function (name) {
+    const players = _.map(pickOrderNames, function (name) {
       return { name: name };
     });
     return access.ensurePlayers(players);
@@ -31,7 +31,7 @@ function refreshPlayerState(pickOrderNames) {
     });
   })
   .then(function (sortedPlayers) {
-    var pickOrder = tourneyUtils.snakeDraftOrder(sortedPlayers);
+    const pickOrder = tourneyUtils.snakeDraftOrder(sortedPlayers);
     return access.setPickOrder(pickOrder);
   });
 }
@@ -40,10 +40,10 @@ if (require.main === module) {
   mongoose.set('debug', true);
   mongoose.connect(config.mongo_url);
 
-  var db = mongoose.connection;
+  const db = mongoose.connection;
   db.on('error', console.error.bind(console, 'connection error:'));
   db.once('open', function callback () {
-    var tourneyCfg = tourneyConfigReader.loadConfig();
+    const tourneyCfg = tourneyConfigReader.loadConfig();
     refreshPlayerState(tourneyCfg.draftOrder).then(function () {
       process.exit(0);
     });

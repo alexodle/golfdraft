@@ -1,22 +1,21 @@
 "use strict";
 
-var _ = require("lodash");
-var AdminApp = require("./AdminApp.jsx");
-var AppHeader = require("./AppHeader.jsx");
-var AppSettingsStore = require('../stores/AppSettingsStore');
-var ChatStore = require("../stores/ChatStore");
-var ChatStore = require("../stores/ChatStore");
-var DraftApp = require("./DraftApp.jsx");
-var DraftStore = require("../stores/DraftStore");
-var React = require("react");
-var ScoreStore = require('../stores/ScoreStore');
-var TourneyApp = require("./TourneyApp.jsx");
-var TourneyStore = require("../stores/TourneyStore");
-var UserStore = require("../stores/UserStore");
-var GolferStore = require("../stores/GolferStore");
-var WhoIsYou = require("./WhoIsYou.jsx");
+const _ = require("lodash");
+const AdminApp = require("./AdminApp.jsx");
+const AppHeader = require("./AppHeader.jsx");
+const AppSettingsStore = require('../stores/AppSettingsStore');
+const ChatStore = require("../stores/ChatStore");
+const DraftApp = require("./DraftApp.jsx");
+const DraftStore = require("../stores/DraftStore");
+const React = require("react");
+const ScoreStore = require('../stores/ScoreStore');
+const TourneyApp = require("./TourneyApp.jsx");
+const TourneyStore = require("../stores/TourneyStore");
+const UserStore = require("../stores/UserStore");
+const GolferStore = require("../stores/GolferStore");
+const WhoIsYou = require("./WhoIsYou.jsx");
 
-var RELEVANT_STORES = [
+const RELEVANT_STORES = [
   AppSettingsStore,
   ChatStore,
   DraftStore,
@@ -54,19 +53,19 @@ function getAppState() {
 }
 
 function getGolfersRemaining(golfers, draftPicks) {
-  var pickedGolfers = _.pluck(draftPicks, "golfer");
-  var golfersRemaining = _.omit(golfers, pickedGolfers);
+  const pickedGolfers = _.pluck(draftPicks, "golfer");
+  const golfersRemaining = _.omit(golfers, pickedGolfers);
   return golfersRemaining;
 }
 
-var DraftWrapper = React.createClass({
+const DraftWrapper = React.createClass({
 
   childContextTypes: {
     location: React.PropTypes.object
   },
 
   render: function () {
-    var props = this.props;
+    const props = this.props;
     return (
       <section>
         <AppHeader
@@ -98,14 +97,14 @@ var DraftWrapper = React.createClass({
 
 });
 
-var TourneyWrapper = React.createClass({
+const TourneyWrapper = React.createClass({
 
   childContextTypes: {
     location: React.PropTypes.object
   },
 
   render: function () {
-    var props = this.props;
+    const props = this.props;
     return (
       <section>
         <AppHeader
@@ -129,14 +128,14 @@ var TourneyWrapper = React.createClass({
 
 });
 
-var AdminWrapper = React.createClass({
+const AdminWrapper = React.createClass({
 
   childContextTypes: {
     location: React.PropTypes.object
   },
 
   render: function () {
-    var props = this.props;
+    const props = this.props;
     return (
       <section>
         <AppHeader
@@ -161,7 +160,7 @@ var AdminWrapper = React.createClass({
 
 });
 
-var AppNode = React.createClass({
+const AppNode = React.createClass({
 
   getInitialState: function () {
     return getAppState();
@@ -180,10 +179,10 @@ var AppNode = React.createClass({
   },
 
   render: function () {
-    var state = this.state;
+    const state = this.state;
 
     // Calculated here since it's used in multiple places
-    var golfersRemaining = getGolfersRemaining(
+    const golfersRemaining = getGolfersRemaining(
       state.golfers,
       state.draft.draftPicks
     );

@@ -1,9 +1,9 @@
 'use strict';
 
-var _ = require('lodash');
-var React = require('react');
+const _ = require('lodash');
+const React = require('react');
 
-var AppPausedStatus = React.createClass({
+const AppPausedStatus = React.createClass({
 
   render: function () {
     return (

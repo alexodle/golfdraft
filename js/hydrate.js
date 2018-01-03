@@ -1,18 +1,18 @@
 'use strict';
 
-var _ = require('lodash');
-var AppActions = require('./actions/AppActions');
-var DraftActions = require('./actions/DraftActions');
-var DraftParser = require('./logic/DraftParser');
-var PlayerStore = require('./stores/PlayerStore');
-var ScoreActions = require('./actions/ScoreActions');
-var SettingsActions = require('./actions/SettingsActions');
-var UserActions = require('./actions/UserActions');
+const _ = require('lodash');
+const AppActions = require('./actions/AppActions');
+const DraftActions = require('./actions/DraftActions');
+const DraftParser = require('./logic/DraftParser');
+const PlayerStore = require('./stores/PlayerStore');
+const ScoreActions = require('./actions/ScoreActions');
+const SettingsActions = require('./actions/SettingsActions');
+const UserActions = require('./actions/UserActions');
 
 /** Hydrates the app with data stamped on initial page load
 */
 function hydrate(seedData) {
-  var draft = DraftParser.parseDraft(seedData.draft);
+  const draft = DraftParser.parseDraft(seedData.draft);
 
   AppActions.setPlayers(seedData.players);
   AppActions.setGolfers(seedData.golfers);
@@ -27,7 +27,7 @@ function hydrate(seedData) {
   // HACKHACK - For now users are just wrappers around players. I may or may
   // not need to differentiate the two in the future, so just keep the
   // abstraction for now.
-  var users = _.transform(PlayerStore.getAll(), function (memo, p) {
+  const users = _.transform(PlayerStore.getAll(), function (memo, p) {
     memo[p.id] = { id: p.id, name: p.name, player: p.id };
   });
   AppActions.setUsers(users);

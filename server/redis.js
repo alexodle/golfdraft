@@ -1,14 +1,14 @@
-var config = require('./config');
-var redis = require("redis");
+const config = require('./config');
+const redis = require("redis");
 
 if (!config.prod) {
   redis.debug_mode = true;
 }
 
-var redisUrl = require("url").parse(config.redis_url);
+const redisUrl = require("url").parse(config.redis_url);
 
 function createClient() {
-  var redisCli = redis.createClient(redisUrl.port, redisUrl.hostname);
+  const redisCli = redis.createClient(redisUrl.port, redisUrl.hostname);
   redisCli.auth(redisUrl.auth.split(":")[1]);
 
   redisCli.on("error", function (err) {
@@ -18,8 +18,8 @@ function createClient() {
   return redisCli;
 }
 
-var pubSubClient = createClient();
-var client = createClient();
+const pubSubClient = createClient();
+const client = createClient();
 
 function unref() {
   pubSubClient.unref();

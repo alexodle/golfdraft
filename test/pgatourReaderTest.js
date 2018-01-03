@@ -1,10 +1,10 @@
 require('./initTestConfig');
 
-var constants = require('../common/constants');
-var reader = require('../scores_sync/pgatourReader');
-var should = require('should');
+const constants = require('../common/constants');
+const reader = require('../scores_sync/pgatourReader');
+const should = require('should');
 
-var MISSED_CUT = constants.MISSED_CUT;
+const MISSED_CUT = constants.MISSED_CUT;
 
 describe('PgaTourReader', function () {
   describe('parseGolfer', function () {

@@ -1,40 +1,9 @@
 "use strict";
 
-var _ = require("lodash");
-
-var memo = {};
-
-function _memoKey(i1, i2) {
-  return i1 < i2 ?
-    (i1 + "::" + i2) :
-    (i2 + "::" + i1);
-}
+const _ = require("lodash");
 
 function _normalize(s) {
   return s.trim().toLowerCase();
-}
-
-function _calc(s1, s2, i1, i2) {
-  var key = _memoKey(i1, i2);
-  if (memo[key]) return memo[key];
-
-  while (i1 < s1.length && i2 < s2.length && s1[i1] == s2[i2]) {
-    i1 += 1;
-    i2 += 1;
-  }
-
-  if (i1 == s1.length && i2 == s2.length) return 0;
-
-  if (i1 == s1.length || i2 == s2.length) {
-    return s1.length - i1 + s2.length - i2;
-  }
-
-  var dist1 = _calc(s1, s2, i1 + 1, i2);
-  var dist2 = _calc(s1, s2, i1, i2 + 1);
-  var dist = 1 + Math.min(dist1, dist2);
-
-  memo[key] = dist;
-  return dist;
 }
 
 function _forEachWordPermutation(words, callback, output) {
@@ -43,42 +12,40 @@ function _forEachWordPermutation(words, callback, output) {
   }
 
   _.each(words, function (w, i) {
-    var newWords = words.slice(0, i).concat(words.slice(i + 1, words.length));
+    const newWords = words.slice(0, i).concat(words.slice(i + 1, words.length));
     return _forEachWordPermutation(newWords, callback, output.concat([w]));
   }); 
 }
 
 function runAll(sourceList, targetList) {
   return _.map(sourceList, function (sourceStr) {
-    var results = _.chain(targetList)
-      .map(function (targetStr) {
-        return _.extend({ target: targetStr }, run(sourceStr, targetStr));
-      })
-      .sortBy(function (result) {
-        return -result.coeff;
-      })
-      .value();
+    const results = _.map(targetList, function (targetStr) {
+      return _.extend({ target: targetStr }, run(sourceStr, targetStr));
+    });
+    results.sort(function (r1, r2) {
+      if (r1.coeff !== r2.coeff) {
+        return r2.coeff - r1.coeff; // reverse;
+      }
+      return r1.target.localeCompare(r2.target);
+    });
     return { source: sourceStr, results: results };
   });
 }
 
 function run(s1, s2) {
-  var norms1 = _normalize(s1);
-  var norms2 = _normalize(s2);
+  const norms1 = _normalize(s1);
+  const norms2 = _normalize(s2);
 
-  var bestDist = Number.MAX_VALUE;
+  let bestDist = Number.MAX_VALUE;
   _forEachWordPermutation(norms1.split(" "), function (s1perm) {
-    memo = {};
-    var dist = _calc(s1perm, norms2, 0, 0);
-
-    bestDist = Math.min(bestDist, dist);
+    bestDist = Math.min(bestDist, _.levenshtein(s1perm, norms2));
     return bestDist > 0;
   }, []);
 
-  memo = {};
+  const longestLength = Math.max(norms1.length, norms2.length);
   return {
     dist: bestDist,
-    coeff: (norms1.length + norms2.length - bestDist) / (norms1.length + norms2.length)
+    coeff: (longestLength - bestDist) / longestLength
   };
 }
 

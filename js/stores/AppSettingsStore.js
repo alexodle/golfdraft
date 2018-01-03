@@ -1,16 +1,16 @@
 'use strict';
 
-var _ = require('lodash');
+const _ = require('lodash');
 
-var Store = require('./Store');
-var AppDispatcher = require('../dispatcher/AppDispatcher');
-var AppConstants = require('../constants/AppConstants');
+const Store = require('./Store');
+const AppDispatcher = require('../dispatcher/AppDispatcher');
+const AppConstants = require('../constants/AppConstants');
 
-var _playSounds = true;
-var _isPaused = false;
-var _allowClock = true;
+let _playSounds = true;
+let _isPaused = false;
+let _allowClock = true;
 
-var AppSettingsStore =  _.extend({}, Store.prototype, {
+const AppSettingsStore =  _.extend({}, Store.prototype, {
 
   changeEvent: 'AppSettingsStore:change',
 
@@ -30,7 +30,7 @@ var AppSettingsStore =  _.extend({}, Store.prototype, {
 
 // Register to handle all updates
 AppDispatcher.register(function (payload) {
-  var action = payload.action;
+  const action = payload.action;
 
   switch(action.actionType) {
 

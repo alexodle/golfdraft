@@ -1,16 +1,16 @@
 'use strict';
 
-var _ = require('lodash');
-var GolfDraftPanel = require('./GolfDraftPanel.jsx');
-var GolferLogic = require('../logic/GolferLogic');
-var React = require('react');
+const _ = require('lodash');
+const GolfDraftPanel = require('./GolfDraftPanel.jsx');
+const GolferLogic = require('../logic/GolferLogic');
+const React = require('react');
 
-var SHOW_N = 20;
+const SHOW_N = 20;
 
-var BestLeft = React.createClass({
+const BestLeft = React.createClass({
 
   render: function () {
-    var golfersRemaining = _.chain(this.props.golfersRemaining)
+    const golfersRemaining = _.chain(this.props.golfersRemaining)
       .sortBy('wgr')
       .first(SHOW_N)
       .value();

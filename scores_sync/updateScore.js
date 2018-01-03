@@ -1,16 +1,16 @@
 'use strict';
 
-var _ = require('lodash');
-var access = require('../server/access');
-var config = require('../server/config');
-var constants = require('../common/constants');
-var Promise = require('promise');
+const _ = require('lodash');
+const access = require('../server/access');
+const config = require('../server/config');
+const constants = require('../common/constants');
+const Promise = require('promise');
 
-var DAYS = constants.NDAYS;
-var MISSED_CUT = constants.MISSED_CUT;
-var OVERRIDE_KEYS = ['golfer', 'day', 'scores'];
+const DAYS = constants.NDAYS;
+const MISSED_CUT = constants.MISSED_CUT;
+const OVERRIDE_KEYS = ['golfer', 'day', 'scores'];
 
-var UpdateScore = {
+const UpdateScore = {
 
   validate: function (d) {
     if (_.has(d, 'par') && !_.contains([70, 71, 72], d.par)) {
@@ -19,10 +19,10 @@ var UpdateScore = {
     }
 
     return _.every(d.golfers, function (g) {
-      var inv = false;
-      var validScores = _.every(g.scores, function (s) {
+      const validScores = _.every(g.scores, function (s) {
         return _.isFinite(s) || s === MISSED_CUT;
       });
+      let inv = false;
 
       if (g.golfer === "-") {
         console.log("ERROR - Invalid golfer name");
@@ -46,7 +46,7 @@ var UpdateScore = {
   },
 
   mergeOverrides: function (scores, scoreOverrides) {
-    var overridesByGolfer = _.chain(scoreOverrides)
+    const overridesByGolfer = _.chain(scoreOverrides)
       .map(function (o) {
         return _.chain(o)
 
@@ -62,8 +62,8 @@ var UpdateScore = {
       })
       .value();
 
-    var newScores = _.map(scores, function (s) {
-      var override = overridesByGolfer[s.golfer.toString()];
+    const newScores = _.map(scores, function (s) {
+      const override = overridesByGolfer[s.golfer.toString()];
       if (override) {
         return _.extend({}, s, override);
       }
@@ -81,15 +81,15 @@ var UpdateScore = {
       }
 
       // Ensure tourney/par
-      var update = { pgatourUrl: url };
+      const update = { pgatourUrl: url };
       if (_.has(rawTourney, 'par')) {
         update.parr = rawTourney.par;
       }
-      var mainPromise = access.updateTourney(update)
+      const mainPromise = access.updateTourney(update)
 
       .then(function () {
         // Ensure golfers
-        var golfers = _.map(rawTourney.golfers, function (g) {
+        const golfers = _.map(rawTourney.golfers, function (g) {
           return { name: g.golfer };
         });
         return access.ensureGolfers(golfers);
@@ -103,13 +103,13 @@ var UpdateScore = {
       })
 
       .then(function (results) {
-        var gs = results[0];
-        var scoreOverrides = results[1];
+        const gs = results[0];
+        const scoreOverrides = results[1];
 
         // Build scores with golfer id
-        var golfersByName = _.indexBy(gs, "name");
-        var scores = _.map(rawTourney.golfers, function (g) {
-          var golfer = golfersByName[g.golfer]._id;
+        const golfersByName = _.indexBy(gs, "name");
+        const scores = _.map(rawTourney.golfers, function (g) {
+          const golfer = golfersByName[g.golfer]._id;
           return {
             golfer: golfer,
             day: g.day,

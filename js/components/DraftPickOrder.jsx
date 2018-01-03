@@ -1,16 +1,16 @@
 'use strict';
 
-var _ = require('lodash');
-var cx = require('classnames');
-var DraftStore = require('../stores/DraftStore');
-var GolfDraftPanel = require('./GolfDraftPanel.jsx');
-var PlayerStore = require('../stores/PlayerStore');
-var React = require('react');
-var UserStore = require('../stores/UserStore');
+const _ = require('lodash');
+const cx = require('classnames');
+const DraftStore = require('../stores/DraftStore');
+const GolfDraftPanel = require('./GolfDraftPanel.jsx');
+const PlayerStore = require('../stores/PlayerStore');
+const React = require('react');
+const UserStore = require('../stores/UserStore');
 
-var ReactPropTypes = React.PropTypes;
+const ReactPropTypes = React.PropTypes;
 
-var DraftPickOrder = React.createClass({
+const DraftPickOrder = React.createClass({
 
   propTypes: {
     currentUser: ReactPropTypes.object.isRequired,
@@ -20,14 +20,15 @@ var DraftPickOrder = React.createClass({
   },
 
   render: function () {
-    var pickingForPlayers = this.props.pickingForPlayers;
+    const pickingForPlayers = this.props.pickingForPlayers;
 
-    var currentPick = this.props.currentPick;
-    var currentPlayer = currentPick ? currentPick.player : null;
+    const currentPick = this.props.currentPick;
+    const currentPlayer = currentPick ? currentPick.player : null;
 
-    var myPlayer = this.props.currentUser.player;
-    var pickOrder = DraftStore.getPickOrder();
-    pickOrder = _.first(pickOrder, pickOrder.length / 4);
+    const myPlayer = this.props.currentUser.player;
+
+    let pickOrder = DraftStore.getPickOrder();
+    pickOrder = _.first(DraftStore.getPickOrder(), pickOrder.length / 4);
     return (
       <div>
         <p><small>
@@ -38,8 +39,8 @@ var DraftPickOrder = React.createClass({
         </small></p>
         <ol className='pick-order-list'>
           {_.map(pickOrder, function (pick, i) {
-            var player = pick.player;
-            var text = PlayerStore.getPlayer(player).name;
+            const player = pick.player;
+            const text = PlayerStore.getPlayer(player).name;
             return (
               <li
                 key={player}

@@ -1,4 +1,4 @@
-var cfg = {
+const cfg = {
   prod: !process.env.DEBUG,
 
   mongo_url: process.env.MONGO_URI || "mongodb://gd:gd@127.0.0.1:27017/gd",
