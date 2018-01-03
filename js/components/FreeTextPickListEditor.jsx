@@ -253,7 +253,7 @@ var FreeTextPickListEditor = React.createClass({
         that._setSuggestions(err.responseJSON.suggestions);
       } else {
         // Not really handled
-        //window.location.reload(); todo TODO
+        window.location.reload();
       }
     })
   }
