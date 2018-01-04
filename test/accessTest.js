@@ -6,39 +6,49 @@ const access = require('../server/access');
 const Promise = require('promise');
 const tourneyUtils = require('../server/tourneyUtils');
 const mongoose = require('mongoose');
+const should = require('should');
 
 const ObjectId = mongoose.Types.ObjectId;
 
 function ensureEmptyDraft() {
   return access.getDraft().then(function (draft) {
-    draft.picks.should.be.empty;
+    draft.picks.should.be.empty();
   });
 }
 
 function expectFailure() {
-  'expected failure, got success'.should.be.not.ok;
+  'Should not be here. Expected failure, got success.'.should.not.be.ok();
 }
 
 function expectSuccess(err) {
-  err.message.should.be.not.ok;
+  ('Should not be here. Expected success, got error: ' + err.message).should.not.be.ok();
 }
 
 function assertPriorityResult(playerId, expected, promise) {
   return promise.then(function (result) {
-    result.completed.should.be.true;
+    result.completed.should.be.true();
     result.priority.should.eql(expected);
 
     return access.getPriority(playerId);
   })
   .then(function (actualPriority) {
     _.invoke(actualPriority, 'toString').should.eql(expected);
-  });
+  }, expectSuccess);
 }
 
 describe('access', function () {
 
   before(function () {
     return initTestConfig.initDb();
+  });
+
+  describe('getPriority', function () {
+    it('returns null for unset priority', function () {
+      return access.getPriority('player1')
+      .then(function (actualPriority) {
+        should(actualPriority).be.a.null();
+      }, expectSuccess);
+    });
   });
 
   describe('updatePriority', function () {
@@ -118,27 +128,99 @@ describe('access', function () {
       ];
       return access.updatePriorityFromNames(playerId, names)
       .then(function (result) {
-        result.completed.should.be.false;
-        result.suggestions.should.eql([
+        result.completed.should.be.false();
+        result.suggestions.should.containDeepOrdered([
           { source: 'JaCk niCklauss', results: [
-            { target: 'Jack Nicklaus', "dist": 1, "coeff": 0.9285714285714286 },
-            { target: 'Gary Player', "dist": 10, "coeff": 0.2857142857142857 },
-            { target: 'Bobby Jones', "dist": 13, "coeff": 0.07142857142857142 },
-            { target: 'Tiger Woods', "dist": 13, "coeff": 0.07142857142857142 }
+            { target: 'Jack Nicklaus' },
+            { target: 'Gary Player' },
+            { target: 'Bobby Jones' },
+            { target: 'Tiger Woods' }
           ]}
         ]);
 
         return access.getPriority(playerId);
       })
       .then(function (actualPriority) {
-        // No priority should exist, so just returns a sorted list of golfers
-        const expected = _.chain(golfers)
-          .sortBy('name')
-          .pluck('_id')
-          .invoke('toString')
-          .value();
-        _.invoke(actualPriority, 'toString').should.eql(expected);
-      });
+        should(actualPriority).be.a.null();
+      }, expectSuccess);
+    });
+
+  });
+
+  describe('makeHighestPriorityPick', function () {
+    let players = null;
+    let golfers = null;
+
+    beforeEach(function () {
+      return Promise.all([
+        access.ensurePlayers([{ name: 'Player1' }, { name: 'Player2' }])
+          .then(access.getPlayers)
+          .then(_.partialRight(_.indexBy, 'name'))
+          .then(function (_players) {
+            players = _players;
+            const pickOrder = tourneyUtils.snakeDraftOrder([
+              players['Player1'],
+              players['Player2']
+            ]);
+            access.setPickOrder(pickOrder);
+          }),
+
+        access.ensureGolfers([{ name: 'Golfer1' }, { name: 'Golfer2' }])
+          .then(access.getGolfers)
+          .then(_.partialRight(_.indexBy, 'name'))
+          .then(function (_golfers) {
+            golfers = _golfers;
+          }),
+
+        access.replaceWgrs([
+          { name: 'Golfer2', wgr: 1 },
+          { name: 'Golfer1', wgr: 2 }
+        ])
+      ]);
+    });
+
+    afterEach(function () {
+      return Promise.all([
+        access.clearPlayers(),
+        access.clearPickOrder(),
+        access.clearDraftPicks(),
+        access.clearGolfers(),
+        access.clearTourney(),
+        access.clearPriorities(),
+        access.clearWgrs()
+      ]);
+    });
+
+    it('uses wgr when priority not available', function () {
+      const newPick = {
+        player: players['Player1']._id,
+        golfer: golfers['Golfer2']._id,
+        pickNumber: 0
+      };
+      return access.makeHighestPriorityPick(players['Player1']._id.toString(), 0)
+        .then(access.getDraft)
+        .then(function (draft) {
+          draft.picks.should.containDeepOrdered([newPick]);
+        }, expectSuccess);
+    });
+
+    it('uses priority list to pick next golfer', function () {
+      const newPick = {
+        player: players['Player1']._id,
+        golfer: golfers['Golfer1']._id,
+        pickNumber: 0
+      };
+      return access.updatePriority(players['Player1']._id.toString(), [
+          golfers['Golfer1']._id.toString(),
+          golfers['Golfer2']._id.toString()
+        ])
+        .then(function () {
+          return access.makeHighestPriorityPick(players['Player1']._id.toString(), 0);
+        })
+        .then(access.getDraft)
+        .then(function (draft) {
+          draft.picks.should.containDeepOrdered([newPick]);
+        }, expectSuccess);
     });
 
   });
@@ -150,23 +232,23 @@ describe('access', function () {
     beforeEach(function () {
       return Promise.all([
         access.ensurePlayers([{ name: 'Player1' }, { name: 'Player2' }])
-        .then(access.getPlayers)
-        .then(_.partialRight(_.indexBy, 'name'))
-        .then(function (_players) {
-          players = _players;
-          const pickOrder = tourneyUtils.snakeDraftOrder([
-            players['Player1'],
-            players['Player2']
-          ]);
-          access.setPickOrder(pickOrder);
-        }),
+          .then(access.getPlayers)
+          .then(_.partialRight(_.indexBy, 'name'))
+          .then(function (_players) {
+            players = _players;
+            const pickOrder = tourneyUtils.snakeDraftOrder([
+              players['Player1'],
+              players['Player2']
+            ]);
+            access.setPickOrder(pickOrder);
+          }),
 
         access.ensureGolfers([{ name: 'Golfer1' }, { name: 'Golfer2' }])
-        .then(access.getGolfers)
-        .then(_.partialRight(_.indexBy, 'name'))
-        .then(function (_golfers) {
-          golfers = _golfers;
-        })
+          .then(access.getGolfers)
+          .then(_.partialRight(_.indexBy, 'name'))
+          .then(function (_golfers) {
+            golfers = _golfers;
+          })
       ]);
     });
 
@@ -224,7 +306,7 @@ describe('access', function () {
       return access.makePick(newPick)
       .then(access.getDraft)
       .then(function (draft) {
-        draft.picks.should.containDeep([newPick]);
+        draft.picks.should.containDeepOrdered([newPick]);
       }, expectSuccess);
     });
 

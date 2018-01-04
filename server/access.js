@@ -65,7 +65,7 @@ function createBasicClearer(model) {
 function mergeWGR(golfer, wgrEntry) {
   golfer = _.pick(golfer, '_id', 'name');
   if (!wgrEntry) {
-    console.warn('WGR not found for: ' + golfer.name);
+    //console.warn('WGR not found for: ' + golfer.name);
     golfer.wgr = UNKNOWN_WGR;
   } else {
     golfer.wgr = wgrEntry.wgr;
@@ -84,15 +84,7 @@ _.extend(access, {
     const query = _.extend({ userId: playerId }, FK_TOURNEY_ID_QUERY);
     return promiseize(models.DraftPriority.findOne(query).exec())
     .then(function (priority) {
-      if (!!priority) {
-        return priority.golferPriority;
-      }
-      return access.getGolfers().then(function (golfers) {
-        return _.chain(golfers)
-        .sortBy(['wgr', 'name'])
-        .pluck('_id')
-        .value();
-      })
+      return priority ? priority.golferPriority : null;
     });
   },
 
@@ -208,22 +200,37 @@ _.extend(access, {
   makeHighestPriorityPick: function (playerId, pickNumber) {
     return Promise.all([
       access.getPriority(playerId),
+      access.getGolfers(),
       access.getPicks()
     ])
     .then(function (results) {
-      const priority = results[0];
-      const picks = results[1];
+      const priority = results[0] || [];
+      const golfers = results[1];
+      const picks = results[2];
+
       const pickedGolfers = _.chain(picks)
         .pluck('golfer')
         .indexBy()
         .value();
 
-      const golferToPick = _.chain(priority)
-      .filter(function (gid) {
-        return !pickedGolfers[gid];
-      })
-      .first()
-      .value();
+      let golferToPick = _.chain(priority)
+        .invoke('toString')
+        .filter(function (gid) {
+          return !pickedGolfers[gid];
+        })
+        .first()
+        .value();
+
+      // If no golfer from the priority list is available, use wgr
+      golferToPick = golferToPick || _.chain(golfers)
+        .sortBy(['wgr', 'name'])
+        .pluck('_id')
+        .invoke('toString')
+        .filter(function (gid) {
+          return !pickedGolfers[gid];
+        })
+        .first()
+        .value();
 
       return access.makePick({
         pickNumber: pickNumber,
@@ -259,7 +266,7 @@ _.extend(access, {
     ])
     .then(function (result) {
       const nPicks = result[0];
-      const playerIsUp = !!result[1] || true;
+      const playerIsUp = !!result[1];
       const golferAlreadyDrafted = result[2];
       const golferExists = !!result[3];
 
@@ -380,6 +387,8 @@ _.extend(access, {
   clearPriorities: createBasicClearer(models.DraftPriority),
 
   clearChatMessages: createBasicClearer(chatModels.Message),
+
+  clearWgrs: createBasicClearer(models.WGR),
 
   resetTourney: function () {
     return Promise.all(_.map([

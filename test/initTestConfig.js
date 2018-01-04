@@ -2,6 +2,7 @@ const _ = require('lodash');
 const config = require('../server/config');
 const models = require('../server/models');
 const Promise = require('promise');
+const should = require('should');
 
 const testTourney = models.Tourney({
   name: 'Test Tourney',
