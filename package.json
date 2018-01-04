@@ -39,6 +39,7 @@
     "socket.io": "^1.4.5",
     "socket.io-client": "^1.4.5",
     "twitter-bootstrap": "^2.1.1",
+    "underscore.string": "^3.3.4",
     "url-loader": "^0.5.7",
     "webpack": "^1.12.14",
     "webpack-dev-server": "^1.14.1"

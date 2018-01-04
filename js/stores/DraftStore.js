@@ -152,7 +152,7 @@ AppDispatcher.register(function (payload) {
       const currentUser = UserStore.getCurrentUser();
       if (!!currentUser) {
         // TODO - Move to separate server sync
-        $.get('/draft/priority', pick)
+        $.get('/draft/priority')
         .done(function (data) {
           if (data.playerId === currentUser.id) {
             _priority = data.priority;

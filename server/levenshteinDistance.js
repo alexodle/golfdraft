@@ -1,6 +1,7 @@
 "use strict";
 
 const _ = require("lodash");
+const _string = require("underscore.string");
 
 function _normalize(s) {
   return s.trim().toLowerCase();
@@ -38,7 +39,7 @@ function run(s1, s2) {
 
   let bestDist = Number.MAX_VALUE;
   _forEachWordPermutation(norms1.split(" "), function (s1perm) {
-    bestDist = Math.min(bestDist, _.levenshtein(s1perm, norms2));
+    bestDist = Math.min(bestDist, _string.levenshtein(s1perm, norms2));
     return bestDist > 0;
   }, []);
 
