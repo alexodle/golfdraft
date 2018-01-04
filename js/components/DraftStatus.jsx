@@ -8,6 +8,7 @@ const React = require('react');
 const DraftStatus = React.createClass({
 
   render: function () {
+    const currentPick = this.props.currentPick;
     const playerName = PlayerStore.getPlayer(currentPick.player).name;
     return (
       <div>

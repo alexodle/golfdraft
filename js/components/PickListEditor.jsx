@@ -31,22 +31,34 @@ const PickListEditor = React.createClass({
     const draggingHoverIndex = this.state.draggingHoverIndex;
     const draggingGolferId = priority[draggingIndex];
     const unsavedChanges = this.props.syncedPriority !== priority;
+    const preDraftMode = !!this.props.preDraftMode;
 
     if (draggingHoverIndex != null) {
       priority = this._newOrder(draggingIndex, draggingHoverIndex);
     }
 
     return (
-      <div>
+      <section>
+
+        <p>
+          <span className="hidden-xs">
+            <small><b>Tip:</b> drag and drop players to make one-off changes to your list</small><br />
+          </span>
+          <small><b>Pro Tip:</b> use the "Paste list" button to paste in a list of golfers (one line per golfer)</small>
+        </p>
+
         <div className="row" style={{marginBottom: "1em"}}>
           <div className="col-md-12">
-            <span>
-              <button
-                className="btn btn-default"
-                type="button"
-                onClick={this._onFreeTextClick}
-              >Paste list</button>
-            </span>
+            {!preDraftMode ? null : (
+              <span>
+                <button
+                  className="btn btn-default"
+                  disabled={unsavedChanges} 
+                  type="button"
+                  onClick={this._onFreeTextClick}
+                >Paste list</button>
+              </span>
+            )}
             <span className="pull-right">
               <button
                 className="btn btn-default"
@@ -62,6 +74,9 @@ const PickListEditor = React.createClass({
                 onClick={this._onSave}
               >Save</button>
             </span>
+            {!unsavedChanges ? null : (
+              <p><small>* Unsaved changes</small></p>
+            )}
           </div>
         </div>
         <div className="row" style={{
@@ -69,9 +84,6 @@ const PickListEditor = React.createClass({
           overflowY: "scroll"
         }}>
           <div className="col-md-12">
-            {!unsavedChanges ? null : (
-              <small>* Unsaved changes</small>
-            )}
             <table className="table table-condensed table-striped">
               <thead></thead>
               <tbody>
@@ -111,7 +123,8 @@ const PickListEditor = React.createClass({
             </table>
           </div>
         </div>
-      </div>
+
+      </section>
     );
   },
 

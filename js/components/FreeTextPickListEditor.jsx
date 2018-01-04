@@ -1,13 +1,14 @@
-"use strict";
+'use strict';
 
-const $ = require("jquery");
-const _ = require("lodash");
-const DraftActions = require("../actions/DraftActions");
-const GolferLogic = require("../logic/GolferLogic");
-const GolferStore = require("../stores/GolferStore");
-const React = require("react");
+const $ = require('jquery');
+const _ = require('lodash');
+const DraftActions = require('../actions/DraftActions');
+const GolferLogic = require('../logic/GolferLogic');
+const GolferStore = require('../stores/GolferStore');
+const React = require('react');
 
 const MIN_COEFF = 0.61;
+const TEXTAREA_PLACEHOLDER = "Sergio Garcia\nPhil Mickelson\nTiger Woods\nDustin Johnson\nJason Day\n...";
 
 const SuggestionSelector = React.createClass({
 
@@ -23,13 +24,13 @@ const SuggestionSelector = React.createClass({
     const suggestion = this.props.suggestion;
     const isViewingAll = this.state.isViewingAll;
     return (
-      <div key={suggestion.source} className="panel panel-default">
-        <div className="panel-body">
+      <div key={suggestion.source} className='panel panel-default'>
+        <div className='panel-body'>
           <p>You entered: <b>{suggestion.source}</b></p>
           <p><small><em>Did you mean:</em></small></p>
           {this._renderChoices()}
           {isViewingAll ? null : (
-            <a href="#" onClick={this._viewAll}>None of the above</a>
+            <a href='#' onClick={this._viewAll}>None of the above</a>
           )}
         </div>
       </div>
@@ -47,13 +48,13 @@ const SuggestionSelector = React.createClass({
       return (
         <div>
           {_.map(suggestionList, function (targetName) {
-            const radioId = suggestion.source + "_" + targetName;
+            const radioId = suggestion.source + '_' + targetName;
             return (
-              <div key={targetName} className="radio">
+              <div key={targetName} className='radio'>
                 <label>
                   <input
                     disabled={disabled}
-                    type="radio"
+                    type='radio'
                     name={suggestion.source}
                     id={radioId}
                     value={targetName}
@@ -69,7 +70,7 @@ const SuggestionSelector = React.createClass({
     } else {
 
       return (
-        <select disabled={disabled} className="form-control" value={selectedValue} onChange={this._onSelectValueChange}>
+        <select disabled={disabled} className='form-control' value={selectedValue} onChange={this._onSelectValueChange}>
           {_.map(suggestionList, function (targetName, i) {
             return (
               <option key={targetName} value={targetName}>{targetName}</option>
@@ -114,7 +115,7 @@ const FreeTextPickListEditor = React.createClass({
 
   getInitialState: function () {
     return {
-      text: "",
+      text: '',
       isPosting: false,
       suggestions: null,
       suggestionSelections: {},
@@ -138,18 +139,18 @@ const FreeTextPickListEditor = React.createClass({
     const errorMessage = this.state.errorMessage;
     return (
       <div>
-        <div className="text-right" style={{marginBottom: "1em"}}>
+        <div className='text-right' style={{marginBottom: '1em'}}>
           <button
-            className="btn btn-default"
-            type="button"
+            className='btn btn-default'
+            type='button'
             onClick={this.props.onCancel}
             disabled={isPosting}
           >Cancel</button>
         </div>
         {!errorMessage ? null : (
-          <div className="alert alert-danger">{errorMessage}</div>
+          <div className='alert alert-danger'>{errorMessage}</div>
         )}
-        <div className="alert alert-warning">Could not get an exact name match on the following golfers:</div>
+        <div className='alert alert-warning'>Could not find an exact match on the following golfers:</div>
         {_.map(suggestions, function (suggestion) {
           return (
             <SuggestionSelector
@@ -161,17 +162,17 @@ const FreeTextPickListEditor = React.createClass({
             />
           );
         }, this)}
-        <div className="text-right">
+        <div className='text-right'>
           <button
-            className="btn btn-default"
-            type="button"
+            className='btn btn-default'
+            type='button'
             onClick={this.props.onCancel}
             disabled={isPosting}
           >Cancel</button>
           <span> </span>
           <button
-            className="btn btn-primary"
-            type="button"
+            className='btn btn-primary'
+            type='button'
             onClick={this._onSave}
             disabled={isPosting}
           >Save</button>
@@ -185,23 +186,30 @@ const FreeTextPickListEditor = React.createClass({
     const isPosting = this.state.isPosting;
     return (
       <div>
-        <div className="text-right">
+        <div className='text-right'>
           <button
-            className="btn btn-default"
-            type="button"
+            className='btn btn-default'
+            type='button'
             onClick={this.props.onCancel}
             disabled={isPosting}
           >Cancel</button>
           <span> </span>
           <button
-            className="btn btn-primary"
-            type="button"
+            className='btn btn-primary'
+            type='button'
             onClick={this._onSave}
             disabled={isPosting}
           >Save</button>
         </div>
         <p>One golfer per line:</p>
-        <textarea disabled={isPosting} style={{width:"100%", height: "30em"}} onChange={this._onChange} value={text} />
+        <textarea
+          className='form-control'
+          placeholder={TEXTAREA_PLACEHOLDER}
+          disabled={isPosting}
+          style={{width:'100%', height: '30em'}}
+          onChange={this._onChange}
+          value={text}
+        />
       </div>
     );
   },
@@ -252,7 +260,7 @@ const FreeTextPickListEditor = React.createClass({
     .done(function (result) {
       DraftActions.setPriority(result.priority);
       this.props.onComplete();
-      window.location.href = "#InlineDraftPriorityEditor";
+      window.location.href = '#InlinePickListEditor';
     }.bind(this))
 
     .fail(function (err) {
@@ -261,10 +269,10 @@ const FreeTextPickListEditor = React.createClass({
       } else {
         this.setState({
           isPosting: false,
-          errorMessage: "Failed to save priority. Try again in a minute. If that doesn't work, contact Odle."
+          errorMessage: 'Failed to save priority. Try again in a minute. If that doesn&#39;t work, contact Odle.'
         });
       }
-      window.location.href = "#InlineDraftPriorityEditor";
+      window.location.href = '#InlinePickListEditor';
     }.bind(this));
   }
 

@@ -91,6 +91,7 @@ const DraftWrapper = React.createClass({
           allowClock={props.allowClock}
           syncedPriority={props.draft.syncedPriority}
           pendingPriority={props.draft.pendingPriority}
+          draftHasStarted={props.draftHasStarted}
         />
       </section>
     );
