@@ -108,7 +108,7 @@ const UpdateScore = {
 
         // Build scores with golfer id
         const golfersByName = _.indexBy(gs, "name");
-        const scores = _.map(rawTourney.golfers, function (g) {
+        let scores = _.map(rawTourney.golfers, function (g) {
           const golfer = golfersByName[g.golfer]._id;
           return {
             golfer: golfer,

@@ -62,7 +62,7 @@ const PlayerStandings = React.createClass({
       <section>
         <p>
           <small>
-            <b>Tip:</b> Click on a player row to view score details (above)
+            <b>Tip:</b> Click on a player row to view score details
           </small>
         </p>
         <table className='table standings-table table-hover'>

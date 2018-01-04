@@ -73,6 +73,15 @@ const TourneyApp = React.createClass({
           </small>
         </p>
 
+        <GolfDraftPanel heading='Overall Standings'>
+          <PlayerStandings
+            currentUser={this.props.currentUser}
+            playerScores={playerScores}
+            selectedPlayer={this.state.playerDetailsPlayer}
+            onPlayerSelect={this._onPlayerSelect}
+          />
+        </GolfDraftPanel>
+
         <a name='PlayerDetails' />
         <GolfDraftPanel heading='Score Details'>
 
@@ -99,15 +108,6 @@ const TourneyApp = React.createClass({
           </GolfDraftPanel>
         )}
 
-        <GolfDraftPanel heading='Overall Standings'>
-          <PlayerStandings
-            currentUser={this.props.currentUser}
-            playerScores={playerScores}
-            selectedPlayer={this.state.playerDetailsPlayer}
-            onPlayerSelect={this._onPlayerSelect}
-          />
-        </GolfDraftPanel>
-
         <ChatRoom
           currentUser={this.props.currentUser}
           messages={this.props.chatMessages}
@@ -118,6 +118,7 @@ const TourneyApp = React.createClass({
   },
 
   _onPlayerSelect: function (player) {
+    window.location.href = '#PlayerDetails';
     this.setState({playerDetailsPlayer: player});
   }
 
