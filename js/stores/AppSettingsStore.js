@@ -9,6 +9,7 @@ const AppConstants = require('../constants/AppConstants');
 let _playSounds = true;
 let _isPaused = false;
 let _allowClock = true;
+let _draftHasStarted = false;
 
 const AppSettingsStore =  _.extend({}, Store.prototype, {
 
@@ -24,6 +25,10 @@ const AppSettingsStore =  _.extend({}, Store.prototype, {
 
   getAllowClock: function () {
     return _allowClock;
+  },
+
+  getDraftHasStarted: function () {
+    return _draftHasStarted;
   }
 
 });
@@ -46,6 +51,11 @@ AppDispatcher.register(function (payload) {
 
     case AppConstants.SET_ALLOW_CLOCK:
       _allowClock = action.allowClock;
+      AppSettingsStore.emitChange();
+      break;
+
+    case AppConstants.SET_DRAFT_HAS_STARTED:
+      _draftHasStarted = action.draftHasStarted;
       AppSettingsStore.emitChange();
       break;
 

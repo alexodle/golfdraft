@@ -402,6 +402,24 @@ db.once('open', function callback () {
     });
   });
 
+  app.put('/admin/draftHasStarted', function (req, res) {
+    if (!req.session.isAdmin) {
+      res.status(401).send('Only can admin can toggle clock');
+      return;
+    }
+
+    const draftHasStarted = !!req.body.draftHasStarted;
+    access.updateAppState({
+      draftHasStarted: draftHasStarted
+    })
+    .then(function () {
+      io.sockets.emit('change:drafthasstarted', {
+        data: { draftHasStarted: draftHasStarted }
+      });
+      res.sendStatus(200);
+    });
+  });
+
   app.delete('/admin/lastpick', function (req, res) {
     if (!req.session.isAdmin) {
       res.status(401).send('Only can admin can undo picks');

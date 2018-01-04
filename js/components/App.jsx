@@ -48,7 +48,8 @@ function getAppState() {
 
     isAdmin: UserStore.isAdmin(),
     isPaused: AppSettingsStore.getIsPaused(),
-    allowClock: AppSettingsStore.getAllowClock()
+    allowClock: AppSettingsStore.getAllowClock(),
+    draftHasStarted: AppSettingsStore.getDraftHasStarted()
   };
 }
 
@@ -153,6 +154,7 @@ const AdminWrapper = React.createClass({
           golfersRemaining={props.golfersRemaining}
           activeUsers={props.activeUsers}
           allowClock={props.allowClock}
+          draftHasStarted={props.draftHasStarted}
         />
       </section>
     );

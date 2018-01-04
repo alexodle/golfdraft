@@ -26,6 +26,13 @@ const SettingsActions = {
     });
   },
 
+  setDraftHasStarted: function (draftHasStarted) {
+    AppDispatcher.handleServerAction({
+      actionType: AppConstants.SET_DRAFT_HAS_STARTED,
+      draftHasStarted: draftHasStarted
+    })
+  }
+
 };
 
 module.exports = SettingsActions;

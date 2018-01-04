@@ -27,6 +27,15 @@ function toggleAllowClock(allowClock) {
   });
 }
 
+function toggleDraftHasStarted(draftHasStarted) {
+  $.ajax({
+    url: '/admin/draftHasStarted',
+    type: 'PUT',
+    contentType: 'application/json',
+    data: JSON.stringify({ draftHasStarted: draftHasStarted })
+  });
+}
+
 const PasswordInput = React.createClass({
 
   getInitialState: function () {
@@ -106,6 +115,19 @@ const AdminApp = React.createClass({
       <section>
         <h1>Hello admin!</h1>
 
+        {props.draftHasStarted ? (
+          <h2>Draft has started</h2>
+        ) : (
+          <h2>Draft has not started yet</h2>
+        )}
+        <div className='panel'>
+          <div className='panel-body'>
+            <button className='btn' onClick={this._onStartDraft}>Start Draft</button>
+            <span> </span>
+            <button className='btn' onClick={this._onUnstartDraft}>Unstart Draft</button>
+          </div>
+        </div>
+
         {!props.isPaused ? null : (
           <h2>Paused!</h2>
         )}
@@ -168,10 +190,20 @@ const AdminApp = React.createClass({
           </div>
         </div>
 
-        <DraftStatus currentPick={props.currentPick} />
+        {!props.currentPick ? null : (
+          <DraftStatus currentPick={props.currentPick} />
+        )}
         <DraftHistory draftPicks={props.draftPicks} />
       </section>
     );
+  },
+
+  _onStartDraft: function () {
+    toggleDraftHasStarted(true);
+  },
+
+  _onUnstartDraft: function () {
+    toggleDraftHasStarted(false);
   },
 
   _onPause: function () {

@@ -33,6 +33,9 @@ function startSocketUpdates() {
   io.on('change:allowclock', function (ev) {
     SettingsActions.setAllowClock(ev.data.allowClock);
   });
+  io.on('change:drafthasstarted', function (ev) {
+    SettingsActions.setDraftHasStarted(ev.data.draftHasStarted);
+  });
   io.on('change:activeusers', function (ev) {
     UserActions.setActiveUsers(ev.data.userCounts);
   });
