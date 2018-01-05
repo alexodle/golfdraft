@@ -80,19 +80,19 @@ const PickListEditor = React.createClass({
             )}
           </div>
         </div>
-        <div className="row">
-          <div className="col-md-12">
-            {hasPriorityList ? null : (
+        {hasPriorityList ? null : (
+          <div className="row">
+            <div className="col-md-12">
               <p><small><b>Note:</b> You have not set a pick list, so we default to WGR.</small></p>
-            )}
-            <span className="hidden-xs">
-              <p><small><b>Tip:</b> drag and drop players to make one-off changes to your list</small></p>
-            </span>
-            {!preDraftMode ? null : (
-              <p><small><b>Pro Tip:</b> use the "Paste list" button to paste in a list of golfers (one line per golfer)</small></p>
-            )}
+              <span className="hidden-xs">
+                <p><small><b>Tip:</b> drag and drop players to make one-off changes to your list</small></p>
+              </span>
+              {!preDraftMode ? null : (
+                <p><small><b>Pro Tip:</b> use the "Paste list" button to paste in a list of golfers (one line per golfer)</small></p>
+              )}
+            </div>
           </div>
-        </div>
+        )}
         <div className="row" style={{
           height: this.props.height || "100%",
           overflowY: "scroll"
