@@ -25,7 +25,7 @@ const Promise = require('es6-promise').Promise;
 const _ = require('lodash');
 
 const _callbacks = [];
-const _promises = [];
+let _promises = [];
 
 /**
  * Add a promise to the queue of callback invocation promises.
