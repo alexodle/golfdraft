@@ -13,7 +13,7 @@ const OVERRIDE_KEYS = ['golfer', 'day', 'scores'];
 const UpdateScore = {
 
   validate: function (d) {
-    if (_.has(d, 'par') && !_.contains([70, 71, 72], d.par)) {
+    if (_.has(d, 'par') && !_.contains([70, 71, 72, 73], d.par)) {
       console.log("ERROR - Par invalid:" + d.par);
       return false;
     }

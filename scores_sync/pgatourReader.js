@@ -49,6 +49,7 @@ function adjustForPar(par, scores) {
 }
 
 function parseGolfer(par, tourneyRound, g) {
+  console.dir(g);
   const bio = g.player_bio;
   const golferCurrentRound = g.current_round;
 

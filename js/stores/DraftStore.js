@@ -11,8 +11,15 @@ const UserStore = require('./UserStore');
 let _picks = [];
 let _pickOrder = [];
 let _pickForPlayers = [];
+
 let _priority = null;
 let _pendingPriority = null;
+resetPriority();
+
+function resetPriority() {
+  _priority = AppConstants.PROPERTY_LOADING;
+  _pendingPriority = _priority;
+}
 
 function getCurrentPickNumber() {
   return _picks.length;
@@ -143,8 +150,7 @@ AppDispatcher.register(function (payload) {
       break;
 
     case AppConstants.CURRENT_USER_CHANGE:
-      _priority = null;
-      _pendingPriority = null;
+      resetPriority();
       DraftStore.emitChange();
       break;
 

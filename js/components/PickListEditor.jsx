@@ -1,6 +1,7 @@
 "use strict";
 
 const _ = require("lodash");
+const AppConstants = require('../constants/AppConstants');
 const DraftActions = require("../actions/DraftActions");
 const FreeTextPickListEditor = require("./FreeTextPickListEditor.jsx");
 const GolferLogic = require("../logic/GolferLogic");
@@ -18,34 +19,34 @@ const PickListEditor = React.createClass({
   },
 
   render: function () {
-    let priority = this._getPriority();
-    if (!priority) {
+    if (this.props.syncedPriority == AppConstants.PROPERTY_LOADING) {
       return this._renderLoading();
     }
 
     if (this.state.isFreeTextMode) {
-      return (<FreeTextPickListEditor onCancel={this._onFreeTextComplete} onComplete={this._onFreeTextComplete} />);
+      return (
+        <FreeTextPickListEditor
+          onCancel={this._onFreeTextComplete}
+          onComplete={this._onFreeTextComplete}
+        />
+      );
     }
 
+    let priority = this._getDisplayPriority();
+
+    const hasPriorityList = !_.isEmpty(this.props.syncedPriority);
     const draggingIndex = this.state.draggingIndex;
     const draggingHoverIndex = this.state.draggingHoverIndex;
-    const draggingGolferId = priority[draggingIndex];
     const unsavedChanges = this.props.syncedPriority !== priority;
     const preDraftMode = !!this.props.preDraftMode;
+    const draggingGolferId = _.isNumber(draggingIndex) ? priority[draggingIndex] : null;
 
-    if (draggingHoverIndex != null) {
+    if (_.isNumber(draggingHoverIndex)) {
       priority = this._newOrder(draggingIndex, draggingHoverIndex);
     }
 
     return (
       <section>
-
-        <p>
-          <span className="hidden-xs">
-            <small><b>Tip:</b> drag and drop players to make one-off changes to your list</small><br />
-          </span>
-          <small><b>Pro Tip:</b> use the "Paste list" button to paste in a list of golfers (one line per golfer)</small>
-        </p>
 
         <div className="row" style={{marginBottom: "1em"}}>
           <div className="col-md-12">
@@ -76,6 +77,19 @@ const PickListEditor = React.createClass({
             </span>
             {!unsavedChanges ? null : (
               <p><small>* Unsaved changes</small></p>
+            )}
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-md-12">
+            {hasPriorityList ? null : (
+              <p><small><b>Note:</b> You have not set a pick list, so we default to WGR.</small></p>
+            )}
+            <span className="hidden-xs">
+              <p><small><b>Tip:</b> drag and drop players to make one-off changes to your list</small></p>
+            </span>
+            {!preDraftMode ? null : (
+              <p><small><b>Pro Tip:</b> use the "Paste list" button to paste in a list of golfers (one line per golfer)</small></p>
             )}
           </div>
         </div>
@@ -143,12 +157,18 @@ const PickListEditor = React.createClass({
     return (<span>Loading...</span>);
   },
 
-  _getPriority: function () {
-    return this.props.pendingPriority;
+  _getDisplayPriority: function () {
+    const pendingPriority = this.props.pendingPriority;
+    if (pendingPriority === AppConstants.PROPERTY_LOADING) return pendingPriority;
+
+    return !_.isEmpty(pendingPriority) ? pendingPriority : _.chain(this.props.golfersRemaining)
+      .sortBy(['wgr', 'name'])
+      .pluck('_id')
+      .value();
   },
 
   _newOrder: function (fromIndex, toIndex) {
-    const currentOrder = this._getPriority();
+    const currentOrder = this._getDisplayPriority();
     const movingGolfer = currentOrder[fromIndex];
     const newOrder = currentOrder.slice();
     newOrder.splice(fromIndex, 1);

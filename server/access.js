@@ -390,6 +390,8 @@ _.extend(access, {
 
   clearWgrs: createBasicClearer(models.WGR),
 
+  clearAppState: createBasicClearer(models.AppState),
+
   resetTourney: function () {
     return Promise.all(_.map([
       models.Tourney.update(TOURNEY_ID_QUERY, {
@@ -404,7 +406,9 @@ _.extend(access, {
       access.clearGolfers(),
       access.clearGolferScores(),
       access.clearGolferScoreOverrides(),
-      access.clearChatMessages()
+      access.clearChatMessages(),
+      access.clearPriorities(),
+      access.clearAppState()
     ], promiseize));
   }
 

@@ -15,7 +15,8 @@ function refreshPlayerState(pickOrderNames) {
     access.clearPlayers(),
     access.clearPickOrder(),
     access.clearDraftPicks(),
-    access.clearChatMessages()
+    access.clearChatMessages(),
+    access.clearPriorities()
   ])
   .then(function () {
     const players = _.map(pickOrderNames, function (name) {

@@ -65,6 +65,7 @@ const DraftApp = React.createClass({
             <GolfDraftPanel heading={this._renderPickListHeader()}>
               <PickListEditor
                 preDraftMode
+                golfersRemaining={this.props.golfersRemaining}
                 syncedPriority={this.props.syncedPriority}
                 pendingPriority={this.props.pendingPriority}
                 height='30em'
@@ -184,6 +185,7 @@ const DraftApp = React.createClass({
           <div className='col-md-8'>
             <GolfDraftPanel heading={this._renderPickListHeader()}>
               <PickListEditor
+                golfersRemaining={this.props.golfersRemaining}
                 syncedPriority={this.props.syncedPriority}
                 pendingPriority={this.props.pendingPriority}
                 height='29em'
