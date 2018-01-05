@@ -7,106 +7,97 @@ const GolferLogic = require('../logic/GolferLogic');
 const GolferStore = require('../stores/GolferStore');
 const React = require('react');
 
-const MIN_COEFF = 0.61;
+const MIN_COEFF = 0.5;
 const TEXTAREA_PLACEHOLDER = "Sergio Garcia\nPhil Mickelson\nTiger Woods\nDustin Johnson\nJason Day\n...";
+
+function calcHasGoodSuggestion(results) {
+  return results[0].coeff >= MIN_COEFF;
+}
 
 const SuggestionSelector = React.createClass({
 
   getInitialState: function () {
-    const results = this.props.suggestion.results;
-    const isViewingAll = _.isEmpty(results) || results[0].coeff < MIN_COEFF;
     return {
-      isViewingAll: isViewingAll
+      isViewingAll: !this.props.hasGoodSuggestion
     };
   },
 
   render: function () {
     const suggestion = this.props.suggestion;
+    const hasGoodSuggestion = this.props.hasGoodSuggestion;
     const isViewingAll = this.state.isViewingAll;
+
     return (
       <div key={suggestion.source} className='panel panel-default'>
         <div className='panel-body'>
-          <p>You entered: <b>{suggestion.source}</b></p>
-          <p><small><em>Did you mean:</em></small></p>
-          {this._renderChoices()}
-          {isViewingAll ? null : (
-            <a href='#' onClick={this._viewAll}>None of the above</a>
-          )}
+
+          <div className='row'>
+            <div className='col-md-2'>
+              <p><em>You entered:</em></p>
+            </div>
+            <div className='col-md-10'>
+              <b>{suggestion.source}</b>
+            </div>
+          </div>
+
+          {isViewingAll ?
+            this._renderChoices() :
+            this._renderSuggestion()
+          }
         </div>
       </div>
     );
   },
 
-  _renderChoices: function () {
-    const suggestion = this.props.suggestion;
+  _renderSuggestion: function () {
     const selectedValue = this.props.selectedValue;
-    const suggestionList = this._getSuggestionList();
-    const isViewingAll = this.state.isViewingAll;
-    const disabled = this.props.disabled;
-
-    if (!isViewingAll) {
-      return (
-        <div>
-          {_.map(suggestionList, function (targetName) {
-            const radioId = suggestion.source + '_' + targetName;
-            return (
-              <div key={targetName} className='radio'>
-                <label>
-                  <input
-                    disabled={disabled}
-                    type='radio'
-                    name={suggestion.source}
-                    id={radioId}
-                    value={targetName}
-                    checked={targetName === selectedValue}
-                    onChange={this._onRadioChange.bind(this, targetName)}
-                  /> {targetName}
-                </label>
-              </div>
-            );
-          }, this)}
+    return (
+      <section>
+        <div className='row'>
+          <div className='col-md-2'>
+            <p><em>Did you mean:</em></p>
+          </div>
+          <div className='col-md-10'>
+            <b>{selectedValue}</b>
+          </div>
         </div>
-      );
-    } else {
+        <p><a href="#" onClick={this._viewAll}>Nope</a></p>
+      </section>
+    );
+  },
 
-      return (
+  _renderChoices: function () {
+    const selectedValue = this.props.selectedValue;
+    const disabled = this.props.disabled;
+    const hasGoodSuggestion = this.props.hasGoodSuggestion;
+    const suggestions = _.chain(this.props.suggestion.results)
+      .pluck('target')
+      .sortBy()
+      .value();
+
+    return (
+      <section>
+        {hasGoodSuggestion ? null : (
+          <p className='text-danger'><em>Could not find a potential match.. Please select golfer from list:</em></p>
+        )}
         <select disabled={disabled} className='form-control' value={selectedValue} onChange={this._onSelectValueChange}>
-          {_.map(suggestionList, function (targetName, i) {
+          {_.map(suggestions, function (targetName, i) {
             return (
               <option key={targetName} value={targetName}>{targetName}</option>
             );
           })}
         </select>
-      );
-    }
-  },
-
-  _getSuggestionList: function () {
-    const isViewingAll = this.state.isViewingAll;
-    let results = this.props.suggestion.results;
-
-    if (!isViewingAll) {
-      results = _.filter(results, function (r) {
-        return r.coeff > MIN_COEFF;
-      });
-    } else {
-      results = _.sortBy(results, 'target');
-    }
-
-    return _.pluck(results, 'target');
-  },
-
-  _viewAll: function (ev) {
-    ev.preventDefault();
-    this.setState({ isViewingAll: true });
+      </section>
+    );
   },
 
   _onSelectValueChange: function (ev) {
     this.props.onSelectionChange(ev.target.value);
   },
 
-  _onRadioChange: function (targetName) {
-    this.props.onSelectionChange(targetName);
+  _viewAll: function (ev) {
+    ev.preventDefault();
+    this.setState({ isViewingAll: true });
   }
 
 });
@@ -150,10 +141,12 @@ const FreeTextPickListEditor = React.createClass({
         {!errorMessage ? null : (
           <div className='alert alert-danger'>{errorMessage}</div>
         )}
-        <div className='alert alert-warning'>Could not find an exact match on the following golfers:</div>
+        <div className='alert alert-warning'>Could not find an exact match for all golfers. Please verify the following matches are correct:</div>
         {_.map(suggestions, function (suggestion) {
+          const hasGoodSuggestion = calcHasGoodSuggestion(suggestion.results);
           return (
             <SuggestionSelector
+              hasGoodSuggestion={hasGoodSuggestion}
               disabled={isPosting}
               key={suggestion.source}
               suggestion={suggestion}
@@ -233,7 +226,14 @@ const FreeTextPickListEditor = React.createClass({
   _setSuggestions: function (suggestions) {
     const suggestionSelections = {};
     _.each(suggestions, function (suggestion) {
-      suggestionSelections[suggestion.source] = suggestion.results[0].target;
+      let selection = suggestion.results[0].target;
+      if (!calcHasGoodSuggestion(suggestion.results)) {
+        selection = _.chain(suggestion.results)
+          .sortBy('target')
+          .first()
+          .value();
+      }
+      suggestionSelections[suggestion.source] = selection;
     });
 
     this.setState({
@@ -260,7 +260,6 @@ const FreeTextPickListEditor = React.createClass({
     .done(function (result) {
       DraftActions.setPriority(result.priority);
       this.props.onComplete();
-      window.location.href = '#InlinePickListEditor';
     }.bind(this))
 
     .fail(function (err) {

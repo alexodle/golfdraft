@@ -78,21 +78,11 @@ const PickListEditor = React.createClass({
             {!unsavedChanges ? null : (
               <p><small>* Unsaved changes</small></p>
             )}
+            {hasPriorityList ? null : (
+              <p><small><b>Note:</b> You have not set a pick list, so we default to WGR.</small></p>
+            )}
           </div>
         </div>
-        {hasPriorityList ? null : (
-          <div className="row">
-            <div className="col-md-12">
-              <p><small><b>Note:</b> You have not set a pick list, so we default to WGR.</small></p>
-              <span className="hidden-xs">
-                <p><small><b>Tip:</b> drag and drop players to make one-off changes to your list</small></p>
-              </span>
-              {!preDraftMode ? null : (
-                <p><small><b>Pro Tip:</b> use the "Paste list" button to paste in a list of golfers (one line per golfer)</small></p>
-              )}
-            </div>
-          </div>
-        )}
         <div className="row" style={{
           height: this.props.height || "100%",
           overflowY: "scroll"
@@ -225,10 +215,12 @@ const PickListEditor = React.createClass({
 
   _onFreeTextClick: function () {
     this.setState({ isFreeTextMode: true });
+    window.location.href = '#InlinePickListEditor';
   },
 
   _onFreeTextComplete: function () {
     this.setState({ isFreeTextMode: false });
+    window.location.href = '#InlinePickListEditor';
   }
 
 });
