@@ -37,7 +37,7 @@ const PickListEditor = React.createClass({
     const hasPriorityList = !_.isEmpty(this.props.syncedPriority);
     const draggingIndex = this.state.draggingIndex;
     const draggingHoverIndex = this.state.draggingHoverIndex;
-    const unsavedChanges = this.props.syncedPriority !== priority;
+    const unsavedChanges = this.props.syncedPriority !== this.props.pendingPriority;
     const preDraftMode = !!this.props.preDraftMode;
     const draggingGolferId = _.isNumber(draggingIndex) ? priority[draggingIndex] : null;
 
