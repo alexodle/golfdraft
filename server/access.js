@@ -392,15 +392,13 @@ _.extend(access, {
 
   clearAppState: createBasicClearer(models.AppState),
 
-  resetTourney: function () {
-    return Promise.all(_.map([
+  resetTourney: function (clearPlayers) {
+    const resets = [
       models.Tourney.update(TOURNEY_ID_QUERY, {
         name: null,
         par: -1,
         sourceUrl: null
       }).exec(),
-
-      access.clearPlayers(),
       access.clearPickOrder(),
       access.clearDraftPicks(),
       access.clearGolfers(),
@@ -409,7 +407,13 @@ _.extend(access, {
       access.clearChatMessages(),
       access.clearPriorities(),
       access.clearAppState()
-    ], promiseize));
+    ];
+
+    if (clearPlayers) {
+      resets.push(access.clearPlayers());
+    }
+
+    return Promise.all(_.map(resets, promiseize));
   }
 
 });
