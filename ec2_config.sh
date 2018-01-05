@@ -8,10 +8,13 @@ export REDIS_TOGO_URL=TODO
 export MONGO_PW=TODO
 export ADMIN_PASS=TODO
 
+BASE_DIR=~/golfdraft
+
+# UPDATE FOR CURRENT TOURNEY
+export TOURNEY_CFG_TAG="" # ex: 17pga
+export TOURNEY_CFG="$BASE_DIR/../golfraft_cfg/tourney_cfg.json"
 
 
-export TOURNEY_CFG_TAG="17pga"
-export TOURNEY_CFG="/home/ec2-user/golfraft_cfg/tourney_cfg.json"
 
 unset DEBUG
 export PORT=8000
