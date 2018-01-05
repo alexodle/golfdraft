@@ -199,7 +199,7 @@ const FreeTextPickListEditor = React.createClass({
           className='form-control'
           placeholder={TEXTAREA_PLACEHOLDER}
           disabled={isPosting}
-          style={{width:'100%', height: '30em'}}
+          style={{width:'100%', height: '30em', resize: 'vertical'}}
           onChange={this._onChange}
           value={text}
         />
