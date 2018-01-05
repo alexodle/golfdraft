@@ -4,7 +4,7 @@
 # ex: cp ~/golfdraft/ec2_config.sh ~/config.sh
 #
 # Then, fill in the following vars:
-export REDIS_TOGO_URL=TODO
+export REDIS_URL=TODO
 export MONGO_PW=TODO
 export ADMIN_PASS=TODO
 

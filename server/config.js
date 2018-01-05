@@ -2,7 +2,7 @@ const cfg = {
   prod: !process.env.DEBUG,
 
   mongo_url: process.env.MONGO_URI || "mongodb://gd:gd@127.0.0.1:27017/gd",
-  redis_url: process.env.REDISTOGO_URL || "redis://:@127.0.0.1:6379/0",
+  redis_url: process.env.REDIS_URL || "redis://:@127.0.0.1:6379/0",
 
   tourney_id: process.env.TOURNEY_ID || '5376879322ed79dd19a07148',
 
