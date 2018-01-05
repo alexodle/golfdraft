@@ -1,17 +1,17 @@
 #!/bin/bash
 
+BASE_DIR=~/golfdraft
+
 killall node
 
-cd ~/
-source config.sh
+source $BASE_DIR/../config.sh
 
-cd golfdraft
+pushd $BASE_DIR
 git checkout master
 git pull origin master
 npm install
 
-cd golfdraft/
-nohup node server/server.js > ../serverlog.log 2>&1 &
-cd ../
+nohup node server/server.js > $BASE_DIR/../serverlog.log 2>&1 &
 
-tail -f ../serverlog.log
+popd
+tail -f $BASE_DIR/../serverlog.log

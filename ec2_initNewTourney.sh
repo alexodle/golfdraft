@@ -1,18 +1,18 @@
-#!/bin/bash
+#!/bin/bash -e
 
-curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
-sudo apt-get install -y nodejs
+BASE_DIR=~/golfdraft
 
-cd ~/
-source config.sh
+source $BASE_DIR/../config.sh
 
-cd ~/golfraft_cfg
+pushd $BASE_DIR/../golfraft_cfg
 git fetch
 git checkout "$TOURNEY_CFG_TAG"
 git pull origin "$TOURNEY_CFG_TAG"
+popd
 
-cd ~/golfdraft
+pushd $BASE_DIR
 git checkout master
 git pull origin master
 npm install
-/usr/bin/nodejs ./server/refreshData.js
+node ./server/refreshData.js
+popd
