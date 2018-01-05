@@ -1,9 +1,9 @@
 'use strict';
 
-var AppDispatcher = require('../dispatcher/AppDispatcher');
-var ScoreConstants = require('../constants/ScoreConstants');
+const AppDispatcher = require('../dispatcher/AppDispatcher');
+const ScoreConstants = require('../constants/ScoreConstants');
 
-var ScoreActions = {
+const ScoreActions = {
 
   scoreUpdate: function (result) {
     AppDispatcher.handleViewAction({

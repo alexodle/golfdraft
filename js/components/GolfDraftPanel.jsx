@@ -1,8 +1,8 @@
 "use strict";
 
-var React = require('react');
+const React = require('react');
 
-var GolfDraftPanel = React.createClass({
+const GolfDraftPanel = React.createClass({
 
   render: function () {
     return (

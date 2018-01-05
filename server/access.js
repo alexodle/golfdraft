@@ -1,17 +1,18 @@
 'use strict';
 
-var _ = require('lodash');
-var config = require('./config');
-var constants = require('../common/constants');
-var models = require('./models');
-var chatModels = require('./chatModels');
-var Promise = require('promise');
-var io = require('./socketIO');
+const _ = require('lodash');
+const chatModels = require('./chatModels');
+const config = require('./config');
+const constants = require('../common/constants');
+const io = require('./socketIO');
+const levenshteinDistance = require('./levenshteinDistance');
+const models = require('./models');
+const Promise = require('promise');
 
-var UNKNOWN_WGR = constants.UNKNOWN_WGR;
-var TOURNEY_ID = config.tourney_id;
-var TOURNEY_ID_QUERY = { _id: TOURNEY_ID };
-var FK_TOURNEY_ID_QUERY = { tourneyId: TOURNEY_ID };
+const UNKNOWN_WGR = constants.UNKNOWN_WGR;
+const TOURNEY_ID = config.tourney_id;
+const TOURNEY_ID_QUERY = { _id: TOURNEY_ID };
+const FK_TOURNEY_ID_QUERY = { tourneyId: TOURNEY_ID };
 
 function extendWithTourneyId(obj) {
   return _.extend({}, obj, FK_TOURNEY_ID_QUERY);
@@ -33,8 +34,8 @@ function promiseize(mongoosePromise) {
 
 function promiseizeFn(fn) {
   return function () {
-    var mongoosePromise = fn.apply(null, arguments);
-    var rVal = promiseize(mongoosePromise);
+    const mongoosePromise = fn.apply(null, arguments);
+    const rVal = promiseize(mongoosePromise);
     return rVal;
   };
 }
@@ -49,7 +50,7 @@ function createMultiUpdater(model, queryMask) {
   return function (objs) {
     objs = extendAllWithTourneyId(objs);
     return Promise.all(_.map(objs, function (o) {
-      var query = _.pick(o, queryMask);
+      const query = _.pick(o, queryMask);
       return promiseize(model.update(query, o, {upsert: true}).exec());
     }));
   };
@@ -64,7 +65,7 @@ function createBasicClearer(model) {
 function mergeWGR(golfer, wgrEntry) {
   golfer = _.pick(golfer, '_id', 'name');
   if (!wgrEntry) {
-    console.warn('WGR not found for: ' + golfer.name);
+    //console.warn('WGR not found for: ' + golfer.name);
     golfer.wgr = UNKNOWN_WGR;
   } else {
     golfer.wgr = wgrEntry.wgr;
@@ -72,7 +73,7 @@ function mergeWGR(golfer, wgrEntry) {
   return golfer;
 }
 
-var access = {};
+const access = {};
 _.extend(access, {
 
   getTourney: promiseizeFn(function () {
@@ -80,32 +81,63 @@ _.extend(access, {
   }),
 
   getPriority: function (playerId) {
-    var query = _.extend({ userId: playerId }, FK_TOURNEY_ID_QUERY);
+    const query = _.extend({ userId: playerId }, FK_TOURNEY_ID_QUERY);
     return promiseize(models.DraftPriority.findOne(query).exec())
     .then(function (priority) {
-      if (!!priority) {
-        return priority.golferPriority;
-      }
-      return access.getGolfers().then(function (golfers) {
-        return _.chain(golfers)
-        .sortBy(['wgr', 'name'])
-        .pluck('_id')
-        .value();
-      })
+      return priority ? priority.golferPriority : null;
     });
   },
 
   updatePriority: promiseizeFn(function (playerId, priority) {
-    var query = _.extend({ userId: playerId }, FK_TOURNEY_ID_QUERY);
+    priority = _.uniq(priority);
+    const query = _.extend({ userId: playerId }, FK_TOURNEY_ID_QUERY);
     return models.DraftPriority.update(
       query,
       {$set: {golferPriority: priority}},
       {upsert: true}
-    ).exec();
+    ).exec()
+    .then(function () {
+      return {
+        completed: true,
+        priority: priority
+      };
+    });
   }),
 
+  updatePriorityFromNames: function (playerId, priorityNames) {
+    return access.getGolfers()
+    .then(function (golfers) {
+      const golfersByLcName = _.indexBy(golfers, function (g) {
+        return g.name.toLowerCase();
+      });
+
+      const notFoundGolferNames = [];
+      const priority = _.map(priorityNames, function (n) {
+        const g = golfersByLcName[n.toLowerCase()];
+        if (!g) {
+          notFoundGolferNames.push(n);
+          return null;
+        }
+        return g._id.toString();
+      });
+
+      if (_.isEmpty(notFoundGolferNames)) {
+        // SUCCESS! Found all golfers by name, so go ahead and save them.
+        return access.updatePriority(playerId, priority);
+      }
+
+      // Did not find at at least one golfer by name. Calculate closest matches and provide those
+      // suggestions to the client.
+      const suggestions = levenshteinDistance.runAll(notFoundGolferNames, _.pluck(golfers, 'name'));
+      return {
+        completed: false,
+        suggestions: suggestions
+      };
+    });
+  },
+
   getGolfer: function (golferId) {
-    var query = _.extend({ _id: golferId }, FK_TOURNEY_ID_QUERY);
+    const query = _.extend({ _id: golferId }, FK_TOURNEY_ID_QUERY);
     return promiseize(models.Golfer.findOne(query).exec())
     .then(function (golfer) {
       return promiseize(models.WGR.findOne({ name: golfer.name }).exec())
@@ -122,7 +154,7 @@ _.extend(access, {
   },
 
   getPlayer: promiseizeFn(function (playerId) {
-    var query = _.extend({ _id: playerId }, FK_TOURNEY_ID_QUERY);
+    const query = _.extend({ _id: playerId }, FK_TOURNEY_ID_QUERY);
     return models.Player.findOne(query).exec();
   }),
 
@@ -133,8 +165,8 @@ _.extend(access, {
     ])
 
     .then(function (results) {
-      var wgrs = _.indexBy(results[0], 'name');
-      var golfers = _.map(results[1], function (g) {
+      const wgrs = _.indexBy(results[0], 'name');
+      const golfers = _.map(results[1], function (g) {
         return mergeWGR(g, wgrs[g.name]);
       });
 
@@ -153,7 +185,7 @@ _.extend(access, {
   getAppState: function () {
     return promiseize(models.AppState.findOne(FK_TOURNEY_ID_QUERY).exec())
       .then(function (appState) {
-        return appState || { isDraftPause: false, allowClock: true };
+        return appState || { isDraftPause: false, allowClock: true, draftHasStarted: false };
       });
   },
 
@@ -168,22 +200,37 @@ _.extend(access, {
   makeHighestPriorityPick: function (playerId, pickNumber) {
     return Promise.all([
       access.getPriority(playerId),
+      access.getGolfers(),
       access.getPicks()
     ])
     .then(function (results) {
-      var priority = results[0];
-      var picks = results[1];
-      var pickedGolfers = _.chain(picks)
+      const priority = results[0] || [];
+      const golfers = results[1];
+      const picks = results[2];
+
+      const pickedGolfers = _.chain(picks)
         .pluck('golfer')
         .indexBy()
         .value();
 
-      var golferToPick = _.chain(priority)
-      .filter(function (gid) {
-        return !pickedGolfers[gid];
-      })
-      .first()
-      .value();
+      let golferToPick = _.chain(priority)
+        .invoke('toString')
+        .filter(function (gid) {
+          return !pickedGolfers[gid];
+        })
+        .first()
+        .value();
+
+      // If no golfer from the priority list is available, use wgr
+      golferToPick = golferToPick || _.chain(golfers)
+        .sortBy(['wgr', 'name'])
+        .pluck('_id')
+        .invoke('toString')
+        .filter(function (gid) {
+          return !pickedGolfers[gid];
+        })
+        .first()
+        .value();
 
       return access.makePick({
         pickNumber: pickNumber,
@@ -194,14 +241,14 @@ _.extend(access, {
   },
 
   makePick: function (pick, ignoreOrder) {
-    var pickOrderQuery = _.extend({}, FK_TOURNEY_ID_QUERY, {
+    const pickOrderQuery = _.extend({}, FK_TOURNEY_ID_QUERY, {
       pickNumber: pick.pickNumber,
       player: pick.player
     });
-    var golferDraftedQuery = _.extend({}, FK_TOURNEY_ID_QUERY, {
+    const golferDraftedQuery = _.extend({}, FK_TOURNEY_ID_QUERY, {
       golfer: pick.golfer
     });
-    var golferExistsQuery = _.extend({}, FK_TOURNEY_ID_QUERY, {
+    const golferExistsQuery = _.extend({}, FK_TOURNEY_ID_QUERY, {
       _id: pick.golfer
     });
     return Promise.all([
@@ -218,10 +265,10 @@ _.extend(access, {
       promiseize(models.Golfer.findOne(golferExistsQuery).exec())
     ])
     .then(function (result) {
-      var nPicks = result[0];
-      var playerIsUp = !!result[1] || true;
-      var golferAlreadyDrafted = result[2];
-      var golferExists = !!result[3];
+      const nPicks = result[0];
+      const playerIsUp = !!result[1];
+      const golferAlreadyDrafted = result[2];
+      const golferExists = !!result[3];
 
       if (nPicks !== _.parseInt(pick.pickNumber) && !ignoreOrder) {
         throw new Error('invalid pick: pick order out of sync');
@@ -337,24 +384,36 @@ _.extend(access, {
     models.GolferScoreOverrides
   ),
 
+  clearPriorities: createBasicClearer(models.DraftPriority),
+
   clearChatMessages: createBasicClearer(chatModels.Message),
 
-  resetTourney: function () {
-    return Promise.all(_.map([
+  clearWgrs: createBasicClearer(models.WGR),
+
+  clearAppState: createBasicClearer(models.AppState),
+
+  resetTourney: function (clearPlayers) {
+    const resets = [
       models.Tourney.update(TOURNEY_ID_QUERY, {
         name: null,
         par: -1,
         sourceUrl: null
       }).exec(),
-
-      access.clearPlayers(),
       access.clearPickOrder(),
       access.clearDraftPicks(),
       access.clearGolfers(),
       access.clearGolferScores(),
       access.clearGolferScoreOverrides(),
-      access.clearChatMessages()
-    ], promiseize));
+      access.clearChatMessages(),
+      access.clearPriorities(),
+      access.clearAppState()
+    ];
+
+    if (clearPlayers) {
+      resets.push(access.clearPlayers());
+    }
+
+    return Promise.all(_.map(resets, promiseize));
   }
 
 });

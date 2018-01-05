@@ -1,40 +1,66 @@
 "use strict";
 
-var _ = require("lodash");
-var DraftActions = require("../actions/DraftActions");
-var GolferLogic = require("../logic/GolferLogic");
-var GolferStore = require("../stores/GolferStore");
-var React = require("react");
+const _ = require("lodash");
+const AppConstants = require('../constants/AppConstants');
+const DraftActions = require("../actions/DraftActions");
+const FreeTextPickListEditor = require("./FreeTextPickListEditor.jsx");
+const GolferLogic = require("../logic/GolferLogic");
+const GolferStore = require("../stores/GolferStore");
+const React = require("react");
 
-var PickListEditor = React.createClass({
+const PickListEditor = React.createClass({
 
   getInitialState: function () {
     return {
       draggingIndex: null,
-      draggingHoverIndex: null
+      draggingHoverIndex: null,
+      isFreeTextMode: false
     };
   },
 
   render: function () {
-    var priority = this._getPriority();
-    if (!priority) {
+    if (this.props.syncedPriority == AppConstants.PROPERTY_LOADING) {
       return this._renderLoading();
     }
 
-    var draggingIndex = this.state.draggingIndex;
-    var draggingHoverIndex = this.state.draggingHoverIndex;
-    var draggingGolferId = priority[draggingIndex];
-    var unsavedChanges = this.props.syncedPriority !== priority;
+    if (this.state.isFreeTextMode) {
+      return (
+        <FreeTextPickListEditor
+          onCancel={this._onFreeTextComplete}
+          onComplete={this._onFreeTextComplete}
+        />
+      );
+    }
 
-    if (draggingHoverIndex != null) {
+    let priority = this._getDisplayPriority();
+
+    const hasPriorityList = !_.isEmpty(this.props.syncedPriority);
+    const draggingIndex = this.state.draggingIndex;
+    const draggingHoverIndex = this.state.draggingHoverIndex;
+    const unsavedChanges = this.props.syncedPriority !== priority;
+    const preDraftMode = !!this.props.preDraftMode;
+    const draggingGolferId = _.isNumber(draggingIndex) ? priority[draggingIndex] : null;
+
+    if (_.isNumber(draggingHoverIndex)) {
       priority = this._newOrder(draggingIndex, draggingHoverIndex);
     }
 
     return (
-      <div>
+      <section>
+
         <div className="row" style={{marginBottom: "1em"}}>
-          <div className="col-md-12 text-right">
-            <span>
+          <div className="col-md-12">
+            {!preDraftMode ? null : (
+              <span>
+                <button
+                  className="btn btn-default"
+                  disabled={unsavedChanges} 
+                  type="button"
+                  onClick={this._onFreeTextClick}
+                >Paste list</button>
+              </span>
+            )}
+            <span className="pull-right">
               <button
                 className="btn btn-default"
                 disabled={!unsavedChanges} 
@@ -49,6 +75,22 @@ var PickListEditor = React.createClass({
                 onClick={this._onSave}
               >Save</button>
             </span>
+            {!unsavedChanges ? null : (
+              <p><small>* Unsaved changes</small></p>
+            )}
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-md-12">
+            {hasPriorityList ? null : (
+              <p><small><b>Note:</b> You have not set a pick list, so we default to WGR.</small></p>
+            )}
+            <span className="hidden-xs">
+              <p><small><b>Tip:</b> drag and drop players to make one-off changes to your list</small></p>
+            </span>
+            {!preDraftMode ? null : (
+              <p><small><b>Pro Tip:</b> use the "Paste list" button to paste in a list of golfers (one line per golfer)</small></p>
+            )}
           </div>
         </div>
         <div className="row" style={{
@@ -56,14 +98,11 @@ var PickListEditor = React.createClass({
           overflowY: "scroll"
         }}>
           <div className="col-md-12">
-            {!unsavedChanges ? null : (
-              <small>* Unsaved changes</small>
-            )}
             <table className="table table-condensed table-striped">
               <thead></thead>
               <tbody>
                 {_.map(priority, function (gid, i) {
-                  var g = GolferStore.getGolfer(gid);
+                  const g = GolferStore.getGolfer(gid);
                   return (
                     <tr
                       key={g.id}
@@ -98,7 +137,8 @@ var PickListEditor = React.createClass({
             </table>
           </div>
         </div>
-      </div>
+
+      </section>
     );
   },
 
@@ -117,14 +157,20 @@ var PickListEditor = React.createClass({
     return (<span>Loading...</span>);
   },
 
-  _getPriority: function () {
-    return this.props.pendingPriority;
+  _getDisplayPriority: function () {
+    const pendingPriority = this.props.pendingPriority;
+    if (pendingPriority === AppConstants.PROPERTY_LOADING) return pendingPriority;
+
+    return !_.isEmpty(pendingPriority) ? pendingPriority : _.chain(this.props.golfersRemaining)
+      .sortBy(['wgr', 'name'])
+      .pluck('_id')
+      .value();
   },
 
   _newOrder: function (fromIndex, toIndex) {
-    var currentOrder = this._getPriority();
-    var movingGolfer = currentOrder[fromIndex];
-    var newOrder = currentOrder.slice();
+    const currentOrder = this._getDisplayPriority();
+    const movingGolfer = currentOrder[fromIndex];
+    const newOrder = currentOrder.slice();
     newOrder.splice(fromIndex, 1);
     newOrder.splice(toIndex, 0, movingGolfer);
     return newOrder;
@@ -132,13 +178,13 @@ var PickListEditor = React.createClass({
 
   _onUpOne: function (i, e) {
     e.preventDefault();
-    var newOrder = this._newOrder(i, i - 1);
+    const newOrder = this._newOrder(i, i - 1);
     DraftActions.updatePendingPriority(newOrder);
   },
 
   _onDownOne: function (i, e) {
     e.preventDefault();
-    var newOrder = this._newOrder(i, i + 1);
+    const newOrder = this._newOrder(i, i + 1);
     DraftActions.updatePendingPriority(newOrder);
   },
 
@@ -153,8 +199,8 @@ var PickListEditor = React.createClass({
   _onDrop: function (toIndex, e) {
     e.preventDefault();
 
-    var fromIndex = this.state.draggingIndex;
-    var newOrder = this._newOrder(fromIndex, toIndex);
+    const fromIndex = this.state.draggingIndex;
+    const newOrder = this._newOrder(fromIndex, toIndex);
 
     DraftActions.updatePendingPriority(newOrder);
   },
@@ -175,6 +221,14 @@ var PickListEditor = React.createClass({
     if (this.state.draggingHoverIndex !== i) {
       this.setState({ draggingHoverIndex: i });
     }
+  },
+
+  _onFreeTextClick: function () {
+    this.setState({ isFreeTextMode: true });
+  },
+
+  _onFreeTextComplete: function () {
+    this.setState({ isFreeTextMode: false });
   }
 
 });

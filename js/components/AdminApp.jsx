@@ -1,13 +1,13 @@
 'use strict';
 
-var $ = require('jquery');
-var _ = require('lodash');
-var DraftActions = require('../actions/DraftActions');
-var DraftHistory = require('./DraftHistory.jsx');
-var DraftStatus = require('./DraftStatus.jsx');
-var DraftStore = require('../stores/DraftStore');
-var React = require('react');
-var UserActions = require('../actions/UserActions');
+const $ = require('jquery');
+const _ = require('lodash');
+const DraftActions = require('../actions/DraftActions');
+const DraftHistory = require('./DraftHistory.jsx');
+const DraftStatus = require('./DraftStatus.jsx');
+const DraftStore = require('../stores/DraftStore');
+const React = require('react');
+const UserActions = require('../actions/UserActions');
 
 function togglePause(isPaused) {
   $.ajax({
@@ -27,7 +27,16 @@ function toggleAllowClock(allowClock) {
   });
 }
 
-var PasswordInput = React.createClass({
+function toggleDraftHasStarted(draftHasStarted) {
+  $.ajax({
+    url: '/admin/draftHasStarted',
+    type: 'PUT',
+    contentType: 'application/json',
+    data: JSON.stringify({ draftHasStarted: draftHasStarted })
+  });
+}
+
+const PasswordInput = React.createClass({
 
   getInitialState: function () {
     return {
@@ -69,7 +78,7 @@ var PasswordInput = React.createClass({
   _onSubmit: function (ev) {
     ev.preventDefault();
 
-    var that = this;
+    const that = this;
     this.setState({ busy: true });
     $.ajax({
       url: '/admin/login',
@@ -86,7 +95,7 @@ var PasswordInput = React.createClass({
 
 });
 
-var AdminApp = React.createClass({
+const AdminApp = React.createClass({
 
   getInitialState: function () {
     return {
@@ -95,8 +104,8 @@ var AdminApp = React.createClass({
   },
 
   render: function () {
-    var props = this.props;
-    var confirmingUndo = this.state.confirmingUndo;
+    const props = this.props;
+    const confirmingUndo = this.state.confirmingUndo;
 
     if (!props.isAdmin) {
       return (<PasswordInput />);
@@ -105,6 +114,19 @@ var AdminApp = React.createClass({
     return (
       <section>
         <h1>Hello admin!</h1>
+
+        {props.draftHasStarted ? (
+          <h2>Draft has started</h2>
+        ) : (
+          <h2>Draft has not started yet</h2>
+        )}
+        <div className='panel'>
+          <div className='panel-body'>
+            <button className='btn' onClick={this._onStartDraft}>Start Draft</button>
+            <span> </span>
+            <button className='btn' onClick={this._onUnstartDraft}>Unstart Draft</button>
+          </div>
+        </div>
 
         {!props.isPaused ? null : (
           <h2>Paused!</h2>
@@ -168,10 +190,20 @@ var AdminApp = React.createClass({
           </div>
         </div>
 
-        <DraftStatus currentPick={props.currentPick} />
+        {!props.currentPick ? null : (
+          <DraftStatus currentPick={props.currentPick} />
+        )}
         <DraftHistory draftPicks={props.draftPicks} />
       </section>
     );
+  },
+
+  _onStartDraft: function () {
+    toggleDraftHasStarted(true);
+  },
+
+  _onUnstartDraft: function () {
+    toggleDraftHasStarted(false);
   },
 
   _onPause: function () {
@@ -215,7 +247,7 @@ var AdminApp = React.createClass({
   },
 
   _onPickBestWGR: function () {
-    var nextBestGolfer = _.chain(this.props.golfersRemaining)
+    const nextBestGolfer = _.chain(this.props.golfersRemaining)
       .sortBy('wgr')
       .first()
       .value()

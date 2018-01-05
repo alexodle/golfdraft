@@ -1,11 +1,11 @@
 "use strict";
 
-var React = require("react");
-var _ = require("lodash");
+const React = require("react");
+const _ = require("lodash");
 
-var DraftChooser = require("./DraftChooser.jsx");
+const DraftChooser = require("./DraftChooser.jsx");
 
-var DebugFooter = React.createClass({
+const DebugFooter = React.createClass({
 
   render: function () {
     return (

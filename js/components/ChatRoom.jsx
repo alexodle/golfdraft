@@ -1,31 +1,31 @@
 'use strict';
 
-var $ = require('jquery');
-var _ = require('lodash');
-var ChatActions = require('../actions/ChatActions');
-var Assets = require('../constants/Assets');
-var GolfDraftPanel = require('./GolfDraftPanel.jsx');
-var moment = require('moment');
-var PlayerStore = require('../stores/PlayerStore');
-var PureRenderMixin = require('react/lib/ReactComponentWithPureRenderMixin');
-var React = require('react');
-var UserStore = require('../stores/UserStore');
+const $ = require('jquery');
+const _ = require('lodash');
+const ChatActions = require('../actions/ChatActions');
+const Assets = require('../constants/Assets');
+const GolfDraftPanel = require('./GolfDraftPanel.jsx');
+const moment = require('moment');
+const PlayerStore = require('../stores/PlayerStore');
+const PureRenderMixin = require('react/lib/ReactComponentWithPureRenderMixin');
+const React = require('react');
+const UserStore = require('../stores/UserStore');
 
-var BOT_NAME = 'DraftBot';
+const BOT_NAME = 'DraftBot';
 
-var ReactPropTypes = React.PropTypes;
+const ReactPropTypes = React.PropTypes;
 
-var newMessageSound = new Audio(Assets.NEW_CHAT_MESSAGE_SOUND);
+const newMessageSound = new Audio(Assets.NEW_CHAT_MESSAGE_SOUND);
 
-var NAME_TAG_RE = /@[a-z]* *[a-z]*$/i;
-var TAG_TO_NAME_RE = /~\[([^\]]+)\]/ig;
-var SPECIFIC_TAG = "~[{{name}}]";
+const NAME_TAG_RE = /@[a-z]* *[a-z]*$/i;
+const TAG_TO_NAME_RE = /~\[([^\]]+)\]/ig;
+const SPECIFIC_TAG = "~[{{name}}]";
 
-var ENTER_KEY = 13;
-var DOWN_KEY = 40;
-var UP_KEY = 38;
+const ENTER_KEY = 13;
+const DOWN_KEY = 40;
+const UP_KEY = 38;
 
-var AutoComplete = React.createClass({
+const AutoComplete = React.createClass({
   mixins: [PureRenderMixin],
 
   getInitialState: function () {
@@ -35,14 +35,14 @@ var AutoComplete = React.createClass({
   },
 
   componentWillUpdate: function (nextProps, nextState) {
-    var currentIndex = this.state.selectedIndex;
-    var newIndex = nextState.selectedIndex;
+    const currentIndex = this.state.selectedIndex;
+    const newIndex = nextState.selectedIndex;
     if (currentIndex !== newIndex) {
       return;
     }
 
-    var oldChoices = this._getChoices();
-    var newChoices = this._getChoices(nextProps);
+    const oldChoices = this._getChoices();
+    const newChoices = this._getChoices(nextProps);
 
     if (
         _.isEmpty(oldChoices) ||
@@ -56,13 +56,13 @@ var AutoComplete = React.createClass({
   },
 
   render: function () {
-    var choices = this._getChoices();
+    const choices = this._getChoices();
 
     if (_.isEmpty(choices)) {
       return null;
     }
 
-    var selection = choices[this.state.selectedIndex].name;
+    const selection = choices[this.state.selectedIndex].name;
     return (
       <form>
         <select
@@ -85,7 +85,7 @@ var AutoComplete = React.createClass({
   },
 
   forceSelect: function () {
-    var choices = this._getChoices();
+    const choices = this._getChoices();
     this.props.onChoose({ value: choices[this.state.selectedIndex].name });
   },
 
@@ -102,9 +102,9 @@ var AutoComplete = React.createClass({
   },
 
   _move: function (n) {
-    var choices = this._getChoices();
-    var currentIndex = this.state.selectedIndex;
-    var newIndex = currentIndex + n;
+    const choices = this._getChoices();
+    const currentIndex = this.state.selectedIndex;
+    const newIndex = currentIndex + n;
 
     if (newIndex < 0 || newIndex >= choices.length) {
       return;
@@ -116,8 +116,8 @@ var AutoComplete = React.createClass({
   _getChoices: function (props) {
     props = props || this.props;
 
-    var text = props.text.toLowerCase();
-    var choices = _.chain(props.allChoices)
+    const text = props.text.toLowerCase();
+    const choices = _.chain(props.allChoices)
       .filter(function (u) {
         return u.name.toLowerCase().startsWith(text);
       })
@@ -138,7 +138,7 @@ var AutoComplete = React.createClass({
 
 });
 
-var ChatRoomInput = React.createClass({
+const ChatRoomInput = React.createClass({
   mixins: [PureRenderMixin],
 
   getInitialState: function () {
@@ -146,8 +146,8 @@ var ChatRoomInput = React.createClass({
   },
 
   render: function () {
-    var text = this.state.text;
-    var nameTag = this.state.taggingText;
+    const text = this.state.text;
+    const nameTag = this.state.taggingText;
 
     return (
       <div>
@@ -189,7 +189,7 @@ var ChatRoomInput = React.createClass({
   },
 
   _updateText: function (ev) {
-    var newText = ev.target.value;
+    const newText = ev.target.value;
     this.setState({
       text: newText,
       taggingText: newText.match(NAME_TAG_RE)
@@ -197,7 +197,7 @@ var ChatRoomInput = React.createClass({
   },
 
   _onTag: function (ev) {
-    var newText = this.state.text.replace(NAME_TAG_RE, "~[" + ev.value + "] ");
+    const newText = this.state.text.replace(NAME_TAG_RE, "~[" + ev.value + "] ");
     this.setState({ text: newText, taggingText: null });
 
     $(this.refs.input).focus();
@@ -211,7 +211,7 @@ var ChatRoomInput = React.createClass({
       return;
     }
 
-    var text = this.state.text;
+    const text = this.state.text;
     if (_.isEmpty(text)) return;
 
     ChatActions.createMessage(text);
@@ -222,16 +222,16 @@ var ChatRoomInput = React.createClass({
 
 });
 
-var Message = React.createClass({
+const Message = React.createClass({
   mixins: [PureRenderMixin],
 
   render: function () {
     // Escape html BEFORE adding tags
-    var text = _.escape(this.props.text);
+    const text = _.escape(this.props.text);
 
     // Add tag html
-    var htmlStr = text.replace(TAG_TO_NAME_RE, function (match, name) {
-      var user = UserStore.getUserByName(name);
+    const htmlStr = text.replace(TAG_TO_NAME_RE, function (match, name) {
+      const user = UserStore.getUserByName(name);
       if (!user) {
         return match;
       } else {
@@ -246,7 +246,7 @@ var Message = React.createClass({
 
 });
 
-var ChatRoom = React.createClass({
+const ChatRoom = React.createClass({
   mixins: [PureRenderMixin],
 
   propTypes: {
@@ -266,13 +266,13 @@ var ChatRoom = React.createClass({
       return;
     }
 
-    var prevMessagesLength = prevProps.messages ? prevProps.messages.length : 0;
-    var newMessagesLength = this.props.messages ? this.props.messages.length : 0;
+    const prevMessagesLength = prevProps.messages ? prevProps.messages.length : 0;
+    const newMessagesLength = this.props.messages ? this.props.messages.length : 0;
 
     if (newMessagesLength > prevMessagesLength) {
-      var myTagStr = SPECIFIC_TAG.replace("{{name}}", this.props.currentUser.name);
-      var addedMessages = this.props.messages.slice(prevMessagesLength, newMessagesLength);
-      var tagsMe = _.some(addedMessages, function (msg) {
+      const myTagStr = SPECIFIC_TAG.replace("{{name}}", this.props.currentUser.name);
+      const addedMessages = this.props.messages.slice(prevMessagesLength, newMessagesLength);
+      const tagsMe = _.some(addedMessages, function (msg) {
         return msg.message.includes(myTagStr);
       });
       if (tagsMe) {
@@ -284,9 +284,9 @@ var ChatRoom = React.createClass({
   },
 
   render: function () {
-    var messages = this.props.messages;
+    const messages = this.props.messages;
 
-    var body = null;
+    let body = null;
     if (!messages) {
       body = (<span>Loading...</span>);
 
@@ -297,9 +297,9 @@ var ChatRoom = React.createClass({
       body = (
         <dl className='chat-list dl-horizontal'>
           {_.map(messages, function (message, i) {
-            var displayName = message.isBot ?
+            const displayName = message.isBot ?
               BOT_NAME : PlayerStore.getPlayer(message.player).name;
-            var className = message.isBot ? 'bot-message' : '';
+            const className = message.isBot ? 'bot-message' : '';
             return [
               (
                 <dt key={'dt' + i} className={className}>
@@ -357,9 +357,9 @@ var ChatRoom = React.createClass({
   },
 
   _forceScroll: function () {
-    var refs = this.refs;
-    var $panel = $(refs.chatPanel);
-    var $body = $(refs.chatPanelBody);
+    const refs = this.refs;
+    const $panel = $(refs.chatPanel);
+    const $body = $(refs.chatPanelBody);
     $panel.scrollTop($body.height());
   }
 

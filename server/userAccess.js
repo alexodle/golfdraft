@@ -1,8 +1,8 @@
-var _ = require('lodash');
-var io = require('./socketIO');
-var redis = require('./redis');
+const _ = require('lodash');
+const io = require('./socketIO');
+const redis = require('./redis');
 
-var redisClient = redis.client;
+const redisClient = redis.client;
 
 function onUserChange() {
   redisClient.hvals('users', function (err, replies) {
@@ -19,7 +19,7 @@ function onUserChange() {
   });
 }
 
-var UserAccess = {
+const UserAccess = {
 
   refresh: function () {
     redisClient.del('users');

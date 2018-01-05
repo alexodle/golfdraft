@@ -1,24 +1,24 @@
 'use strict';
 
-var $ = require('jquery');
-var _ = require('lodash');
-var AppActions = require('./actions/AppActions');
-var ChatActions = require('./actions/ChatActions');
-var DraftActions = require('./actions/DraftActions');
-var DraftParser = require('./logic/DraftParser');
-var ScoreActions = require('./actions/ScoreActions');
-var SettingsActions = require('./actions/SettingsActions');
-var socketio = require('socket.io-client');
-var UserActions = require('./actions/UserActions');
+const $ = require('jquery');
+const _ = require('lodash');
+const AppActions = require('./actions/AppActions');
+const ChatActions = require('./actions/ChatActions');
+const DraftActions = require('./actions/DraftActions');
+const DraftParser = require('./logic/DraftParser');
+const ScoreActions = require('./actions/ScoreActions');
+const SettingsActions = require('./actions/SettingsActions');
+const socketio = require('socket.io-client');
+const UserActions = require('./actions/UserActions');
 
-var hasConnected = false;
+let _hasConnected = false;
 
 /** Start listening for app-wide socket.io updates
 */
 function startSocketUpdates() {
-  var io = socketio.connect();
+  const io = socketio.connect();
   io.on('change:draft', function (ev) {
-    var draft = DraftParser.parseDraft(ev.data);
+    const draft = DraftParser.parseDraft(ev.data);
     DraftActions.draftUpdate(draft);
   });
   io.on('change:scores', function (ev) {
@@ -33,6 +33,9 @@ function startSocketUpdates() {
   io.on('change:allowclock', function (ev) {
     SettingsActions.setAllowClock(ev.data.allowClock);
   });
+  io.on('change:drafthasstarted', function (ev) {
+    SettingsActions.setDraftHasStarted(ev.data.draftHasStarted);
+  });
   io.on('change:activeusers', function (ev) {
     UserActions.setActiveUsers(ev.data.userCounts);
   });
@@ -44,8 +47,8 @@ function startSocketUpdates() {
 
   // Force refresh if it's been sufficiently long since our last update
   io.on('connect', function () {
-    if (!hasConnected) {
-      hasConnected = true;
+    if (!_hasConnected) {
+      _hasConnected = true;
     } else {
 
       // TODO - Move to separate server sync

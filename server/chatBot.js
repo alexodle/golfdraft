@@ -1,16 +1,16 @@
 'use strict';
 
-var _ = require('lodash');
-var access = require('./access');
-var Promise = require('promise');
+const _ = require('lodash');
+const access = require('./access');
+const Promise = require('promise');
 
 module.exports = {
 
   broadcastPickMessage: function (user, draftPick, draft, highestPriPick) {
-    var nextPlayer = null;
-    var nextPick = draft.pickOrder[draft.picks.length];
+    let nextPlayer = null;
+    const nextPick = draft.pickOrder[draft.picks.length];
 
-    var isProxyPick = draftPick.player !== user.player;
+    const isProxyPick = draftPick.player !== user.player;
 
     Promise.all(_.compact([
       access.getPlayer(draftPick.player),
@@ -18,11 +18,11 @@ module.exports = {
       nextPick ? access.getPlayer(nextPick.player) : null,
     ]))
     .then(function (results) {
-      var player = results[0];
-      var golfer = results[1];
+      const player = results[0];
+      const golfer = results[1];
       nextPlayer = results[2];
 
-      var message = null;
+      let message = null;
       if (isProxyPick) {
         if (highestPriPick) {
           message = player.name + ' picks ' + golfer.name + ' (priority proxy from ' + user.name + ')';

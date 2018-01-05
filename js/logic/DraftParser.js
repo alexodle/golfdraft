@@ -4,7 +4,7 @@
  * Parse server draft
  */
 function parseDraft(draft) {
-  var currentTime = new Date();
+  const currentTime = new Date();
 
   draft.serverTimestamp = new Date(draft.serverTimestamp);
   _.each(draft.picks, function (p) {

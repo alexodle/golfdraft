@@ -1,19 +1,19 @@
 "use strict";
 
-var React = require('react');
-var SettingsActions = require("../actions/SettingsActions");
+const React = require('react');
+const SettingsActions = require("../actions/SettingsActions");
 
-var ReactPropTypes = React.PropTypes;
+const ReactPropTypes = React.PropTypes;
 
-var SoundToggle = React.createClass({
+const SoundToggle = React.createClass({
 
   propTypes: {
     playSounds: ReactPropTypes.bool.isRequired
   },
 
   render: function () {
-    var playSounds = this.props.playSounds;
-    var ico = playSounds ? 'fa-bell-o' : 'fa-bell-slash-o';
+    const playSounds = this.props.playSounds;
+    const ico = playSounds ? 'fa-bell-o' : 'fa-bell-slash-o';
     return (
       <span {...this.props}>
         <i onClick={this._togglePlaySounds} className={'fa ' + ico} />

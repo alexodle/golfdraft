@@ -1,18 +1,18 @@
 'use strict';
 
-var $ = require('jquery');
-var _ = require('lodash');
-var AppConstants = require('../constants/AppConstants');
-var AppDispatcher = require('../dispatcher/AppDispatcher');
-var Store = require('./Store');
-var UserActions = require('../actions/UserActions');
+const $ = require('jquery');
+const _ = require('lodash');
+const AppConstants = require('../constants/AppConstants');
+const AppDispatcher = require('../dispatcher/AppDispatcher');
+const Store = require('./Store');
+const UserActions = require('../actions/UserActions');
 
-var _currentUser = null;
-var _users = null;
-var _isAdmin = false;
-var _activeUsers = null;
+let _currentUser = null;
+let _users = null;
+let _isAdmin = false;
+let _activeUsers = null;
 
-var UserStore =  _.extend({}, Store.prototype, {
+const UserStore =  _.extend({}, Store.prototype, {
 
   changeEvent: 'UserStore:change',
 
@@ -44,7 +44,7 @@ var UserStore =  _.extend({}, Store.prototype, {
 
 // Register to handle all updates
 AppDispatcher.register(function (payload) {
-  var action = payload.action;
+  const action = payload.action;
 
   switch(action.actionType) {
 
@@ -58,7 +58,7 @@ AppDispatcher.register(function (payload) {
 
       if (!action.doNotSync) {
         // TODO - Move to separate server sync
-        var xhr = null;
+        let xhr = null;
         if (_currentUser) {
           xhr = $.post('/login', UserStore.getCurrentUser());
         } else {

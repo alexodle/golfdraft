@@ -1,7 +1,7 @@
 'use strict';
 
-var EventEmitter = require('events').EventEmitter;
-var _ = require('lodash');
+const EventEmitter = require('events').EventEmitter;
+const _ = require('lodash');
 
 function Store() {}
 

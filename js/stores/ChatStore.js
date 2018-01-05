@@ -1,14 +1,14 @@
 'use strict';
 
-var $ = require('jquery');
-var _ = require('lodash');
-var AppDispatcher = require('../dispatcher/AppDispatcher');
-var ChatConstants = require('../constants/ChatConstants');
-var Store = require('./Store');
+const $ = require('jquery');
+const _ = require('lodash');
+const AppDispatcher = require('../dispatcher/AppDispatcher');
+const ChatConstants = require('../constants/ChatConstants');
+const Store = require('./Store');
 
-var _messages = null;
+let _messages = null;
 
-var ChatStore =  _.extend({}, Store.prototype, {
+const ChatStore =  _.extend({}, Store.prototype, {
 
   changeEvent: 'ChatStore:change',
 
@@ -20,7 +20,7 @@ var ChatStore =  _.extend({}, Store.prototype, {
 
 // Register to handle all updates
 AppDispatcher.register(function (payload) {
-  var action = payload.action;
+  const action = payload.action;
 
   switch(action.actionType) {
 

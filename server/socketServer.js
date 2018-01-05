@@ -1,12 +1,12 @@
-var _ = require('lodash');
-var io = require('./socketIO');
-var redis = require('./redis');
-var UserAccess = require('./userAccess');
+const _ = require('lodash');
+const io = require('./socketIO');
+const redis = require('./redis');
+const UserAccess = require('./userAccess');
 
-var redisClient = redis.client;
+const redisClient = redis.client;
 
 io.on('connection', function (socket) {
-  var session = socket.request.session;
+  const session = socket.request.session;
 
   if (session.user) {
     UserAccess.onUserLogin(session);

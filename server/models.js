@@ -1,32 +1,32 @@
 'use strict';
 
-var mongoose = require('mongoose');
-var SchemaTypes = mongoose.Schema.Types;
+const mongoose = require('mongoose');
+const SchemaTypes = mongoose.Schema.Types;
 
-var golferSchema = mongoose.Schema({
+const golferSchema = mongoose.Schema({
   tourneyId: SchemaTypes.ObjectId,
   name: String
 });
 golferSchema.index({ name: 1, tourneyId: 1 });
 
 // Keep this separate for now, that way I don't have to change it often
-var wgrSchema = mongoose.Schema({
+const wgrSchema = mongoose.Schema({
   name: String,
   wgr: Number
 });
 wgrSchema.index({ name: 1 });
 
 // For now these are the same
-var playerSchema = golferSchema;
+const playerSchema = golferSchema;
 
-var draftPickOrderSchema = mongoose.Schema({
+const draftPickOrderSchema = mongoose.Schema({
   tourneyId: SchemaTypes.ObjectId,
   pickNumber: Number,
   player: SchemaTypes.ObjectId
 });
 draftPickOrderSchema.index({ pickNumber: 1, tourneyId: 1 });
 
-var draftPickSchema = mongoose.Schema({
+const draftPickSchema = mongoose.Schema({
   tourneyId: SchemaTypes.ObjectId,
   player: SchemaTypes.ObjectId,
   golfer: SchemaTypes.ObjectId,
@@ -36,14 +36,14 @@ var draftPickSchema = mongoose.Schema({
 draftPickSchema.index({ tourneyId: 1, pickNumber: 1 });
 draftPickSchema.index({ tourneyId: 1, golfer: 1 });
 
-var draftPrioritySchema = mongoose.Schema({
+const draftPrioritySchema = mongoose.Schema({
   tourneyId: SchemaTypes.ObjectId,
   userId: String,
   golferPriority: [SchemaTypes.ObjectId] 
 });
 draftPrioritySchema.index({ tourneyId: 1, player: 1 });
 
-var golferScoreSchema = mongoose.Schema({
+const golferScoreSchema = mongoose.Schema({
   tourneyId: SchemaTypes.ObjectId,
   golfer: SchemaTypes.ObjectId,
   day: Number,
@@ -52,33 +52,34 @@ var golferScoreSchema = mongoose.Schema({
 });
 golferScoreSchema.index({ tourneyId: 1, golfer: 1 });
 
-var tourneySchema = mongoose.Schema({
+const tourneySchema = mongoose.Schema({
   name: String,
   par: Number,
   lastUpdated: Date,
   sourceUrl: String
 });
 
-var appStateSchema = mongoose.Schema({
+const appStateSchema = mongoose.Schema({
   tourneyId: SchemaTypes.ObjectId,
   isDraftPaused: Boolean,
-  allowClock: Boolean
+  allowClock: Boolean,
+  draftHasStarted: Boolean
 });
 appStateSchema.index({ tourneyId: 1 });
 
-var Golfer = mongoose.model('Golfer', golferSchema);
-var WGR = mongoose.model('WGR', wgrSchema);
-var Player = mongoose.model('Player', playerSchema);
-var DraftPickOrder = mongoose.model('DraftPickOrder', draftPickOrderSchema);
-var DraftPick = mongoose.model('DraftPick', draftPickSchema);
-var DraftPriority = mongoose.model('DraftPriority', draftPrioritySchema);
-var GolferScore = mongoose.model('GolferScore', golferScoreSchema);
-var GolferScoreOverrides = mongoose.model(
+const Golfer = mongoose.model('Golfer', golferSchema);
+const WGR = mongoose.model('WGR', wgrSchema);
+const Player = mongoose.model('Player', playerSchema);
+const DraftPickOrder = mongoose.model('DraftPickOrder', draftPickOrderSchema);
+const DraftPick = mongoose.model('DraftPick', draftPickSchema);
+const DraftPriority = mongoose.model('DraftPriority', draftPrioritySchema);
+const GolferScore = mongoose.model('GolferScore', golferScoreSchema);
+const GolferScoreOverrides = mongoose.model(
   'GolferScoreOverrides',
   golferScoreSchema
 );
-var Tourney = mongoose.model('Tourney', tourneySchema);
-var AppState = mongoose.model('AppState', appStateSchema);
+const Tourney = mongoose.model('Tourney', tourneySchema);
+const AppState = mongoose.model('AppState', appStateSchema);
 
 module.exports = {
   Golfer: Golfer,

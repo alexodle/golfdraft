@@ -1,9 +1,9 @@
 'use strict';
 
-var AppDispatcher = require('../dispatcher/AppDispatcher');
-var AppConstants = require('../constants/AppConstants');
+const AppDispatcher = require('../dispatcher/AppDispatcher');
+const AppConstants = require('../constants/AppConstants');
 
-var SettingsActions = {
+const SettingsActions = {
 
   setPlaySounds: function (playSounds) {
     AppDispatcher.handleViewAction({
@@ -25,6 +25,13 @@ var SettingsActions = {
       allowClock: allowClock
     });
   },
+
+  setDraftHasStarted: function (draftHasStarted) {
+    AppDispatcher.handleServerAction({
+      actionType: AppConstants.SET_DRAFT_HAS_STARTED,
+      draftHasStarted: draftHasStarted
+    })
+  }
 
 };
 

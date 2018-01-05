@@ -1,12 +1,12 @@
-var _ = require('lodash');
-var constants = require('../common/constants');
-var jsdom = require('jsdom');
-var Promise = require('promise');
-var request = require('request');
+const _ = require('lodash');
+const constants = require('../common/constants');
+const jsdom = require('jsdom');
+const Promise = require('promise');
+const request = require('request');
 
-var AMATEUR_REGEX = /\(Am\)$/i;
+const AMATEUR_REGEX = /\(Am\)$/i;
 
-var RawWgrReader = {
+const RawWgrReader = {
 
   readRawWgr: function (url) {
     return new Promise(function (fulfill, reject) {
@@ -22,15 +22,15 @@ var RawWgrReader = {
             reject(new Error(JSON.stringify(errors)));
             return;
           }
-          var $ = window.$;
-          var wgrs = [];
+          const $ = window.$;
+          const wgrs = [];
 
           $('#ranking_table > .table_container > table > tbody > tr').each(function () {
             $tr = $(this);
-            var $tds = $('td', $tr);
+            const $tds = $('td', $tr);
 
-            var wgr = _.parseInt($($tds.get(0)).text());
-            var golferName = $('td.name', $tr)
+            const wgr = _.parseInt($($tds.get(0)).text());
+            const golferName = $('td.name', $tr)
               .text()
               .trim()
               .replace(AMATEUR_REGEX, '');

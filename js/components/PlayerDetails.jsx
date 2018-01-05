@@ -1,15 +1,15 @@
 "use strict";
 
-var React = require("react");
-var ReactPropTypes = React.PropTypes;
-var cx = require('classnames');
-var _ = require("lodash");
-var utils = require("../../common/utils");
+const React = require("react");
+const ReactPropTypes = React.PropTypes;
+const cx = require('classnames');
+const _ = require("lodash");
+const utils = require("../../common/utils");
 
-var PlayerStore = require('../stores/PlayerStore');
-var GolferStore = require('../stores/GolferStore');
+const PlayerStore = require('../stores/PlayerStore');
+const GolferStore = require('../stores/GolferStore');
 
-var PlayerDetails = React.createClass({
+const PlayerDetails = React.createClass({
 
   propTypes: {
     player: ReactPropTypes.string.isRequired,
@@ -17,20 +17,20 @@ var PlayerDetails = React.createClass({
   },
 
   render: function () {
-    var player = this.props.player;
-    var playerScore = this.props.playerScores[player];
-    var scoresByDay = playerScore.scoresByDay;
-    var draftPicksByGolfer = _.indexBy(this.props.draftPicks, 'golfer');
+    const player = this.props.player;
+    const playerScore = this.props.playerScores[player];
+    const scoresByDay = playerScore.scoresByDay;
+    const draftPicksByGolfer = _.indexBy(this.props.draftPicks, 'golfer');
 
-    var sortedScores = _.chain(this.props.playerScores)
+    const sortedScores = _.chain(this.props.playerScores)
       .pluck("total")
       .sortBy()
       .value();
-    var playerRank = _.sortedIndex(sortedScores, playerScore.total);
-    var isTied = sortedScores[playerRank + 1] === playerScore.total;
+    const playerRank = _.sortedIndex(sortedScores, playerScore.total);
+    const isTied = sortedScores[playerRank + 1] === playerScore.total;
 
-    var golferScores = _.sortBy(playerScore.scoresByGolfer, 'total');
-    var trs = _.map(golferScores, function (gs) {
+    const golferScores = _.sortBy(playerScore.scoresByGolfer, 'total');
+    const trs = _.map(golferScores, function (gs) {
       return (
         <tr key={gs.golfer}>
           <td>
@@ -39,12 +39,12 @@ var PlayerDetails = React.createClass({
           </td>
           <td>{utils.toGolferScoreStr(gs.total)}</td>
           {_.map(gs.scores, function (s, i) {
-            var missedCut = gs.missedCuts[i];
-            var scoreUsed = _.chain(scoresByDay[i].usedScores)
+            const missedCut = gs.missedCuts[i];
+            const scoreUsed = _.chain(scoresByDay[i].usedScores)
               .pluck('golfer')
               .contains(gs.golfer)
               .value();
-            var currentDay = gs.day === i + 1;
+            const currentDay = gs.day === i + 1;
             return (
               <td
                 className={cx({
@@ -65,7 +65,7 @@ var PlayerDetails = React.createClass({
       );
     });
 
-    var tieText = isTied ? "(Tie)" : "";
+    const tieText = isTied ? "(Tie)" : "";
     return (
       <section>
         <h2>

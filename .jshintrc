@@ -1,4 +1,5 @@
 {
   "node": true,
-  "predef" : ["window", "Audio"]
+  "predef" : ["window", "Audio"],
+  "esversion": 6
 }

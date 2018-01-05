@@ -21,18 +21,18 @@
  * created circular dependencies.
  */
 
-var Promise = require('es6-promise').Promise;
-var _ = require('lodash');
+const Promise = require('es6-promise').Promise;
+const _ = require('lodash');
 
-var _callbacks = [];
-var _promises = [];
+const _callbacks = [];
+let _promises = [];
 
 /**
  * Add a promise to the queue of callback invocation promises.
  * @param {function} callback The Store's registered callback.
  * @param {object} payload The data from the Action.
  */
-var _addPromise = function(callback, payload) {
+const _addPromise = function(callback, payload) {
   _promises.push(new Promise(function(resolve, reject) {
     if (callback(payload)) {
       resolve(payload);
@@ -45,11 +45,11 @@ var _addPromise = function(callback, payload) {
 /**
  * Empty the queue of callback invocation promises.
  */
-var _clearPromises = function() {
+const _clearPromises = function() {
   _promises = [];
 };
 
-var Dispatcher = function() {};
+const Dispatcher = function() {};
 Dispatcher.prototype =  _.extend({}, Dispatcher.prototype, {
 
   /**
@@ -81,7 +81,7 @@ Dispatcher.prototype =  _.extend({}, Dispatcher.prototype, {
    *
    * Example usage where StoreB waits for StoreA:
    *
-   *   var StoreA =  _.extend({}, EventEmitter.prototype, {
+   *   const StoreA =  _.extend({}, EventEmitter.prototype, {
    *     // other methods omitted
    *
    *     dispatchIndex: Dispatcher.register(function(payload) {
@@ -89,7 +89,7 @@ Dispatcher.prototype =  _.extend({}, Dispatcher.prototype, {
    *     })
    *   }
    *
-   *   var StoreB =  _.extend({}, EventEmitter.prototype, {
+   *   const StoreB =  _.extend({}, EventEmitter.prototype, {
    *     // other methods omitted
    *
    *     dispatchIndex: Dispatcher.register(function(payload) {
@@ -108,7 +108,7 @@ Dispatcher.prototype =  _.extend({}, Dispatcher.prototype, {
    * A more robust Dispatcher would issue a warning in this scenario.
    */
   waitFor: function(/*array*/ promiseIndexes, /*function*/ callback) {
-    var selectedPromises = _promises.filter(function(/*object*/ _, /*number*/ j) {
+    const selectedPromises = _promises.filter(function(/*object*/ _, /*number*/ j) {
       return promiseIndexes.indexOf(j) !== -1;
     });
     Promise.all(selectedPromises).then(callback);

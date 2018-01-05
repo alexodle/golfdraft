@@ -1,12 +1,12 @@
 'use strict';
 
-var _ = require('lodash');
-var constants = require('../../common/constants');
-var utils = require('../../common/utils');
+const _ = require('lodash');
+const constants = require('../../common/constants');
+const utils = require('../../common/utils');
 
-var NDAYS = constants.NDAYS;
-var MISSED_CUT = constants.MISSED_CUT;
-var NSCORES_PER_DAY = constants.NSCORES_PER_DAY;
+const NDAYS = constants.NDAYS;
+const MISSED_CUT = constants.MISSED_CUT;
+const NSCORES_PER_DAY = constants.NSCORES_PER_DAY;
 
 function getGolfersByPlayer(draftPicks) {
   return _.chain(draftPicks)
@@ -18,7 +18,7 @@ function getGolfersByPlayer(draftPicks) {
 }
 
 function playerScore(playerGolfers, scores, player) {
-  var scoresByGolfer = _.chain(playerGolfers)
+  const scoresByGolfer = _.chain(playerGolfers)
     .map(function (g) {
       return _.extend({}, scores[g], {
         total: _.sum(scores[g].scores)
@@ -27,8 +27,8 @@ function playerScore(playerGolfers, scores, player) {
     .indexBy('golfer')
     .value();
 
-  var scoresByDay = _.times(NDAYS, function (day) {
-    var dayScores = _.chain(playerGolfers)
+  const scoresByDay = _.times(NDAYS, function (day) {
+    const dayScores = _.chain(playerGolfers)
       .map(function (g) {
         return scores[g];
       })
@@ -37,7 +37,7 @@ function playerScore(playerGolfers, scores, player) {
       })
       .value();
 
-    var usedScores = _.first(dayScores, NSCORES_PER_DAY);
+    const usedScores = _.first(dayScores, NSCORES_PER_DAY);
     return {
       day: day,
       allScores: dayScores,
@@ -65,7 +65,7 @@ function worstScoreForDay(playerScores, day) {
     .value();
 }
 
-var ScoreLogic = {
+const ScoreLogic = {
 
   /**
    * Calculates the overall score for each pool player in tournament. Scoring
@@ -80,8 +80,8 @@ var ScoreLogic = {
    * score of all golfers for the particular day will be used instead.
    */
   calcPlayerScores: function (draftPicks, golferScores) {
-    var golfersByPlayer = getGolfersByPlayer(draftPicks);
-    var draftPosByPlayer = _(draftPicks)
+    const golfersByPlayer = getGolfersByPlayer(draftPicks);
+    const draftPosByPlayer = _(draftPicks)
       .groupBy('player')
       .mapValues(function (dps) {
         return _.min(dps, function (dp) {
@@ -91,7 +91,7 @@ var ScoreLogic = {
       })
       .value();
 
-    var playerScores = _.chain(golfersByPlayer)
+    const playerScores = _.chain(golfersByPlayer)
       .map(function (golfers, player) {
         return _.extend({},
           playerScore(golfers, golferScores, player),
@@ -114,7 +114,7 @@ var ScoreLogic = {
    * golfer actually shooting that particular score.
    */
   fillMissedCutScores: function (playerScores) {
-    var worstScores = _.chain(NDAYS)
+    const worstScores = _.chain(NDAYS)
       .range()
       .map(_.partial(worstScoreForDay, playerScores))
       .value();

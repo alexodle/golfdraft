@@ -1,10 +1,10 @@
 'use strict';
 
-var _ = require("lodash");
-var AppDispatcher = require('../dispatcher/AppDispatcher');
-var DraftConstants = require('../constants/DraftConstants');
+const _ = require("lodash");
+const AppDispatcher = require('../dispatcher/AppDispatcher');
+const DraftConstants = require('../constants/DraftConstants');
 
-var DraftActions = {
+const DraftActions = {
 
   makePick: function (golfer) {
     AppDispatcher.handleViewAction({
@@ -56,6 +56,13 @@ var DraftActions = {
   savePriority: function () {
     AppDispatcher.handleViewAction({
       actionType: DraftConstants.SAVE_PRIORITY
+    });
+  },
+
+  setPriority: function (priority) {
+    AppDispatcher.handleViewAction({
+      actionType: DraftConstants.SET_PRIORITY,
+      priority: priority
     });
   }
 

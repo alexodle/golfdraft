@@ -1,33 +1,15 @@
 'use strict';
 
-var _ = require('lodash');
-var DraftActions = require('../actions/DraftActions');
-var Link = require('react-router').Link;
-var PlayerStore = require('../stores/PlayerStore');
-var React = require('react');
+const _ = require('lodash');
+const DraftActions = require('../actions/DraftActions');
+const PlayerStore = require('../stores/PlayerStore');
+const React = require('react');
 
-var DraftOver = React.createClass({
-
-  render: function () {
-    return (
-      <div className="jumbotron">
-        <h1>The draft is over!</h1>
-        <p><Link to='/'>Check out the live leaderboard</Link></p>
-      </div>
-    );
-  }
-
-});
-
-var DraftStatus = React.createClass({
+const DraftStatus = React.createClass({
 
   render: function () {
-    var currentPick = this.props.currentPick;
-    if (!currentPick) {
-      return (<DraftOver />);
-    }
-
-    var playerName = PlayerStore.getPlayer(currentPick.player).name;
+    const currentPick = this.props.currentPick;
+    const playerName = PlayerStore.getPlayer(currentPick.player).name;
     return (
       <div>
         <p className='draft-status'>

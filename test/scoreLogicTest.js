@@ -1,21 +1,21 @@
-var _ = require('lodash');
-var constants = require('../common/constants');
-var ScoreLogic = require('../js/logic/ScoreLogic');
+const _ = require('lodash');
+const constants = require('../common/constants');
+const ScoreLogic = require('../js/logic/ScoreLogic');
 
-var MISSED_CUT = constants.MISSED_CUT;
+const MISSED_CUT = constants.MISSED_CUT;
 
 describe('ScoreLogic', function () {
 
   describe('calcPlayerScores', function () {
 
     it('calculates scores for each day', function () {
-      var draftPicks = [
+      const draftPicks = [
         { pickNumber: 0, player: 'Player1', golfer: 'Golfer1_0' },
         { pickNumber: 1, player: 'Player1', golfer: 'Golfer1_1' },
         { pickNumber: 2, player: 'Player1', golfer: 'Golfer1_2' },
         { pickNumber: 3, player: 'Player1', golfer: 'Golfer1_3' }
       ];
-      var scores = {
+      const scores = {
         Golfer1_0: { golfer: 'Golfer1_0', day: 1, scores: [-1,  0,  0,  0] },
         Golfer1_1: { golfer: 'Golfer1_1', day: 1, scores: [-2,  0,  0,  0] },
         Golfer1_2: { golfer: 'Golfer1_2', day: 1, scores: [0,  -1,  0,  0] },

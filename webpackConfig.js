@@ -1,4 +1,4 @@
-var ExtractTextPlugin = require('extract-text-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 module.exports = {
   entry: "./js/app.jsx",
@@ -6,37 +6,46 @@ module.exports = {
     new ExtractTextPlugin("bundle.css")
   ],
   module: {
-    loaders: [
-      { test: /\.eot($|\?)/, loader: "url" },
-      { test: /\.gif($|\?)/, loader: "url?limit=10000&minetype=image/gif" },
-      { test: /\.jpg($|\?)/, loader: "url?limit=10000&minetype=image/jpg" },
-      { test: /\.json($|\?)/, loader: 'json' },
+    rules: [
+      { test: /\.eot($|\?)/, use: "url-loader" },
+      { test: /\.gif($|\?)/, use: "url-loader?limit=10000&minetype=image/gif" },
+      { test: /\.jpg($|\?)/, use: "url-loader?limit=10000&minetype=image/jpg" },
+      { test: /\.json($|\?)/, use: 'json-loader' },
       {
         test: /\.jsx($|\?)/,
-        loader: 'babel?optional[]=runtime',
+        use: 'babel-loader',
+        exclude: /(node_modules|bower_components)/
+      },
+      {
+        test: /\.js($|\?)/,
+        use: 'babel-loader',
         exclude: /(node_modules|bower_components)/
       },
       {
         test: /\.less($|\?)/,
-        loader: ExtractTextPlugin.extract('style-loader', [
-          'css-loader',
-          'autoprefixer-loader?{browsers:["last 2 version", "IE 9"]}',
-          'less-loader',
-          ''
-        ].join('!'))
+        use: ExtractTextPlugin.extract({
+          use: [
+            'css-loader',
+            'autoprefixer-loader?{browsers:["last 2 version", "IE 9"]}',
+            'less-loader'
+          ],
+          fallback: 'style-loader'
+        })
       },
       {
         test: /\.css($|\?)/,
-        loader: ExtractTextPlugin.extract('style-loader', [
-          'css-loader',
-          'autoprefixer-loader?{browsers:["last 2 version", "IE 9"]}',
-          ''
-        ].join('!'))
+        use: ExtractTextPlugin.extract({
+          use: [
+            'css-loader',
+            'autoprefixer-loader?{browsers:["last 2 version", "IE 9"]}'
+          ],
+          fallback: 'style-loader'
+        })
       },
-      { test: /\.png($|\?)/, loader: "url?limit=10000&minetype=image/png&prefix=/img/" },
-      { test: /\.svg($|\?)/, loader: "url" },
-      { test: /\.ttf($|\?)/, loader: "url" },
-      { test: /\.woff2?($|\?)/, loader: "url?mimetype=application/font-woff" }
+      { test: /\.png($|\?)/, use: "url-loader?limit=10000&minetype=image/png&prefix=/img/" },
+      { test: /\.svg($|\?)/, use: "url-loader" },
+      { test: /\.ttf($|\?)/, use: "url-loader" },
+      { test: /\.woff2?($|\?)/, use: "url-loader?mimetype=application/font-woff" }
     ]
   },
   stats: {

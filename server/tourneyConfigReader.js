@@ -2,13 +2,13 @@
 
 // Refreshes players, pick order, draft picks, and chat
 
-var _ = require('lodash');
-var config = require('./config');
-var fs = require('fs');
+const _ = require('lodash');
+const config = require('./config');
+const fs = require('fs');
 
 
 function loadConfig() {
-  var cfg = JSON.parse(fs.readFileSync(config.tourney_cfg, 'utf8'));
+  const cfg = JSON.parse(fs.readFileSync(config.tourney_cfg, 'utf8'));
   return cfg;
 }
 

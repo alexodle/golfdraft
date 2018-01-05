@@ -5,14 +5,14 @@ require('bootstrap/dist/css/bootstrap.css');
 require('font-awesome/css/font-awesome.css');
 require('../less/app.less');
 
-var $ = require('jquery');
-var ChatActions = require('./actions/ChatActions');
-var React = require('react');
-var ReactDOM = require('react-dom');
-var Router = require('react-router');
-var routes = require('./routes.jsx');
+const $ = require('jquery');
+const ChatActions = require('./actions/ChatActions');
+const React = require('react');
+const ReactDOM = require('react-dom');
+const Router = require('react-router');
+const routes = require('./routes.jsx');
 
-var router = Router.createRoutes({
+const router = Router.createRoutes({
   routes: routes,
   location: Router.HistoryLocation
 });
@@ -20,7 +20,7 @@ var router = Router.createRoutes({
 // Hydrate the app with seed data before running
 require('./hydrate')();
 
-var node = document.getElementById('golfdraftapp');
+const node = document.getElementById('golfdraftapp');
 ReactDOM.render(
   (<div className="container">
     <div className="row">

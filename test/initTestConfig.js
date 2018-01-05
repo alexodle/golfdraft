@@ -1,9 +1,10 @@
-var _ = require('lodash');
-var config = require('../server/config');
-var models = require('../server/models');
-var Promise = require('promise');
+const _ = require('lodash');
+const config = require('../server/config');
+const models = require('../server/models');
+const Promise = require('promise');
+const should = require('should');
 
-var testTourney = models.Tourney({
+const testTourney = models.Tourney({
   name: 'Test Tourney',
   par: 70,
   lastUpdate: new Date(),
@@ -21,7 +22,7 @@ _.extend(config, {
 
 function initDb() {
   // set up db connection
-  var mongoose = require('mongoose');
+  const mongoose = require('mongoose');
   mongoose.connect(config.mongo_url);
 
   return new Promise(function (fulfill, reject) {

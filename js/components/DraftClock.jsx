@@ -1,20 +1,20 @@
 'use strict';
 
-var _ = require('lodash');
-var Assets = require('../constants/Assets');
-var GolfDraftPanel = require('./GolfDraftPanel.jsx');
-var moment = require('moment');
-var React = require('react');
+const _ = require('lodash');
+const Assets = require('../constants/Assets');
+const GolfDraftPanel = require('./GolfDraftPanel.jsx');
+const moment = require('moment');
+const React = require('react');
 
-var TIME_INTERVAL = 1000;
-var WARNING_TIME = 1000 * 60 * 2;
-var OVERTIME = 1000 * 60 * 3;
-var FINAL_COUNTDOWN_THRESHOLD = 1000 * 15;
-var WARNING_SOUND_INTERVAL_SECONDS = 10;
+const TIME_INTERVAL = 1000;
+const WARNING_TIME = 1000 * 60 * 2;
+const OVERTIME = 1000 * 60 * 3;
+const FINAL_COUNTDOWN_THRESHOLD = 1000 * 15;
+const WARNING_SOUND_INTERVAL_SECONDS = 10;
 
-var pickWarningSound = new Audio(Assets.PICK_WARNING_SOUND);
+const pickWarningSound = new Audio(Assets.PICK_WARNING_SOUND);
 
-var DraftClock = React.createClass({
+const DraftClock = React.createClass({
 
   getInitialState: function () {
     return this._getTotalMillis();
@@ -38,9 +38,9 @@ var DraftClock = React.createClass({
   },
 
   componentDidUpdate: function (prevProps, prevState) {
-    var displayTimeChanged = this._getDisplayTime(prevState) !== this._getDisplayTime();
-    var isMyPick = this.props.isMyPick;
-    var totalMillis = this.state.totalMillis;
+    const displayTimeChanged = this._getDisplayTime(prevState) !== this._getDisplayTime();
+    const isMyPick = this.props.isMyPick;
+    const totalMillis = this.state.totalMillis;
 
     if (!displayTimeChanged || !isMyPick || !totalMillis || totalMillis < WARNING_TIME) {
       return;
@@ -54,17 +54,17 @@ var DraftClock = React.createClass({
   },
 
   render: function () {
-    var body = null;
+    let body = null;
 
-    var totalMillis = this.state.totalMillis || 0;
-    var className = "";
+    const totalMillis = this.state.totalMillis || 0;
+    let className = "";
     if (totalMillis > OVERTIME) {
       className = "text-danger";
     } else if (totalMillis > WARNING_TIME) {
       className = "text-warning";
     }
 
-    var format = this._getDisplayTime();
+    const format = this._getDisplayTime();
     body = (
       <p className='draft-clock'><b className={className}>{format}</b></p>
     );
@@ -83,7 +83,7 @@ var DraftClock = React.createClass({
       return 'NS';
     }
 
-    var totalMillis = state.totalMillis || 0;
+    const totalMillis = state.totalMillis || 0;
     return moment.utc(totalMillis).format("mm:ss");
   },
 
@@ -94,9 +94,9 @@ var DraftClock = React.createClass({
       return { totalMillis: null };
     }
 
-    var lastPick = _.last(props.draftPicks);
-    var currentTime = new Date();
-    var totalMillis = Math.max(0, currentTime - lastPick.clientTimestamp);
+    const lastPick = _.last(props.draftPicks);
+    const currentTime = new Date();
+    const totalMillis = Math.max(0, currentTime - lastPick.clientTimestamp);
     return {
       totalMillis: totalMillis
     };

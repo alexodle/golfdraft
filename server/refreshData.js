@@ -1,14 +1,14 @@
 'use strict';
 
-var _ = require('lodash');
-var access = require('./access');
-var config = require('./config');
-var mongoose = require('mongoose');
-var Promise = require('promise');
-var readerConfig = require('../scores_sync/readerConfig');
-var tourneyConfigReader = require('./tourneyConfigReader');
-var tourneyUtils = require('./tourneyUtils');
-var updateScore = require('../scores_sync/updateScore');
+const _ = require('lodash');
+const access = require('./access');
+const config = require('./config');
+const mongoose = require('mongoose');
+const Promise = require('promise');
+const readerConfig = require('../scores_sync/readerConfig');
+const tourneyConfigReader = require('./tourneyConfigReader');
+const tourneyUtils = require('./tourneyUtils');
+const updateScore = require('../scores_sync/updateScore');
 
 mongoose.set('debug', true);
 mongoose.connect(config.mongo_url);
@@ -43,7 +43,7 @@ function refreshData(pickOrderNames, reader, url) {
   .then(function () {
     console.log("Adding players");
     console.log("");
-    var players = _.map(pickOrderNames, function (name) {
+    const players = _.map(pickOrderNames, function (name) {
       return {name: name};
     });
     return access.ensurePlayers(players);
@@ -57,7 +57,7 @@ function refreshData(pickOrderNames, reader, url) {
   })
   .then(function (sortedPlayers) {
     console.log("Updating pickOrder");
-    var pickOrder = tourneyUtils.snakeDraftOrder(sortedPlayers);
+    const pickOrder = tourneyUtils.snakeDraftOrder(sortedPlayers);
     return access.setPickOrder(pickOrder);
   })
   .then(function () {
@@ -82,9 +82,9 @@ function refreshData(pickOrderNames, reader, url) {
   });
 }
 
-var db = mongoose.connection;
+const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function callback () {
-  var tourneyCfg = tourneyConfigReader.loadConfig();
+  const tourneyCfg = tourneyConfigReader.loadConfig();
   refreshData(tourneyCfg.draftOrder, tourneyCfg.scores.type, tourneyCfg.scores.url);
 });

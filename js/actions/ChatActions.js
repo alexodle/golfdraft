@@ -1,9 +1,9 @@
 'use strict';
 
-var AppDispatcher = require('../dispatcher/AppDispatcher');
-var ChatConstants = require('../constants/ChatConstants');
+const AppDispatcher = require('../dispatcher/AppDispatcher');
+const ChatConstants = require('../constants/ChatConstants');
 
-var ChatActions = {
+const ChatActions = {
 
   setMessages: function (messages) {
     AppDispatcher.handleServerAction({

@@ -1,17 +1,17 @@
 'use strict';
 
-var React = require('react');
-var _ = require('lodash');
+const React = require('react');
+const _ = require('lodash');
 
-var UserActions = require('../actions/UserActions');
-var UserStore = require('../stores/UserStore');
-var PlayerStore = require('../stores/PlayerStore');
+const UserActions = require('../actions/UserActions');
+const UserStore = require('../stores/UserStore');
+const PlayerStore = require('../stores/PlayerStore');
 
 function getSortedUsers() {
   return _.sortBy(UserStore.getAll(), 'name');
 }
 
-var WhoIsYou = React.createClass({
+const WhoIsYou = React.createClass({
 
   contextTypes: {
     router: React.PropTypes.object.isRequired
@@ -22,7 +22,7 @@ var WhoIsYou = React.createClass({
   },
 
   getInitialState: function () {
-    var selectedUser = getSortedUsers()[0].id;
+    const selectedUser = getSortedUsers()[0].id;
     return { selectedUser: selectedUser };
   },
 
@@ -67,7 +67,7 @@ var WhoIsYou = React.createClass({
     ev.preventDefault();
     UserActions.setCurrentUser(this.state.selectedUser);
 
-    var location = this.props.location;
+    const location = this.props.location;
     if (location.state && location.state.nextPathname) {
       this.context.router.replace(location.state.nextPathname);
     } else {

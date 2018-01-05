@@ -7,7 +7,8 @@ module.exports = function (grunt) {
   // Time how long tasks take. Can help when optimizing build times
   require('time-grunt')(grunt);
 
-  var webpack = require('webpack');
+  const webpack = require('webpack');
+  const path = require('path');
 
   grunt.initConfig({
     express: {
@@ -34,13 +35,12 @@ module.exports = function (grunt) {
 
       prod: {
         output: {
-          path: './dist/',
+          path: path.resolve(__dirname, 'dist'),
           filename: 'bundle.js'
         },
         plugins: [
-          new webpack.optimize.DedupePlugin(),
           new webpack.optimize.UglifyJsPlugin(),
-          new webpack.optimize.OccurenceOrderPlugin(),
+          new webpack.optimize.OccurrenceOrderPlugin(),
           new webpack.optimize.AggressiveMergingPlugin(),
           new webpack.DefinePlugin({
             // Remove all debug-only code from React
@@ -53,7 +53,7 @@ module.exports = function (grunt) {
 
       dev: {
         output: {
-          path: './distd/',
+          path: path.resolve(__dirname, 'distd'),
           filename: 'bundle.js'
         },
         //devtool: 'eval', // Fast rebuild
@@ -102,6 +102,7 @@ module.exports = function (grunt) {
     }
 
   });
+  grunt.loadNpmTasks('grunt-webpack');
 
   grunt.registerTask('test', [
     'mochaTest'

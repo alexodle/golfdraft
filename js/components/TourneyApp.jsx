@@ -1,21 +1,21 @@
 'use strict';
 
-var _ = require('lodash');
-var ChatRoom = require('./ChatRoom.jsx');
-var constants = require('../../common/constants');
-var GolfDraftPanel = require('./GolfDraftPanel.jsx');
-var GolferLogic = require('../logic/GolferLogic');
-var GolferStore = require('../stores/GolferStore');
-var moment = require('moment');
-var PlayerDetails = require('./PlayerDetails.jsx');
-var PlayerStandings = require('./PlayerStandings.jsx');
-var React = require('react');
-var ScoreLogic = require('../logic/ScoreLogic');
-var utils = require('../../common/utils');
+const _ = require('lodash');
+const ChatRoom = require('./ChatRoom.jsx');
+const constants = require('../../common/constants');
+const GolfDraftPanel = require('./GolfDraftPanel.jsx');
+const GolferLogic = require('../logic/GolferLogic');
+const GolferStore = require('../stores/GolferStore');
+const moment = require('moment');
+const PlayerDetails = require('./PlayerDetails.jsx');
+const PlayerStandings = require('./PlayerStandings.jsx');
+const React = require('react');
+const ScoreLogic = require('../logic/ScoreLogic');
+const utils = require('../../common/utils');
 
-var ReactPropTypes = React.PropTypes;
+const ReactPropTypes = React.PropTypes;
 
-var NDAYS = constants.NDAYS;
+const NDAYS = constants.NDAYS;
 
 function getState(state, props) {
   return {
@@ -23,7 +23,7 @@ function getState(state, props) {
   };
 }
 
-var TourneyApp = React.createClass({
+const TourneyApp = React.createClass({
 
   propTypes: {
     currentUser: ReactPropTypes.object.isRequired,
@@ -37,15 +37,15 @@ var TourneyApp = React.createClass({
   },
 
   render: function () {
-    var playerScores = ScoreLogic.calcPlayerScores(
+    const playerScores = ScoreLogic.calcPlayerScores(
       this.props.draft.draftPicks,
       this.props.scores
     );
 
-    var scores = this.props.scores;
-    var worstScoresPerDay = _.chain(NDAYS)
+    const scores = this.props.scores;
+    const worstScoresPerDay = _.chain(NDAYS)
       .times(function (day) {
-        var worstScore = _.chain(scores)
+        const worstScore = _.chain(scores)
           .reject(function (s) {
             return s.missedCuts[day];
           })
@@ -73,6 +73,15 @@ var TourneyApp = React.createClass({
           </small>
         </p>
 
+        <GolfDraftPanel heading='Overall Standings'>
+          <PlayerStandings
+            currentUser={this.props.currentUser}
+            playerScores={playerScores}
+            selectedPlayer={this.state.playerDetailsPlayer}
+            onPlayerSelect={this._onPlayerSelect}
+          />
+        </GolfDraftPanel>
+
         <a name='PlayerDetails' />
         <GolfDraftPanel heading='Score Details'>
 
@@ -99,15 +108,6 @@ var TourneyApp = React.createClass({
           </GolfDraftPanel>
         )}
 
-        <GolfDraftPanel heading='Overall Standings'>
-          <PlayerStandings
-            currentUser={this.props.currentUser}
-            playerScores={playerScores}
-            selectedPlayer={this.state.playerDetailsPlayer}
-            onPlayerSelect={this._onPlayerSelect}
-          />
-        </GolfDraftPanel>
-
         <ChatRoom
           currentUser={this.props.currentUser}
           messages={this.props.chatMessages}
@@ -118,6 +118,7 @@ var TourneyApp = React.createClass({
   },
 
   _onPlayerSelect: function (player) {
+    window.location.href = '#PlayerDetails';
     this.setState({playerDetailsPlayer: player});
   }
 

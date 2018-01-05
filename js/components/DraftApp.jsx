@@ -1,25 +1,24 @@
-"use strict";
+'use strict';
 
-var _ = require("lodash");
-var AppPausedStatus = require('./AppPausedStatus.jsx');
-var Assets = require("../constants/Assets");
-var BestLeft = require("./BestLeft.jsx");
-var ChatRoom = require("./ChatRoom.jsx");
-var DraftChooser = require("./DraftChooser.jsx");
-var DraftClock = require("./DraftClock.jsx");
-var DraftHistory = require("./DraftHistory.jsx");
-var DraftPickOrder = require("./DraftPickOrder.jsx");
-var DraftStatus = require("./DraftStatus.jsx");
-var GolfDraftPanel = require("./GolfDraftPanel.jsx");
-var keyMirror = require('fbjs/lib/keyMirror');
-var PickListEditor = require("./PickListEditor.jsx");
-var React = require("react");
-var SettingsActions = require("../actions/SettingsActions");
+const _ = require('lodash');
+const AppPausedStatus = require('./AppPausedStatus.jsx');
+const Assets = require('../constants/Assets');
+const BestLeft = require('./BestLeft.jsx');
+const ChatRoom = require('./ChatRoom.jsx');
+const DraftChooser = require('./DraftChooser.jsx');
+const DraftClock = require('./DraftClock.jsx');
+const DraftHistory = require('./DraftHistory.jsx');
+const DraftPickOrder = require('./DraftPickOrder.jsx');
+const DraftStatus = require('./DraftStatus.jsx');
+const GolfDraftPanel = require('./GolfDraftPanel.jsx');
+const Link = require('react-router').Link;
+const PickListEditor = require('./PickListEditor.jsx');
+const React = require('react');
 
-var myTurnSound = new Audio(Assets.MY_TURN_SOUND);
-var pickMadeSound = new Audio(Assets.PICK_MADE_SOUND);
+const myTurnSound = new Audio(Assets.MY_TURN_SOUND);
+const pickMadeSound = new Audio(Assets.PICK_MADE_SOUND);
 
-var DraftApp = React.createClass({
+const DraftApp = React.createClass({
 
   getInitialState: function () {
     return {
@@ -28,7 +27,7 @@ var DraftApp = React.createClass({
   },
 
   componentWillReceiveProps: function (nextProps) {
-    var props = this.props;
+    const props = this.props;
     if (!props.playSounds) return;
 
     if (!props.isMyDraftPick && nextProps.isMyDraftPick) {
@@ -38,85 +37,184 @@ var DraftApp = React.createClass({
     }
   },
 
-  render: function () {
-    var isMyPick = this.props.isMyDraftPick;
-    var isDraftPaused = this.props.isPaused;
-
-    var priorityPanelHeader = (
+  _renderPickListHeader: function () {
+    return (
       <span>
-        <span>Pick Priorities</span>
-        <span className="pull-right"><em>NEW!</em></span>
+        <span>Pick List Editor</span>
+        <span className='pull-right'><em>NEW!</em></span>
       </span>
     );
+  },
 
+  _renderPreDraft: function () {
     return (
-      <div>
-        <div>
-          {isDraftPaused ? (<AppPausedStatus />) : (
-            <div className="row">
-              <div className="col-md-9">
-                {!isMyPick ? (
-                  <GolfDraftPanel heading='Draft Status'>
-                    <DraftStatus currentPick={this.props.currentPick} />
-                  </GolfDraftPanel>
-                ) : (
-                  <DraftChooser
-                    currentUser={this.props.currentUser}
-                    golfersRemaining={this.props.golfersRemaining}
-                    currentPick={this.props.currentPick}
-                    syncedPriority={this.props.syncedPriority}
-                  />
-                )}
-              </div>
-              <div className="col-md-3">
-                <DraftClock
-                  draftPicks={this.props.draftPicks}
-                  isMyPick={this.props.isMyDraftPick}
-                  allowClock={this.props.allowClock}
-                />
-              </div>
-            </div>
-          )}
-          <div className="row">
-            <div className="col-md-4">
-              <GolfDraftPanel heading='Draft Order'>
-                <DraftPickOrder
-                  currentUser={this.props.currentUser}
-                  currentPick={this.props.currentPick}
-                  pickingForPlayers={this.props.pickingForPlayers}
-                  onPlayerSelected={this._onDraftHistorySelectionChange}
-                />
-              </GolfDraftPanel>
-            </div>
-            <div className="col-md-8">
-              <GolfDraftPanel heading={priorityPanelHeader}>
-                <PickListEditor
-                  syncedPriority={this.props.syncedPriority}
-                  pendingPriority={this.props.pendingPriority}
-                  height="29em"
-                />
-              </GolfDraftPanel>
-            </div>
-          </div>
-          <div className="row">
-            <div className="col-md-12">
-              <ChatRoom
-                currentUser={this.props.currentUser}
-                messages={this.props.chatMessages}
-                activeUsers={this.props.activeUsers}
-              />
-            </div>
-          </div>
-          <div className="row">
-            <div className="col-md-12">
-              <DraftHistory
-                draftPicks={this.props.draftPicks}
-                selectedPlayerId={this.state.draftHistoryPlayerId}
-                onSelectionChange={this._onDraftHistorySelectionChange}
-              />
+      <section>
+
+        <div className='row'>
+          <div className='col-md-12'>
+            <div className='jumbotron'>
+              <h1>Draft not started.</h1>
+              <em>New feature: <a href='#InlinePickListEditor'>Set up your pick list beforehand</a></em>
             </div>
           </div>
         </div>
+
+        <div className='row'>
+          <div className='col-md-12'>
+            <a name='InlinePickListEditor' />
+            <GolfDraftPanel heading={this._renderPickListHeader()}>
+              <PickListEditor
+                preDraftMode
+                golfersRemaining={this.props.golfersRemaining}
+                syncedPriority={this.props.syncedPriority}
+                pendingPriority={this.props.pendingPriority}
+                height='30em'
+              />
+            </GolfDraftPanel>
+          </div>
+        </div>
+
+        <div className='row'>
+          <div className='col-md-12'>
+            <ChatRoom
+              currentUser={this.props.currentUser}
+              messages={this.props.chatMessages}
+              activeUsers={this.props.activeUsers}
+            />
+          </div>
+        </div>
+
+      </section>
+    );
+  },
+
+  _renderDraftComplete: function () {
+    return (
+      <section>
+
+        <div className="row">
+          <div className='col-md-12'>
+            <div className='jumbotron'>
+              <h1>The draft is over!</h1>
+              <p><Link to='/'>Check out the live leaderboard</Link></p>
+            </div>
+          </div>
+        </div>
+
+        <div className='row'>
+          <div className='col-md-12'>
+            <ChatRoom
+              currentUser={this.props.currentUser}
+              messages={this.props.chatMessages}
+              activeUsers={this.props.activeUsers}
+            />
+          </div>
+        </div>
+
+        <div className='row'>
+          <div className='col-md-12'>
+            <DraftHistory
+              draftPicks={this.props.draftPicks}
+              selectedPlayerId={this.state.draftHistoryPlayerId}
+              onSelectionChange={this._onDraftHistorySelectionChange}
+            />
+          </div>
+        </div>
+
+      </section>
+    );
+  },
+
+  render: function () {
+    if (!this.props.draftHasStarted) {
+      return this._renderPreDraft();
+    }
+
+    const isDraftComplete = !this.props.currentPick;
+    if (isDraftComplete) {
+      return this._renderDraftComplete();
+    }
+
+    const isMyPick = this.props.isMyDraftPick;
+    const isDraftPaused = this.props.isPaused;
+
+    return (
+      <div>
+        {isDraftPaused ? (<AppPausedStatus />) : (
+          <div className='row'>
+
+            <div className='col-md-9'>
+              {!isMyPick ? (
+                <GolfDraftPanel heading='Draft Status'>
+                  <DraftStatus currentPick={this.props.currentPick} />
+                </GolfDraftPanel>
+              ) : (
+                <DraftChooser
+                  currentUser={this.props.currentUser}
+                  golfersRemaining={this.props.golfersRemaining}
+                  currentPick={this.props.currentPick}
+                  syncedPriority={this.props.syncedPriority}
+                />
+              )}
+            </div>
+
+            <div className='col-md-3'>
+              <DraftClock
+                draftPicks={this.props.draftPicks}
+                isMyPick={this.props.isMyDraftPick}
+                allowClock={this.props.allowClock}
+              />
+            </div>
+          </div>
+        )}
+
+        <div className='row'>
+
+          <div className='col-md-4'>
+            <GolfDraftPanel heading='Draft Order'>
+              <a name='InlineDraftPriorityEditor' />
+              <DraftPickOrder
+                currentUser={this.props.currentUser}
+                currentPick={this.props.currentPick}
+                pickingForPlayers={this.props.pickingForPlayers}
+                onPlayerSelected={this._onDraftHistorySelectionChange}
+              />
+            </GolfDraftPanel>
+          </div>
+
+          <div className='col-md-8'>
+            <GolfDraftPanel heading={this._renderPickListHeader()}>
+              <PickListEditor
+                golfersRemaining={this.props.golfersRemaining}
+                syncedPriority={this.props.syncedPriority}
+                pendingPriority={this.props.pendingPriority}
+                height='29em'
+              />
+            </GolfDraftPanel>
+          </div>
+
+        </div>
+
+        <div className='row'>
+          <div className='col-md-12'>
+            <ChatRoom
+              currentUser={this.props.currentUser}
+              messages={this.props.chatMessages}
+              activeUsers={this.props.activeUsers}
+            />
+          </div>
+        </div>
+
+        <div className='row'>
+          <div className='col-md-12'>
+            <DraftHistory
+              draftPicks={this.props.draftPicks}
+              selectedPlayerId={this.state.draftHistoryPlayerId}
+              onSelectionChange={this._onDraftHistorySelectionChange}
+            />
+          </div>
+        </div>
+
       </div>
     );
   },

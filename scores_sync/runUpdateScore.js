@@ -1,20 +1,20 @@
 'use strict';
 
-var config = require('../server/config');
-var mongoose = require('mongoose');
-var readerConfig = require('./readerConfig');
-var redis = require("../server/redis");
-var tourneyConfigReader = require('../server/tourneyConfigReader');
-var updateScore = require('./updateScore');
+const config = require('../server/config');
+const mongoose = require('mongoose');
+const readerConfig = require('./readerConfig');
+const redis = require("../server/redis");
+const tourneyConfigReader = require('../server/tourneyConfigReader');
+const updateScore = require('./updateScore');
 
-var TIMEOUT = 30 * 1000; // 30 seconds
+const TIMEOUT = 30 * 1000; // 30 seconds
 
-var tourneyCfg = tourneyConfigReader.loadConfig();
+const tourneyCfg = tourneyConfigReader.loadConfig();
 
-var reader = readerConfig[tourneyCfg.scores.type].reader;
+const reader = readerConfig[tourneyCfg.scores.type].reader;
 console.log(tourneyCfg.scores.type);
 console.log(reader);
-var url = tourneyCfg.scores.url;
+const url = tourneyCfg.scores.url;
 
 mongoose.set('debug', true);
 mongoose.connect(config.mongo_url);
@@ -27,7 +27,7 @@ function end() {
 function updateScores() {
   console.log("attempting update...");
 
-  var timeoutId = setTimeout(function () {
+  const timeoutId = setTimeout(function () {
     console.error("TIMEOUT");
     end();
     process.exit(1);
@@ -44,6 +44,6 @@ function updateScores() {
   });
 }
 
-var db = mongoose.connection;
+const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', updateScores);

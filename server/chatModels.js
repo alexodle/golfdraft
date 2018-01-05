@@ -1,8 +1,8 @@
 'use strict';
 
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
-var messageSchema = mongoose.Schema({
+const messageSchema = mongoose.Schema({
   tourneyId: mongoose.Schema.ObjectId,
   player: mongoose.Schema.ObjectId,
   isBot: Boolean,
@@ -11,7 +11,7 @@ var messageSchema = mongoose.Schema({
 });
 messageSchema.index({ tourneyId: 1 });
 
-var Message = mongoose.model('Message', messageSchema);
+const Message = mongoose.model('Message', messageSchema);
 
 module.exports = {
   Message: Message

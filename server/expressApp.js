@@ -1,7 +1,7 @@
 'use strict';
 
-var _ = require('lodash');
-var express = require('express');
+const _ = require('lodash');
+const express = require('express');
 
-var app = express();
+const app = express();
 module.exports = app;
