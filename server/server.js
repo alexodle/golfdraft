@@ -274,7 +274,7 @@ db.once('open', function callback () {
     });
   }
 
-  function handlePick(req, res, pickPromise, highestPriPick) {
+  function handlePick(req, res, pickPromise, pickListPick) {
     const user = req.session.user;
     let pick = null;
 
@@ -296,9 +296,11 @@ db.once('open', function callback () {
       .then(access.getDraft)
       .then(function (draft) {
         updateClients(draft);
-
-        // Do this second, since it's least important
-        chatBot.broadcastPickMessage(user, pick, draft, highestPriPick);
+        if (pickListPick) {
+          return chatBot.broadcastProxyPickListPickMessage(user, pick, draft);
+        } else {
+          return chatBot.broadcastPickMessage(user, pick, draft);
+        }
       })
       .catch(function (err) {
         if (err === NOT_AN_ERROR) throw err;
@@ -362,7 +364,7 @@ db.once('open', function callback () {
         return access.makePick(pick);
       });
 
-    handlePick(req, res, pickPromise, false /* highestPriPick */);
+    handlePick(req, res, pickPromise, false /* pickListPick */);
   });
 
   app.post('/draft/pickHighestPriGolfer', function (req, res) {
@@ -379,7 +381,7 @@ db.once('open', function callback () {
       return access.makeHighestPriorityPick(body.player, body.pickNumber);
     });
     
-    handlePick(req, res, pickPromise, true /* highestPriPick */);
+    handlePick(req, res, pickPromise, true /* pickListPick */);
   });
 
   // ADMIN FUNCTIONALITY
@@ -436,22 +438,26 @@ db.once('open', function callback () {
       return;
     }
 
-    access.undoLastPick()
-    .then(function () {
-      res.sendStatus(200);
-    })
-    .catch(function (err) {
-      res.status(500).send(err);
-      throw err;
-    })
+    let removedDraftPick = null;
+    return access.undoLastPick()
+      .then(function (draftPick) {
+        removedDraftPick = draftPick;
+        res.sendStatus(200);
+      })
+      .catch(function (err) {
+        res.status(500).send(err);
+        throw err;
+      })
 
-    // Alert clients
-    .then(access.getDraft)
-    .then(updateClients)
-    .catch(function (err) {
-      console.log(err);
-    });
-
+      // Alert clients
+      .then(access.getDraft)
+      .then(function (draft) {
+        updateClients(draft);
+        return chatBot.broadcastUndoPickMessage(removedDraftPick, draft);
+      })
+      .catch(function (err) {
+        console.log(err);
+      });
   });
 
   app.put('/admin/forceRefresh', function (req, res) {

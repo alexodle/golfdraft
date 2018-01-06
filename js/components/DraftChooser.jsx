@@ -72,7 +72,7 @@ const DraftChooser = React.createClass({
                 "active": sortKey === 'priority'
               })}
               onClick={_.partial(this._setSortKey, 'priority')}
-            >User Priority</button>
+            >User Pick List</button>
           )}
           <button
             type="button"
@@ -94,13 +94,12 @@ const DraftChooser = React.createClass({
 
         <form role="form">
         {isProxyPick && sortKey === 'priority' ? (
-          <div>
+          <div style={{marginTop: "1em"}}>
+            <small>* If no pick list is set, uses next WGR</small><br />
             <button
-              style={{marginTop: "2em"}}
               className="btn btn-default btn-primary"
               onClick={this._onProxyPriorityPick}
-            >Auto-pick next player on pick list</button><br />
-            <small>* If there is no pick list, uses next WGR</small>
+            >Select next player on pick list</button>
           </div>
         ) : (
           <div>
