@@ -42,8 +42,6 @@ function getAppState() {
     scores: ScoreStore.getScores(),
     lastScoresUpdate: ScoreStore.getLastUpdated(),
 
-    playSounds: AppSettingsStore.getPlaySounds(),
-
     chatMessages: ChatStore.getMessages(),
 
     isAdmin: UserStore.isAdmin(),
@@ -72,13 +70,11 @@ const DraftWrapper = React.createClass({
         <AppHeader
           tourneyName={props.tourneyName}
           currentUser={props.currentUser}
-          playSounds={props.playSounds}
           location={props.location}
           drafting
         />
         <DraftApp
           tourneyName={props.tourneyName}
-          playSounds={props.playSounds}
           currentUser={props.currentUser}
           currentPick={props.draft.currentPick}
           isMyDraftPick={props.draft.isMyDraftPick}
@@ -112,7 +108,6 @@ const TourneyWrapper = React.createClass({
         <AppHeader
           tourneyName={props.tourneyName}
           currentUser={props.currentUser}
-          playSounds={props.playSounds}
           location={props.location}
         />
         <TourneyApp
@@ -143,7 +138,6 @@ const AdminWrapper = React.createClass({
         <AppHeader
           tourneyName={props.tourneyName}
           currentUser={props.currentUser}
-          playSounds={props.playSounds}
           location={props.location}
         />
         <AdminApp

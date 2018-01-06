@@ -5,32 +5,11 @@ const AppConstants = require('../constants/AppConstants');
 
 const SettingsActions = {
 
-  setPlaySounds: function (playSounds) {
+  setAppState: function (appState) {
     AppDispatcher.handleViewAction({
-      actionType: AppConstants.SET_PLAY_SOUNDS,
-      playSounds: playSounds
+      actionType: AppConstants.SET_APP_STATE,
+      appState: appState
     });
-  },
-
-  setIsPaused: function (isPaused) {
-    AppDispatcher.handleServerAction({
-      actionType: AppConstants.SET_IS_PAUSED,
-      isPaused: isPaused
-    });
-  },
-
-  setAllowClock: function (allowClock) {
-    AppDispatcher.handleServerAction({
-      actionType: AppConstants.SET_ALLOW_CLOCK,
-      allowClock: allowClock
-    });
-  },
-
-  setDraftHasStarted: function (draftHasStarted) {
-    AppDispatcher.handleServerAction({
-      actionType: AppConstants.SET_DRAFT_HAS_STARTED,
-      draftHasStarted: draftHasStarted
-    })
   }
 
 };

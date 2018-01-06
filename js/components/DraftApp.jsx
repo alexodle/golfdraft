@@ -28,8 +28,6 @@ const DraftApp = React.createClass({
 
   componentWillReceiveProps: function (nextProps) {
     const props = this.props;
-    if (!props.playSounds) return;
-
     if (!props.isMyDraftPick && nextProps.isMyDraftPick) {
       myTurnSound.play();
     } else if (props.draftPicks.length + 1 === nextProps.draftPicks.length) {

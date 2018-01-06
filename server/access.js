@@ -91,17 +91,34 @@ _.extend(access, {
   updatePriority: promiseizeFn(function (playerId, priority) {
     priority = _.uniq(priority);
     const query = _.extend({ userId: playerId }, FK_TOURNEY_ID_QUERY);
-    return models.DraftPriority.update(
-      query,
-      {$set: {golferPriority: priority}},
-      {upsert: true}
-    ).exec()
-    .then(function () {
-      return {
-        completed: true,
-        priority: priority
-      };
-    });
+    return models.DraftPriority
+      .update(
+        query,
+        { $set: { golferPriority: priority } },
+        { upsert: true }
+      ).exec()
+      .then(function () {
+        return {
+          completed: true,
+          priority: priority
+        };
+      });
+  }),
+
+  updateAutoPick: promiseize(function (playerId, autoPick) {
+    const query = FK_TOURNEY_ID_QUERY;
+
+    let update = null;
+    if (!!autoPick) {
+      update = models.AppState.update(query, { $addToSet: { autoPickPlayers: playerId } });
+    } else {
+      update = models.AppState.update(
+        query,
+        { $pull: { autoPickPlayers: playerId } },
+        { multi: true });
+    }
+
+    return update.exec();
   }),
 
   updatePriorityFromNames: function (playerId, priorityNames) {
@@ -193,7 +210,7 @@ _.extend(access, {
     return models.AppState.update(
       FK_TOURNEY_ID_QUERY,
       props,
-      {upsert: true}
+      { upsert: true }
     ).exec();
   }),
 

@@ -6,29 +6,30 @@ const Store = require('./Store');
 const AppDispatcher = require('../dispatcher/AppDispatcher');
 const AppConstants = require('../constants/AppConstants');
 
-let _playSounds = true;
-let _isPaused = false;
-let _allowClock = true;
-let _draftHasStarted = false;
+let _appState = {};
+
+function valueOr(key, orValue) {
+  return _.has(_appState, key) ? _appState[key] : orValue;
+}
 
 const AppSettingsStore =  _.extend({}, Store.prototype, {
 
   changeEvent: 'AppSettingsStore:change',
 
-  getPlaySounds: function () {
-    return _playSounds;
-  },
-
   getIsPaused: function () {
-    return _isPaused;
+    return valueOr('isPaused', false);
   },
 
   getAllowClock: function () {
-    return _allowClock;
+    return valueOr('allowClock', true);
   },
 
   getDraftHasStarted: function () {
-    return _draftHasStarted;
+    return valueOr('draftHasStarted', false);
+  },
+
+  getAutoPicks: function () {
+    return valueOr('autoPickPlayers', {});
   }
 
 });
@@ -39,23 +40,10 @@ AppDispatcher.register(function (payload) {
 
   switch(action.actionType) {
 
-    case AppConstants.SET_PLAY_SOUNDS:
-      _playSounds = action.playSounds;
-      AppSettingsStore.emitChange();
-      break;
-
-    case AppConstants.SET_IS_PAUSED:
-      _isPaused = action.isPaused;
-      AppSettingsStore.emitChange();
-      break;
-
-    case AppConstants.SET_ALLOW_CLOCK:
-      _allowClock = action.allowClock;
-      AppSettingsStore.emitChange();
-      break;
-
-    case AppConstants.SET_DRAFT_HAS_STARTED:
-      _draftHasStarted = action.draftHasStarted;
+    case AppConstants.SET_APP_STATE:
+      _appState = _.extend({}, action.appState, {
+        autoPickPlayers: _.indexBy(action.appState.autoPickPlayers)
+      });
       AppSettingsStore.emitChange();
       break;
 

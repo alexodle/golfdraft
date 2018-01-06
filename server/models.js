@@ -38,7 +38,7 @@ draftPickSchema.index({ tourneyId: 1, golfer: 1 });
 
 const draftPrioritySchema = mongoose.Schema({
   tourneyId: SchemaTypes.ObjectId,
-  userId: String,
+  userId: SchemaTypes.ObjectId,
   golferPriority: [SchemaTypes.ObjectId] 
 });
 draftPrioritySchema.index({ tourneyId: 1, player: 1 });
@@ -63,7 +63,8 @@ const appStateSchema = mongoose.Schema({
   tourneyId: SchemaTypes.ObjectId,
   isDraftPaused: Boolean,
   allowClock: Boolean,
-  draftHasStarted: Boolean
+  draftHasStarted: Boolean,
+  autoPickPlayers: [SchemaTypes.ObjectId]
 });
 appStateSchema.index({ tourneyId: 1 });
 

@@ -10,7 +10,6 @@ const AppHeader = React.createClass({
   propTypes: {
     tourneyName: ReactPropTypes.string.isRequired,
     currentUser: ReactPropTypes.object.isRequired,
-    playSounds: ReactPropTypes.bool.isRequired,
     drafting: ReactPropTypes.bool,
     location: React.PropTypes.object
   },

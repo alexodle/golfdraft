@@ -11,8 +11,6 @@ const SettingsActions = require('./actions/SettingsActions');
 const socketio = require('socket.io-client');
 const UserActions = require('./actions/UserActions');
 
-let _hasConnected = false;
-
 /** Start listening for app-wide socket.io updates
 */
 function startSocketUpdates() {
@@ -27,14 +25,8 @@ function startSocketUpdates() {
   io.on('change:chat', function (ev) {
     ChatActions.newMessage(ev.data);
   });
-  io.on('change:ispaused', function (ev) {
-    SettingsActions.setIsPaused(ev.data.isPaused);
-  });
-  io.on('change:allowclock', function (ev) {
-    SettingsActions.setAllowClock(ev.data.allowClock);
-  });
-  io.on('change:drafthasstarted', function (ev) {
-    SettingsActions.setDraftHasStarted(ev.data.draftHasStarted);
+  io.on('change:appstate', function (ev) {
+    SettingsActions.setAppState(ev.data.appState);
   });
   io.on('change:activeusers', function (ev) {
     UserActions.setActiveUsers(ev.data.userCounts);
@@ -43,32 +35,6 @@ function startSocketUpdates() {
   // ADMIN power
   io.on('action:forcerefresh', function (ev) {
     window.location.reload();
-  });
-
-  // Force refresh if it's been sufficiently long since our last update
-  io.on('connect', function () {
-    if (!_hasConnected) {
-      _hasConnected = true;
-    } else {
-
-      // TODO - Move to separate server sync
-      $.get('/bootstrap')
-      .fail(function () {
-        // No real error handling here, just reload the page to make sure we
-        // don't get people in a weird state.
-        window.location.reload();
-      })
-      .success(function (results) {
-        AppActions.setPlayers(results.players);
-        AppActions.setGolfers(results.golfers);
-        DraftActions.draftUpdate(results.draft);
-        ScoreActions.scoreUpdate({
-          scores: results.scores,
-          lastUpdated: results.tourney.lastUpdated
-        });
-        SettingsActions.setIsPaused(results.appState.isDraftPaused);
-      });
-    }
   });
 }
 

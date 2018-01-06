@@ -278,35 +278,69 @@ db.once('open', function callback () {
     const user = req.session.user;
     let pick = null;
 
-    return pickPromise.then(function (_pick) {
-      pick = _pick;
-      res.sendStatus(200);
-    })
-    .catch(function (err) {
-      if (err === NOT_AN_ERROR) throw err;
+    return pickPromise
+      .then(function (_pick) {
+        pick = _pick;
+        res.sendStatus(200);
+      })
+      .catch(function (err) {
+        if (err === NOT_AN_ERROR) throw err;
 
-      if (err.message.indexOf('invalid pick') !== -1) {
-        res.status(400).send(err.message);
-      }
-      throw err;
-    })
+        if (err.message.indexOf('invalid pick') !== -1) {
+          res.status(400).send(err.message);
+        }
+        throw err;
+      })
 
-    // Alert clients
-    .then(access.getDraft)
-    .then(function (draft) {
-      updateClients(draft);
+      // Alert clients
+      .then(access.getDraft)
+      .then(function (draft) {
+        updateClients(draft);
 
-      // Do this second, since it's least important
-      chatBot.broadcastPickMessage(user, pick, draft, highestPriPick);
-    })
-    .catch(function (err) {
-      if (err === NOT_AN_ERROR) throw err;
-
-      // The main functionality finished,
-      // so don't return a failed response code
-      console.log(err);
-    });
+        // Do this second, since it's least important
+        chatBot.broadcastPickMessage(user, pick, draft, highestPriPick);
+      })
+      .catch(function (err) {
+        if (err === NOT_AN_ERROR) throw err;
+        console.log(err);
+      });
   }
+
+  function onAppStateUpdate(req, res, promise) {
+    return promise
+      .catch(function (err) {
+        console.log(err);
+        res.status(500).send(err);
+        throw NOT_AN_ERROR; // skip next steps
+      })
+      .then(function () {
+        res.sendStatus(200);
+
+        return access.getAppState();
+      })
+      .then(function (appState) {
+        io.sockets.emit('change:appstate', {
+          data: { appState: appState }
+        });
+      })
+      .catch(function (err) {
+        if (err === NOT_AN_ERROR) return;
+        console.log(err);
+      })
+  }
+
+  app.post('/draft/autoPick', function (req, res) {
+    const body = req.body;
+    const user = req.session.user;
+
+    if (!user || !user.id) {
+      res.status(401).send('Must be logged in to make a pick');
+      return;
+    }
+
+    const autoPick = !!body.autoPick;
+    return onAppStateUpdate(req, res, access.updateAutoPick(user, autoPick));
+  });
 
   app.post('/draft/picks', function (req, res) {
     const body = req.body;
@@ -324,9 +358,9 @@ db.once('open', function callback () {
     };
 
     const pickPromise = ensureNotPaused(req, res)
-    .then(function () {
-      return access.makePick(pick);
-    });
+      .then(function () {
+        return access.makePick(pick);
+      });
 
     handlePick(req, res, pickPromise, false /* highestPriPick */);
   });
@@ -373,15 +407,7 @@ db.once('open', function callback () {
     }
 
     const isDraftPaused = !!req.body.isPaused;
-    access.updateAppState({
-      isDraftPaused: isDraftPaused
-    })
-    .then(function () {
-      io.sockets.emit('change:ispaused', {
-        data: { isPaused: isDraftPaused }
-      });
-      res.sendStatus(200);
-    });
+    return onAppStateUpdate(req, res, access.updateAppState({ isDraftPaused: isDraftPaused }));
   });
 
   app.put('/admin/allowClock', function (req, res) {
@@ -391,33 +417,17 @@ db.once('open', function callback () {
     }
 
     const allowClock = !!req.body.allowClock;
-    access.updateAppState({
-      allowClock: allowClock
-    })
-    .then(function () {
-      io.sockets.emit('change:allowclock', {
-        data: { allowClock: allowClock }
-      });
-      res.sendStatus(200);
-    });
+    return onAppStateUpdate(req, res, access.updateAppState({ allowClock: allowClock }));
   });
 
   app.put('/admin/draftHasStarted', function (req, res) {
     if (!req.session.isAdmin) {
-      res.status(401).send('Only can admin can toggle clock');
+      res.status(401).send('Only can admin can toggle draft status');
       return;
     }
 
     const draftHasStarted = !!req.body.draftHasStarted;
-    access.updateAppState({
-      draftHasStarted: draftHasStarted
-    })
-    .then(function () {
-      io.sockets.emit('change:drafthasstarted', {
-        data: { draftHasStarted: draftHasStarted }
-      });
-      res.sendStatus(200);
-    });
+    return onAppStateUpdate(req, res, access.updateAppState({ draftHasStarted: draftHasStarted }));
   });
 
   app.delete('/admin/lastpick', function (req, res) {
