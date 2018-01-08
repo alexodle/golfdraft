@@ -185,7 +185,7 @@ AppDispatcher.register(function (payload) {
 
       // TODO - Move to separate server sync
       const data = { priority: _priority };
-      $.post('/draft/priority', data)
+      $.put('/draft/priority', data)
       .fail(function () {
         window.location.reload();
       });

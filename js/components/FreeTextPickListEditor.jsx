@@ -255,7 +255,7 @@ const FreeTextPickListEditor = React.createClass({
     this.setState({ isPosting: true });
 
     const data = { priorityNames: this._cleanedGolfers() };
-    $.post('/draft/priority', data)
+    $.put('/draft/priority', data)
 
     .done(function (result) {
       DraftActions.setPriority(result.priority);

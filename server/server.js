@@ -232,7 +232,7 @@ db.once('open', function callback () {
     });
   });
 
-  app.post('/draft/priority', function (req, res) {
+  app.put('/draft/priority', function (req, res) {
     const body = req.body;
     const user = req.session.user;
 
