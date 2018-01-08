@@ -204,7 +204,7 @@ const DraftChooser = React.createClass({
 
   _onProxyPriorityPick: function (ev) {
     ev.preventDefault();
-    DraftActions.makeHighestPriorityPick();
+    DraftActions.makePickListPick();
   },
 
   _onSubmit: function (ev) {

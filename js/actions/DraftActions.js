@@ -13,7 +13,7 @@ const DraftActions = {
     });
   },
 
-  makeHighestPriorityPick: function () {
+  makePickListPick: function () {
     AppDispatcher.handleViewAction({
       actionType: DraftConstants.DRAFT_PICK_HIGHEST_PRI
     });

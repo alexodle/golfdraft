@@ -307,7 +307,7 @@ db.once('open', function callback () {
     });
   });
 
-  app.post('/draft/pickHighestPriGolfer', function (req, res) {
+  app.post('/draft/pickPickListGolfer', function (req, res) {
     const body = req.body;
     const user = req.session.user;
 
@@ -321,7 +321,7 @@ db.once('open', function callback () {
       req,
       res,
       makePick: function () {
-        return access.makeHighestPriorityPick(player, pickNumber);
+        return access.makePickListPick(player, pickNumber);
       },
       broadcastPickMessage: function (spec) {
         return chatBot.broadcastProxyPickListPickMessage(user, spec.pick, spec.draft);
@@ -477,7 +477,7 @@ function autoPick(playerId, pickNumber) {
   let isPickListPick = null;
   return handlePick({
     makePick: function () {
-      return access.makeHighestPriorityPick(playerId, pickNumber)
+      return access.makePickListPick(playerId, pickNumber)
         .then(function (result) {
           isPickListPick = result.isPickListPick;
           return result;

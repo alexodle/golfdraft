@@ -217,7 +217,7 @@ _.extend(access, {
     ).exec();
   }),
 
-  makeHighestPriorityPick: function (playerId, pickNumber) {
+  makePickListPick: function (playerId, pickNumber) {
     return Promise.all([
       access.getPriority(playerId),
       access.getGolfers(),

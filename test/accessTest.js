@@ -147,7 +147,7 @@ describe('access', function () {
 
   });
 
-  describe('makeHighestPriorityPick', function () {
+  describe('makePickListPick', function () {
     let players = null;
     let golfers = null;
 
@@ -197,7 +197,7 @@ describe('access', function () {
         golfer: golfers['Golfer2']._id,
         pickNumber: 0
       };
-      return access.makeHighestPriorityPick(players['Player1']._id.toString(), 0)
+      return access.makePickListPick(players['Player1']._id.toString(), 0)
         .then(access.getDraft)
         .then(function (draft) {
           draft.picks.should.containDeepOrdered([newPick]);
@@ -215,7 +215,7 @@ describe('access', function () {
           golfers['Golfer2']._id.toString()
         ])
         .then(function () {
-          return access.makeHighestPriorityPick(players['Player1']._id.toString(), 0);
+          return access.makePickListPick(players['Player1']._id.toString(), 0);
         })
         .then(access.getDraft)
         .then(function (draft) {

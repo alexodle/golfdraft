@@ -122,7 +122,7 @@ AppDispatcher.register(function (payload) {
       const partialPick = getCurrentPick();
 
       // TODO - Move to separate server sync
-      $.post('/draft/pickHighestPriGolfer', partialPick)
+      $.post('/draft/pickPickListGolfer', partialPick)
       .fail(function () {
         // No real error handling here, just reload the page to make sure we
         // don't get people in a weird state.
