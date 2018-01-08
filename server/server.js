@@ -373,6 +373,8 @@ db.once('open', function callback () {
     }
 
     return handlePick({
+      force: true,
+
       req,
       res,
       makePick: function () {
@@ -476,10 +478,11 @@ function ensureDraftIsRunning(req, res) {
 }
 
 function handlePick(spec) {
-  const {res, makePick, broadcastPickMessage} = spec;
+  const {res, makePick, broadcastPickMessage, force} = spec;
   let pick = null;
 
-  return ensureDraftIsRunning()
+  const promise = !force ? ensureDraftIsRunning() : Promise.resolve();
+  return promise
     .then(makePick)
     .catch(function (err) {
       if (err === NOT_AN_ERROR) throw err;
