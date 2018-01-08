@@ -8988,6 +8988,9 @@ button.close {
 .pick-order-list .current-player {
   background-color: #f5f5f5;
 }
+.pick-order-list .auto-label {
+  font-size: 0.5em;
+}
 .player-details-table .score-used {
   font-weight: bold;
   background-color: #dff0d8;
