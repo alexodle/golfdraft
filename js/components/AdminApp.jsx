@@ -36,6 +36,15 @@ function toggleDraftHasStarted(draftHasStarted) {
   });
 }
 
+function toggleAutoPick(playerId, autoPick) {
+  $.ajax({
+    url: '/admin/autoPickPlayers',
+    type: 'PUT',
+    contentType: 'application/json',
+    data: JSON.stringify({ playerId: playerId, autoPick: autoPick })
+  });
+}
+
 const PasswordInput = React.createClass({
 
   getInitialState: function () {
@@ -116,46 +125,89 @@ const AdminApp = React.createClass({
         <h1>Hello admin!</h1>
 
         {props.draftHasStarted ? (
-          <h2>Draft has started</h2>
+          <h2>Draft has started!</h2>
         ) : (
           <h2>Draft has not started yet</h2>
         )}
         <div className='panel'>
           <div className='panel-body'>
-            <button className='btn' onClick={this._onStartDraft}>Start Draft</button>
+            <button
+              type='button'
+              className='btn btn-default'
+              onClick={this._onStartDraft}
+            >Start Draft</button>
             <span> </span>
-            <button className='btn' onClick={this._onUnstartDraft}>Unstart Draft</button>
+            <button
+              type='button'
+              className='btn btn-default'
+              onClick={this._onUnstartDraft}
+            >Unstart Draft</button>
           </div>
         </div>
 
-        {!props.isPaused ? null : (
+        {props.isPaused ? (
           <h2>Paused!</h2>
+        ) : (
+          <h2>Not Paused</h2>
         )}
         <div className='panel'>
           <div className='panel-body'>
-            <button className='btn' onClick={this._onPause}>Pause</button>
+            <button
+              type='button'
+              className='btn btn-default'
+              onClick={this._onPause}
+            >Pause</button>
             <span> </span>
-            <button className='btn' onClick={this._onUnpause}>Unpause</button>
+            <button
+              type='button'
+              className='btn btn-default'
+              onClick={this._onUnpause}
+            >Unpause</button>
           </div>
         </div>
 
+        <h2>Auto picks</h2>
+        <div className='panel'>
+          <div className='panel-body'>
+            <ul className='list-unstyled'>
+              {_.map(props.players, function (player) {
+                const checked = !!props.autoPickPlayers[player._id];
+                return (
+                  <li key={player._id}>
+                    <div className='checkbox'>
+                      <label>
+                        <input
+                          type='checkbox'
+                          checked={checked}
+                          onChange={toggleAutoPick.bind(null, player._id, !checked)}
+                        /> {player.name}
+                      </label>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </div>
 
-        {!props.allowClock ? null : (
-          <h2>Allowing clock!</h2>
+        {props.allowClock ? (
+          <h2>Allowing clock</h2>
+        ) : (
+          <h2>Not allowing clock!</h2>
         )}
         <div className='panel'>
           <div className='panel-body'>
-            <button className='btn' onClick={this._onAllowClock}>Allow clock</button>
+            <button
+              type='button'
+              className='btn btn-default'
+              onClick={this._onAllowClock}
+            >Allow clock</button>
             <span> </span>
-            <button className='btn' onClick={this._onStopClock}>Pause clock</button>
-          </div>
-        </div>
-
-        <div className='panel'>
-          <div className='panel-body'>
-            <button className='btn' onClick={this._onPickBestWGR}>
-              Pick best WGR
-            </button>
+            <button
+              type='button'
+              className='btn btn-default'
+              onClick={this._onStopClock}
+            >Pause clock</button>
           </div>
         </div>
 
@@ -163,7 +215,8 @@ const AdminApp = React.createClass({
           <div className='panel-body'>
             {confirmingUndo ? null : (
               <button
-                className='btn'
+                className='btn btn-default'
+                  type='button'
                 onClick={this._undoLastPick}
               >Undo Pick</button>
             )}
@@ -171,12 +224,14 @@ const AdminApp = React.createClass({
               <span>
                 <label>Are you sure you want to undo the last pick?</label>
                 <button
-                  className='btn'
+                  className='btn btn-default'
+                  type='button'
                   onClick={this._confirmUndoLastPick}
                 >I'm sure</button>
                 <span> </span>
                 <button
-                  className='btn'
+                  className='btn btn-default'
+                  type='button'
                   onClick={this._cancelUndoLastPick}
                 >Cancel</button>
               </span>
@@ -186,7 +241,7 @@ const AdminApp = React.createClass({
 
         <div className='panel'>
           <div className='panel-body'>
-            <button className='btn' onClick={this._forceRefresh}>Force Refresh</button>
+            <button className='btn btn-default' onClick={this._forceRefresh}>Force Refresh</button>
           </div>
         </div>
 
@@ -244,15 +299,6 @@ const AdminApp = React.createClass({
       url: '/admin/forceRefresh',
       type: 'PUT'
     });
-  },
-
-  _onPickBestWGR: function () {
-    const nextBestGolfer = _.chain(this.props.golfersRemaining)
-      .sortBy('wgr')
-      .first()
-      .value()
-      .id;
-    DraftActions.makePick(nextBestGolfer);
   }
 
 });

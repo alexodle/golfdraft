@@ -43,6 +43,15 @@ const utils = {
     } else {
       return 'thru ' + thru;
     }
+  },
+
+  oidsAreEqual: function (a, b) {
+    // We may have ObjectId OR String values, so ensure to convert both toString before comparing
+    return a.toString() === b.toString();
+  },
+
+  containsObjectId: function (oidList, targetOid) {
+    return _.any(oidList, _.partial(utils.oidsAreEqual, targetOid));
   }
 
 };

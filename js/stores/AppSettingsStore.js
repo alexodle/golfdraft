@@ -28,7 +28,7 @@ const AppSettingsStore =  _.extend({}, Store.prototype, {
     return valueOr('draftHasStarted', false);
   },
 
-  getAutoPicks: function () {
+  getAutoPickPlayers: function () {
     return valueOr('autoPickPlayers', {});
   }
 

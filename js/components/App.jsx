@@ -11,6 +11,7 @@ const React = require("react");
 const ScoreStore = require('../stores/ScoreStore');
 const TourneyApp = require("./TourneyApp.jsx");
 const TourneyStore = require("../stores/TourneyStore");
+const PlayerStore = require("../stores/PlayerStore");
 const UserStore = require("../stores/UserStore");
 const GolferStore = require("../stores/GolferStore");
 const WhoIsYou = require("./WhoIsYou.jsx");
@@ -29,6 +30,7 @@ function getAppState() {
     currentUser: UserStore.getCurrentUser(),
     activeUsers: UserStore.getActive(),
     golfers: GolferStore.getAll(),
+    players: PlayerStore.getAll(),
 
     draft: {
       isMyDraftPick: DraftStore.getIsMyDraftPick(),
@@ -47,7 +49,8 @@ function getAppState() {
     isAdmin: UserStore.isAdmin(),
     isPaused: AppSettingsStore.getIsPaused(),
     allowClock: AppSettingsStore.getAllowClock(),
-    draftHasStarted: AppSettingsStore.getDraftHasStarted()
+    draftHasStarted: AppSettingsStore.getDraftHasStarted(),
+    autoPickPlayers: AppSettingsStore.getAutoPickPlayers()
   };
 }
 
@@ -150,6 +153,8 @@ const AdminWrapper = React.createClass({
           activeUsers={props.activeUsers}
           allowClock={props.allowClock}
           draftHasStarted={props.draftHasStarted}
+          players={props.players}
+          autoPickPlayers={props.autoPickPlayers}
         />
       </section>
     );

@@ -20,10 +20,13 @@ const redis = require("./redis");
 const session = require('express-session');
 const tourneyConfigReader = require('./tourneyConfigReader');
 const UserAccess = require('./userAccess');
+const utils = require('../common/utils');
 
 const RedisStore = require('connect-redis')(session);
 
 const MAX_AGE = 1000 * 60 * 60 * 24 * 365;
+const AUTO_PICK_INTERVAL_MILLIS = 1000;
+const AUTO_PICK_STARTUP_DELAY = 1000 * 5;
 
 const NOT_AN_ERROR = {};
 
@@ -264,74 +267,7 @@ db.once('open', function callback () {
     }
   });
 
-  function ensureNotPaused(req, res) {
-    return access.getAppState()
-    .then(function (appState) {
-      if (appState && appState.isDraftPaused) {
-        res.status(400).status('Admin has paused the app');
-        throw NOT_AN_ERROR;
-      }
-    });
-  }
-
-  function handlePick(req, res, pickPromise, pickListPick) {
-    const user = req.session.user;
-    let pick = null;
-
-    return pickPromise
-      .then(function (_pick) {
-        pick = _pick;
-        res.sendStatus(200);
-      })
-      .catch(function (err) {
-        if (err === NOT_AN_ERROR) throw err;
-
-        if (err.message.indexOf('invalid pick') !== -1) {
-          res.status(400).send(err.message);
-        }
-        throw err;
-      })
-
-      // Alert clients
-      .then(access.getDraft)
-      .then(function (draft) {
-        updateClients(draft);
-        if (pickListPick) {
-          return chatBot.broadcastProxyPickListPickMessage(user, pick, draft);
-        } else {
-          return chatBot.broadcastPickMessage(user, pick, draft);
-        }
-      })
-      .catch(function (err) {
-        if (err === NOT_AN_ERROR) throw err;
-        console.log(err);
-      });
-  }
-
-  function onAppStateUpdate(req, res, promise) {
-    return promise
-      .catch(function (err) {
-        console.log(err);
-        res.status(500).send(err);
-        throw NOT_AN_ERROR; // skip next steps
-      })
-      .then(function () {
-        res.sendStatus(200);
-
-        return access.getAppState();
-      })
-      .then(function (appState) {
-        io.sockets.emit('change:appstate', {
-          data: { appState: appState }
-        });
-      })
-      .catch(function (err) {
-        if (err === NOT_AN_ERROR) return;
-        console.log(err);
-      })
-  }
-
-  app.post('/draft/autoPick', function (req, res) {
+  app.put('/draft/autoPick', function (req, res) {
     const body = req.body;
     const user = req.session.user;
 
@@ -341,7 +277,7 @@ db.once('open', function callback () {
     }
 
     const autoPick = !!body.autoPick;
-    return onAppStateUpdate(req, res, access.updateAutoPick(user, autoPick));
+    return onAppStateUpdate(req, res, access.updateAutoPick(user.id, autoPick));
   });
 
   app.post('/draft/picks', function (req, res) {
@@ -359,12 +295,16 @@ db.once('open', function callback () {
       golfer: body.golfer
     };
 
-    const pickPromise = ensureNotPaused(req, res)
-      .then(function () {
+    return handlePick({
+      req,
+      res,
+      makePick: function () {
         return access.makePick(pick);
-      });
-
-    handlePick(req, res, pickPromise, false /* pickListPick */);
+      },
+      broadcastPickMessage: function (spec) {
+        return chatBot.broadcastPickMessage(user, spec.pick, spec.draft);
+      }
+    });
   });
 
   app.post('/draft/pickHighestPriGolfer', function (req, res) {
@@ -376,12 +316,17 @@ db.once('open', function callback () {
       return;
     }
 
-    const pickPromise = ensureNotPaused(req, res)
-    .then(function () {
-      return access.makeHighestPriorityPick(body.player, body.pickNumber);
+    const {player, pickNumber} = body;
+    return handlePick({
+      req,
+      res,
+      makePick: function () {
+        return access.makeHighestPriorityPick(player, pickNumber);
+      },
+      broadcastPickMessage: function (spec) {
+        return chatBot.broadcastProxyPickListPickMessage(user, spec.pick, spec.draft);
+      }
     });
-    
-    handlePick(req, res, pickPromise, true /* pickListPick */);
   });
 
   // ADMIN FUNCTIONALITY
@@ -400,6 +345,17 @@ db.once('open', function callback () {
       }
       res.sendStatus(200);
     });
+  });
+
+  app.put('/admin/autoPickPlayers', function (req, res) {
+    if (!req.session.isAdmin) {
+      res.status(401).send('Only can admin can pause the draft');
+      return;
+    }
+
+    const playerId = req.body.playerId;
+    const autoPick = !!req.body.autoPick;
+    return onAppStateUpdate(req, res, access.updateAutoPick(playerId, autoPick));
   });
 
   app.put('/admin/pause', function (req, res) {
@@ -470,16 +426,157 @@ db.once('open', function callback () {
     res.sendStatus(200);
   });
 
-  function updateClients(draft) {
-    io.sockets.emit('change:draft', {
-      data: draft,
-      evType: 'change:draft',
-      action: 'draft:pick'
-    });
-  }
-
   require('./expressServer').listen(port);
   redisPubSubClient.subscribe("scores:update");
 
+  // Give some time to settle, and then start ensuring we run auto picks
+  setTimeout(ensureNextAutoPick, AUTO_PICK_STARTUP_DELAY);
+
   console.log('I am fully running now!');
 });
+
+// HELPERS
+
+function isDraftOver(draft) {
+  const nextPickNumber = draft.picks.length;
+  const nextPick = draft.pickOrder[nextPickNumber];
+  return !nextPick;
+}
+
+function ensureNextAutoPick() {
+  setTimeout(function () {
+    console.info('ensureNextAutoPick: running');
+    return ensureDraftIsRunning()
+      .then(function (spec) {
+        const {appState, draft} = spec;
+        const {autoPickPlayers} = appState;
+        const nextPickNumber = draft.picks.length;
+        const nextPick = draft.pickOrder[nextPickNumber];
+        const nextPickPlayer = nextPick.player;
+
+        if (utils.containsObjectId(autoPickPlayers, nextPickPlayer)) {
+          console.info('ensureNextAutoPick: making next pick!');
+          autoPick(nextPickPlayer, nextPickNumber);
+        } else {
+          console.info('ensureNextAutoPick: not auto-picking; player not in auto-pick list. ' +
+            'player: ' + nextPickPlayer + ', autoPickPlayers: ' + autoPickPlayers);
+        }
+      })
+      .catch(function (err) {
+        if (err === NOT_AN_ERROR) {
+          console.info('ensureNextAutoPick: not auto-picking; draft is not running.');
+          throw err;
+        }
+        console.log(err);
+      });
+  }, AUTO_PICK_INTERVAL_MILLIS);
+}
+
+function autoPick(playerId, pickNumber) {
+  console.info('autoPick: Auto-picking for ' + playerId + ', ' + pickNumber);
+  let isPickListPick = null;
+  return handlePick({
+    makePick: function () {
+      return access.makeHighestPriorityPick(playerId, pickNumber)
+        .then(function (result) {
+          isPickListPick = result.isPickListPick;
+          return result;
+        });
+    },
+    broadcastPickMessage: function (spec) {
+      return chatBot.broadcastAutoPickMessage(spec.pick, spec.draft, isPickListPick);
+    }
+  });
+}
+
+function ensureDraftIsRunning(req, res) {
+  return Promise.all([
+      access.getAppState(),
+      access.getDraft()
+    ])
+    .then(function (results) {
+      const [appState, draft] = results;
+      if (isDraftOver(draft) || appState.isDraftPaused || !appState.draftHasStarted) {
+        if (res) {
+          res.status(400).status('Draft is not active');
+        }
+        throw NOT_AN_ERROR;
+      }
+
+      return { appState, draft };
+    });
+}
+
+function handlePick(spec) {
+  const {res, makePick, broadcastPickMessage} = spec;
+  let pick = null;
+
+  return ensureDraftIsRunning()
+    .then(makePick)
+    .catch(function (err) {
+      if (err === NOT_AN_ERROR) throw err;
+
+      if (res) {
+        if (err.message.indexOf('invalid pick') !== -1) {
+          res.status(400).send(err);
+        } else {
+          res.status(500).send(err);
+        }
+      }
+
+      throw err;
+    })
+    .then(function (_pick) {
+      ensureNextAutoPick();
+
+      pick = _pick;
+
+      if (res) {
+        res.sendStatus(200);
+      }
+      return access.getDraft();
+    })
+    .then(function (draft) {
+      updateClients(draft);
+      return broadcastPickMessage({ pick, draft });
+    })
+    .catch(function (err) {
+      if (err === NOT_AN_ERROR) throw err;
+      console.log(err);
+    });
+}
+
+function onAppStateUpdate(req, res, promise) {
+  return promise
+    .catch(function (err) {
+      console.log(err);
+      res.status(500).send(err);
+      throw NOT_AN_ERROR; // skip next steps
+    })
+    .then(function () {
+      res.sendStatus(200);
+
+      // App state will affect whether or not we should be running auto picks
+      // SET AND FORGET
+      ensureNextAutoPick();
+
+      return access.getAppState();
+    })
+    .then(function (appState) {
+      io.sockets.emit('change:appstate', {
+        data: { appState: appState }
+      });
+    })
+    .catch(function (err) {
+      if (err === NOT_AN_ERROR) throw err;
+      console.log(err);
+    });
+}
+
+function updateClients(draft) {
+  io.sockets.emit('change:draft', {
+    data: draft,
+    evType: 'change:draft',
+    action: 'draft:pick'
+  });
+}

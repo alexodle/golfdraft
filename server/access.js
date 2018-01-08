@@ -105,12 +105,15 @@ _.extend(access, {
       });
   }),
 
-  updateAutoPick: promiseize(function (playerId, autoPick) {
+  updateAutoPick: promiseizeFn(function (playerId, autoPick) {
     const query = FK_TOURNEY_ID_QUERY;
 
     let update = null;
     if (!!autoPick) {
-      update = models.AppState.update(query, { $addToSet: { autoPickPlayers: playerId } });
+      update = models.AppState.update(
+        query,
+        { $addToSet: { autoPickPlayers: playerId } },
+        { upsert: true });
     } else {
       update = models.AppState.update(
         query,
@@ -239,6 +242,7 @@ _.extend(access, {
         .value();
 
       // If no golfer from the priority list is available, use wgr
+      let isPickListPick = !!golferToPick;
       golferToPick = golferToPick || _.chain(golfers)
         .sortBy(['wgr', 'name'])
         .pluck('_id')
@@ -250,10 +254,13 @@ _.extend(access, {
         .value();
 
       return access.makePick({
-        pickNumber: pickNumber,
-        player: playerId,
-        golfer: golferToPick
-      });
+          pickNumber: pickNumber,
+          player: playerId,
+          golfer: golferToPick
+        })
+        .then(function (resp) {
+          return _.extend({ isPickListPick }, resp);
+        });
     });
   },
 
