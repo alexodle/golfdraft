@@ -372,26 +372,16 @@ db.once('open', function callback () {
       return;
     }
 
-    let removedDraftPick = null;
-    return access.undoLastPick()
-      .then(function (draftPick) {
-        removedDraftPick = draftPick;
-        res.sendStatus(200);
-      })
-      .catch(function (err) {
-        res.status(500).send(err);
-        throw err;
-      })
-
-      // Alert clients
-      .then(access.getDraft)
-      .then(function (draft) {
-        updateClients(draft);
-        return chatBot.broadcastUndoPickMessage(removedDraftPick, draft);
-      })
-      .catch(function (err) {
-        console.log(err);
-      });
+    return handlePick({
+      req,
+      res,
+      makePick: function () {
+        return access.undoLastPick();
+      },
+      broadcastPickMessage: function (spec) {
+        return chatBot.broadcastUndoPickMessage(spec.pick, spec.draft);
+      }
+    });
   });
 
   app.put('/admin/forceRefresh', function (req, res) {
