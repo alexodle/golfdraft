@@ -25,7 +25,7 @@ const utils = require('../common/utils');
 const RedisStore = require('connect-redis')(session);
 
 const MAX_AGE = 1000 * 60 * 60 * 24 * 365;
-const AUTO_PICK_INTERVAL_MILLIS = 1000;
+const ENSURE_AUTO_PICK_DELAY_MILLIS = 500;
 const AUTO_PICK_STARTUP_DELAY = 1000 * 5;
 
 const NOT_AN_ERROR = {};
@@ -439,7 +439,7 @@ function ensureNextAutoPick() {
         }
         console.log(err);
       });
-  }, AUTO_PICK_INTERVAL_MILLIS);
+  }, ENSURE_AUTO_PICK_DELAY_MILLIS);
 }
 
 function autoPick(playerId, pickNumber) {
@@ -498,10 +498,7 @@ function handlePick(spec) {
       throw err;
     })
     .then(function (_pick) {
-      ensureNextAutoPick();
-
       pick = _pick;
-
       if (res) {
         res.sendStatus(200);
       }
@@ -511,6 +508,7 @@ function handlePick(spec) {
       updateClients(draft);
       return broadcastPickMessage({ pick, draft });
     })
+    .then(ensureNextAutoPick)
     .catch(function (err) {
       if (err === NOT_AN_ERROR) throw err;
       console.log(err);
