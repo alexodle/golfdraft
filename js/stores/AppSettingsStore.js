@@ -17,7 +17,7 @@ const AppSettingsStore =  _.extend({}, Store.prototype, {
   changeEvent: 'AppSettingsStore:change',
 
   getIsPaused: function () {
-    return valueOr('isPaused', false);
+    return valueOr('isDraftPaused', false);
   },
 
   getAllowClock: function () {
