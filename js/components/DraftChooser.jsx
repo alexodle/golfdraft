@@ -14,8 +14,8 @@ function isProxyPick(props) {
   return props.currentUser.player !== props.currentPick.player;
 }
 
-function shouldShowPriorityOption(props) {
-  return isProxyPick(props) || !_.isEmpty(props.syncedPriority);
+function shouldShowPickListOption(props) {
+  return isProxyPick(props) || !_.isEmpty(props.syncedPickList);
 }
 
 const DraftChooser = React.createClass({
@@ -39,7 +39,7 @@ const DraftChooser = React.createClass({
     const sortKey = this.state.sortKey;
     const isProxyPick = this._isProxyPick();
     const sortedGolfers = this._sortedGolfers(golfersRemaining, sortKey);
-    const showPriorityOption = shouldShowPriorityOption(this.props);
+    const showPickListOption = shouldShowPickListOption(this.props);
 
     let header = null;
     if (!isProxyPick) {
@@ -64,14 +64,14 @@ const DraftChooser = React.createClass({
 
         <div className="btn-group" role="group" aria-label="Sorting choices">
           <label>Sort players by:</label><br />
-          {!showPriorityOption ? null : (
+          {!showPickListOption ? null : (
             <button
               type="button"
               className={cx({
                 "btn btn-default": true,
-                "active": sortKey === 'priority'
+                "active": sortKey === 'pickList'
               })}
-              onClick={_.partial(this._setSortKey, 'priority')}
+              onClick={_.partial(this._setSortKey, 'pickList')}
             >User Pick List</button>
           )}
           <button
@@ -93,12 +93,12 @@ const DraftChooser = React.createClass({
         </div>
 
         <form role="form">
-        {isProxyPick && sortKey === 'priority' ? (
+        {isProxyPick && sortKey === 'pickList' ? (
           <div style={{marginTop: "1em"}}>
             <small>* If no pick list is set, uses next WGR</small><br />
             <button
               className="btn btn-default btn-primary"
-              onClick={this._onProxyPriorityPick}
+              onClick={this._onProxyPickListPick}
             >Select next player on pick list</button>
           </div>
         ) : (
@@ -143,7 +143,7 @@ const DraftChooser = React.createClass({
   },
 
   _isLoading: function () {
-    return this.props.syncedPriority === AppConstants.PROPERTY_LOADING;
+    return this.props.syncedPickList === AppConstants.PROPERTY_LOADING;
   },
 
   _isProxyPick: function () {
@@ -152,12 +152,12 @@ const DraftChooser = React.createClass({
 
   _sortedGolfers: function (golfers, sortKey) {
     const isProxyPick = this._isProxyPick();
-    if (sortKey === 'priority') {
+    if (sortKey === 'pickList') {
       if (isProxyPick) {
         // special case, we cannot show the full list if this a proxy pick
         return null;
       } else {
-        return _.chain(this.props.syncedPriority)
+        return _.chain(this.props.syncedPickList)
           .map(GolferStore.getGolfer)
           .value();
       }
@@ -172,8 +172,8 @@ const DraftChooser = React.createClass({
     let sortKey = state.sortKey;
     let selectedGolfer = state.selectedGolfer;
 
-    if (!sortKey || sortKey === 'priority') {
-      sortKey = shouldShowPriorityOption(props) ? 'priority' : 'wgr';
+    if (!sortKey || sortKey === 'pickList') {
+      sortKey = shouldShowPickListOption(props) ? 'pickList' : 'wgr';
     }
 
     if (!selectedGolfer || !golfersRemaining[selectedGolfer]) {
@@ -202,7 +202,7 @@ const DraftChooser = React.createClass({
     });
   },
 
-  _onProxyPriorityPick: function (ev) {
+  _onProxyPickListPick: function (ev) {
     ev.preventDefault();
     DraftActions.makePickListPick();
   },

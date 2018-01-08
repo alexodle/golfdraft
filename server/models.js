@@ -36,12 +36,12 @@ const draftPickSchema = mongoose.Schema({
 draftPickSchema.index({ tourneyId: 1, pickNumber: 1 });
 draftPickSchema.index({ tourneyId: 1, golfer: 1 });
 
-const draftPrioritySchema = mongoose.Schema({
+const draftPickListSchema = mongoose.Schema({
   tourneyId: SchemaTypes.ObjectId,
   userId: SchemaTypes.ObjectId,
-  golferPriority: [SchemaTypes.ObjectId] 
+  golferPickList: [SchemaTypes.ObjectId] 
 });
-draftPrioritySchema.index({ tourneyId: 1, player: 1 });
+draftPickListSchema.index({ tourneyId: 1, player: 1 });
 
 const golferScoreSchema = mongoose.Schema({
   tourneyId: SchemaTypes.ObjectId,
@@ -73,7 +73,7 @@ const WGR = mongoose.model('WGR', wgrSchema);
 const Player = mongoose.model('Player', playerSchema);
 const DraftPickOrder = mongoose.model('DraftPickOrder', draftPickOrderSchema);
 const DraftPick = mongoose.model('DraftPick', draftPickSchema);
-const DraftPriority = mongoose.model('DraftPriority', draftPrioritySchema);
+const DraftPickList = mongoose.model('DraftPickList', draftPickListSchema);
 const GolferScore = mongoose.model('GolferScore', golferScoreSchema);
 const GolferScoreOverrides = mongoose.model(
   'GolferScoreOverrides',
@@ -88,7 +88,7 @@ module.exports = {
   WGR: WGR,
   DraftPickOrder: DraftPickOrder,
   DraftPick: DraftPick,
-  DraftPriority: DraftPriority,
+  DraftPickList: DraftPickList,
   GolferScore: GolferScore,
   GolferScoreOverrides: GolferScoreOverrides,
   Tourney: Tourney,

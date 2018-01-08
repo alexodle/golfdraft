@@ -24,15 +24,15 @@ function expectSuccess(err) {
   ('Should not be here. Expected success, got error: ' + err.message).should.not.be.ok();
 }
 
-function assertPriorityResult(playerId, expected, promise) {
+function assertPickListResult(playerId, expected, promise) {
   return promise.then(function (result) {
     result.completed.should.be.true();
-    result.priority.should.eql(expected);
+    result.pickList.should.eql(expected);
 
-    return access.getPriority(playerId);
+    return access.getPickList(playerId);
   })
-  .then(function (actualPriority) {
-    _.invoke(actualPriority, 'toString').should.eql(expected);
+  .then(function (actualPickList) {
+    _.invoke(actualPickList, 'toString').should.eql(expected);
   }, expectSuccess);
 }
 
@@ -42,38 +42,38 @@ describe('access', function () {
     return initTestConfig.initDb();
   });
 
-  describe('getPriority', function () {
-    it('returns null for unset priority', function () {
-      return access.getPriority('player1')
-      .then(function (actualPriority) {
-        should(actualPriority).be.a.null();
+  describe('getPickList', function () {
+    it('returns null for unset pickList', function () {
+      return access.getPickList(new ObjectId('5a4d46c9b1a9473036f6a81a').toString())
+      .then(function (actualPickList) {
+        should(actualPickList).be.a.null();
       }, expectSuccess);
     });
   });
 
-  describe('updatePriority', function () {
+  describe('updatePickList', function () {
 
     afterEach(function () {
       return access.clearPriorities();
     });
 
-    it('updates priority for player', function () {
-      const playerId = 'player1';
+    it('updates pickList for player', function () {
+      const playerId = new ObjectId('5a4d46c9b1a9473036f6a81a').toString();
       const expected = [
         new ObjectId('5a4d46c9b1a9473036f6a81b').toString(),
         new ObjectId('5a4d46c9b1a9473036f6a81c').toString(),
         new ObjectId('5a4d46c9b1a9473036f6a81d').toString()
       ];
-      return assertPriorityResult(
+      return assertPickListResult(
         playerId,
         expected,
-        access.updatePriority(playerId, expected)
+        access.updatePickList(playerId, expected)
       );
     });
 
   });
 
-  describe('updatePriorityFromNames', function () {
+  describe('updatePickListFromNames', function () {
     let golfers = null;
 
     beforeEach(function () {
@@ -97,8 +97,8 @@ describe('access', function () {
       ]);
     });
 
-    it('updates priority for player by name', function () {
-      const playerId = 'player1';
+    it('updates pickList for player by name', function () {
+      const playerId = new ObjectId('5a4d46c9b1a9473036f6a81a').toString();
       const names = [
         'Bobby Jones',
         'gary player',
@@ -111,22 +111,22 @@ describe('access', function () {
         golfers['Tiger Woods']._id.toString(),
         golfers['Jack Nicklaus']._id.toString(),
       ];
-      return assertPriorityResult(
+      return assertPickListResult(
         playerId,
         expected,
-        access.updatePriorityFromNames(playerId, names)
+        access.updatePickListFromNames(playerId, names)
       );
     });
 
     it('provides suggestions when mismatches found', function () {
-      const playerId = 'player1';
+      const playerId = new ObjectId('5a4d46c9b1a9473036f6a81a').toString();
       const names = [
         'Tiger Woods',
         'Bobby Jones',
         'Gary Player',
         'JaCk niCklauss' // extra "s" on the end
       ];
-      return access.updatePriorityFromNames(playerId, names)
+      return access.updatePickListFromNames(playerId, names)
       .then(function (result) {
         result.completed.should.be.false();
         result.suggestions.should.containDeepOrdered([
@@ -138,10 +138,10 @@ describe('access', function () {
           ]}
         ]);
 
-        return access.getPriority(playerId);
+        return access.getPickList(playerId);
       })
-      .then(function (actualPriority) {
-        should(actualPriority).be.a.null();
+      .then(function (actualPickList) {
+        should(actualPickList).be.a.null();
       }, expectSuccess);
     });
 
@@ -191,7 +191,7 @@ describe('access', function () {
       ]);
     });
 
-    it('uses wgr when priority not available', function () {
+    it('uses wgr when pickList not available', function () {
       const newPick = {
         player: players['Player1']._id,
         golfer: golfers['Golfer2']._id,
@@ -204,13 +204,13 @@ describe('access', function () {
         }, expectSuccess);
     });
 
-    it('uses priority list to pick next golfer', function () {
+    it('uses pickList list to pick next golfer', function () {
       const newPick = {
         player: players['Player1']._id,
         golfer: golfers['Golfer1']._id,
         pickNumber: 0
       };
-      return access.updatePriority(players['Player1']._id.toString(), [
+      return access.updatePickList(players['Player1']._id.toString(), [
           golfers['Golfer1']._id.toString(),
           golfers['Golfer2']._id.toString()
         ])

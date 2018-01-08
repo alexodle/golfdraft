@@ -64,8 +64,8 @@ const DraftApp = React.createClass({
               <PickListEditor
                 preDraftMode
                 golfersRemaining={this.props.golfersRemaining}
-                syncedPriority={this.props.syncedPriority}
-                pendingPriority={this.props.pendingPriority}
+                syncedPickList={this.props.syncedPickList}
+                pendingPickList={this.props.pendingPickList}
                 height='30em'
               />
             </GolfDraftPanel>
@@ -151,7 +151,7 @@ const DraftApp = React.createClass({
                   currentUser={this.props.currentUser}
                   golfersRemaining={this.props.golfersRemaining}
                   currentPick={this.props.currentPick}
-                  syncedPriority={this.props.syncedPriority}
+                  syncedPickList={this.props.syncedPickList}
                 />
               )}
             </div>
@@ -170,7 +170,7 @@ const DraftApp = React.createClass({
 
           <div className='col-md-4'>
             <GolfDraftPanel heading='Draft Order'>
-              <a name='InlineDraftPriorityEditor' />
+              <a name='InlineDraftPickListEditor' />
               <DraftPickOrder
                 currentUser={this.props.currentUser}
                 currentPick={this.props.currentPick}
@@ -184,8 +184,8 @@ const DraftApp = React.createClass({
             <GolfDraftPanel heading={this._renderPickListHeader()}>
               <PickListEditor
                 golfersRemaining={this.props.golfersRemaining}
-                syncedPriority={this.props.syncedPriority}
-                pendingPriority={this.props.pendingPriority}
+                syncedPickList={this.props.syncedPickList}
+                pendingPickList={this.props.pendingPickList}
                 height='29em'
               />
             </GolfDraftPanel>

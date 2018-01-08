@@ -80,27 +80,27 @@ _.extend(access, {
     return models.Tourney.findOne(TOURNEY_ID_QUERY).exec();
   }),
 
-  getPriority: function (playerId) {
+  getPickList: function (playerId) {
     const query = _.extend({ userId: playerId }, FK_TOURNEY_ID_QUERY);
-    return promiseize(models.DraftPriority.findOne(query).exec())
-    .then(function (priority) {
-      return priority ? priority.golferPriority : null;
+    return promiseize(models.DraftPickList.findOne(query).exec())
+    .then(function (pickList) {
+      return pickList ? pickList.golferPickList : null;
     });
   },
 
-  updatePriority: promiseizeFn(function (playerId, priority) {
-    priority = _.uniq(priority);
+  updatePickList: promiseizeFn(function (playerId, pickList) {
+    pickList = _.uniq(pickList);
     const query = _.extend({ userId: playerId }, FK_TOURNEY_ID_QUERY);
-    return models.DraftPriority
+    return models.DraftPickList
       .update(
         query,
-        { $set: { golferPriority: priority } },
+        { $set: { golferPickList: pickList } },
         { upsert: true }
       ).exec()
       .then(function () {
         return {
           completed: true,
-          priority: priority
+          pickList: pickList
         };
       });
   }),
@@ -124,7 +124,7 @@ _.extend(access, {
     return update.exec();
   }),
 
-  updatePriorityFromNames: function (playerId, priorityNames) {
+  updatePickListFromNames: function (playerId, pickListNames) {
     return access.getGolfers()
     .then(function (golfers) {
       const golfersByLcName = _.indexBy(golfers, function (g) {
@@ -132,7 +132,7 @@ _.extend(access, {
       });
 
       const notFoundGolferNames = [];
-      const priority = _.map(priorityNames, function (n) {
+      const pickList = _.map(pickListNames, function (n) {
         const g = golfersByLcName[n.toLowerCase()];
         if (!g) {
           notFoundGolferNames.push(n);
@@ -143,7 +143,7 @@ _.extend(access, {
 
       if (_.isEmpty(notFoundGolferNames)) {
         // SUCCESS! Found all golfers by name, so go ahead and save them.
-        return access.updatePriority(playerId, priority);
+        return access.updatePickList(playerId, pickList);
       }
 
       // Did not find at at least one golfer by name. Calculate closest matches and provide those
@@ -219,12 +219,12 @@ _.extend(access, {
 
   makePickListPick: function (playerId, pickNumber) {
     return Promise.all([
-      access.getPriority(playerId),
+      access.getPickList(playerId),
       access.getGolfers(),
       access.getPicks()
     ])
     .then(function (results) {
-      const priority = results[0] || [];
+      const pickList = results[0] || [];
       const golfers = results[1];
       const picks = results[2];
 
@@ -233,7 +233,7 @@ _.extend(access, {
         .indexBy()
         .value();
 
-      let golferToPick = _.chain(priority)
+      let golferToPick = _.chain(pickList)
         .invoke('toString')
         .filter(function (gid) {
           return !pickedGolfers[gid];
@@ -241,7 +241,7 @@ _.extend(access, {
         .first()
         .value();
 
-      // If no golfer from the priority list is available, use wgr
+      // If no golfer from the pickList list is available, use wgr
       let isPickListPick = !!golferToPick;
       golferToPick = golferToPick || _.chain(golfers)
         .sortBy(['wgr', 'name'])
@@ -408,7 +408,7 @@ _.extend(access, {
     models.GolferScoreOverrides
   ),
 
-  clearPriorities: createBasicClearer(models.DraftPriority),
+  clearPriorities: createBasicClearer(models.DraftPickList),
 
   clearChatMessages: createBasicClearer(chatModels.Message),
 

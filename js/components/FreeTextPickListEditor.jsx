@@ -254,11 +254,11 @@ const FreeTextPickListEditor = React.createClass({
   _onSave: function () {
     this.setState({ isPosting: true });
 
-    const data = { priorityNames: this._cleanedGolfers() };
-    $.put('/draft/priority', data)
+    const data = { pickListNames: this._cleanedGolfers() };
+    $.put('/draft/pickList', data)
 
     .done(function (result) {
-      DraftActions.setPriority(result.priority);
+      DraftActions.setPickList(result.pickList);
       this.props.onComplete();
     }.bind(this))
 
@@ -268,7 +268,7 @@ const FreeTextPickListEditor = React.createClass({
       } else {
         this.setState({
           isPosting: false,
-          errorMessage: 'Failed to save priority. Try again in a minute. If that doesn&#39;t work, contact Odle.'
+          errorMessage: 'Failed to save pickList. Try again in a minute. If that doesn&#39;t work, contact Odle.'
         });
       }
       window.location.href = '#InlinePickListEditor';

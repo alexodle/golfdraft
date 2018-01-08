@@ -211,19 +211,19 @@ db.once('open', function callback () {
     });
   });
 
-  app.get('/draft/priority', function (req, res) {
+  app.get('/draft/pickList', function (req, res) {
     const user = req.session.user;
 
     if (!user || !user.id) {
-      res.status(401).send('Must be logged in to get draft priority');
+      res.status(401).send('Must be logged in to get draft pickList');
       return;
     }
 
-    access.getPriority(user.id)
-    .then(function (priority) {
+    access.getPickList(user.id)
+    .then(function (pickList) {
       res.status(200).send({
         playerId: user.id,
-        priority: priority
+        pickList: pickList
       });
     })
     .catch(function (err) {
@@ -232,19 +232,19 @@ db.once('open', function callback () {
     });
   });
 
-  app.put('/draft/priority', function (req, res) {
+  app.put('/draft/pickList', function (req, res) {
     const body = req.body;
     const user = req.session.user;
 
     if (!user || !user.id) {
-      res.status(401).send('Must be logged in to set draft priority');
+      res.status(401).send('Must be logged in to set draft pickList');
       return;
     }
 
-    if (body.priority) {
-      access.updatePriority(user.id, body.priority)
+    if (body.pickList) {
+      access.updatePickList(user.id, body.pickList)
       .then(function () {
-        res.status(200).send({ playerId: user.id, priority: body.priority });
+        res.status(200).send({ playerId: user.id, pickList: body.pickList });
       })
       .catch(function (err) {
         console.log(err);
@@ -252,10 +252,10 @@ db.once('open', function callback () {
       });
       
     } else {
-      access.updatePriorityFromNames(user.id, body.priorityNames)
+      access.updatePickListFromNames(user.id, body.pickListNames)
       .then(function (result) {
         if (result.completed) {
-          res.status(200).send({ playerId: user.id, priority: result.priority });
+          res.status(200).send({ playerId: user.id, pickList: result.pickList });
         } else {
           res.status(300).send({ playerId: user.id, suggestions: result.suggestions });
         }

@@ -12,13 +12,13 @@ let _picks = [];
 let _pickOrder = [];
 let _pickForPlayers = [];
 
-let _priority = null;
-let _pendingPriority = null;
-resetPriority();
+let _pickList = null;
+let _pendingPickList = null;
+resetPickList();
 
-function resetPriority() {
-  _priority = AppConstants.PROPERTY_LOADING;
-  _pendingPriority = _priority;
+function resetPickList() {
+  _pickList = AppConstants.PROPERTY_LOADING;
+  _pendingPickList = _pickList;
 }
 
 function getCurrentPickNumber() {
@@ -49,12 +49,12 @@ function addPick(golfer) {
 
 function filterPicksFromPriorities() {
   const pickedGids = _.pluck(_picks, 'golfer');
-  if (_priority !== _pendingPriority) {
-    _priority = _.difference(_priority, pickedGids);
-    _pendingPriority = _.difference(_pendingPriority, pickedGids);
+  if (_pickList !== _pendingPickList) {
+    _pickList = _.difference(_pickList, pickedGids);
+    _pendingPickList = _.difference(_pendingPickList, pickedGids);
   } else {
-    _priority = _.difference(_priority, pickedGids);
-    _pendingPriority = _priority;
+    _pickList = _.difference(_pickList, pickedGids);
+    _pendingPickList = _pickList;
   }
 }
 
@@ -87,12 +87,12 @@ const DraftStore =  _.extend({}, Store.prototype, {
     return _pickForPlayers;
   },
 
-  getPriority: function () {
-    return _priority;
+  getPickList: function () {
+    return _pickList;
   },
 
-  getPendingPriority: function () {
-    return _pendingPriority;
+  getPendingPickList: function () {
+    return _pendingPickList;
   }
 
 });
@@ -150,7 +150,7 @@ AppDispatcher.register(function (payload) {
       break;
 
     case AppConstants.CURRENT_USER_CHANGE:
-      resetPriority();
+      resetPickList();
       DraftStore.emitChange();
       break;
 
@@ -158,11 +158,11 @@ AppDispatcher.register(function (payload) {
       const currentUser = UserStore.getCurrentUser();
       if (!!currentUser) {
         // TODO - Move to separate server sync
-        $.get('/draft/priority')
+        $.get('/draft/pickList')
         .done(function (data) {
           if (data.playerId === currentUser.id) {
-            _priority = data.priority;
-            _pendingPriority = _priority;
+            _pickList = data.pickList;
+            _pendingPickList = _pickList;
             filterPicksFromPriorities();
             DraftStore.emitChange();
           }
@@ -171,21 +171,21 @@ AppDispatcher.register(function (payload) {
       break;
 
     case DraftConstants.UPDATE_PENDING_PRIORITY:
-      _pendingPriority = action.pendingPriority;
+      _pendingPickList = action.pendingPickList;
       DraftStore.emitChange();
       break;
 
     case DraftConstants.RESET_PENDING_PRIORITY:
-      _pendingPriority = _priority;
+      _pendingPickList = _pickList;
       DraftStore.emitChange();
       break;
 
     case DraftConstants.SAVE_PRIORITY:
-      _priority = _pendingPriority;
+      _pickList = _pendingPickList;
 
       // TODO - Move to separate server sync
-      const data = { priority: _priority };
-      $.put('/draft/priority', data)
+      const data = { pickList: _pickList };
+      $.put('/draft/pickList', data)
       .fail(function () {
         window.location.reload();
       });
@@ -194,8 +194,8 @@ AppDispatcher.register(function (payload) {
       break;
 
     case DraftConstants.SET_PRIORITY:
-      _priority = action.priority;
-      _pendingPriority = _priority;
+      _pickList = action.pickList;
+      _pendingPickList = _pickList;
       
       DraftStore.emitChange();
       break;

@@ -19,7 +19,7 @@ const PickListEditor = React.createClass({
   },
 
   render: function () {
-    if (this.props.syncedPriority == AppConstants.PROPERTY_LOADING) {
+    if (this.props.syncedPickList == AppConstants.PROPERTY_LOADING) {
       return this._renderLoading();
     }
 
@@ -32,17 +32,17 @@ const PickListEditor = React.createClass({
       );
     }
 
-    let priority = this._getDisplayPriority();
+    let pickList = this._getDisplayPickList();
 
-    const hasPriorityList = !_.isEmpty(this.props.syncedPriority);
+    const hasPickListList = !_.isEmpty(this.props.syncedPickList);
     const draggingIndex = this.state.draggingIndex;
     const draggingHoverIndex = this.state.draggingHoverIndex;
-    const unsavedChanges = this.props.syncedPriority !== this.props.pendingPriority;
+    const unsavedChanges = this.props.syncedPickList !== this.props.pendingPickList;
     const preDraftMode = !!this.props.preDraftMode;
-    const draggingGolferId = _.isNumber(draggingIndex) ? priority[draggingIndex] : null;
+    const draggingGolferId = _.isNumber(draggingIndex) ? pickList[draggingIndex] : null;
 
     if (_.isNumber(draggingHoverIndex)) {
-      priority = this._newOrder(draggingIndex, draggingHoverIndex);
+      pickList = this._newOrder(draggingIndex, draggingHoverIndex);
     }
 
     return (
@@ -78,7 +78,7 @@ const PickListEditor = React.createClass({
             {!unsavedChanges ? null : (
               <p><small>* Unsaved changes</small></p>
             )}
-            {hasPriorityList ? null : (
+            {hasPickListList ? null : (
               <p><small><b>Note:</b> You have not set a pick list, so we default to WGR.</small></p>
             )}
           </div>
@@ -91,7 +91,7 @@ const PickListEditor = React.createClass({
             <table className="table table-condensed table-striped">
               <thead></thead>
               <tbody>
-                {_.map(priority, function (gid, i) {
+                {_.map(pickList, function (gid, i) {
                   const g = GolferStore.getGolfer(gid);
                   return (
                     <tr
@@ -115,7 +115,7 @@ const PickListEditor = React.createClass({
                         <span className="visible-xs">
                           {this._renderArrowLink("glyphicon-arrow-up", this._onUpOne.bind(this, i), i === 0)}
                           <span>&nbsp;</span>
-                          {this._renderArrowLink("glyphicon-arrow-down", this._onDownOne.bind(this, i), i + 1 === priority.length)}
+                          {this._renderArrowLink("glyphicon-arrow-down", this._onDownOne.bind(this, i), i + 1 === pickList.length)}
                           &nbsp;&nbsp;{i+1}.&nbsp;&nbsp;{GolferLogic.renderGolfer(g)}
                         </span>
 
@@ -147,18 +147,18 @@ const PickListEditor = React.createClass({
     return (<span>Loading...</span>);
   },
 
-  _getDisplayPriority: function () {
-    const pendingPriority = this.props.pendingPriority;
-    if (pendingPriority === AppConstants.PROPERTY_LOADING) return pendingPriority;
+  _getDisplayPickList: function () {
+    const pendingPickList = this.props.pendingPickList;
+    if (pendingPickList === AppConstants.PROPERTY_LOADING) return pendingPickList;
 
-    return !_.isEmpty(pendingPriority) ? pendingPriority : _.chain(this.props.golfersRemaining)
+    return !_.isEmpty(pendingPickList) ? pendingPickList : _.chain(this.props.golfersRemaining)
       .sortBy(['wgr', 'name'])
       .pluck('_id')
       .value();
   },
 
   _newOrder: function (fromIndex, toIndex) {
-    const currentOrder = this._getDisplayPriority();
+    const currentOrder = this._getDisplayPickList();
     const movingGolfer = currentOrder[fromIndex];
     const newOrder = currentOrder.slice();
     newOrder.splice(fromIndex, 1);
@@ -169,21 +169,21 @@ const PickListEditor = React.createClass({
   _onUpOne: function (i, e) {
     e.preventDefault();
     const newOrder = this._newOrder(i, i - 1);
-    DraftActions.updatePendingPriority(newOrder);
+    DraftActions.updatePendingPickList(newOrder);
   },
 
   _onDownOne: function (i, e) {
     e.preventDefault();
     const newOrder = this._newOrder(i, i + 1);
-    DraftActions.updatePendingPriority(newOrder);
+    DraftActions.updatePendingPickList(newOrder);
   },
 
   _onReset: function () {
-    DraftActions.resetPendingPriority();
+    DraftActions.resetPendingPickList();
   },
 
   _onSave: function () {
-    DraftActions.savePriority();
+    DraftActions.savePickList();
   },
 
   _onDrop: function (toIndex, e) {
@@ -192,7 +192,7 @@ const PickListEditor = React.createClass({
     const fromIndex = this.state.draggingIndex;
     const newOrder = this._newOrder(fromIndex, toIndex);
 
-    DraftActions.updatePendingPriority(newOrder);
+    DraftActions.updatePendingPickList(newOrder);
   },
 
   _onDragStart: function (i, e) {

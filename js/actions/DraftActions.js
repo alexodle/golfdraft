@@ -40,29 +40,29 @@ const DraftActions = {
     });
   },
 
-  updatePendingPriority: function (pendingPriority) {
+  updatePendingPickList: function (pendingPickList) {
     AppDispatcher.handleViewAction({
       actionType: DraftConstants.UPDATE_PENDING_PRIORITY,
-      pendingPriority: pendingPriority
+      pendingPickList: pendingPickList
     });
   },
 
-  resetPendingPriority: function () {
+  resetPendingPickList: function () {
     AppDispatcher.handleViewAction({
       actionType: DraftConstants.RESET_PENDING_PRIORITY
     });
   },
 
-  savePriority: function () {
+  savePickList: function () {
     AppDispatcher.handleViewAction({
       actionType: DraftConstants.SAVE_PRIORITY
     });
   },
 
-  setPriority: function (priority) {
+  setPickList: function (pickList) {
     AppDispatcher.handleViewAction({
       actionType: DraftConstants.SET_PRIORITY,
-      priority: priority
+      pickList: pickList
     });
   }
 

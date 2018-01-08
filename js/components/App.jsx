@@ -37,8 +37,8 @@ function getAppState() {
       currentPick: DraftStore.getCurrentPick(),
       draftPicks: DraftStore.getDraftPicks(),
       pickingForPlayers: DraftStore.getPickingForPlayers(),
-      syncedPriority: DraftStore.getPriority(),
-      pendingPriority: DraftStore.getPendingPriority()
+      syncedPickList: DraftStore.getPickList(),
+      pendingPickList: DraftStore.getPendingPickList()
     },
 
     scores: ScoreStore.getScores(),
@@ -88,8 +88,8 @@ const DraftWrapper = React.createClass({
           pickingForPlayers={props.draft.pickingForPlayers}
           activeUsers={props.activeUsers}
           allowClock={props.allowClock}
-          syncedPriority={props.draft.syncedPriority}
-          pendingPriority={props.draft.pendingPriority}
+          syncedPickList={props.draft.syncedPickList}
+          pendingPickList={props.draft.pendingPickList}
           draftHasStarted={props.draftHasStarted}
         />
       </section>
