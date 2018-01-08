@@ -88,21 +88,6 @@ _.extend(access, {
       });
   },
 
-  /**
-   * Return all players who have pick lists set
-   */
-  getPickListPlayers: promiseizeFn(function () {
-    const query = _.extend({ 'golferPickList.1': { $exists: true } }, FK_TOURNEY_ID_QUERY);
-    return promiseize(
-      models.DraftPickList
-        .find(query)
-        .select({ userId: 1 })
-        .exec())
-      .then(function (pickLists) {
-        return _.pluck(pickLists, 'userId');
-      });
-  }),
-
   updatePickList: function (playerId, pickList) {
     pickList = _.uniq(pickList);
     const query = _.extend({ userId: playerId }, FK_TOURNEY_ID_QUERY);

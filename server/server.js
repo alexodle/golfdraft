@@ -136,8 +136,7 @@ db.once('open', function callback () {
         access.getDraft(),
         access.getScores(),
         access.getTourney(),
-        access.getAppState(),
-        access.getPickListPlayers()
+        access.getAppState()
       ])
       .then(function (results) {
         res.render('index', {
@@ -147,7 +146,6 @@ db.once('open', function callback () {
           scores: JSON.stringify(results[3]),
           tourney: JSON.stringify(results[4]),
           appState: JSON.stringify(results[5]),
-          pickListPlayers: JSON.stringify(results[6]),
           user: JSON.stringify(req.session.user),
           tourneyName: tourneyCfg.name,
           prod: config.prod,
@@ -244,15 +242,7 @@ db.once('open', function callback () {
         });
     }
 
-    return promise
-      .then(function () {
-        return access.getPickListPlayers();
-      })
-      .then(function (pickListPlayers) {
-        io.sockets.emit('change:picklistplayers', {
-          data: { pickListPlayers: pickListPlayers }
-        });
-      });
+    return promise;
   });
 
   app.put('/draft/autoPick', function (req, res) {
