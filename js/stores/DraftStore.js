@@ -47,7 +47,7 @@ function addPick(golfer) {
   return pick;
 }
 
-function filterPicksFromPriorities() {
+function filterPicksFromPickLists() {
   const pickedGids = _.pluck(_picks, 'golfer');
   if (_pickList !== _pendingPickList) {
     _pickList = _.difference(_pickList, pickedGids);
@@ -105,7 +105,7 @@ AppDispatcher.register(function (payload) {
 
     case DraftConstants.DRAFT_PICK:
       const pick = addPick(action.golfer);
-      filterPicksFromPriorities();
+      filterPicksFromPickLists();
 
       // TODO - Move to separate server sync
       $.post('/draft/picks', pick)
@@ -134,7 +134,7 @@ AppDispatcher.register(function (payload) {
       const draft = action.draft;
       _picks = draft.picks;
       _pickOrder = draft.pickOrder;
-      filterPicksFromPriorities();
+      filterPicksFromPickLists();
 
       DraftStore.emitChange();
       break;
@@ -163,7 +163,7 @@ AppDispatcher.register(function (payload) {
           if (data.playerId === currentUser.id) {
             _pickList = data.pickList;
             _pendingPickList = _pickList;
-            filterPicksFromPriorities();
+            filterPicksFromPickLists();
             DraftStore.emitChange();
           }
         });

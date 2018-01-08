@@ -54,7 +54,7 @@ describe('access', function () {
   describe('updatePickList', function () {
 
     afterEach(function () {
-      return access.clearPriorities();
+      return access.clearPickLists();
     });
 
     it('updates pickList for player', function () {
@@ -92,7 +92,7 @@ describe('access', function () {
 
     afterEach(function () {
       return Promise.all([
-        access.clearPriorities(),
+        access.clearPickLists(),
         access.clearGolfers()
       ]);
     });
@@ -186,7 +186,7 @@ describe('access', function () {
         access.clearDraftPicks(),
         access.clearGolfers(),
         access.clearTourney(),
-        access.clearPriorities(),
+        access.clearPickLists(),
         access.clearWgrs()
       ]);
     });

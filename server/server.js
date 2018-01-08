@@ -131,58 +131,33 @@ db.once('open', function callback () {
 
   app.get(['/', '/draft', '/admin', '/whoisyou'], function (req, res) {
     Promise.all([
-      access.getGolfers(),
-      access.getPlayers(),
-      access.getDraft(),
-      access.getScores(),
-      access.getTourney(),
-      access.getAppState()
-    ])
-    .then(function (results) {
-      res.render('index', {
-        golfers: JSON.stringify(results[0]),
-        players: JSON.stringify(results[1]),
-        draft: JSON.stringify(results[2]),
-        scores: JSON.stringify(results[3]),
-        tourney: JSON.stringify(results[4]),
-        appState: JSON.stringify(results[5]),
-        user: JSON.stringify(req.session.user),
-        tourneyName: tourneyCfg.name,
-        prod: config.prod,
-        cdnUrl: config.cdn_url
+        access.getGolfers(),
+        access.getPlayers(),
+        access.getDraft(),
+        access.getScores(),
+        access.getTourney(),
+        access.getAppState(),
+        access.getPickListPlayers()
+      ])
+      .then(function (results) {
+        res.render('index', {
+          golfers: JSON.stringify(results[0]),
+          players: JSON.stringify(results[1]),
+          draft: JSON.stringify(results[2]),
+          scores: JSON.stringify(results[3]),
+          tourney: JSON.stringify(results[4]),
+          appState: JSON.stringify(results[5]),
+          pickListPlayers: JSON.stringify(results[6]),
+          user: JSON.stringify(req.session.user),
+          tourneyName: tourneyCfg.name,
+          prod: config.prod,
+          cdnUrl: config.cdn_url
+        });
+      })
+      .catch(function (err) {
+        console.log(err);
+        res.status(500).send(err);
       });
-    })
-    .catch(function (err) {
-      console.log(err);
-      res.status(500).send(err);
-    });
-  });
-
-  app.get('/bootstrap', function (req, res) {
-    Promise.all([
-      access.getGolfers(),
-      access.getPlayers(),
-      access.getDraft(),
-      access.getScores(),
-      access.getTourney(),
-      access.getAppState()
-    ])
-    .then(function (results) {
-      res.send({
-        golfers: results[0],
-        players: results[1],
-        draft: results[2],
-        scores: results[3],
-        tourney: results[4],
-        appState: results[5],
-        tourneyName: tourneyCfg.name,
-        user: req.session.user
-      });
-    })
-    .catch(function (err) {
-      console.log(err);
-      res.status(500).send(err);
-    });
   });
 
   app.post('/login', function (req, res) {
@@ -220,16 +195,16 @@ db.once('open', function callback () {
     }
 
     access.getPickList(user.id)
-    .then(function (pickList) {
-      res.status(200).send({
-        playerId: user.id,
-        pickList: pickList
+      .then(function (pickList) {
+        res.status(200).send({
+          playerId: user.id,
+          pickList: pickList
+        });
+      })
+      .catch(function (err) {
+        console.log(err);
+        res.status(500).send(err);
       });
-    })
-    .catch(function (err) {
-      console.log(err);
-      res.status(500).send(err);
-    });
   });
 
   app.put('/draft/pickList', function (req, res) {
@@ -241,30 +216,43 @@ db.once('open', function callback () {
       return;
     }
 
+    let promise = null;
     if (body.pickList) {
-      access.updatePickList(user.id, body.pickList)
-      .then(function () {
-        res.status(200).send({ playerId: user.id, pickList: body.pickList });
-      })
-      .catch(function (err) {
-        console.log(err);
-        res.status(500).send(err);
-      });
+      promise = access.updatePickList(user.id, body.pickList)
+        .then(function () {
+          res.status(200).send({ playerId: user.id, pickList: body.pickList });
+        })
+        .catch(function (err) {
+          console.log(err);
+          res.status(500).send(err);
+          throw err;
+        });
       
     } else {
-      access.updatePickListFromNames(user.id, body.pickListNames)
-      .then(function (result) {
-        if (result.completed) {
-          res.status(200).send({ playerId: user.id, pickList: result.pickList });
-        } else {
-          res.status(300).send({ playerId: user.id, suggestions: result.suggestions });
-        }
-      })
-      .catch(function (err) {
-        console.log(err);
-        res.status(500).send(err);
-      });
+      promise = access.updatePickListFromNames(user.id, body.pickListNames)
+        .then(function (result) {
+          if (result.completed) {
+            res.status(200).send({ playerId: user.id, pickList: result.pickList });
+          } else {
+            res.status(300).send({ playerId: user.id, suggestions: result.suggestions });
+          }
+        })
+        .catch(function (err) {
+          console.log(err);
+          res.status(500).send(err);
+          throw err;
+        });
     }
+
+    return promise
+      .then(function () {
+        return access.getPickListPlayers();
+      })
+      .then(function (pickListPlayers) {
+        io.sockets.emit('change:picklistplayers', {
+          data: { pickListPlayers: pickListPlayers }
+        });
+      });
   });
 
   app.put('/draft/autoPick', function (req, res) {

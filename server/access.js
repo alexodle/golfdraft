@@ -83,27 +83,42 @@ _.extend(access, {
   getPickList: function (playerId) {
     const query = _.extend({ userId: playerId }, FK_TOURNEY_ID_QUERY);
     return promiseize(models.DraftPickList.findOne(query).exec())
-    .then(function (pickList) {
-      return pickList ? pickList.golferPickList : null;
-    });
+      .then(function (pickList) {
+        return pickList ? pickList.golferPickList : null;
+      });
   },
 
-  updatePickList: promiseizeFn(function (playerId, pickList) {
+  /**
+   * Return all players who have pick lists set
+   */
+  getPickListPlayers: promiseizeFn(function () {
+    const query = _.extend({ 'golferPickList.1': { $exists: true } }, FK_TOURNEY_ID_QUERY);
+    return promiseize(
+      models.DraftPickList
+        .find(query)
+        .select({ userId: 1 })
+        .exec())
+      .then(function (pickLists) {
+        return _.pluck(pickLists, 'userId');
+      });
+  }),
+
+  updatePickList: function (playerId, pickList) {
     pickList = _.uniq(pickList);
     const query = _.extend({ userId: playerId }, FK_TOURNEY_ID_QUERY);
-    return models.DraftPickList
+    return promiseize(models.DraftPickList
       .update(
         query,
         { $set: { golferPickList: pickList } },
         { upsert: true }
-      ).exec()
+      ).exec())
       .then(function () {
         return {
           completed: true,
           pickList: pickList
         };
       });
-  }),
+  },
 
   updateAutoPick: promiseizeFn(function (playerId, autoPick) {
     const query = FK_TOURNEY_ID_QUERY;
@@ -408,7 +423,7 @@ _.extend(access, {
     models.GolferScoreOverrides
   ),
 
-  clearPriorities: createBasicClearer(models.DraftPickList),
+  clearPickLists: createBasicClearer(models.DraftPickList),
 
   clearChatMessages: createBasicClearer(chatModels.Message),
 
@@ -429,7 +444,7 @@ _.extend(access, {
       access.clearGolferScores(),
       access.clearGolferScoreOverrides(),
       access.clearChatMessages(),
-      access.clearPriorities(),
+      access.clearPickLists(),
       access.clearAppState()
     ];
 
