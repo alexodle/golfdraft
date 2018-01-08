@@ -42,26 +42,26 @@ const DraftActions = {
 
   updatePendingPickList: function (pendingPickList) {
     AppDispatcher.handleViewAction({
-      actionType: DraftConstants.UPDATE_PENDING_PRIORITY,
+      actionType: DraftConstants.UPDATE_PENDING_PICK_LIST,
       pendingPickList: pendingPickList
     });
   },
 
   resetPendingPickList: function () {
     AppDispatcher.handleViewAction({
-      actionType: DraftConstants.RESET_PENDING_PRIORITY
+      actionType: DraftConstants.RESET_PENDING_PICK_LIST
     });
   },
 
   savePickList: function () {
     AppDispatcher.handleViewAction({
-      actionType: DraftConstants.SAVE_PRIORITY
+      actionType: DraftConstants.SAVE_PICK_LIST
     });
   },
 
   setPickList: function (pickList) {
     AppDispatcher.handleViewAction({
-      actionType: DraftConstants.SET_PRIORITY,
+      actionType: DraftConstants.SET_PICK_LIST,
       pickList: pickList
     });
   }

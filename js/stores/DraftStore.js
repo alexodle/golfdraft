@@ -170,17 +170,17 @@ AppDispatcher.register(function (payload) {
       }
       break;
 
-    case DraftConstants.UPDATE_PENDING_PRIORITY:
+    case DraftConstants.UPDATE_PENDING_PICK_LIST:
       _pendingPickList = action.pendingPickList;
       DraftStore.emitChange();
       break;
 
-    case DraftConstants.RESET_PENDING_PRIORITY:
+    case DraftConstants.RESET_PENDING_PICK_LIST:
       _pendingPickList = _pickList;
       DraftStore.emitChange();
       break;
 
-    case DraftConstants.SAVE_PRIORITY:
+    case DraftConstants.SAVE_PICK_LIST:
       _pickList = _pendingPickList;
 
       // TODO - Move to separate server sync
@@ -193,7 +193,7 @@ AppDispatcher.register(function (payload) {
       DraftStore.emitChange();
       break;
 
-    case DraftConstants.SET_PRIORITY:
+    case DraftConstants.SET_PICK_LIST:
       _pickList = action.pickList;
       _pendingPickList = _pickList;
       
