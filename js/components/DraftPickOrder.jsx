@@ -16,19 +16,18 @@ const DraftPickOrder = React.createClass({
     currentUser: ReactPropTypes.object.isRequired,
     pickingForPlayers: ReactPropTypes.array.isRequired,
     onPlayerSelected: ReactPropTypes.func.isRequired,
-    currentPick: ReactPropTypes.object
+    currentPick: ReactPropTypes.object,
+    autoPickPlayers: ReactPropTypes.object
   },
 
   render: function () {
-    const pickingForPlayers = this.props.pickingForPlayers;
-
-    const currentPick = this.props.currentPick;
+    const {pickingForPlayers, currentPick, currentUser, autoPickPlayers} = this.props;
     const currentPlayer = currentPick ? currentPick.player : null;
-
-    const myPlayer = this.props.currentUser.player;
+    const myPlayer = currentUser.player;
 
     let pickOrder = DraftStore.getPickOrder();
     pickOrder = _.first(DraftStore.getPickOrder(), pickOrder.length / 4);
+
     return (
       <div>
         <p><small>
@@ -40,7 +39,6 @@ const DraftPickOrder = React.createClass({
         <ol className='pick-order-list'>
           {_.map(pickOrder, function (pick, i) {
             const player = pick.player;
-            const text = PlayerStore.getPlayer(player).name;
             return (
               <li
                 key={player}
@@ -52,8 +50,11 @@ const DraftPickOrder = React.createClass({
                   'current-player': currentPlayer === player
                 })}
               >
+                {!autoPickPlayers[player] ? null : (
+                  <span><span className='label label-success auto-label'>AUTO</span> </span>
+                )}
                 <a href='#DraftHistory' onClick={_.partial(this._onSelect, player)}>
-                  {text}
+                  {PlayerStore.getPlayer(player).name}
                 </a>
               </li>);
           }, this)}

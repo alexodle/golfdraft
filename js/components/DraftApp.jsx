@@ -175,6 +175,7 @@ const DraftApp = React.createClass({
                 currentUser={this.props.currentUser}
                 currentPick={this.props.currentPick}
                 pickingForPlayers={this.props.pickingForPlayers}
+                autoPickPlayers={this.props.autoPickPlayers}
                 onPlayerSelected={this._onDraftHistorySelectionChange}
               />
             </GolfDraftPanel>

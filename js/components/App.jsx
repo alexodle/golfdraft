@@ -91,6 +91,7 @@ const DraftWrapper = React.createClass({
           syncedPickList={props.draft.syncedPickList}
           pendingPickList={props.draft.pendingPickList}
           draftHasStarted={props.draftHasStarted}
+          autoPickPlayers={props.autoPickPlayers}
         />
       </section>
     );
