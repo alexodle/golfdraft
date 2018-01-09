@@ -11,7 +11,9 @@ const cfg = {
   // Unsafe not to hash. But who cares in this case? Matt Simon cares.
   admin_password: process.env.ADMIN_PASS || 'admin',
 
-  tourney_cfg: process.env.TOURNEY_CFG || 'tourney_cfg.json'
+  tourney_cfg: process.env.TOURNEY_CFG || 'tourney_cfg.json',
+
+  session_secret: process.env.SESSION_SECRET || 'dev_session_secret'
 };
 cfg.debug = !cfg.prod;
 

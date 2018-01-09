@@ -1,7 +1,5 @@
 'use strict';
 
-const port = Number(process.env.PORT || 3000);
-
 const _ = require('lodash');
 const access = require('./access');
 const app = require('./expressApp');
@@ -9,20 +7,22 @@ const bodyParser = require('body-parser');
 const chatBot = require('./chatBot');
 const compression = require('compression');
 const config = require('./config');
-const cookieParser = require('cookie-parser');
 const exphbs  = require('express-handlebars');
 const express = require('express');
 const io = require('./socketIO');
+const LocalStrategy = require('passport-local').Strategy;
 const logfmt = require("logfmt");
 const mongoose = require('mongoose');
+const passport = require('passport');
 const Promise = require('promise');
 const redis = require("./redis");
+const RedisStore = require('connect-redis')(session);
 const session = require('express-session');
 const tourneyConfigReader = require('./tourneyConfigReader');
 const UserAccess = require('./userAccess');
 const utils = require('../common/utils');
 
-const RedisStore = require('connect-redis')(session);
+const port = Number(process.env.PORT || 3000);
 
 const MAX_AGE = 1000 * 60 * 60 * 24 * 365;
 const ENSURE_AUTO_PICK_DELAY_MILLIS = 500;
@@ -40,12 +40,15 @@ UserAccess.refresh();
 // Request logging
 app.use(logfmt.requestLogger());
 
-// Middlewares
+// Session handling
 const sessionMiddleware = session({
   store: new RedisStore({ url: config.redis_url }),
-  secret: 'odle rules'
+  secret: config.session_secret,
+  maxAge: MAX_AGE,
+  logErrors: true,
+  resave: false,
+  cookie: { secure: true }
 });
-app.use(cookieParser()); // Must come before session()
 app.use(sessionMiddleware);
 io.use(function(socket, next) {
   sessionMiddleware(socket.request, socket.request.res, next);
@@ -53,6 +56,22 @@ io.use(function(socket, next) {
 
 // Gzip
 app.use(compression());
+
+// Authentication
+passport.use(new LocalStrategy(
+  function(username, password, done) {
+    User.findOne({ username: username }, function(err, user) {
+      if (err) { return done(err); }
+      if (!user) {
+        return done(null, false, { message: 'Incorrect username.' });
+      }
+      if (!user.validPassword(password)) {
+        return done(null, false, { message: 'Incorrect password.' });
+      }
+      return done(null, user);
+    });
+  }
+));
 
 // Handlebars
 app.engine('handlebars', exphbs({
