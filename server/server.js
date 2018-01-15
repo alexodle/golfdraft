@@ -98,7 +98,7 @@ function logSessionState(req, res, next) {
     console.log(
       'ip=%s user=%j isAdmin=%s',
       req.connection.remoteAddress,
-      session.user,
+      session.passport,
       !!session.isAdmin
     );
   } catch (e) {

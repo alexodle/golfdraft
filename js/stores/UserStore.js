@@ -33,7 +33,7 @@ const UserStore =  _.extend({}, Store.prototype, {
   },
 
   getAll: function () {
-    return _users;
+    return _.values(_users);
   },
 
   getActive: function () {
@@ -49,7 +49,7 @@ AppDispatcher.register(function (payload) {
   switch(action.actionType) {
 
     case AppConstants.SET_USERS:
-      _users = action.users;
+      _users = _.indexBy(action.users, '_id');
       UserStore.emitChange();
       break;
 

@@ -1,8 +1,8 @@
 'use strict';
 
-const React = require('react');
+const $ = require('jquery');
 const _ = require('lodash');
-
+const React = require('react');
 const UserActions = require('../actions/UserActions');
 const UserStore = require('../stores/UserStore');
 
@@ -22,40 +22,52 @@ const WhoIsYou = React.createClass({
 
   getInitialState: function () {
     const selectedUser = getSortedUsers()[0].id;
-    return { selectedUser: selectedUser, password: '' };
+    return { selectedUser, password: '', isLoading: false, badAuth: false };
   },
 
   render: function () {
+    const {badAuth, isLoading, password, selectedUser} = this.state;
+    const submitDisabled = !password || isLoading;
     return (
       <div>
         <h2>Who is you?</h2>
-        <div className="panel panel-default">
-          <div className="panel-body">
-            <form role="form">
-              <div className="form-group">
+        {!badAuth ? null : (
+          <div className='alert alert-danger' role='alert'>
+            Invalid password. Try again.
+          </div>
+        )}
+        <div className='panel panel-default'>
+          <div className='panel-body'>
+            <form role='form'>
+              <div className='form-group'>
                 <select
-                  id="userSelect"
+                  id='userSelect'
                   value={this.state.selectedUser}
                   onChange={this._onUserChange}
-                  size="15"
-                  className="form-control"
+                  size='15'
+                  className='form-control'
                 >
                   {_.map(getSortedUsers(), function (u) {
                     return (<option key={u.id} value={u.id}>{u.name}</option>);
                   })}
                 </select>
+              </div>
+              <div className={'form-group' + (badAuth ? ' has-error' : '')}>
                 <input
-                  id="password"
-                  type="password"
-                  className="form-control"
-                  placeholder="password"
-                  value={this.state.password}
+                  ref='passwordInput'
+                  id='password'
+                  type='password'
+                  className='form-control'
+                  placeholder='password'
+                  disabled={isLoading}
+                  onChange={this._onPasswordChange}
+                  value={password}
                 />
               </div>
               <button
-                className="btn btn-default btn-primary"
+                className='btn btn-default btn-primary'
                 onClick={this._onSubmit}
-                disabled={!this.state.password}
+                disabled={submitDisabled}
               >
                 Sign in
               </button>
@@ -76,14 +88,16 @@ const WhoIsYou = React.createClass({
 
   _onSubmit: function (ev) {
     ev.preventDefault();
+    this.setState({ isLoading: true, badAuth: false });
 
-    xhr = $.post('/login', {
+    const xhr = $.post('/login', {
       username: UserStore.getUser(this.state.selectedUser).username,
       password: this.state.password
     });
     xhr.fail(function () {
-      window.location.reload();
-    });
+      this.setState({ isLoading: false, badAuth: true, password: '' });
+      this.refs.passwordInput.focus();
+    }.bind(this));
     xhr.done(function () {
       UserActions.setCurrentUser(this.state.selectedUser);
       UserActions.setCurrentUserSynced();
@@ -94,7 +108,7 @@ const WhoIsYou = React.createClass({
       } else {
         this.context.router.replace('/');
       }
-    });
+    }.bind(this));
   }
 
 });
