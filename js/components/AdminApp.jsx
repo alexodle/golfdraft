@@ -36,12 +36,12 @@ function toggleDraftHasStarted(draftHasStarted) {
   });
 }
 
-function toggleAutoPick(playerId, autoPick) {
+function toggleAutoPick(userId, autoPick) {
   $.ajax({
-    url: '/admin/autoPickPlayers',
+    url: '/admin/autoPickUsers',
     type: 'PUT',
     contentType: 'application/json',
-    data: JSON.stringify({ playerId: playerId, autoPick: autoPick })
+    data: JSON.stringify({ userId: userId, autoPick: autoPick })
   });
 }
 
@@ -170,17 +170,17 @@ const AdminApp = React.createClass({
         <div className='panel'>
           <div className='panel-body'>
             <ul className='list-unstyled'>
-              {_.map(props.players, function (player) {
-                const checked = !!props.autoPickPlayers[player._id];
+              {_.map(props.users, function (user) {
+                const checked = !!props.autoPickUsers[user._id];
                 return (
-                  <li key={player._id}>
+                  <li key={user._id}>
                     <div className='checkbox'>
                       <label>
                         <input
                           type='checkbox'
                           checked={checked}
-                          onChange={toggleAutoPick.bind(null, player._id, !checked)}
-                        /> {player.name}
+                          onChange={toggleAutoPick.bind(null, user._id, !checked)}
+                        /> {user.name}
                       </label>
                     </div>
                   </li>

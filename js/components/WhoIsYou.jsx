@@ -5,7 +5,7 @@ const _ = require('lodash');
 
 const UserActions = require('../actions/UserActions');
 const UserStore = require('../stores/UserStore');
-const PlayerStore = require('../stores/PlayerStore');
+const UserStore = require('../stores/UserStore');
 
 function getSortedUsers() {
   return _.sortBy(UserStore.getAll(), 'name');
@@ -79,7 +79,7 @@ const WhoIsYou = React.createClass({
     ev.preventDefault();
 
     xhr = $.post('/login', {
-      username: PlayerStore.getPlayer(this.state.selectedUser).username,
+      username: UserStore.getUser(this.state.selectedUser).username,
       password: this.state.password
     });
     xhr.fail(function () {

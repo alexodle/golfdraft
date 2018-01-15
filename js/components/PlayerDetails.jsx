@@ -6,30 +6,30 @@ const cx = require('classnames');
 const _ = require("lodash");
 const utils = require("../../common/utils");
 
-const PlayerStore = require('../stores/PlayerStore');
+const UserStore = require('../stores/UserStore');
 const GolferStore = require('../stores/GolferStore');
 
-const PlayerDetails = React.createClass({
+const UserDetails = React.createClass({
 
   propTypes: {
-    player: ReactPropTypes.string.isRequired,
-    playerScores: ReactPropTypes.object.isRequired
+    user: ReactPropTypes.string.isRequired,
+    userScores: ReactPropTypes.object.isRequired
   },
 
   render: function () {
-    const player = this.props.player;
-    const playerScore = this.props.playerScores[player];
-    const scoresByDay = playerScore.scoresByDay;
+    const user = this.props.user;
+    const userScore = this.props.userScores[user];
+    const scoresByDay = userScore.scoresByDay;
     const draftPicksByGolfer = _.indexBy(this.props.draftPicks, 'golfer');
 
-    const sortedScores = _.chain(this.props.playerScores)
+    const sortedScores = _.chain(this.props.userScores)
       .pluck("total")
       .sortBy()
       .value();
-    const playerRank = _.sortedIndex(sortedScores, playerScore.total);
-    const isTied = sortedScores[playerRank + 1] === playerScore.total;
+    const userRank = _.sortedIndex(sortedScores, userScore.total);
+    const isTied = sortedScores[userRank + 1] === userScore.total;
 
-    const golferScores = _.sortBy(playerScore.scoresByGolfer, 'total');
+    const golferScores = _.sortBy(userScore.scoresByGolfer, 'total');
     const trs = _.map(golferScores, function (gs) {
       return (
         <tr key={gs.golfer}>
@@ -69,11 +69,11 @@ const PlayerDetails = React.createClass({
     return (
       <section>
         <h2>
-          {PlayerStore.getPlayer(player).name}
-          <span> </span>({utils.toGolferScoreStr(playerScore.total)})
-          <small> {utils.getOrdinal(playerRank + 1)} place {tieText}</small>
+          {UserStore.getUser(user).name}
+          <span> </span>({utils.toGolferScoreStr(userScore.total)})
+          <small> {utils.getOrdinal(userRank + 1)} place {tieText}</small>
         </h2>
-        <table className='table player-details-table'>
+        <table className='table user-details-table'>
           <thead>
             <tr>
               <th>Golfer</th>
@@ -92,4 +92,4 @@ const PlayerDetails = React.createClass({
 
 });
 
-module.exports = PlayerDetails;
+module.exports = UserDetails;

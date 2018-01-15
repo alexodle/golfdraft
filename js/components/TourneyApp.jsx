@@ -7,8 +7,8 @@ const GolfDraftPanel = require('./GolfDraftPanel.jsx');
 const GolferLogic = require('../logic/GolferLogic');
 const GolferStore = require('../stores/GolferStore');
 const moment = require('moment');
-const PlayerDetails = require('./PlayerDetails.jsx');
-const PlayerStandings = require('./PlayerStandings.jsx');
+const UserDetails = require('./UserDetails.jsx');
+const UserStandings = require('./UserStandings.jsx');
 const React = require('react');
 const ScoreLogic = require('../logic/ScoreLogic');
 const utils = require('../../common/utils');
@@ -19,7 +19,7 @@ const NDAYS = constants.NDAYS;
 
 function getState(state, props) {
   return {
-    playerDetailsPlayer: state.playerDetailsPlayer || props.currentUser.player
+    userDetailsUser: state.userDetailsUser || props.currentUser.user
   };
 }
 
@@ -37,7 +37,7 @@ const TourneyApp = React.createClass({
   },
 
   render: function () {
-    const playerScores = ScoreLogic.calcPlayerScores(
+    const userScores = ScoreLogic.calcUserScores(
       this.props.draft.draftPicks,
       this.props.scores
     );
@@ -74,20 +74,20 @@ const TourneyApp = React.createClass({
         </p>
 
         <GolfDraftPanel heading='Overall Standings'>
-          <PlayerStandings
+          <UserStandings
             currentUser={this.props.currentUser}
-            playerScores={playerScores}
-            selectedPlayer={this.state.playerDetailsPlayer}
-            onPlayerSelect={this._onPlayerSelect}
+            userScores={userScores}
+            selectedUser={this.state.userDetailsUser}
+            onUserSelect={this._onUserSelect}
           />
         </GolfDraftPanel>
 
-        <a name='PlayerDetails' />
+        <a name='UserDetails' />
         <GolfDraftPanel heading='Score Details'>
 
-          <PlayerDetails
-            player={this.state.playerDetailsPlayer}
-            playerScores={playerScores}
+          <UserDetails
+            user={this.state.userDetailsUser}
+            userScores={userScores}
             draftPicks={this.props.draft.draftPicks}
           />
         </GolfDraftPanel>
@@ -117,9 +117,9 @@ const TourneyApp = React.createClass({
     );
   },
 
-  _onPlayerSelect: function (player) {
-    window.location.href = '#PlayerDetails';
-    this.setState({playerDetailsPlayer: player});
+  _onUserSelect: function (user) {
+    window.location.href = '#UserDetails';
+    this.setState({userDetailsUser: user});
   }
 
 });

@@ -7,11 +7,11 @@ const DraftActions = require('../actions/DraftActions');
 const GolfDraftPanel = require('./GolfDraftPanel.jsx');
 const GolferLogic = require('../logic/GolferLogic');
 const GolferStore = require('../stores/GolferStore');
-const PlayerStore = require('../stores/PlayerStore');
+const UserStore = require('../stores/UserStore');
 const React = require('react');
 
 function isProxyPick(props) {
-  return props.currentUser.player !== props.currentPick.player;
+  return props.currentUser.user !== props.currentPick.user;
 }
 
 function shouldShowPickListOption(props) {
@@ -45,13 +45,13 @@ const DraftChooser = React.createClass({
     if (!isProxyPick) {
       header = (<h4>It&#8217;s your turn! Make your pick.</h4>);
     } else {
-      const playerName = PlayerStore.getPlayer(currentPick.player).name;
+      const userName = UserStore.getUser(currentPick.user).name;
       header = (
         <section>
-          <h4>Make a pick for: {playerName}</h4>
+          <h4>Make a pick for: {userName}</h4>
           <p>
             <a href="#" onClick={this._onStopTakingPick}>
-              I&#39;ll stop making picks for {playerName}
+              I&#39;ll stop making picks for {userName}
             </a>
           </p>
         </section>
@@ -63,7 +63,7 @@ const DraftChooser = React.createClass({
         {header}
 
         <div className="btn-group" role="group" aria-label="Sorting choices">
-          <label>Sort players by:</label><br />
+          <label>Sort users by:</label><br />
           {!showPickListOption ? null : (
             <button
               type="button"
@@ -99,12 +99,12 @@ const DraftChooser = React.createClass({
             <button
               className="btn btn-default btn-primary"
               onClick={this._onProxyPickListPick}
-            >Select next player on pick list</button>
+            >Select next user on pick list</button>
           </div>
         ) : (
           <div>
             <div className="form-group">
-              <label labelFor="golfersRemaining">Select your player:</label>
+              <label labelFor="golfersRemaining">Select your user:</label>
               <select
                 id="golfersRemaining"
                 value={this.state.selectedGolfer}
@@ -214,7 +214,7 @@ const DraftChooser = React.createClass({
 
   _onStopTakingPick: function (ev) {
     ev.preventDefault();
-    DraftActions.stopDraftingForPlayer(this.props.currentPick.player);
+    DraftActions.stopDraftingForUser(this.props.currentPick.user);
   }
 
 });

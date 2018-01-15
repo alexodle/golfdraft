@@ -2,27 +2,27 @@
 
 const _ = require('lodash');
 const DraftActions = require('../actions/DraftActions');
-const PlayerStore = require('../stores/PlayerStore');
+const UserStore = require('../stores/UserStore');
 const React = require('react');
 
 const DraftStatus = React.createClass({
 
   render: function () {
     const currentPick = this.props.currentPick;
-    const playerName = PlayerStore.getPlayer(currentPick.player).name;
+    const userName = UserStore.getUser(currentPick.user).name;
     return (
       <div>
         <p className='draft-status'>
-          Now drafting (Pick #{currentPick.pickNumber + 1}): <b>{playerName}</b>
+          Now drafting (Pick #{currentPick.pickNumber + 1}): <b>{userName}</b>
         </p>
-        <a href='#' onClick={this._onTakePick}>I'll pick for {playerName}</a>
+        <a href='#' onClick={this._onTakePick}>I'll pick for {userName}</a>
       </div>
     );
   },
 
   _onTakePick: function (ev) {
     ev.preventDefault();
-    DraftActions.draftForPlayer(this.props.currentPick.player);
+    DraftActions.draftForUser(this.props.currentPick.user);
   }
 
 });

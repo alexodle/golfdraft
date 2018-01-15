@@ -3,30 +3,30 @@
 const _ = require("lodash");
 const cx = require('classnames');
 const GolferStore = require('../stores/GolferStore');
-const PlayerStore = require('../stores/PlayerStore');
+const UserStore = require('../stores/UserStore');
 const React = require("react");
 const utils = require('../../common/utils');
 
 const ReactPropTypes = React.PropTypes;
 
-const PlayerStandings = React.createClass({
+const UserStandings = React.createClass({
 
   propTypes: {
     currentUser: ReactPropTypes.object.isRequired,
-    playerScores: ReactPropTypes.object.isRequired,
-    selectedPlayer: ReactPropTypes.string.isRequired
+    userScores: ReactPropTypes.object.isRequired,
+    selectedUser: ReactPropTypes.string.isRequired
   },
 
   render: function () {
-    const playerScores = _.sortBy(this.props.playerScores, 'total');
-    const playerTotals = _.pluck(playerScores, 'total');
-    const topScore = playerTotals[0];
+    const userScores = _.sortBy(this.props.userScores, 'total');
+    const userTotals = _.pluck(userScores, 'total');
+    const topScore = userTotals[0];
 
-    const trs = _.map(playerScores, function (ps) {
-      const p = PlayerStore.getPlayer(ps.player);
-      const playerIsMe = this.props.currentUser.player === p.id;
-      const playerIsSelected = this.props.selectedPlayer === p.id;
-      const viewPlayer = _.partial(this._onPlayerSelect, p.id);
+    const trs = _.map(userScores, function (ps) {
+      const p = UserStore.getUser(ps.user);
+      const userIsMe = this.props.currentUser.user === p.id;
+      const userIsSelected = this.props.selectedUser === p.id;
+      const viewUser = _.partial(this._onUserSelect, p.id);
       const holesLeft = _.sum(ps.scoresByGolfer, function (gs) {
         if (_.any(gs.missedCuts)) {
           return 0;
@@ -41,19 +41,19 @@ const PlayerStandings = React.createClass({
         <tr
           key={p.id}
           className={cx({
-            'selected-player-row': playerIsSelected
+            'selected-user-row': userIsSelected
           })}
-          onClick={viewPlayer}
+          onClick={viewUser}
         >
-          <td>{_.sortedIndex(playerTotals, ps.total) + 1}</td>
-          <td>{playerIsMe ? (<b>{p.name}</b>) : p.name}</td>
+          <td>{_.sortedIndex(userTotals, ps.total) + 1}</td>
+          <td>{userIsMe ? (<b>{p.name}</b>) : p.name}</td>
           <td>{utils.toGolferScoreStr(ps.total)}</td>
           <td>{ps.pickNumber + 1}</td>
           <td className='hidden-xs'>{holesLeft > 0 ? holesLeft : 'F'}</td>
           {_.map(ps.scoresByDay, function (ds) {
             return (<td className='hidden-xs' key={ds.day}>{utils.toGolferScoreStr(ds.total)}</td>);
           })}
-          <td className='visible-xs'><a href='#PlayerDetails' onClick={viewPlayer}>Details</a></td>
+          <td className='visible-xs'><a href='#UserDetails' onClick={viewUser}>Details</a></td>
         </tr>
       );
     }, this);
@@ -62,14 +62,14 @@ const PlayerStandings = React.createClass({
       <section>
         <p>
           <small>
-            <b>Tip:</b> Click on a player row to view score details
+            <b>Tip:</b> Click on a user row to view score details
           </small>
         </p>
         <table className='table standings-table table-hover'>
           <thead>
             <tr>
               <th>#</th>
-              <th>Pool Player</th>
+              <th>Pool User</th>
               <th>Total</th>
               <th>Pick Number</th>
               <th className='hidden-xs'>Holes Left Today</th>
@@ -86,10 +86,10 @@ const PlayerStandings = React.createClass({
     );
   },
 
-  _onPlayerSelect: function (pid) {
-    this.props.onPlayerSelect(pid);
+  _onUserSelect: function (pid) {
+    this.props.onUserSelect(pid);
   }
 
 });
 
-module.exports = PlayerStandings;
+module.exports = UserStandings;

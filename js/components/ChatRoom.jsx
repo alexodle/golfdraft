@@ -6,7 +6,7 @@ const ChatActions = require('../actions/ChatActions');
 const Assets = require('../constants/Assets');
 const GolfDraftPanel = require('./GolfDraftPanel.jsx');
 const moment = require('moment');
-const PlayerStore = require('../stores/PlayerStore');
+const UserStore = require('../stores/UserStore');
 const PureRenderMixin = require('react/lib/ReactComponentWithPureRenderMixin');
 const React = require('react');
 const UserStore = require('../stores/UserStore');
@@ -298,7 +298,7 @@ const ChatRoom = React.createClass({
         <dl className='chat-list dl-horizontal'>
           {_.map(messages, function (message, i) {
             const displayName = message.isBot ?
-              BOT_NAME : PlayerStore.getPlayer(message.player).name;
+              BOT_NAME : UserStore.getUser(message.user).name;
             const className = message.isBot ? 'bot-message' : '';
             return [
               (

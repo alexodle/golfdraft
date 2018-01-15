@@ -4,7 +4,7 @@ const _ = require('lodash');
 const cx = require('classnames');
 const DraftStore = require('../stores/DraftStore');
 const GolfDraftPanel = require('./GolfDraftPanel.jsx');
-const PlayerStore = require('../stores/PlayerStore');
+const UserStore = require('../stores/UserStore');
 const React = require('react');
 const UserStore = require('../stores/UserStore');
 
@@ -14,16 +14,16 @@ const DraftPickOrder = React.createClass({
 
   propTypes: {
     currentUser: ReactPropTypes.object.isRequired,
-    pickingForPlayers: ReactPropTypes.array.isRequired,
-    onPlayerSelected: ReactPropTypes.func.isRequired,
+    pickingForUsers: ReactPropTypes.array.isRequired,
+    onUserSelected: ReactPropTypes.func.isRequired,
     currentPick: ReactPropTypes.object,
-    autoPickPlayers: ReactPropTypes.object
+    autoPickUsers: ReactPropTypes.object
   },
 
   render: function () {
-    const {pickingForPlayers, currentPick, currentUser, autoPickPlayers} = this.props;
-    const currentPlayer = currentPick ? currentPick.player : null;
-    const myPlayer = currentUser.player;
+    const {pickingForUsers, currentPick, currentUser, autoPickUsers} = this.props;
+    const currentUser = currentPick ? currentPick.user : null;
+    const myUser = currentUser.user;
 
     let pickOrder = DraftStore.getPickOrder();
     pickOrder = _.first(DraftStore.getPickOrder(), pickOrder.length / 4);
@@ -31,30 +31,30 @@ const DraftPickOrder = React.createClass({
     return (
       <div>
         <p><small>
-          <b>Tip:</b> your are picking for all players in bold
+          <b>Tip:</b> your are picking for all users in bold
         </small></p>
         <p><small>
-          <b>Pro Tip:</b> click on a player to see their picks
+          <b>Pro Tip:</b> click on a user to see their picks
         </small></p>
         <ol className='pick-order-list'>
           {_.map(pickOrder, function (pick, i) {
-            const player = pick.player;
+            const user = pick.user;
             return (
               <li
-                key={player}
+                key={user}
                 className={cx({
-                  'my-player': (
-                    myPlayer === player ||
-                    _.contains(pickingForPlayers, player)
+                  'my-user': (
+                    myUser === user ||
+                    _.contains(pickingForUsers, user)
                   ),
-                  'current-player': currentPlayer === player
+                  'current-user': currentUser === user
                 })}
               >
-                {!autoPickPlayers[player] ? null : (
+                {!autoPickUsers[user] ? null : (
                   <span><span className='label label-success auto-label'>AUTO</span> </span>
                 )}
-                <a href='#DraftHistory' onClick={_.partial(this._onSelect, player)}>
-                  {PlayerStore.getPlayer(player).name}
+                <a href='#DraftHistory' onClick={_.partial(this._onSelect, user)}>
+                  {UserStore.getUser(user).name}
                 </a>
               </li>);
           }, this)}
@@ -64,7 +64,7 @@ const DraftPickOrder = React.createClass({
   },
 
   _onSelect: function (pid) {
-    this.props.onPlayerSelected(pid);
+    this.props.onUserSelected(pid);
   }
 
 });

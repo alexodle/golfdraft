@@ -11,7 +11,7 @@ const React = require("react");
 const ScoreStore = require('../stores/ScoreStore');
 const TourneyApp = require("./TourneyApp.jsx");
 const TourneyStore = require("../stores/TourneyStore");
-const PlayerStore = require("../stores/PlayerStore");
+const UserStore = require("../stores/UserStore");
 const UserStore = require("../stores/UserStore");
 const GolferStore = require("../stores/GolferStore");
 const WhoIsYou = require("./WhoIsYou.jsx");
@@ -30,13 +30,13 @@ function getAppState() {
     currentUser: UserStore.getCurrentUser(),
     activeUsers: UserStore.getActive(),
     golfers: GolferStore.getAll(),
-    players: PlayerStore.getAll(),
+    users: UserStore.getAll(),
 
     draft: {
       isMyDraftPick: DraftStore.getIsMyDraftPick(),
       currentPick: DraftStore.getCurrentPick(),
       draftPicks: DraftStore.getDraftPicks(),
-      pickingForPlayers: DraftStore.getPickingForPlayers(),
+      pickingForUsers: DraftStore.getPickingForUsers(),
       syncedPickList: DraftStore.getPickList(),
       pendingPickList: DraftStore.getPendingPickList()
     },
@@ -50,7 +50,7 @@ function getAppState() {
     isPaused: AppSettingsStore.getIsPaused(),
     allowClock: AppSettingsStore.getAllowClock(),
     draftHasStarted: AppSettingsStore.getDraftHasStarted(),
-    autoPickPlayers: AppSettingsStore.getAutoPickPlayers()
+    autoPickUsers: AppSettingsStore.getAutoPickUsers()
   };
 }
 
@@ -85,13 +85,13 @@ const DraftWrapper = React.createClass({
           chatMessages={props.chatMessages}
           isPaused={props.isPaused}
           golfersRemaining={props.golfersRemaining}
-          pickingForPlayers={props.draft.pickingForPlayers}
+          pickingForUsers={props.draft.pickingForUsers}
           activeUsers={props.activeUsers}
           allowClock={props.allowClock}
           syncedPickList={props.draft.syncedPickList}
           pendingPickList={props.draft.pendingPickList}
           draftHasStarted={props.draftHasStarted}
-          autoPickPlayers={props.autoPickPlayers}
+          autoPickUsers={props.autoPickUsers}
         />
       </section>
     );
@@ -154,8 +154,8 @@ const AdminWrapper = React.createClass({
           activeUsers={props.activeUsers}
           allowClock={props.allowClock}
           draftHasStarted={props.draftHasStarted}
-          players={props.players}
-          autoPickPlayers={props.autoPickPlayers}
+          users={props.users}
+          autoPickUsers={props.autoPickUsers}
         />
       </section>
     );

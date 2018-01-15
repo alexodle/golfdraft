@@ -22,7 +22,7 @@ const DraftApp = React.createClass({
 
   getInitialState: function () {
     return {
-      draftHistoryPlayerId: null
+      draftHistoryUserId: null
     };
   },
 
@@ -113,7 +113,7 @@ const DraftApp = React.createClass({
           <div className='col-md-12'>
             <DraftHistory
               draftPicks={this.props.draftPicks}
-              selectedPlayerId={this.state.draftHistoryPlayerId}
+              selectedUserId={this.state.draftHistoryUserId}
               onSelectionChange={this._onDraftHistorySelectionChange}
             />
           </div>
@@ -174,9 +174,9 @@ const DraftApp = React.createClass({
               <DraftPickOrder
                 currentUser={this.props.currentUser}
                 currentPick={this.props.currentPick}
-                pickingForPlayers={this.props.pickingForPlayers}
-                autoPickPlayers={this.props.autoPickPlayers}
-                onPlayerSelected={this._onDraftHistorySelectionChange}
+                pickingForUsers={this.props.pickingForUsers}
+                autoPickUsers={this.props.autoPickUsers}
+                onUserSelected={this._onDraftHistorySelectionChange}
               />
             </GolfDraftPanel>
           </div>
@@ -208,7 +208,7 @@ const DraftApp = React.createClass({
           <div className='col-md-12'>
             <DraftHistory
               draftPicks={this.props.draftPicks}
-              selectedPlayerId={this.state.draftHistoryPlayerId}
+              selectedUserId={this.state.draftHistoryUserId}
               onSelectionChange={this._onDraftHistorySelectionChange}
             />
           </div>
@@ -218,8 +218,8 @@ const DraftApp = React.createClass({
     );
   },
 
-  _onDraftHistorySelectionChange: function (playerId) {
-    this.setState({ draftHistoryPlayerId: playerId });
+  _onDraftHistorySelectionChange: function (userId) {
+    this.setState({ draftHistoryUserId: userId });
   }
 
 });
