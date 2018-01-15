@@ -11,7 +11,7 @@ const UserStore = require('../stores/UserStore');
 const React = require('react');
 
 function isProxyPick(props) {
-  return props.currentUser.user !== props.currentPick.user;
+  return props.currentUser._id !== props.currentPick.user;
 }
 
 function shouldShowPickListOption(props) {
@@ -114,7 +114,7 @@ const DraftChooser = React.createClass({
               >
                 {_.map(sortedGolfers, function (g) {
                   return (
-                    <option key={g.id} value={g.id}>
+                    <option key={g._id} value={g._id}>
                       {GolferLogic.renderGolfer(g)}
                     </option>
                   );
@@ -178,7 +178,7 @@ const DraftChooser = React.createClass({
 
     if (!selectedGolfer || !golfersRemaining[selectedGolfer]) {
       const firstGolfer = _.first(this._sortedGolfers(golfersRemaining, sortKey));
-      selectedGolfer = firstGolfer ? firstGolfer.id : null;
+      selectedGolfer = firstGolfer ? firstGolfer._id : null;
     }
     return {
       selectedGolfer: selectedGolfer,
@@ -195,7 +195,7 @@ const DraftChooser = React.createClass({
 
     const golfersRemaining = this.props.golfersRemaining;
     const firstGolfer = _.first(this._sortedGolfers(golfersRemaining, sortKey));
-    const selectedGolfer = firstGolfer ? firstGolfer.id : null;
+    const selectedGolfer = firstGolfer ? firstGolfer._id : null;
     this.setState({
       sortKey: sortKey,
       selectedGolfer: selectedGolfer

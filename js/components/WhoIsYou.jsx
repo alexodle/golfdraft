@@ -21,7 +21,7 @@ const WhoIsYou = React.createClass({
   },
 
   getInitialState: function () {
-    const selectedUser = getSortedUsers()[0].id;
+    const selectedUser = getSortedUsers()[0]._id;
     return { selectedUser, password: '', isLoading: false, badAuth: false };
   },
 
@@ -48,7 +48,7 @@ const WhoIsYou = React.createClass({
                   className='form-control'
                 >
                   {_.map(getSortedUsers(), function (u) {
-                    return (<option key={u.id} value={u.id}>{u.name}</option>);
+                    return (<option key={u._id} value={u._id}>{u.name}</option>);
                   })}
                 </select>
               </div>

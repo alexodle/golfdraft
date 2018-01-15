@@ -21,7 +21,7 @@ const DraftPickOrder = React.createClass({
 
   render: function () {
     const {pickingForUsers, currentPick, currentUser, autoPickUsers} = this.props;
-    const myUser = currentUser.user;
+    const myUser = currentUser._id;
 
     let pickOrder = DraftStore.getPickOrder();
     pickOrder = _.first(DraftStore.getPickOrder(), pickOrder.length / 4);

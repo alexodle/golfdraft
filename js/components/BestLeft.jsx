@@ -18,7 +18,7 @@ const BestLeft = React.createClass({
       <GolfDraftPanel heading='Golfers Available'>
         <ol>
           {_.map(golfersRemaining, function (g) {
-            return (<li key={g.id}>{GolferLogic.renderGolfer(g)}</li>);
+            return (<li key={g._id}>{GolferLogic.renderGolfer(g)}</li>);
           })}
         </ol>
       </GolfDraftPanel>

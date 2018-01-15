@@ -19,7 +19,7 @@ const NDAYS = constants.NDAYS;
 
 function getState(state, props) {
   return {
-    userDetailsUser: state.userDetailsUser || props.currentUser.user
+    userDetailsUser: state.userDetailsUser || props.currentUser._id
   };
 }
 

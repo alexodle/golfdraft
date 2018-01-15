@@ -28,7 +28,6 @@ const UserActions = {
       currentUser: user,
       doNotSync: true
     });
-    UserActions.setCurrentUserSynced();
   },
 
   setIsAdmin: function (isAdmin) {

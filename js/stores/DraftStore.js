@@ -48,6 +48,8 @@ function addPick(golfer) {
 }
 
 function filterPicksFromPickLists() {
+  if (_pickList == AppConstants.PROPERTY_LOADING) return;
+
   const pickedGids = _.pluck(_picks, 'golfer');
   if (_pickList !== _pendingPickList) {
     _pickList = _.difference(_pickList, pickedGids);
@@ -78,7 +80,7 @@ const DraftStore =  _.extend({}, Store.prototype, {
     if (!currentPick || !currentUser) return false;
 
     return (
-      currentPick.user === currentUser.user ||
+      currentPick.user === currentUser._id ||
       _.contains(_pickForUsers, currentPick.user)
     );
   },
@@ -160,7 +162,7 @@ AppDispatcher.register(function (payload) {
         // TODO - Move to separate server sync
         $.get('/draft/pickList')
         .done(function (data) {
-          if (data.userId === currentUser.id) {
+          if (data.userId === currentUser._id) {
             _pickList = data.pickList;
             _pendingPickList = _pickList;
             filterPicksFromPickLists();

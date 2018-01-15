@@ -27,7 +27,7 @@ AppDispatcher.register(function (payload) {
 
   switch(action.actionType) {
     case AppConstants.SET_GOLFERS:
-      _golfers = _.indexBy(action.golfers, 'id');
+      _golfers = _.indexBy(action.golfers, '_id');
       GolferStore.emitChange();
       break;
   }

@@ -24,9 +24,9 @@ const UserStandings = React.createClass({
 
     const trs = _.map(userScores, function (ps) {
       const p = UserStore.getUser(ps.user);
-      const userIsMe = this.props.currentUser.user === p.id;
-      const userIsSelected = this.props.selectedUser === p.id;
-      const viewUser = _.partial(this._onUserSelect, p.id);
+      const userIsMe = this.props.currentUser._id === p._id;
+      const userIsSelected = this.props.selectedUser === p._id;
+      const viewUser = _.partial(this._onUserSelect, p._id);
       const holesLeft = _.sum(ps.scoresByGolfer, function (gs) {
         if (_.any(gs.missedCuts)) {
           return 0;
@@ -39,7 +39,7 @@ const UserStandings = React.createClass({
 
       return (
         <tr
-          key={p.id}
+          key={p._id}
           className={cx({
             'selected-user-row': userIsSelected
           })}

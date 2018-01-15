@@ -20,18 +20,6 @@
       sd.appState = {{{appState}}};
       sd.user = {{{or user "null"}}};
       sd.tourneyName = "{{{tourneyName}}}";
-
-      [
-        sd.golfers,
-        sd.users,
-        sd.scores,
-        [sd.draft],
-        [sd.tourney]
-      ].forEach(function (mongoObjs) {
-        mongoObjs.forEach(function (o) {
-          o.id = o._id;
-        });
-      });
     </script>
   </head>
   <body>

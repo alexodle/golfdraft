@@ -54,7 +54,7 @@ const PickListEditor = React.createClass({
               <span>
                 <button
                   className="btn btn-default"
-                  disabled={unsavedChanges} 
+                  disabled={unsavedChanges}
                   type="button"
                   onClick={this._onFreeTextClick}
                 >Paste list</button>
@@ -63,7 +63,7 @@ const PickListEditor = React.createClass({
             <span className="pull-right">
               <button
                 className="btn btn-default"
-                disabled={!unsavedChanges} 
+                disabled={!unsavedChanges}
                 type="button"
                 onClick={this._onReset}
               >Reset</button>
@@ -95,8 +95,8 @@ const PickListEditor = React.createClass({
                   const g = GolferStore.getGolfer(gid);
                   return (
                     <tr
-                      key={g.id}
-                      className={!draggingGolferId || draggingGolferId !== g.id ? "" : "info"}
+                      key={g._id}
+                      className={!draggingGolferId || draggingGolferId !== g._id ? "" : "info"}
                     >
                       <td
                         draggable
@@ -111,7 +111,7 @@ const PickListEditor = React.createClass({
                           <span className="hidden-xs glyphicon glyphicon-menu-hamburger text-muted" />
                           &nbsp;&nbsp;{i+1}.&nbsp;&nbsp;{GolferLogic.renderGolfer(g)}
                         </span>
-                        
+
                         <span className="visible-xs">
                           {this._renderArrowLink("glyphicon-arrow-up", this._onUpOne.bind(this, i), i === 0)}
                           <span>&nbsp;</span>

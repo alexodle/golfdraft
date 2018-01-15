@@ -47,7 +47,7 @@ const AutoComplete = React.createClass({
         _.isEmpty(oldChoices) ||
         _.isEmpty(newChoices) ||
         !newChoices[currentIndex] ||
-        oldChoices[currentIndex].id !== newChoices[currentIndex].id
+        oldChoices[currentIndex]._id !== newChoices[currentIndex]._id
       ) {
 
       this.setState({ selectedIndex: 0 });
@@ -75,7 +75,7 @@ const AutoComplete = React.createClass({
         >
           {_.map(choices, function (u) {
             return (
-              <option key={u.id} value={u.name}>{u.name}</option>
+              <option key={u._id} value={u.name}>{u.name}</option>
             );
           })}
         </select>
