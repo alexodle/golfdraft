@@ -28,8 +28,8 @@ const AppSettingsStore =  _.extend({}, Store.prototype, {
     return valueOr('draftHasStarted', false);
   },
 
-  getAutoPickPlayers: function () {
-    return valueOr('autoPickPlayers', {});
+  getAutoPickUsers: function () {
+    return valueOr('autoPickUsers', {});
   }
 
 });
@@ -42,7 +42,7 @@ AppDispatcher.register(function (payload) {
 
     case AppConstants.SET_APP_STATE:
       _appState = _.extend({}, action.appState, {
-        autoPickPlayers: _.indexBy(action.appState.autoPickPlayers)
+        autoPickUsers: _.indexBy(action.appState.autoPickUsers)
       });
       AppSettingsStore.emitChange();
       break;

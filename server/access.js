@@ -13,6 +13,7 @@ const UNKNOWN_WGR = constants.UNKNOWN_WGR;
 const TOURNEY_ID = config.tourney_id;
 const TOURNEY_ID_QUERY = { _id: TOURNEY_ID };
 const FK_TOURNEY_ID_QUERY = { tourneyId: TOURNEY_ID };
+const PLACEHOLDER_PASSWORD = 'PLACEHOLDER_PASSWORD';
 
 function extendWithTourneyId(obj) {
   return _.extend({}, obj, FK_TOURNEY_ID_QUERY);
@@ -22,28 +23,16 @@ function extendAllWithTourneyId(objs) {
   return _.map(objs, extendWithTourneyId);
 }
 
-function promiseize(mongoosePromise) {
-  return new Promise(function (fulfill, reject) {
-    return mongoosePromise.then(function () {
-      fulfill.apply(null, arguments);
-    }, function () {
-      reject.apply(null, arguments);
-    });
-  });
-}
-
-function promiseizeFn(fn) {
-  return function () {
-    const mongoosePromise = fn.apply(null, arguments);
-    const rVal = promiseize(mongoosePromise);
-    return rVal;
-  };
+function nameToUsername(name) {
+  return name
+    .toLowerCase()
+    .replace(' ', '_');
 }
 
 function createBasicGetter(model) {
-  return promiseizeFn(function () {
+  return function () {
     return model.find(FK_TOURNEY_ID_QUERY).exec();
-  });
+  };
 }
 
 function createMultiUpdater(model, queryMask) {
@@ -51,15 +40,15 @@ function createMultiUpdater(model, queryMask) {
     objs = extendAllWithTourneyId(objs);
     return Promise.all(_.map(objs, function (o) {
       const query = _.pick(o, queryMask);
-      return promiseize(model.update(query, o, {upsert: true}).exec());
+      return model.update(query, o, {upsert: true}).exec();
     }));
   };
 }
 
 function createBasicClearer(model) {
-  return promiseizeFn(function () {
+  return function () {
     return model.remove(FK_TOURNEY_ID_QUERY).exec();
-  });
+  };
 }
 
 function mergeWGR(golfer, wgrEntry) {
@@ -76,27 +65,27 @@ function mergeWGR(golfer, wgrEntry) {
 const access = {};
 _.extend(access, {
 
-  getTourney: promiseizeFn(function () {
+  getTourney: function () {
     return models.Tourney.findOne(TOURNEY_ID_QUERY).exec();
-  }),
+  },
 
-  getPickList: function (playerId) {
-    const query = _.extend({ userId: playerId }, FK_TOURNEY_ID_QUERY);
-    return promiseize(models.DraftPickList.findOne(query).exec())
+  getPickList: function (userId) {
+    const query = _.extend({ userId: userId }, FK_TOURNEY_ID_QUERY);
+    return models.DraftPickList.findOne(query).exec()
       .then(function (pickList) {
         return pickList ? pickList.golferPickList : null;
       });
   },
 
-  updatePickList: function (playerId, pickList) {
+  updatePickList: function (userId, pickList) {
     pickList = _.uniq(pickList);
-    const query = _.extend({ userId: playerId }, FK_TOURNEY_ID_QUERY);
-    return promiseize(models.DraftPickList
+    const query = _.extend({ userId: userId }, FK_TOURNEY_ID_QUERY);
+    return models.DraftPickList
       .update(
         query,
         { $set: { golferPickList: pickList } },
         { upsert: true }
-      ).exec())
+      ).exec()
       .then(function () {
         return {
           completed: true,
@@ -105,26 +94,26 @@ _.extend(access, {
       });
   },
 
-  updateAutoPick: promiseizeFn(function (playerId, autoPick) {
+  updateAutoPick: function (userId, autoPick) {
     const query = FK_TOURNEY_ID_QUERY;
 
     let update = null;
     if (!!autoPick) {
       update = models.AppState.update(
         query,
-        { $addToSet: { autoPickPlayers: playerId } },
+        { $addToSet: { autoPickUsers: userId } },
         { upsert: true });
     } else {
       update = models.AppState.update(
         query,
-        { $pull: { autoPickPlayers: playerId } },
+        { $pull: { autoPickUsers: userId } },
         { multi: true });
     }
 
     return update.exec();
-  }),
+  },
 
-  updatePickListFromNames: function (playerId, pickListNames) {
+  updatePickListFromNames: function (userId, pickListNames) {
     return access.getGolfers()
     .then(function (golfers) {
       const golfersByLcName = _.indexBy(golfers, function (g) {
@@ -143,7 +132,7 @@ _.extend(access, {
 
       if (_.isEmpty(notFoundGolferNames)) {
         // SUCCESS! Found all golfers by name, so go ahead and save them.
-        return access.updatePickList(playerId, pickList);
+        return access.updatePickList(userId, pickList);
       }
 
       // Did not find at at least one golfer by name. Calculate closest matches and provide those
@@ -158,43 +147,61 @@ _.extend(access, {
 
   getGolfer: function (golferId) {
     const query = _.extend({ _id: golferId }, FK_TOURNEY_ID_QUERY);
-    return promiseize(models.Golfer.findOne(query).exec())
-    .then(function (golfer) {
-      return promiseize(models.WGR.findOne({ name: golfer.name }).exec())
-      .then(function (wgr) {
-        golfer = mergeWGR(golfer, wgr);
-      })
-      .catch(function () {
-        golfer = mergeWGR(golfer);
-      })
-      .then(function () {
-        return golfer;
+    return models.Golfer.findOne(query).exec()
+      .then(function (golfer) {
+        return models.WGR.findOne({ name: golfer.name }).exec()
+          .then(function (wgr) {
+            return mergeWGR(golfer, wgr);
+          })
+          .catch(function () {
+            return mergeWGR(golfer);
+          });
       });
-    });
   },
 
-  getPlayer: promiseizeFn(function (playerId) {
-    const query = _.extend({ _id: playerId }, FK_TOURNEY_ID_QUERY);
-    return models.Player.findOne(query).exec();
-  }),
+  getUser: function (userId) {
+    return models.User.findOne({ _id: userId }).exec();
+  },
+
+  validateAndGetUser: function (username, password) {
+    return models.User.findOne({ username }).select('+password').exec()
+      .then(function (user) {
+        if (user.validPassword(password)) {
+          return access.getUser(user._id);
+        }
+        return null;
+      })
+      .catch(function (err) {
+        console.log(err);
+        return null;
+      });
+  },
+
+  getUserByUsername: function (username, withPassword) {
+    const findOp = models.User.findOne({ username });
+    if (withPassword) {
+      findOp = findOp.select('+password');
+    }
+    return findOp.exec();
+  },
 
   getGolfers: function () {
     return Promise.all([
-      promiseize(models.WGR.find().exec()),
-      promiseize(models.Golfer.find(FK_TOURNEY_ID_QUERY).exec()),
-    ])
-
-    .then(function (results) {
-      const wgrs = _.indexBy(results[0], 'name');
-      const golfers = _.map(results[1], function (g) {
-        return mergeWGR(g, wgrs[g.name]);
+        models.WGR.find().exec(),
+        models.Golfer.find(FK_TOURNEY_ID_QUERY).exec(),
+      ])
+      .then(function (results) {
+        const wgrs = _.indexBy(results[0], 'name');
+        const golfers = _.map(results[1], function (g) {
+          return mergeWGR(g, wgrs[g.name]);
+        });
+        return golfers;
       });
-
-      return golfers;
-    });
   },
 
-  getPlayers: createBasicGetter(models.Player),
+  getUsers: function () {
+    return models.User.find({}).exec();
+  },
 
   getScores: createBasicGetter(models.GolferScore),
 
@@ -203,23 +210,23 @@ _.extend(access, {
   getScoreOverrides: createBasicGetter(models.GolferScoreOverrides),
 
   getAppState: function () {
-    return promiseize(models.AppState.findOne(FK_TOURNEY_ID_QUERY).exec())
+    return models.AppState.findOne(FK_TOURNEY_ID_QUERY).exec()
       .then(function (appState) {
         return appState || { isDraftPause: false, allowClock: true, draftHasStarted: false };
       });
   },
 
-  updateAppState: promiseizeFn(function (props) {
+  updateAppState: function (props) {
     return models.AppState.update(
       FK_TOURNEY_ID_QUERY,
       props,
       { upsert: true }
     ).exec();
-  }),
+  },
 
-  makePickListPick: function (playerId, pickNumber) {
+  makePickListPick: function (userId, pickNumber) {
     return Promise.all([
-      access.getPickList(playerId),
+      access.getPickList(userId),
       access.getGolfers(),
       access.getPicks()
     ])
@@ -255,7 +262,7 @@ _.extend(access, {
 
       return access.makePick({
           pickNumber: pickNumber,
-          player: playerId,
+          user: userId,
           golfer: golferToPick
         })
         .then(function (resp) {
@@ -267,7 +274,7 @@ _.extend(access, {
   makePick: function (pick, ignoreOrder) {
     const pickOrderQuery = _.extend({}, FK_TOURNEY_ID_QUERY, {
       pickNumber: pick.pickNumber,
-      player: pick.player
+      user: pick.user
     });
     const golferDraftedQuery = _.extend({}, FK_TOURNEY_ID_QUERY, {
       golfer: pick.golfer
@@ -276,65 +283,65 @@ _.extend(access, {
       _id: pick.golfer
     });
     return Promise.all([
-      // Ensure correct pick numnber
-      promiseize(models.DraftPick.count(FK_TOURNEY_ID_QUERY).exec()),
+        // Ensure correct pick numnber
+        models.DraftPick.count(FK_TOURNEY_ID_QUERY).exec(),
 
-      // Ensure this player is actually up in the draft
-      promiseize(models.DraftPickOrder.findOne(pickOrderQuery).exec()),
+        // Ensure this user is actually up in the draft
+        models.DraftPickOrder.findOne(pickOrderQuery).exec(),
 
-      // Ensure golfer isn't already picked
-      promiseize(models.DraftPick.findOne(golferDraftedQuery).exec()),
+        // Ensure golfer isn't already picked
+        models.DraftPick.findOne(golferDraftedQuery).exec(),
 
-      // Ensure this golfer actually exists
-      promiseize(models.Golfer.findOne(golferExistsQuery).exec())
-    ])
-    .then(function (result) {
-      const nPicks = result[0];
-      const playerIsUp = !!result[1];
-      const golferAlreadyDrafted = result[2];
-      const golferExists = !!result[3];
+        // Ensure this golfer actually exists
+        models.Golfer.findOne(golferExistsQuery).exec()
+      ])
+      .then(function (result) {
+        const nPicks = result[0];
+        const userIsUp = !!result[1];
+        const golferAlreadyDrafted = result[2];
+        const golferExists = !!result[3];
 
-      if (nPicks !== _.parseInt(pick.pickNumber) && !ignoreOrder) {
-        throw new Error('invalid pick: pick order out of sync');
-      } else if (!playerIsUp && !ignoreOrder) {
-        throw new Error('invalid pick: player picked out of order');
-      } else if (golferAlreadyDrafted) {
-        throw new Error('invalid pick: golfer already drafted');
-      } else if (!golferExists) {
-        throw new Error('invalid pick: invalid golfer');
-      }
+        if (nPicks !== _.parseInt(pick.pickNumber) && !ignoreOrder) {
+          throw new Error('invalid pick: pick order out of sync');
+        } else if (!userIsUp && !ignoreOrder) {
+          throw new Error('invalid pick: user picked out of order');
+        } else if (golferAlreadyDrafted) {
+          throw new Error('invalid pick: golfer already drafted');
+        } else if (!golferExists) {
+          throw new Error('invalid pick: invalid golfer');
+        }
 
-      pick = extendWithTourneyId(pick);
-      pick.timestamp = new Date();
-      return promiseize(models.DraftPick.create(pick));
-    })
-    .then(function () {
-      return pick;
-    });
+        pick = extendWithTourneyId(pick);
+        pick.timestamp = new Date();
+        return models.DraftPick.create(pick);
+      })
+      .then(function () {
+        return pick;
+      });
   },
 
   undoLastPick: function () {
-    return promiseize(models.DraftPick.count(FK_TOURNEY_ID_QUERY).exec())
-    .then(function (nPicks) {
-      return promiseize(models.DraftPick.findOneAndRemove({ pickNumber: nPicks - 1 }).exec());
-    });
+    return models.DraftPick.count(FK_TOURNEY_ID_QUERY).exec()
+      .then(function (nPicks) {
+        return models.DraftPick.findOneAndRemove({ pickNumber: nPicks - 1 }).exec();
+      });
   },
 
   getDraft: function () {
     return Promise.all([
-      promiseize(models.DraftPickOrder.find(FK_TOURNEY_ID_QUERY).exec()),
-      access.getPicks()
-    ])
-    .then(function (results) {
-      return {
-        pickOrder: _.sortBy(results[0], 'pickNumber'),
-        picks: _.sortBy(results[1], 'pickNumber'),
-        serverTimestamp: new Date()
-      };
-    });
+        models.DraftPickOrder.find(FK_TOURNEY_ID_QUERY).exec(),
+        access.getPicks()
+      ])
+      .then(function (results) {
+        return {
+          pickOrder: _.sortBy(results[0], 'pickNumber'),
+          picks: _.sortBy(results[1], 'pickNumber'),
+          serverTimestamp: new Date()
+        };
+      });
   },
 
-  updateTourney: promiseizeFn(function (props) {
+  updateTourney: function (props) {
     props = _.extend({}, props, { lastUpdated: new Date() });
     console.log('updating tourney: ' + JSON.stringify(props));
     return models.Tourney.update(
@@ -342,23 +349,38 @@ _.extend(access, {
       props,
       {upsert: true}
     ).exec();
-  }),
+  },
 
-  ensurePlayers: createMultiUpdater(models.Player, ['name', 'tourneyId']),
+  ensureUsers: function (allUsers) {
+    const userJsons = _.map(allUsers, function (user) {
+      const name = user.name;
+      const username = nameToUsername(name);
+      const password = PLACEHOLDER_PASSWORD;
+      return { name, username, password };
+    });
+    return access.getUsers()
+      .then(function (users) {
+        const existingUsersByName = _.indexBy(users, 'name');
+        const usersToAdd = _.filter(userJsons, function (json) {
+          return !existingUsersByName[json.name];
+        });
+        return models.User.create(usersToAdd);
+      });
+  },
 
   ensureGolfers: createMultiUpdater(models.Golfer, ['name', 'tourneyId']),
 
   replaceWgrs: function (wgrEntries) {
-    return promiseize(models.WGR.remove().exec()).then(function () {
-      return promiseize(models.WGR.create(wgrEntries));
-    });
+    return models.WGR.remove().exec()
+      .then(function () {
+        return models.WGR.create(wgrEntries);
+      });
   },
 
   setPickOrder: createMultiUpdater(
     models.DraftPickOrder,
-    ['tourneyId', 'player', 'pickNumber']
+    ['tourneyId', 'user', 'pickNumber']
   ),
-
 
   updateScores:  createMultiUpdater(
     models.GolferScore,
@@ -367,11 +389,11 @@ _.extend(access, {
 
   // Chat
 
-  getChatMessages: promiseizeFn(function () {
+  getChatMessages: function () {
     return chatModels.Message.find(FK_TOURNEY_ID_QUERY).exec();
-  }),
+  },
 
-  createChatMessage: promiseizeFn(function (message) {
+  createChatMessage: function (message) {
     message = extendWithTourneyId(message);
     message.date = new Date(); // probably not needed b/c we can use ObjectId
     return chatModels.Message.create(message)
@@ -382,7 +404,7 @@ _.extend(access, {
         action: 'chat:newMessage'
       });
     });
-  }),
+  },
 
   createChatBotMessage: function (message) {
     return access.createChatMessage(_.extend({ isBot: true }, message));
@@ -390,11 +412,9 @@ _.extend(access, {
 
   // DEBUGGING/TESTING
 
-  clearTourney: promiseizeFn(function () {
+  clearTourney: function () {
     return models.Tourney.remove(TOURNEY_ID_QUERY).exec();
-  }),
-
-  clearPlayers: createBasicClearer(models.Player),
+  },
 
   clearPickOrder: createBasicClearer(models.DraftPickOrder),
 
@@ -416,12 +436,15 @@ _.extend(access, {
 
   clearAppState: createBasicClearer(models.AppState),
 
-  resetTourney: function (clearPlayers) {
-    const resets = [
+  clearUsers: function () {
+    return model.remove({}).exec();
+  },
+
+  resetTourney: function () {
+    return Promise.all([
       models.Tourney.update(TOURNEY_ID_QUERY, {
         name: null,
-        par: -1,
-        sourceUrl: null
+        par: -1
       }).exec(),
       access.clearPickOrder(),
       access.clearDraftPicks(),
@@ -431,13 +454,7 @@ _.extend(access, {
       access.clearChatMessages(),
       access.clearPickLists(),
       access.clearAppState()
-    ];
-
-    if (clearPlayers) {
-      resets.push(access.clearPlayers());
-    }
-
-    return Promise.all(_.map(resets, promiseize));
+    ]);
   }
 
 });

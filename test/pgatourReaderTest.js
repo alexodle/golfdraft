@@ -20,7 +20,7 @@ describe('PgaTourReader', function () {
         });
     });
 
-    it('parses for active mid-tourney player', function () {
+    it('parses for active mid-tourney user', function () {
       reader
         .parseGolfer(70, 3, require('./files/golfer_midtourney_active'))
         .should.eql({
@@ -31,7 +31,7 @@ describe('PgaTourReader', function () {
         });
     });
 
-    it('parses for active mid-tourney mid-day player', function () {
+    it('parses for active mid-tourney mid-day user', function () {
       reader
         .parseGolfer(70, 3, require('./files/golfer_midtourney_playing'))
         .should.eql({

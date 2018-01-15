@@ -9,7 +9,6 @@ const AppConstants = keyMirror({
   SET_APP_STATE: null,
   SET_GOLFERS: null,
   SET_IS_ADMIN: null,
-  SET_PLAYERS: null,
   SET_TOURNEY_NAME: null,
   SET_USERS: null
 });

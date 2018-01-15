@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 
 const messageSchema = mongoose.Schema({
   tourneyId: mongoose.Schema.ObjectId,
-  player: mongoose.Schema.ObjectId,
+  user: mongoose.Schema.ObjectId,
   isBot: Boolean,
   message: String,
   date: Date

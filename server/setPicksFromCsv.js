@@ -6,7 +6,7 @@ const config = require('./config');
 const mongoose = require('mongoose');
 const fs = require('fs');
 const Promise = require('promise');
-const refreshPlayerState = require('./refreshPlayerState');
+const refreshUserState = require('./refreshUserState');
 const constants = require('../common/constants');
 
 function cleanName(n) {
@@ -37,13 +37,13 @@ function setPicksFromCsv(csvPicks) {
         .pluck(0)
         .value();
 
-      const playerLookup, golferLookup;
-      return refreshPlayerState(pickOrder)
+      const userLookup, golferLookup;
+      return refreshUserState(pickOrder)
         .then(function () {
-          return access.getPlayers();
+          return access.getUsers();
         })
-        .then(function (players) {
-          playerLookup = _.indexBy(players, 'name');
+        .then(function (users) {
+          userLookup = _.indexBy(users, 'name');
         })
         .then(function () {
           return access.getGolfers();
@@ -55,24 +55,24 @@ function setPicksFromCsv(csvPicks) {
 
           let curr = null;
           return Promise.all(_.map(picks, function (p, i) {
-            const playerName = p[0];
+            const userName = p[0];
             const golferName = cleanName(p[1]);
 
-            const player = playerLookup[playerName];
+            const user = userLookup[userName];
             const golfer = golferLookup[golferName];
 
-            if (!player) {
-              console.log("Cannot find player: " + playerName);
+            if (!user) {
+              console.log("Cannot find user: " + userName);
               throw new Error();
             } else if (!golfer) {
               console.log("Cannot find golfer: " + golferName);
               throw new Error();
             }
 
-            console.log('Making pick (' + i + ') - p:' + player.name + ' g:' + golfer.name);
+            console.log('Making pick (' + i + ') - p:' + user.name + ' g:' + golfer.name);
             return access.makePick({
               pickNumber: i,
-              player: player._id,
+              user: user._id,
               golfer: golfer._id
             }, true /* ignoreOrder */);
           }));

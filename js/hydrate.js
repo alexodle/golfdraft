@@ -4,7 +4,6 @@ const _ = require('lodash');
 const AppActions = require('./actions/AppActions');
 const DraftActions = require('./actions/DraftActions');
 const DraftParser = require('./logic/DraftParser');
-const PlayerStore = require('./stores/PlayerStore');
 const ScoreActions = require('./actions/ScoreActions');
 const SettingsActions = require('./actions/SettingsActions');
 const UserActions = require('./actions/UserActions');
@@ -14,7 +13,7 @@ const UserActions = require('./actions/UserActions');
 function hydrate(seedData) {
   const draft = DraftParser.parseDraft(seedData.draft);
 
-  AppActions.setPlayers(seedData.players);
+  AppActions.setUsers(seedData.users);
   AppActions.setGolfers(seedData.golfers);
   DraftActions.draftUpdate(draft);
   ScoreActions.scoreUpdate({
@@ -23,14 +22,6 @@ function hydrate(seedData) {
   });
   SettingsActions.setAppState(seedData.appState);
   AppActions.setTourneyName(seedData.tourneyName);
-
-  // HACKHACK - For now users are just wrappers around players. I may or may
-  // not need to differentiate the two in the future, so just keep the
-  // abstraction for now.
-  const users = _.transform(PlayerStore.getAll(), function (memo, p) {
-    memo[p.id] = { id: p.id, name: p.name, player: p.id };
-  });
-  AppActions.setUsers(users);
 
   if (seedData.user) {
     UserActions.hydrateCurrentUser(seedData.user.id);

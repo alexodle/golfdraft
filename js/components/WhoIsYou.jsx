@@ -23,7 +23,7 @@ const WhoIsYou = React.createClass({
 
   getInitialState: function () {
     const selectedUser = getSortedUsers()[0].id;
-    return { selectedUser: selectedUser };
+    return { selectedUser: selectedUser, password: '' };
   },
 
   render: function () {
@@ -37,7 +37,7 @@ const WhoIsYou = React.createClass({
                 <select
                   id="userSelect"
                   value={this.state.selectedUser}
-                  onChange={this._onChange}
+                  onChange={this._onUserChange}
                   size="15"
                   className="form-control"
                 >
@@ -45,10 +45,18 @@ const WhoIsYou = React.createClass({
                     return (<option key={u.id} value={u.id}>{u.name}</option>);
                   })}
                 </select>
+                <input
+                  id="password"
+                  type="password"
+                  className="form-control"
+                  placeholder="password"
+                  value={this.state.password}
+                />
               </div>
               <button
                 className="btn btn-default btn-primary"
                 onClick={this._onSubmit}
+                disabled={!this.state.password}
               >
                 Sign in
               </button>
@@ -59,20 +67,35 @@ const WhoIsYou = React.createClass({
     );
   },
 
-  _onChange: function (ev) {
-    this.setState({selectedUser: ev.target.value});
+  _onUserChange: function (ev) {
+    this.setState({ selectedUser: ev.target.value });
+  },
+
+  _onPasswordChange: function (ev) {
+    this.setState({ password: ev.target.value });
   },
 
   _onSubmit: function (ev) {
     ev.preventDefault();
-    UserActions.setCurrentUser(this.state.selectedUser);
 
-    const location = this.props.location;
-    if (location.state && location.state.nextPathname) {
-      this.context.router.replace(location.state.nextPathname);
-    } else {
-      this.context.router.replace('/');
-    }
+    xhr = $.post('/login', {
+      username: PlayerStore.getPlayer(this.state.selectedUser).username,
+      password: this.state.password
+    });
+    xhr.fail(function () {
+      window.location.reload();
+    });
+    xhr.done(function () {
+      UserActions.setCurrentUser(this.state.selectedUser);
+      UserActions.setCurrentUserSynced();
+
+      const location = this.props.location;
+      if (location.state && location.state.nextPathname) {
+        this.context.router.replace(location.state.nextPathname);
+      } else {
+        this.context.router.replace('/');
+      }
+    });
   }
 
 });

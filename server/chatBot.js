@@ -3,29 +3,27 @@
 const _ = require('lodash');
 const access = require('./access');
 const Promise = require('promise');
+const utils = require('../common/utils');
 
-function getData(draft, draftPick) {
+function loadPick(draft, draftPick) {
   const nextPick = draft.pickOrder[draft.picks.length];
   return Promise.all(_.compact([
-      access.getPlayer(draftPick.player),
+      access.getUser(draftPick.user),
       access.getGolfer(draftPick.golfer),
-      nextPick ? access.getPlayer(nextPick.player) : null,
+      nextPick ? access.getUser(nextPick.user) : null,
     ]))
     .then(function (results){
-      return {
-        player: results[0],
-        golfer: results[1],
-        nextPlayer: results[2]
-      };
+      const [pickUser, pickGolfer, nextUser] = results;
+      return { pickUser, pickGolfer, nextUser };
     });
 }
 
-function sendMessage(message, data) {
+function sendMessage(message, pickInfo) {
   return access.createChatBotMessage({ message: message})
     .then(function () {
-      if (data.nextPlayer) {
+      if (pickInfo.nextUser) {
         return access.createChatBotMessage({
-          message: data.nextPlayer.name + ', you\'re up!'
+          message: pickInfo.nextUser.name + ', you\'re up!'
         });
       } else {
         return access.createChatBotMessage({
@@ -38,47 +36,47 @@ function sendMessage(message, data) {
 module.exports = {
 
   broadcastUndoPickMessage: function (draftPick, draft) {
-    return getData(draft, draftPick)
-      .then(function (data) {
-        const {player, golfer} = data;
-        const message = 'PICK REVERTED: ' + player.name + ' picks ' + golfer.name;
-        return sendMessage(message, data);
+    return loadPick(draft, draftPick)
+      .then(function (pickInfo) {
+        const {pickUser, pickGolfer} = pickInfo;
+        const message = 'PICK REVERTED: ' + pickUser.name + ' picks ' + pickGolfer.name;
+        return sendMessage(message, pickInfo);
       });
   },
 
   broadcastAutoPickMessage: function (draftPick, draft, isPickListPick) {
-    return getData(draft, draftPick)
-      .then(function (data) {
-        const {player, golfer} = data;
-        const message = player.name + ' picks ' + golfer.name + (isPickListPick ? 
+    return loadPick(draft, draftPick)
+      .then(function (pickInfo) {
+        const {pickUser, pickGolfer} = pickInfo;
+        const message = pickUser.name + ' picks ' + pickGolfer.name + (isPickListPick ?
             ' (auto-draft from pick list)' :
             ' (auto-draft wgr)'
         );
-        return sendMessage(message, data);
+        return sendMessage(message, pickInfo);
       });
   },
 
-  broadcastProxyPickListPickMessage: function (user, draftPick, draft) {
-    return getData(draft, draftPick)
-      .then(function (data) {
-        const {player, golfer} = data;
-        const message = player.name + ' picks ' + golfer.name + ' (pick list proxy from ' + user.name + ')';
-        return sendMessage(message, data);
+  broadcastProxyPickListPickMessage: function (currentUser, draftPick, draft) {
+    return loadPick(draft, draftPick)
+      .then(function (pickInfo) {
+        const {pickUser, pickGolfer} = pickInfo;
+        const message = pickUser.name + ' picks ' + pickGolfer.name + ' (pick list proxy from ' + currentUser.name + ')';
+        return sendMessage(message, pickInfo);
       });
   },
 
-  broadcastPickMessage: function (user, draftPick, draft) {
-    return getData(draft, draftPick)
-      .then(function (data) {
-        const {player, golfer} = data;
-        const isProxyPick = draftPick.player !== user.player;
+  broadcastPickMessage: function (currentUser, draftPick, draft) {
+    return loadPick(draft, draftPick)
+      .then(function (pickInfo) {
+        const {pickUser, pickGolfer} = pickInfo;
+        const isProxyPick = utils.oidsAreEqual(pickUser._id, currentUser._id);
 
-        let message = player.name + ' picks ' + golfer.name;
+        let message = pickUser.name + ' picks ' + pickGolfer.name;
         if (isProxyPick) {
-          message += ' (proxy from ' + user.name + ')';
+          message += ' (proxy from ' + currentUser.name + ')';
         }
 
-        return sendMessage(message, data);
+        return sendMessage(message, pickInfo);
       });
   }
 

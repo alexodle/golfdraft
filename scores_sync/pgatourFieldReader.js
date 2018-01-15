@@ -5,8 +5,8 @@ const request = require('request');
 const JQUERY_URL = 'file://' + __dirname + '/../assets/jquery.js';
 
 function parseJson(json) {
-  const golfers = _.map(JSON.parse(json).Tournament.Players, function (p) {
-    const lastFirst = p.PlayerName.split(', ');
+  const golfers = _.map(JSON.parse(json).Tournament.Users, function (p) {
+    const lastFirst = p.UserName.split(', ');
     return {
       golfer: lastFirst[1] + ' ' + lastFirst[0],
       scores: [0, 0, 0, 0],

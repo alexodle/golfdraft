@@ -1,6 +1,6 @@
 'use strict';
 
-// Refreshes players, pick order, draft picks, and chat
+// Refreshes users, pick order, draft picks, and chat
 
 const _ = require('lodash');
 const access = require('./access');
@@ -10,29 +10,28 @@ const Promise = require('promise');
 const tourneyConfigReader = require('./tourneyConfigReader');
 const tourneyUtils = require('./tourneyUtils');
 
-function refreshPlayerState(pickOrderNames) {
+function refreshUserState(pickOrderNames) {
   return Promise.all([
-    access.clearPlayers(),
     access.clearPickOrder(),
     access.clearDraftPicks(),
     access.clearChatMessages(),
     access.clearPickLists()
   ])
   .then(function () {
-    const players = _.map(pickOrderNames, function (name) {
+    const users = _.map(pickOrderNames, function (name) {
       return { name: name };
     });
-    return access.ensurePlayers(players);
+    return access.ensureUsers(users);
   })
   .then(function () {
-    return access.getPlayers().then(function (players) {
-      return _.sortBy(players, function (p) {
+    return access.getUsers().then(function (users) {
+      return _.sortBy(users, function (p) {
         return _.indexOf(pickOrderNames, p.name);
       });
     });
   })
-  .then(function (sortedPlayers) {
-    const pickOrder = tourneyUtils.snakeDraftOrder(sortedPlayers);
+  .then(function (sortedUsers) {
+    const pickOrder = tourneyUtils.snakeDraftOrder(sortedUsers);
     return access.setPickOrder(pickOrder);
   });
 }
@@ -45,10 +44,10 @@ if (require.main === module) {
   db.on('error', console.error.bind(console, 'connection error:'));
   db.once('open', function callback () {
     const tourneyCfg = tourneyConfigReader.loadConfig();
-    refreshPlayerState(tourneyCfg.draftOrder).then(function () {
+    refreshUserState(tourneyCfg.draftOrder).then(function () {
       process.exit(0);
     });
   });
 }
 
-module.exports = refreshPlayerState;
+module.exports = refreshUserState;

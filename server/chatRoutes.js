@@ -27,7 +27,7 @@ app.post('/chat/messages', function (req, res) {
   }
 
   const message = {
-    player: user.player,
+    user: user.user,
     message: body.message
   };
   access.createChatMessage(message)

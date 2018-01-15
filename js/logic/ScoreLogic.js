@@ -8,17 +8,17 @@ const NDAYS = constants.NDAYS;
 const MISSED_CUT = constants.MISSED_CUT;
 const NSCORES_PER_DAY = constants.NSCORES_PER_DAY;
 
-function getGolfersByPlayer(draftPicks) {
+function getGolfersByUser(draftPicks) {
   return _.chain(draftPicks)
-    .groupBy('player')
-    .transform(function (memo, picks, playerId) {
-      memo[playerId] = _.pluck(picks, 'golfer');
+    .groupBy('user')
+    .transform(function (memo, picks, userId) {
+      memo[userId] = _.pluck(picks, 'golfer');
     })
     .value();
 }
 
-function playerScore(playerGolfers, scores, player) {
-  const scoresByGolfer = _.chain(playerGolfers)
+function userScore(userGolfers, scores, user) {
+  const scoresByGolfer = _.chain(userGolfers)
     .map(function (g) {
       return _.extend({}, scores[g], {
         total: _.sum(scores[g].scores)
@@ -28,7 +28,7 @@ function playerScore(playerGolfers, scores, player) {
     .value();
 
   const scoresByDay = _.times(NDAYS, function (day) {
-    const dayScores = _.chain(playerGolfers)
+    const dayScores = _.chain(userGolfers)
       .map(function (g) {
         return scores[g];
       })
@@ -49,15 +49,15 @@ function playerScore(playerGolfers, scores, player) {
   });
 
   return {
-    player: player,
+    user: user,
     scoresByDay: scoresByDay,
     scoresByGolfer: scoresByGolfer,
     total: _.sum(scoresByDay, 'total')
   };
 }
 
-function worstScoreForDay(playerScores, day) {
-  return _.chain(playerScores)
+function worstScoreForDay(userScores, day) {
+  return _.chain(userScores)
     .pluck('scores')
     .pluck(day)
     .reject(MISSED_CUT)
@@ -68,7 +68,7 @@ function worstScoreForDay(playerScores, day) {
 const ScoreLogic = {
 
   /**
-   * Calculates the overall score for each pool player in tournament. Scoring
+   * Calculates the overall score for each pool user in tournament. Scoring
    * works on a per-day basis, and is calculated as such:
    *
    * score = 0
@@ -79,10 +79,10 @@ const ScoreLogic = {
    * If the either of the top 2 scores contains a MISSED_CUT, then the worst
    * score of all golfers for the particular day will be used instead.
    */
-  calcPlayerScores: function (draftPicks, golferScores) {
-    const golfersByPlayer = getGolfersByPlayer(draftPicks);
-    const draftPosByPlayer = _(draftPicks)
-      .groupBy('player')
+  calcUserScores: function (draftPicks, golferScores) {
+    const golfersByUser = getGolfersByUser(draftPicks);
+    const draftPosByUser = _(draftPicks)
+      .groupBy('user')
       .mapValues(function (dps) {
         return _.min(dps, function (dp) {
           return dp.pickNumber;
@@ -91,21 +91,21 @@ const ScoreLogic = {
       })
       .value();
 
-    const playerScores = _.chain(golfersByPlayer)
-      .map(function (golfers, player) {
+    const userScores = _.chain(golfersByUser)
+      .map(function (golfers, user) {
         return _.extend({},
-          playerScore(golfers, golferScores, player),
-          { pickNumber: draftPosByPlayer[player] });
+          userScore(golfers, golferScores, user),
+          { pickNumber: draftPosByUser[user] });
       })
-      .indexBy('player')
+      .indexBy('user')
       .value();
 
-    return playerScores;
+    return userScores;
   },
 
   /**
    * Replaces missed cut scores with the worst score of any golfer for that
-   * particular day. See calcPlayerScores() description for why this is
+   * particular day. See calcUserScores() description for why this is
    * important.
    *
    * Appends a missedCuts array to the scores object, which contains true for
@@ -113,12 +113,12 @@ const ScoreLogic = {
    * which scores were actually the result of a missed cut instead of the
    * golfer actually shooting that particular score.
    */
-  fillMissedCutScores: function (playerScores) {
+  fillMissedCutScores: function (userScores) {
     const worstScores = _.chain(NDAYS)
       .range()
-      .map(_.partial(worstScoreForDay, playerScores))
+      .map(_.partial(worstScoreForDay, userScores))
       .value();
-    _.each(playerScores, function (ps) {
+    _.each(userScores, function (ps) {
       ps.missedCuts = _.map(ps.scores, function (s) {
         return s === MISSED_CUT;
       });
@@ -126,7 +126,7 @@ const ScoreLogic = {
         return ps.missedCuts[i] ? worstScores[i] : s;
       });
     });
-    return playerScores;
+    return userScores;
   }
 
 };

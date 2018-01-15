@@ -13,16 +13,16 @@ function end() {
 
 function printScoresForFrank() {
   Promise.all([
-    access.getPlayers(),
+    access.getUsers(),
     access.getDraft(),
     access.getGolfers()
   ])
   .then(function (results) {
-    const players = results[0];
-    const draftPicks = _.groupBy(results[1].picks, 'player');
+    const users = results[0];
+    const draftPicks = _.groupBy(results[1].picks, 'user');
     const golfers = _.indexBy(results[2], '_id');
 
-    _.each(players, function (p) {
+    _.each(users, function (p) {
       console.log(p.name);
       _.each(draftPicks[p._id], function (pick) {
         console.log("\t" + golfers[pick.golfer].name);

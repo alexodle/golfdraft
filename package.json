@@ -26,6 +26,7 @@
     "node-schedule": "^0.1.13",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
+    "passport-local-mongoose": "^4.4.0",
     "promise": "^5.0.0",
     "proxyquire": "^1.7.4",
     "react": "^0.14.7",

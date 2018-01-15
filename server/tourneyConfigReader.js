@@ -1,6 +1,6 @@
 'use strict';
 
-// Refreshes players, pick order, draft picks, and chat
+// Refreshes users, pick order, draft picks, and chat
 
 const _ = require('lodash');
 const config = require('./config');

@@ -10,17 +10,19 @@ const config = require('./config');
 const exphbs  = require('express-handlebars');
 const express = require('express');
 const io = require('./socketIO');
-const LocalStrategy = require('passport-local').Strategy;
 const logfmt = require("logfmt");
+const User = require('./models').User;
 const mongoose = require('mongoose');
 const passport = require('passport');
 const Promise = require('promise');
 const redis = require("./redis");
-const RedisStore = require('connect-redis')(session);
 const session = require('express-session');
 const tourneyConfigReader = require('./tourneyConfigReader');
 const UserAccess = require('./userAccess');
 const utils = require('../common/utils');
+
+const RedisStore = require('connect-redis')(session);
+const redisPubSubClient = redis.pubSubClient;
 
 const port = Number(process.env.PORT || 3000);
 
@@ -29,8 +31,6 @@ const ENSURE_AUTO_PICK_DELAY_MILLIS = 500;
 const AUTO_PICK_STARTUP_DELAY = 1000 * 5;
 
 const NOT_AN_ERROR = {};
-
-const redisPubSubClient = redis.pubSubClient;
 
 mongoose.connect(config.mongo_url);
 
@@ -47,6 +47,7 @@ const sessionMiddleware = session({
   maxAge: MAX_AGE,
   logErrors: true,
   resave: false,
+  saveUninitialized: false,
   cookie: { secure: true }
 });
 app.use(sessionMiddleware);
@@ -58,20 +59,11 @@ io.use(function(socket, next) {
 app.use(compression());
 
 // Authentication
-passport.use(new LocalStrategy(
-  function(username, password, done) {
-    User.findOne({ username: username }, function(err, user) {
-      if (err) { return done(err); }
-      if (!user) {
-        return done(null, false, { message: 'Incorrect username.' });
-      }
-      if (!user.validPassword(password)) {
-        return done(null, false, { message: 'Incorrect password.' });
-      }
-      return done(null, user);
-    });
-  }
-));
+passport.use(User.createStrategy());
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Handlebars
 app.engine('handlebars', exphbs({
@@ -151,7 +143,7 @@ db.once('open', function callback () {
   app.get(['/', '/draft', '/admin', '/whoisyou'], function (req, res) {
     Promise.all([
         access.getGolfers(),
-        access.getPlayers(),
+        access.getUsers(),
         access.getDraft(),
         access.getScores(),
         access.getTourney(),
@@ -160,7 +152,7 @@ db.once('open', function callback () {
       .then(function (results) {
         res.render('index', {
           golfers: JSON.stringify(results[0]),
-          players: JSON.stringify(results[1]),
+          users: JSON.stringify(results[1]),
           draft: JSON.stringify(results[2]),
           scores: JSON.stringify(results[3]),
           tourney: JSON.stringify(results[4]),
@@ -177,30 +169,27 @@ db.once('open', function callback () {
       });
   });
 
-  app.post('/login', function (req, res) {
-    const user = req.body;
-    req.session.user = user;
-    req.session.save(function (err) {
+  app.post('/register', function (req, res) {
+    const { username, name, password } = req.body;
+    User.register(new User({ username, name }), password, function (err) {
       if (err) {
-        res.status(500).send(err);
+        console.log('error while user register!', err);
+        res.sendStatus(401);
         return;
       }
-      UserAccess.onUserLogin(req.session);
-      res.sendStatus(200);
+
+      res.status(200).send({ username });
     });
   });
 
-  app.post('/logout', function (req, res) {
-    req.session.user = null;
+  app.post('/login', passport.authenticate('local'), function (req, res, next) {
+    console.dir(req.session);
+    res.status(200).send({ username: req.body.username });
+  });
 
-    req.session.save(function (err) {
-      if (err) {
-        res.status(500).send(err);
-        return;
-      }
-      UserAccess.onUserLogout(req.session);
-      res.sendStatus(200);
-    });
+  app.post('/logout', function (req, res) {
+    req.logout();
+    res.sendStatus(200);
   });
 
   app.get('/draft/pickList', function (req, res) {
@@ -214,7 +203,7 @@ db.once('open', function callback () {
     access.getPickList(user.id)
       .then(function (pickList) {
         res.status(200).send({
-          playerId: user.id,
+          userId: user.id,
           pickList: pickList
         });
       })
@@ -237,21 +226,21 @@ db.once('open', function callback () {
     if (body.pickList) {
       promise = access.updatePickList(user.id, body.pickList)
         .then(function () {
-          res.status(200).send({ playerId: user.id, pickList: body.pickList });
+          res.status(200).send({ userId: user.id, pickList: body.pickList });
         })
         .catch(function (err) {
           console.log(err);
           res.status(500).send(err);
           throw err;
         });
-      
+
     } else {
       promise = access.updatePickListFromNames(user.id, body.pickListNames)
         .then(function (result) {
           if (result.completed) {
-            res.status(200).send({ playerId: user.id, pickList: result.pickList });
+            res.status(200).send({ userId: user.id, pickList: result.pickList });
           } else {
-            res.status(300).send({ playerId: user.id, suggestions: result.suggestions });
+            res.status(300).send({ userId: user.id, suggestions: result.suggestions });
           }
         })
         .catch(function (err) {
@@ -288,7 +277,7 @@ db.once('open', function callback () {
 
     const pick = {
       pickNumber: body.pickNumber,
-      player: body.player,
+      user: body.user,
       golfer: body.golfer
     };
 
@@ -313,15 +302,16 @@ db.once('open', function callback () {
       return;
     }
 
-    const {player, pickNumber} = body;
+    const forUser = body.user;
+    const pickNumber = body.pickNumber;
     return handlePick({
       req,
       res,
       makePick: function () {
-        return access.makePickListPick(player, pickNumber);
+        return access.makePickListPick(forUser, pickNumber);
       },
       broadcastPickMessage: function (spec) {
-        return chatBot.broadcastProxyPickListPickMessage(user, spec.pick, spec.draft);
+        return chatBot.broadcastProxyPickListPickMessage(forUser, spec.pick, spec.draft);
       }
     });
   });
@@ -344,15 +334,15 @@ db.once('open', function callback () {
     });
   });
 
-  app.put('/admin/autoPickPlayers', function (req, res) {
+  app.put('/admin/autoPickUsers', function (req, res) {
     if (!req.session.isAdmin) {
       res.status(401).send('Only can admin can pause the draft');
       return;
     }
 
-    const playerId = req.body.playerId;
+    const userId = req.body.userId;
     const autoPick = !!req.body.autoPick;
-    return onAppStateUpdate(req, res, access.updateAutoPick(playerId, autoPick));
+    return onAppStateUpdate(req, res, access.updateAutoPick(userId, autoPick));
   });
 
   app.put('/admin/pause', function (req, res) {
@@ -438,17 +428,17 @@ function ensureNextAutoPick() {
     return ensureDraftIsRunning()
       .then(function (spec) {
         const {appState, draft} = spec;
-        const {autoPickPlayers} = appState;
+        const {autoPickUsers} = appState;
         const nextPickNumber = draft.picks.length;
         const nextPick = draft.pickOrder[nextPickNumber];
-        const nextPickPlayer = nextPick.player;
+        const nextPickUser = nextPick.user;
 
-        if (utils.containsObjectId(autoPickPlayers, nextPickPlayer)) {
+        if (utils.containsObjectId(autoPickUsers, nextPickUser)) {
           console.info('ensureNextAutoPick: making next pick!');
-          autoPick(nextPickPlayer, nextPickNumber);
+          autoPick(nextPickUser, nextPickNumber);
         } else {
-          console.info('ensureNextAutoPick: not auto-picking; player not in auto-pick list. ' +
-            'player: ' + nextPickPlayer + ', autoPickPlayers: ' + autoPickPlayers);
+          console.info('ensureNextAutoPick: not auto-picking; user not in auto-pick list. ' +
+            'user: ' + nextPickUser + ', autoPickUsers: ' + autoPickUsers);
         }
       })
       .catch(function (err) {
@@ -461,12 +451,12 @@ function ensureNextAutoPick() {
   }, ENSURE_AUTO_PICK_DELAY_MILLIS);
 }
 
-function autoPick(playerId, pickNumber) {
-  console.info('autoPick: Auto-picking for ' + playerId + ', ' + pickNumber);
+function autoPick(userId, pickNumber) {
+  console.info('autoPick: Auto-picking for ' + userId + ', ' + pickNumber);
   let isPickListPick = null;
   return handlePick({
     makePick: function () {
-      return access.makePickListPick(playerId, pickNumber)
+      return access.makePickListPick(userId, pickNumber)
         .then(function (result) {
           isPickListPick = result.isPickListPick;
           return result;

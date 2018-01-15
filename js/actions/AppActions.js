@@ -12,13 +12,6 @@ const AppActions = {
     });
   },
 
-  setPlayers: function (players) {
-    AppDispatcher.handleViewAction({
-      actionType: AppConstants.SET_PLAYERS,
-      players: players
-    });
-  },
-
   setUsers: function (users) {
     AppDispatcher.handleViewAction({
       actionType: AppConstants.SET_USERS,

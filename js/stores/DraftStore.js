@@ -10,7 +10,7 @@ const UserStore = require('./UserStore');
 
 let _picks = [];
 let _pickOrder = [];
-let _pickForPlayers = [];
+let _pickForUsers = [];
 
 let _pickList = null;
 let _pendingPickList = null;
@@ -31,7 +31,7 @@ function getCurrentPick() {
     return null;
   }
   return {
-    player: _pickOrder[pickNumber].player,
+    user: _pickOrder[pickNumber].user,
     pickNumber: pickNumber
   };
 }
@@ -78,13 +78,13 @@ const DraftStore =  _.extend({}, Store.prototype, {
     if (!currentPick || !currentUser) return false;
 
     return (
-      currentPick.player === currentUser.player ||
-      _.contains(_pickForPlayers, currentPick.player)
+      currentPick.user === currentUser.user ||
+      _.contains(_pickForUsers, currentPick.user)
     );
   },
 
-  getPickingForPlayers: function () {
-    return _pickForPlayers;
+  getPickingForUsers: function () {
+    return _pickForUsers;
   },
 
   getPickList: function () {
@@ -139,13 +139,13 @@ AppDispatcher.register(function (payload) {
       DraftStore.emitChange();
       break;
 
-    case DraftConstants.DRAFT_FOR_PLAYER:
-      _pickForPlayers = _.uniq(_pickForPlayers.concat([action.player]));
+    case DraftConstants.DRAFT_FOR_USER:
+      _pickForUsers = _.uniq(_pickForUsers.concat([action.user]));
       DraftStore.emitChange();
       break;
 
-    case DraftConstants.STOP_DRAFT_FOR_PLAYER:
-      _pickForPlayers = _.without(_pickForPlayers, action.player);
+    case DraftConstants.STOP_DRAFT_FOR_USER:
+      _pickForUsers = _.without(_pickForUsers, action.user);
       DraftStore.emitChange();
       break;
 
@@ -160,7 +160,7 @@ AppDispatcher.register(function (payload) {
         // TODO - Move to separate server sync
         $.get('/draft/pickList')
         .done(function (data) {
-          if (data.playerId === currentUser.id) {
+          if (data.userId === currentUser.id) {
             _pickList = data.pickList;
             _pendingPickList = _pickList;
             filterPicksFromPickLists();
@@ -196,7 +196,7 @@ AppDispatcher.register(function (payload) {
     case DraftConstants.SET_PICK_LIST:
       _pickList = action.pickList;
       _pendingPickList = _pickList;
-      
+
       DraftStore.emitChange();
       break;
 

@@ -41,23 +41,23 @@ function refreshData(pickOrderNames, reader, url) {
     return access.resetTourney();
   })
   .then(function () {
-    console.log("Adding players");
+    console.log("Adding users");
     console.log("");
-    const players = _.map(pickOrderNames, function (name) {
+    const users = _.map(pickOrderNames, function (name) {
       return {name: name};
     });
-    return access.ensurePlayers(players);
+    return access.ensureUsers(users);
   })
   .then(function () {
-    return access.getPlayers().then(function (players) {
-      return _.sortBy(players, function (p) {
+    return access.getUsers().then(function (users) {
+      return _.sortBy(users, function (p) {
         return _.indexOf(pickOrderNames, p.name);
       });
     });
   })
-  .then(function (sortedPlayers) {
+  .then(function (sortedUsers) {
     console.log("Updating pickOrder");
-    const pickOrder = tourneyUtils.snakeDraftOrder(sortedPlayers);
+    const pickOrder = tourneyUtils.snakeDraftOrder(sortedUsers);
     return access.setPickOrder(pickOrder);
   })
   .then(function () {

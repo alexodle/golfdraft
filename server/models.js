@@ -1,76 +1,77 @@
 'use strict';
 
 const mongoose = require('mongoose');
+const Promise = require('promise');
+const User = require('./User');
+
+
 const SchemaTypes = mongoose.Schema.Types;
+mongoose.Promise = Promise;
+
 
 const golferSchema = mongoose.Schema({
-  tourneyId: SchemaTypes.ObjectId,
-  name: String
+  tourneyId: { type: SchemaTypes.ObjectId, required: true },
+  name: { type: String, required: true, unique: true }
 });
 golferSchema.index({ name: 1, tourneyId: 1 });
 
 // Keep this separate for now, that way I don't have to change it often
 const wgrSchema = mongoose.Schema({
-  name: String,
-  wgr: Number
+  name: { type: String, required: true, unique: true },
+  wgr: { type: Number, required: true, unique: true }
 });
 wgrSchema.index({ name: 1 });
 
-// For now these are the same
-const playerSchema = golferSchema;
-
 const draftPickOrderSchema = mongoose.Schema({
-  tourneyId: SchemaTypes.ObjectId,
-  pickNumber: Number,
-  player: SchemaTypes.ObjectId
+  tourneyId: { type: SchemaTypes.ObjectId, required: true },
+  pickNumber: { type: Number, required: true },
+  user: { type: SchemaTypes.ObjectId, required: true }
 });
-draftPickOrderSchema.index({ pickNumber: 1, tourneyId: 1 });
+draftPickOrderSchema.index({ pickNumber: 1, tourneyId: 1 }, { unique: true });
 
 const draftPickSchema = mongoose.Schema({
-  tourneyId: SchemaTypes.ObjectId,
-  player: SchemaTypes.ObjectId,
-  golfer: SchemaTypes.ObjectId,
-  pickNumber: Number,
-  timestamp: Date
+  tourneyId: { type: SchemaTypes.ObjectId, required: true },
+  user: { type: SchemaTypes.ObjectId, required: true },
+  golfer: { type: SchemaTypes.ObjectId, required: true },
+  pickNumber: { type: Number, required: true },
+  timestamp: { type: Date, required: true }
 });
-draftPickSchema.index({ tourneyId: 1, pickNumber: 1 });
-draftPickSchema.index({ tourneyId: 1, golfer: 1 });
+draftPickSchema.index({ tourneyId: 1, pickNumber: 1 }, { unique: true });
+draftPickSchema.index({ tourneyId: 1, golfer: 1 }, { unique: true });
 
 const draftPickListSchema = mongoose.Schema({
-  tourneyId: SchemaTypes.ObjectId,
-  userId: SchemaTypes.ObjectId,
-  golferPickList: [SchemaTypes.ObjectId] 
+  tourneyId: { type: SchemaTypes.ObjectId, required: true },
+  userId: { type: SchemaTypes.ObjectId, required: true },
+  golferPickList: [SchemaTypes.ObjectId]
 });
-draftPickListSchema.index({ tourneyId: 1, player: 1 });
+draftPickListSchema.index({ tourneyId: 1, userId: 1 }, { unique: true });
 
 const golferScoreSchema = mongoose.Schema({
-  tourneyId: SchemaTypes.ObjectId,
-  golfer: SchemaTypes.ObjectId,
+  tourneyId: { type: SchemaTypes.ObjectId, required: true },
+  golfer: { type: SchemaTypes.ObjectId, required: true },
   day: Number,
   thru: Number,
   scores: [SchemaTypes.Mixed]
 });
-golferScoreSchema.index({ tourneyId: 1, golfer: 1 });
-
-const tourneySchema = mongoose.Schema({
-  name: String,
-  par: Number,
-  lastUpdated: Date,
-  sourceUrl: String
-});
+golferScoreSchema.index({ tourneyId: 1, golfer: 1 }, { unique: true });
 
 const appStateSchema = mongoose.Schema({
-  tourneyId: SchemaTypes.ObjectId,
+  tourneyId: { type: SchemaTypes.ObjectId, required: true, unique: true },
   isDraftPaused: Boolean,
   allowClock: Boolean,
   draftHasStarted: Boolean,
-  autoPickPlayers: [SchemaTypes.ObjectId]
+  autoPickUsers: [SchemaTypes.ObjectId]
 });
-appStateSchema.index({ tourneyId: 1 });
+appStateSchema.index({ tourneyId: 1 }, { unique: true });
+
+const tourneySchema = mongoose.Schema({
+  name: { type: String, required: true },
+  lastUpdated: { type: Date, required: true },
+  par: Number
+});
 
 const Golfer = mongoose.model('Golfer', golferSchema);
 const WGR = mongoose.model('WGR', wgrSchema);
-const Player = mongoose.model('Player', playerSchema);
 const DraftPickOrder = mongoose.model('DraftPickOrder', draftPickOrderSchema);
 const DraftPick = mongoose.model('DraftPick', draftPickSchema);
 const DraftPickList = mongoose.model('DraftPickList', draftPickListSchema);
@@ -79,18 +80,18 @@ const GolferScoreOverrides = mongoose.model(
   'GolferScoreOverrides',
   golferScoreSchema
 );
-const Tourney = mongoose.model('Tourney', tourneySchema);
 const AppState = mongoose.model('AppState', appStateSchema);
+const Tourney = mongoose.model('Tourney', tourneySchema);
 
 module.exports = {
-  Golfer: Golfer,
-  Player: Player,
-  WGR: WGR,
-  DraftPickOrder: DraftPickOrder,
-  DraftPick: DraftPick,
-  DraftPickList: DraftPickList,
-  GolferScore: GolferScore,
-  GolferScoreOverrides: GolferScoreOverrides,
-  Tourney: Tourney,
-  AppState: AppState
+  AppState,
+  DraftPick,
+  DraftPickList,
+  DraftPickOrder,
+  Golfer,
+  GolferScore,
+  GolferScoreOverrides,
+  Tourney,
+  User,
+  WGR,
 };
