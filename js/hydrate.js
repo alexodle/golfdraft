@@ -24,7 +24,7 @@ function hydrate(seedData) {
   AppActions.setTourneyName(seedData.tourneyName);
 
   if (seedData.user) {
-    UserActions.hydrateCurrentUser(seedData.user.id);
+    UserActions.hydrateCurrentUser(seedData.user._id);
   }
 }
 

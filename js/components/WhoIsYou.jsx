@@ -94,13 +94,14 @@ const WhoIsYou = React.createClass({
       username: UserStore.getUser(this.state.selectedUser).username,
       password: this.state.password
     });
+
     xhr.fail(function () {
       this.setState({ isLoading: false, badAuth: true, password: '' });
       this.refs.passwordInput.focus();
     }.bind(this));
+
     xhr.done(function () {
       UserActions.setCurrentUser(this.state.selectedUser);
-      UserActions.setCurrentUserSynced();
 
       const location = this.props.location;
       if (location.state && location.state.nextPathname) {

@@ -48,22 +48,22 @@ const sessionMiddleware = session({
   logErrors: true,
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: true }
+  cookie: { secure: !!config.prod }
 });
 app.use(sessionMiddleware);
 io.use(function(socket, next) {
   sessionMiddleware(socket.request, socket.request.res, next);
 });
 
-// Gzip
-app.use(compression());
-
 // Authentication
-passport.use(User.createStrategy());
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
 app.use(passport.initialize());
 app.use(passport.session());
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+passport.use(User.createStrategy());
+
+// Gzip
+app.use(compression());
 
 // Handlebars
 app.engine('handlebars', exphbs({
@@ -92,21 +92,20 @@ app.use('/assets', express.static(__dirname + '/../assets', {
 app.use(bodyParser());
 
 // Log session state on every request
-function logSessionState(req, res, next) {
+app.use(function logSessionState(req, res, next) {
   try {
     const session = req.session;
     console.log(
       'ip=%s user=%j isAdmin=%s',
       req.connection.remoteAddress,
-      session.passport,
+      req.user,
       !!session.isAdmin
     );
   } catch (e) {
     console.error(e);
   }
   next();
-}
-app.use(logSessionState);
+});
 
 const tourneyCfg = tourneyConfigReader.loadConfig();
 
@@ -157,7 +156,7 @@ db.once('open', function callback () {
           scores: JSON.stringify(results[3]),
           tourney: JSON.stringify(results[4]),
           appState: JSON.stringify(results[5]),
-          user: JSON.stringify(req.session.user),
+          user: JSON.stringify(req.user),
           tourneyName: tourneyCfg.name,
           prod: config.prod,
           cdnUrl: config.cdn_url
@@ -183,7 +182,9 @@ db.once('open', function callback () {
   });
 
   app.post('/login', passport.authenticate('local'), function (req, res, next) {
+    console.log('logged in:');
     console.dir(req.session);
+    console.log('req.user: ' + req.user);
     res.status(200).send({ username: req.body.username });
   });
 
@@ -193,17 +194,17 @@ db.once('open', function callback () {
   });
 
   app.get('/draft/pickList', function (req, res) {
-    const user = req.session.user;
+    const user = req.user;
 
-    if (!user || !user.id) {
+    if (!user || !user._id) {
       res.status(401).send('Must be logged in to get draft pickList');
       return;
     }
 
-    access.getPickList(user.id)
+    access.getPickList(user._id)
       .then(function (pickList) {
         res.status(200).send({
-          userId: user.id,
+          userId: user._id,
           pickList: pickList
         });
       })
@@ -215,18 +216,18 @@ db.once('open', function callback () {
 
   app.put('/draft/pickList', function (req, res) {
     const body = req.body;
-    const user = req.session.user;
+    const user = req.user;
 
-    if (!user || !user.id) {
+    if (!user || !user._id) {
       res.status(401).send('Must be logged in to set draft pickList');
       return;
     }
 
     let promise = null;
     if (body.pickList) {
-      promise = access.updatePickList(user.id, body.pickList)
+      promise = access.updatePickList(user._id, body.pickList)
         .then(function () {
-          res.status(200).send({ userId: user.id, pickList: body.pickList });
+          res.status(200).send({ userId: user._id, pickList: body.pickList });
         })
         .catch(function (err) {
           console.log(err);
@@ -235,12 +236,12 @@ db.once('open', function callback () {
         });
 
     } else {
-      promise = access.updatePickListFromNames(user.id, body.pickListNames)
+      promise = access.updatePickListFromNames(user._id, body.pickListNames)
         .then(function (result) {
           if (result.completed) {
-            res.status(200).send({ userId: user.id, pickList: result.pickList });
+            res.status(200).send({ userId: user._id, pickList: result.pickList });
           } else {
-            res.status(300).send({ userId: user.id, suggestions: result.suggestions });
+            res.status(300).send({ userId: user._id, suggestions: result.suggestions });
           }
         })
         .catch(function (err) {
@@ -255,22 +256,22 @@ db.once('open', function callback () {
 
   app.put('/draft/autoPick', function (req, res) {
     const body = req.body;
-    const user = req.session.user;
+    const user = req.user;
 
-    if (!user || !user.id) {
+    if (!user || !user._id) {
       res.status(401).send('Must be logged in to make a pick');
       return;
     }
 
     const autoPick = !!body.autoPick;
-    return onAppStateUpdate(req, res, access.updateAutoPick(user.id, autoPick));
+    return onAppStateUpdate(req, res, access.updateAutoPick(user._id, autoPick));
   });
 
   app.post('/draft/picks', function (req, res) {
     const body = req.body;
-    const user = req.session.user;
+    const user = req.user;
 
-    if (!user || !user.id) {
+    if (!user || !user._id) {
       res.status(401).send('Must be logged in to make a pick');
       return;
     }
@@ -295,9 +296,9 @@ db.once('open', function callback () {
 
   app.post('/draft/pickPickListGolfer', function (req, res) {
     const body = req.body;
-    const user = req.session.user;
+    const user = req.user;
 
-    if (!user || !user.id) {
+    if (!user || !user._id) {
       res.status(401).send('Must be logged in to make a pick');
       return;
     }
