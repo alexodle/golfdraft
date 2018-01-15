@@ -255,24 +255,24 @@ const FreeTextPickListEditor = React.createClass({
     this.setState({ isPosting: true });
 
     const data = { pickListNames: this._cleanedGolfers() };
-    $.put('/draft/pickList', data)
+    $.post('/draft/pickList', data)
 
-    .done(function (result) {
-      DraftActions.setPickList(result.pickList);
-      this.props.onComplete();
-    }.bind(this))
+      .done(function (result) {
+        DraftActions.setPickList(result.pickList);
+        this.props.onComplete();
+      }.bind(this))
 
-    .fail(function (err) {
-      if (err.status === 300) {
-        this._setSuggestions(err.responseJSON.suggestions);
-      } else {
-        this.setState({
-          isPosting: false,
-          errorMessage: 'Failed to save pickList. Try again in a minute. If that doesn&#39;t work, contact Odle.'
-        });
-      }
-      window.location.href = '#InlinePickListEditor';
-    }.bind(this));
+      .fail(function (err) {
+        if (err.status === 300) {
+          this._setSuggestions(err.responseJSON.suggestions);
+        } else {
+          this.setState({
+            isPosting: false,
+            errorMessage: 'Failed to save pickList. Try again in a minute. If that doesn&#39;t work, contact Odle.'
+          });
+        }
+        window.location.href = '#InlinePickListEditor';
+      }.bind(this));
   }
 
 });

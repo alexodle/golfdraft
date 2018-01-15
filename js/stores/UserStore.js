@@ -56,7 +56,7 @@ AppDispatcher.register(function (payload) {
     case AppConstants.CURRENT_USER_CHANGE:
       _currentUser = action.currentUser;
 
-      if (!_currentUser || !action.doNotSync) {
+      if (!_currentUser && !action.doNotSync) {
         $.post('/logout')
           .done(function () {
             UserActions.setCurrentUserSynced();

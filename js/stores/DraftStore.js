@@ -185,10 +185,10 @@ AppDispatcher.register(function (payload) {
 
       // TODO - Move to separate server sync
       const data = { pickList: _pickList };
-      $.put('/draft/pickList', data)
-      .fail(function () {
-        window.location.reload();
-      });
+      $.post('/draft/pickList', data)
+        .fail(function () {
+          window.location.reload();
+        });
 
       DraftStore.emitChange();
       break;

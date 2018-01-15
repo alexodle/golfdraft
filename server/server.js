@@ -182,9 +182,6 @@ db.once('open', function callback () {
   });
 
   app.post('/login', passport.authenticate('local'), function (req, res, next) {
-    console.log('logged in:');
-    console.dir(req.session);
-    console.log('req.user: ' + req.user);
     res.status(200).send({ username: req.body.username });
   });
 
@@ -193,13 +190,8 @@ db.once('open', function callback () {
     res.sendStatus(200);
   });
 
-  app.get('/draft/pickList', function (req, res) {
+  app.get('/draft/pickList', passport.authenticate('session'), function (req, res) {
     const user = req.user;
-
-    if (!user || !user._id) {
-      res.status(401).send('Must be logged in to get draft pickList');
-      return;
-    }
 
     access.getPickList(user._id)
       .then(function (pickList) {
@@ -214,14 +206,9 @@ db.once('open', function callback () {
       });
   });
 
-  app.put('/draft/pickList', function (req, res) {
+  app.post('/draft/pickList', passport.authenticate('session'), function (req, res) {
     const body = req.body;
     const user = req.user;
-
-    if (!user || !user._id) {
-      res.status(401).send('Must be logged in to set draft pickList');
-      return;
-    }
 
     let promise = null;
     if (body.pickList) {
@@ -254,27 +241,17 @@ db.once('open', function callback () {
     return promise;
   });
 
-  app.put('/draft/autoPick', function (req, res) {
+  app.put('/draft/autoPick', passport.authenticate('session'), function (req, res) {
     const body = req.body;
     const user = req.user;
-
-    if (!user || !user._id) {
-      res.status(401).send('Must be logged in to make a pick');
-      return;
-    }
 
     const autoPick = !!body.autoPick;
     return onAppStateUpdate(req, res, access.updateAutoPick(user._id, autoPick));
   });
 
-  app.post('/draft/picks', function (req, res) {
+  app.post('/draft/picks', passport.authenticate('session'), function (req, res) {
     const body = req.body;
     const user = req.user;
-
-    if (!user || !user._id) {
-      res.status(401).send('Must be logged in to make a pick');
-      return;
-    }
 
     const pick = {
       pickNumber: body.pickNumber,
@@ -294,14 +271,9 @@ db.once('open', function callback () {
     });
   });
 
-  app.post('/draft/pickPickListGolfer', function (req, res) {
+  app.post('/draft/pickPickListGolfer', passport.authenticate('session'), function (req, res) {
     const body = req.body;
     const user = req.user;
-
-    if (!user || !user._id) {
-      res.status(401).send('Must be logged in to make a pick');
-      return;
-    }
 
     const forUser = body.user;
     const pickNumber = body.pickNumber;
@@ -319,11 +291,12 @@ db.once('open', function callback () {
 
   // ADMIN FUNCTIONALITY
 
-  app.post('/admin/login', function (req, res) {
+  app.post('/admin/login', passport.authenticate('session'), function (req, res) {
     if (req.body.password !== config.admin_password) {
       res.status(401).send('Bad password');
       return;
     }
+
     req.session.isAdmin = true;
     req.session.save(function (err) {
       if (err) {
@@ -335,7 +308,7 @@ db.once('open', function callback () {
     });
   });
 
-  app.put('/admin/autoPickUsers', function (req, res) {
+  app.put('/admin/autoPickUsers', passport.authenticate('session'), function (req, res) {
     if (!req.session.isAdmin) {
       res.status(401).send('Only can admin can pause the draft');
       return;
@@ -346,7 +319,7 @@ db.once('open', function callback () {
     return onAppStateUpdate(req, res, access.updateAutoPick(userId, autoPick));
   });
 
-  app.put('/admin/pause', function (req, res) {
+  app.put('/admin/pause', passport.authenticate('session'), function (req, res) {
     if (!req.session.isAdmin) {
       res.status(401).send('Only can admin can pause the draft');
       return;
@@ -356,7 +329,7 @@ db.once('open', function callback () {
     return onAppStateUpdate(req, res, access.updateAppState({ isDraftPaused: isDraftPaused }));
   });
 
-  app.put('/admin/allowClock', function (req, res) {
+  app.put('/admin/allowClock', passport.authenticate('session'), function (req, res) {
     if (!req.session.isAdmin) {
       res.status(401).send('Only can admin can toggle clock');
       return;
@@ -366,7 +339,7 @@ db.once('open', function callback () {
     return onAppStateUpdate(req, res, access.updateAppState({ allowClock: allowClock }));
   });
 
-  app.put('/admin/draftHasStarted', function (req, res) {
+  app.put('/admin/draftHasStarted', passport.authenticate('session'), function (req, res) {
     if (!req.session.isAdmin) {
       res.status(401).send('Only can admin can toggle draft status');
       return;
@@ -376,7 +349,7 @@ db.once('open', function callback () {
     return onAppStateUpdate(req, res, access.updateAppState({ draftHasStarted: draftHasStarted }));
   });
 
-  app.delete('/admin/lastpick', function (req, res) {
+  app.delete('/admin/lastpick', passport.authenticate('session'), function (req, res) {
     if (!req.session.isAdmin) {
       res.status(401).send('Only can admin can undo picks');
       return;
@@ -396,7 +369,7 @@ db.once('open', function callback () {
     });
   });
 
-  app.put('/admin/forceRefresh', function (req, res) {
+  app.put('/admin/forceRefresh', passport.authenticate('session'), function (req, res) {
     if (!req.session.isAdmin) {
       res.status(401).send('Only can admin can force refreshes');
       return;
@@ -404,6 +377,14 @@ db.once('open', function callback () {
 
     io.sockets.emit('action:forcerefresh');
     res.sendStatus(200);
+  });
+
+  // END
+  app.use(function (err, req, res, next) {
+    if (err) {
+      console.log(err);
+      next();
+    }
   });
 
   require('./expressServer').listen(port);
