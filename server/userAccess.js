@@ -25,12 +25,12 @@ const UserAccess = {
     redisClient.del('users');
   },
 
-  onUserLogin: function (session) {
-    redisClient.hset('users', session.id, session.user.id, onUserChange);
+  onUserActivity: function (sessionId, userId) {
+    redisClient.hset('users', sessionId, userId, onUserChange);
   },
 
-  onUserLogout: function (session) {
-    redisClient.hdel('users', session.id, onUserChange);
+  onUserLogout: function (sessionId) {
+    redisClient.hdel('users', sessionId, onUserChange);
   }
 
 };

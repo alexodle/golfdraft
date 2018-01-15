@@ -9,7 +9,7 @@ io.on('connection', function (socket) {
   const session = socket.request.session;
 
   if (session.user) {
-    UserAccess.onUserLogin(session);
+    UserAccess.onUserActivity(session);
   }
 
   socket.on('disconnect', function() {

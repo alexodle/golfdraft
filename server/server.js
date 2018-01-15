@@ -107,6 +107,13 @@ app.use(function logSessionState(req, res, next) {
   next();
 });
 
+app.use(function updateUserActivity(req, res, next) {
+  if (req.user) {
+    UserAccess.onUserActivity(req.session.id, req.user._id);
+  }
+  next();
+});
+
 const tourneyCfg = tourneyConfigReader.loadConfig();
 
 const db = mongoose.connection;
@@ -186,6 +193,7 @@ db.once('open', function callback () {
   });
 
   app.post('/logout', function (req, res) {
+    UserAccess.onUserLogout(req.session.id);
     req.logout();
     res.sendStatus(200);
   });
