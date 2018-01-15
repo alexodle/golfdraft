@@ -2,11 +2,10 @@
 
 const $ = require('jquery');
 const _ = require('lodash');
-const ChatActions = require('../actions/ChatActions');
 const Assets = require('../constants/Assets');
+const ChatActions = require('../actions/ChatActions');
 const GolfDraftPanel = require('./GolfDraftPanel.jsx');
 const moment = require('moment');
-const UserStore = require('../stores/UserStore');
 const PureRenderMixin = require('react/lib/ReactComponentWithPureRenderMixin');
 const React = require('react');
 const UserStore = require('../stores/UserStore');

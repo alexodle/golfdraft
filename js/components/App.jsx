@@ -12,7 +12,6 @@ const ScoreStore = require('../stores/ScoreStore');
 const TourneyApp = require("./TourneyApp.jsx");
 const TourneyStore = require("../stores/TourneyStore");
 const UserStore = require("../stores/UserStore");
-const UserStore = require("../stores/UserStore");
 const GolferStore = require("../stores/GolferStore");
 const WhoIsYou = require("./WhoIsYou.jsx");
 

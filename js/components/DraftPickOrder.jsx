@@ -4,7 +4,6 @@ const _ = require('lodash');
 const cx = require('classnames');
 const DraftStore = require('../stores/DraftStore');
 const GolfDraftPanel = require('./GolfDraftPanel.jsx');
-const UserStore = require('../stores/UserStore');
 const React = require('react');
 const UserStore = require('../stores/UserStore');
 
@@ -22,7 +21,6 @@ const DraftPickOrder = React.createClass({
 
   render: function () {
     const {pickingForUsers, currentPick, currentUser, autoPickUsers} = this.props;
-    const currentUser = currentPick ? currentPick.user : null;
     const myUser = currentUser.user;
 
     let pickOrder = DraftStore.getPickOrder();
@@ -38,23 +36,22 @@ const DraftPickOrder = React.createClass({
         </small></p>
         <ol className='pick-order-list'>
           {_.map(pickOrder, function (pick, i) {
-            const user = pick.user;
             return (
               <li
-                key={user}
+                key={pick.user}
                 className={cx({
                   'my-user': (
-                    myUser === user ||
-                    _.contains(pickingForUsers, user)
+                    myUser === pick.user ||
+                    _.contains(pickingForUsers, pick.user)
                   ),
-                  'current-user': currentUser === user
+                  'current-user': myUser === pick.user
                 })}
               >
-                {!autoPickUsers[user] ? null : (
+                {!autoPickUsers[pick.user] ? null : (
                   <span><span className='label label-success auto-label'>AUTO</span> </span>
                 )}
-                <a href='#DraftHistory' onClick={_.partial(this._onSelect, user)}>
-                  {UserStore.getUser(user).name}
+                <a href='#DraftHistory' onClick={_.partial(this._onSelect, pick.user)}>
+                  {UserStore.getUser(pick.user).name}
                 </a>
               </li>);
           }, this)}

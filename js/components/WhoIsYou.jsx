@@ -5,7 +5,6 @@ const _ = require('lodash');
 
 const UserActions = require('../actions/UserActions');
 const UserStore = require('../stores/UserStore');
-const UserStore = require('../stores/UserStore');
 
 function getSortedUsers() {
   return _.sortBy(UserStore.getAll(), 'name');
