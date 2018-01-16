@@ -16,7 +16,13 @@ const WARNING_SOUND_INTERVAL_SECONDS = 10;
 const pickWarningSound = new Audio(Assets.PICK_WARNING_SOUND);
 
 class DraftClock extends React.Component {
-  getInitialState() {
+
+  constructor(props) {
+    super(props);
+    this.state = this._getInitialState();
+  }
+
+  _getInitialState() {
     return this._getTotalMillis();
   }
 

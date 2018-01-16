@@ -8,13 +8,16 @@ const AppSettingsStore = require('../stores/AppSettingsStore');
 const ChatStore = require("../stores/ChatStore");
 const DraftApp = require("./DraftApp.jsx");
 const DraftStore = require("../stores/DraftStore");
+const GolferStore = require("../stores/GolferStore");
 const React = require("react");
+const Router = require('react-router-dom');
 const ScoreStore = require('../stores/ScoreStore');
 const TourneyApp = require("./TourneyApp.jsx");
 const TourneyStore = require("../stores/TourneyStore");
 const UserStore = require("../stores/UserStore");
-const GolferStore = require("../stores/GolferStore");
 const WhoIsYou = require("./WhoIsYou.jsx");
+
+const Route = Router.Route;
 
 const RELEVANT_STORES = [
   AppSettingsStore,
@@ -52,6 +55,25 @@ function getAppState() {
     draftHasStarted: AppSettingsStore.getDraftHasStarted(),
     autoPickUsers: AppSettingsStore.getAutoPickUsers()
   };
+}
+
+function requireAuth(nextState, replace) {
+  if (!UserStore.getCurrentUser()) {
+    replace({
+      pathname: '/whoisyou',
+      state: { nextPathname: nextState.location.pathname }
+    });
+    return false;
+  }
+  return true;
+}
+
+function requireDraftDone(nextState, replace) {
+  if (DraftStore.getCurrentPick()) {
+    replace('/draft');
+    return false;
+  }
+  return true;
 }
 
 function getGolfersRemaining(golfers, draftPicks) {
@@ -161,7 +183,13 @@ class AdminWrapper extends React.Component {
 };
 
 class AppNode extends React.Component {
-  getInitialState() {
+
+  constructor(props) {
+    super(props);
+    this.state = this._getInitialState();
+  }
+
+  _getInitialState() {
     return getAppState();
   }
 
@@ -184,6 +212,29 @@ class AppNode extends React.Component {
     const golfersRemaining = getGolfersRemaining(
       state.golfers,
       state.draft.draftPicks
+    );
+
+    function connect(Component) {
+      return class extends React.Component {
+        render() {
+          return (<Component {...this.props} {...state} golfersRemaining={golfersRemaining} />);
+        }
+      };
+    }
+
+    return (
+      <div>
+        <Route
+          component={connect(TourneyWrapper)}
+          onEnter={function (nextState, replace) {
+            requireAuth(nextState, replace) && requireDraftDone(nextState, replace);
+          }}
+          path="/"
+        />
+        <Route path="draft" component={connect(DraftWrapper)} onEnter={requireAuth} />
+        <Route path="whoisyou" component={connect(WhoIsYou)} />
+        <Route path="admin" component={connect(AdminWrapper)} />
+      </div>
     );
 
     return React.cloneElement(this.props.children, {

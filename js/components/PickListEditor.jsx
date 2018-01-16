@@ -10,7 +10,7 @@ const GolferStore = require("../stores/GolferStore");
 const React = require("react");
 
 class PickListEditor extends React.Component {
-  getInitialState() {
+  _getInitialState() {
     return {
       draggingIndex: null,
       draggingHoverIndex: null,

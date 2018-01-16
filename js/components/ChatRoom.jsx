@@ -26,7 +26,12 @@ const UP_KEY = 38;
 
 class AutoComplete extends React.PureComponent {
 
-  getInitialState() {
+  constructor(props) {
+    super(props);
+    this.state = this._getInitialState();
+  }
+
+  _getInitialState() {
     return {
       selectedIndex: 0
     };
@@ -138,7 +143,12 @@ class AutoComplete extends React.PureComponent {
 
 class ChatRoomInput extends React.PureComponent {
 
-  getInitialState() {
+  constructor(props) {
+    super(props);
+    this.state = this._getInitialState();
+  }
+
+  _getInitialState() {
     return { text: '', taggingText: null };
   }
 

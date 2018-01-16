@@ -32,7 +32,12 @@ class TourneyApp extends React.Component {
     chatMessages: ReactPropTypes.array
   }
 
-  getInitialState() {
+  constructor(props) {
+    super(props);
+    this.state = this._getInitialState();
+  }
+
+  _getInitialState() {
     return getState({}, this.props);
   }
 

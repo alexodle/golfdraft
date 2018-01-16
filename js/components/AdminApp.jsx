@@ -47,7 +47,13 @@ function toggleAutoPick(userId, autoPick) {
 }
 
 class PasswordInput extends React.Component {
-  getInitialState() {
+
+  constructor(props) {
+    super(props);
+    this.state = this._getInitialState();
+  }
+
+  _getInitialState() {
     return {
       password: '',
       busy: false
@@ -105,7 +111,13 @@ class PasswordInput extends React.Component {
 };
 
 class AdminApp extends React.Component {
-  getInitialState() {
+
+  constructor(props) {
+    super(props);
+    this.state = this._getInitialState();
+  }
+
+  _getInitialState() {
     return {
       confirmingUndo: false
     };

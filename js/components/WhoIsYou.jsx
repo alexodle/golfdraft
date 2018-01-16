@@ -20,7 +20,12 @@ class WhoIsYou extends React.Component {
     location: React.PropTypes.object
   }
 
-  getInitialState() {
+  constructor(props) {
+    super(props);
+    this.state = this._getInitialState();
+  }
+
+  _getInitialState() {
     const selectedUser = getSortedUsers()[0]._id;
     return { selectedUser, password: '', isLoading: false, badAuth: false };
   }

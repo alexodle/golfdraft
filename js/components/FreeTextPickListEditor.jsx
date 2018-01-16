@@ -16,7 +16,13 @@ function calcHasGoodSuggestion(results) {
 }
 
 class SuggestionSelector extends React.Component {
-  getInitialState() {
+
+  constructor(props) {
+    super(props);
+    this.state = this._getInitialState();
+  }
+
+  _getInitialState() {
     return {
       isViewingAll: !this.props.hasGoodSuggestion
     };
@@ -103,7 +109,13 @@ class SuggestionSelector extends React.Component {
 };
 
 class FreeTextPickListEditor extends React.Component {
-  getInitialState() {
+
+  constructor(props) {
+    super(props);
+    this.state = this._getInitialState();
+  }
+
+  _getInitialState() {
     return {
       text: '',
       isPosting: false,

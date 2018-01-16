@@ -20,7 +20,13 @@ function shouldShowPickListOption(props) {
 }
 
 class DraftChooser extends React.Component {
-  getInitialState() {
+
+  constructor(props) {
+    super(props);
+    this.state = this._getInitialState();
+  }
+
+  _getInitialState() {
     return this._getSelectionState(this.props);
   }
 

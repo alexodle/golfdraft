@@ -20,7 +20,13 @@ const myTurnSound = new Audio(Assets.MY_TURN_SOUND);
 const pickMadeSound = new Audio(Assets.PICK_MADE_SOUND);
 
 class DraftApp extends React.Component {
-  getInitialState() {
+
+  constructor(props) {
+    super(props);
+    this.state = this._getInitialState();
+  }
+
+  _getInitialState() {
     return {
       draftHistoryUserId: null
     };

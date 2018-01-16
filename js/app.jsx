@@ -7,29 +7,29 @@ require('font-awesome/css/font-awesome.css');
 require('../less/app.less');
 
 const $ = require('jquery');
+const AppNode = require('./components/App.jsx').AppNode;
 const ChatActions = require('./actions/ChatActions');
 const React = require('react');
 const ReactDOM = require('react-dom');
-const Router = require('react-router');
-const routes = require('./routes.jsx');
+const Router = require('react-router-dom');
 
-const router = Router.createRoutes({
-  routes: routes,
-  location: Router.HistoryLocation
-});
+const BrowserRouter = Router.BrowserRouter;
+const Route = Router.Route;
 
 // Hydrate the app with seed data before running
 require('./hydrate')();
 
 const node = document.getElementById('golfdraftapp');
 ReactDOM.render(
-  (<div className="container">
-    <div className="row">
-      <div className="col-md-offset-1 col-md-10">
-        {routes}
+  (<BrowserRouter>
+    <div className="container">
+      <div className="row">
+        <div className="col-md-offset-1 col-md-10">
+          <Route component={AppNode} path="/" />
+        </div>
       </div>
     </div>
-  </div>),
+  </BrowserRouter>),
   node
 );
 
