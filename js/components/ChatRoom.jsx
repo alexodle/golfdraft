@@ -7,7 +7,6 @@ const Assets = require('../constants/Assets');
 const ChatActions = require('../actions/ChatActions');
 const GolfDraftPanel = require('./GolfDraftPanel.jsx');
 const moment = require('moment');
-const PureRenderMixin = require('react/lib/ReactComponentWithPureRenderMixin');
 const React = require('react');
 const UserStore = require('../stores/UserStore');
 
@@ -25,16 +24,15 @@ const ENTER_KEY = 13;
 const DOWN_KEY = 40;
 const UP_KEY = 38;
 
-const AutoComplete = React.createClass({
-  mixins: [PureRenderMixin],
+class AutoComplete extends React.PureComponent {
 
-  getInitialState: function () {
+  getInitialState() {
     return {
       selectedIndex: 0
     };
-  },
+  }
 
-  componentWillUpdate: function (nextProps, nextState) {
+  componentWillUpdate(nextProps, nextState) {
     const currentIndex = this.state.selectedIndex;
     const newIndex = nextState.selectedIndex;
     if (currentIndex !== newIndex) {
@@ -53,9 +51,9 @@ const AutoComplete = React.createClass({
 
       this.setState({ selectedIndex: 0 });
     }
-  },
+  }
 
-  render: function () {
+  render() {
     const choices = this._getChoices();
 
     if (_.isEmpty(choices)) {
@@ -82,26 +80,26 @@ const AutoComplete = React.createClass({
         </select>
       </form>
     );
-  },
+  }
 
-  forceSelect: function () {
+  forceSelect() {
     const choices = this._getChoices();
     this.props.onChoose({ value: choices[this.state.selectedIndex].name });
-  },
+  }
 
-  forceDown: function () {
+  forceDown() {
     this._move(1);
-  },
+  }
 
-  forceUp: function () {
+  forceUp() {
     this._move(-1);
-  },
+  }
 
-  _onChange: function (ev) {
+  _onChange(ev) {
     this.setState({ selectedIndex: ev.currentTarget.selectedIndex });
-  },
+  }
 
-  _move: function (n) {
+  _move(n) {
     const choices = this._getChoices();
     const currentIndex = this.state.selectedIndex;
     const newIndex = currentIndex + n;
@@ -111,9 +109,9 @@ const AutoComplete = React.createClass({
     }
 
     this.setState({ selectedIndex: newIndex });
-  },
+  }
 
-  _getChoices: function (props) {
+  _getChoices(props) {
     props = props || this.props;
 
     const text = props.text.toLowerCase();
@@ -124,28 +122,27 @@ const AutoComplete = React.createClass({
       .value();
 
     return choices;
-  },
+  }
 
-  _onClick: function (ev) {
+  _onClick(ev) {
     this.forceSelect();
-  },
+  }
 
-  _onKeyUp: function (ev) {
+  _onKeyUp(ev) {
     if (ev.keyCode === ENTER_KEY) {
       this.forceSelect();
     }
   }
 
-});
+};
 
-const ChatRoomInput = React.createClass({
-  mixins: [PureRenderMixin],
+class ChatRoomInput extends React.PureComponent {
 
-  getInitialState: function () {
+  getInitialState() {
     return { text: '', taggingText: null };
-  },
+  }
 
-  render: function () {
+  render() {
     const text = this.state.text;
     const nameTag = this.state.taggingText;
 
@@ -174,9 +171,9 @@ const ChatRoomInput = React.createClass({
         </form>
       </div>
     );
-  },
+  }
 
-  _onKeyUp: function (ev) {
+  _onKeyUp(ev) {
     if (this.state.taggingText) {
       if (ev.keyCode === UP_KEY) {
         this.refs.nameTagger.forceUp();
@@ -186,24 +183,24 @@ const ChatRoomInput = React.createClass({
         ev.preventDefault();
       }
     }
-  },
+  }
 
-  _updateText: function (ev) {
+  _updateText(ev) {
     const newText = ev.target.value;
     this.setState({
       text: newText,
       taggingText: newText.match(NAME_TAG_RE)
     });
-  },
+  }
 
-  _onTag: function (ev) {
+  _onTag(ev) {
     const newText = this.state.text.replace(NAME_TAG_RE, "~[" + ev.value + "] ");
     this.setState({ text: newText, taggingText: null });
 
     $(this.refs.input).focus();
-  },
+  }
 
-  _onSend: function (ev) {
+  _onSend(ev) {
     ev.preventDefault();
 
     if (this.state.taggingText) {
@@ -220,12 +217,11 @@ const ChatRoomInput = React.createClass({
     $(this.refs.input).focus();
   }
 
-});
+};
 
-const Message = React.createClass({
-  mixins: [PureRenderMixin],
+class Message extends React.PureComponent {
 
-  render: function () {
+  render() {
     // Escape html BEFORE adding tags
     const text = _.escape(this.props.text);
 
@@ -244,20 +240,19 @@ const Message = React.createClass({
     );
   }
 
-});
+};
 
-const ChatRoom = React.createClass({
-  mixins: [PureRenderMixin],
+class ChatRoom extends React.PureComponent {
 
   propTypes: {
     messages: ReactPropTypes.array
-  },
+  }
 
-  componentDidMount: function () {
+  componentDidMount() {
     this._forceScroll();
-  },
+  }
 
-  componentDidUpdate: function (prevProps) {
+  componentDidUpdate(prevProps) {
     // Don't process these until we have initially loaded messages
     if (!prevProps.messages) {
       if (this.props.messages) {
@@ -281,9 +276,9 @@ const ChatRoom = React.createClass({
 
       this._forceScroll();
     }
-  },
+  }
 
-  render: function () {
+  render() {
     const messages = this.props.messages;
 
     let body = null;
@@ -354,15 +349,15 @@ const ChatRoom = React.createClass({
         </div>
       </GolfDraftPanel>
     );
-  },
+  }
 
-  _forceScroll: function () {
+  _forceScroll() {
     const refs = this.refs;
     const $panel = $(refs.chatPanel);
     const $body = $(refs.chatPanelBody);
     $panel.scrollTop($body.height());
   }
 
-});
+};
 
 module.exports = ChatRoom;

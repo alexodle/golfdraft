@@ -6,9 +6,8 @@ const _ = require("lodash");
 
 const DraftChooser = require("./DraftChooser.jsx");
 
-const DebugFooter = React.createClass({
-
-  render: function () {
+class DebugFooter extends React.Component {
+  render() {
     return (
       <div className="page-footer">
         <h2>DEBUG DEBUG DEBUG DEBUG</h2>
@@ -20,6 +19,6 @@ const DebugFooter = React.createClass({
     );
   }
 
-});
+};
 
 module.exports = DebugFooter;

@@ -10,15 +10,14 @@ const utils = require('../../common/utils');
 
 const ReactPropTypes = React.PropTypes;
 
-const UserStandings = React.createClass({
-
+class UserStandings extends React.Component {
   propTypes: {
     currentUser: ReactPropTypes.object.isRequired,
     userScores: ReactPropTypes.object.isRequired,
     selectedUser: ReactPropTypes.string.isRequired
-  },
+  }
 
-  render: function () {
+  render() {
     const userScores = _.sortBy(this.props.userScores, 'total');
     const userTotals = _.pluck(userScores, 'total');
     const topScore = userTotals[0];
@@ -85,12 +84,12 @@ const UserStandings = React.createClass({
         </table>
       </section>
     );
-  },
+  }
 
-  _onUserSelect: function (pid) {
+  _onUserSelect(pid) {
     this.props.onUserSelect(pid);
   }
 
-});
+};
 
 module.exports = UserStandings;

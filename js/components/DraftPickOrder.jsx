@@ -10,17 +10,16 @@ const UserStore = require('../stores/UserStore');
 
 const ReactPropTypes = React.PropTypes;
 
-const DraftPickOrder = React.createClass({
-
+class DraftPickOrder extends React.Component {
   propTypes: {
     currentUser: ReactPropTypes.object.isRequired,
     pickingForUsers: ReactPropTypes.array.isRequired,
     onUserSelected: ReactPropTypes.func.isRequired,
     currentPick: ReactPropTypes.object,
     autoPickUsers: ReactPropTypes.object
-  },
+  }
 
-  render: function () {
+  render() {
     const {pickingForUsers, currentPick, currentUser, autoPickUsers} = this.props;
     const myUser = currentUser._id;
 
@@ -59,12 +58,12 @@ const DraftPickOrder = React.createClass({
         </ol>
       </div>
     );
-  },
+  }
 
-  _onSelect: function (pid) {
+  _onSelect(pid) {
     this.props.onUserSelected(pid);
   }
 
-});
+};
 
 module.exports = DraftPickOrder;

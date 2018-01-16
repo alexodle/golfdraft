@@ -19,33 +19,32 @@ const React = require('react');
 const myTurnSound = new Audio(Assets.MY_TURN_SOUND);
 const pickMadeSound = new Audio(Assets.PICK_MADE_SOUND);
 
-const DraftApp = React.createClass({
-
-  getInitialState: function () {
+class DraftApp extends React.Component {
+  getInitialState() {
     return {
       draftHistoryUserId: null
     };
-  },
+  }
 
-  componentWillReceiveProps: function (nextProps) {
+  componentWillReceiveProps(nextProps) {
     const props = this.props;
     if (!props.isMyDraftPick && nextProps.isMyDraftPick) {
       myTurnSound.play();
     } else if (props.draftPicks.length + 1 === nextProps.draftPicks.length) {
       pickMadeSound.play();
     }
-  },
+  }
 
-  _renderPickListHeader: function () {
+  _renderPickListHeader() {
     return (
       <span>
         <span>Pick List Editor</span>
         <span className='pull-right'><em>NEW!</em></span>
       </span>
     );
-  },
+  }
 
-  _renderPreDraft: function () {
+  _renderPreDraft() {
     return (
       <section>
 
@@ -85,9 +84,9 @@ const DraftApp = React.createClass({
 
       </section>
     );
-  },
+  }
 
-  _renderDraftComplete: function () {
+  _renderDraftComplete() {
     return (
       <section>
 
@@ -122,9 +121,9 @@ const DraftApp = React.createClass({
 
       </section>
     );
-  },
+  }
 
-  render: function () {
+  render() {
     if (!this.props.draftHasStarted) {
       return this._renderPreDraft();
     }
@@ -217,12 +216,12 @@ const DraftApp = React.createClass({
 
       </div>
     );
-  },
+  }
 
-  _onDraftHistorySelectionChange: function (userId) {
+  _onDraftHistorySelectionChange(userId) {
     this.setState({ draftHistoryUserId: userId });
   }
 
-});
+};
 
 module.exports = DraftApp;

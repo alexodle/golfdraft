@@ -9,17 +9,16 @@ const GolferLogic = require("../logic/GolferLogic");
 const GolferStore = require("../stores/GolferStore");
 const React = require("react");
 
-const PickListEditor = React.createClass({
-
-  getInitialState: function () {
+class PickListEditor extends React.Component {
+  getInitialState() {
     return {
       draggingIndex: null,
       draggingHoverIndex: null,
       isFreeTextMode: false
     };
-  },
+  }
 
-  render: function () {
+  render() {
     if (this.props.syncedPickList == AppConstants.PROPERTY_LOADING) {
       return this._renderLoading();
     }
@@ -131,9 +130,9 @@ const PickListEditor = React.createClass({
 
       </section>
     );
-  },
+  }
 
-  _renderArrowLink: function (arrowClass, onClick, isDisabled) {
+  _renderArrowLink(arrowClass, onClick, isDisabled) {
     if (isDisabled) {
       return (<span className={"text-muted glyphicon " + arrowClass} />);
     }
@@ -142,13 +141,13 @@ const PickListEditor = React.createClass({
         <span className={"glyphicon " + arrowClass} />
       </a>
     );
-  },
+  }
 
-  _renderLoading: function () {
+  _renderLoading() {
     return (<span>Loading...</span>);
-  },
+  }
 
-  _getDisplayPickList: function () {
+  _getDisplayPickList() {
     const pendingPickList = this.props.pendingPickList;
     if (pendingPickList === AppConstants.PROPERTY_LOADING) return pendingPickList;
 
@@ -156,74 +155,74 @@ const PickListEditor = React.createClass({
       .sortBy(['wgr', 'name'])
       .pluck('_id')
       .value();
-  },
+  }
 
-  _newOrder: function (fromIndex, toIndex) {
+  _newOrder(fromIndex, toIndex) {
     const currentOrder = this._getDisplayPickList();
     const movingGolfer = currentOrder[fromIndex];
     const newOrder = currentOrder.slice();
     newOrder.splice(fromIndex, 1);
     newOrder.splice(toIndex, 0, movingGolfer);
     return newOrder;
-  },
+  }
 
-  _onUpOne: function (i, e) {
+  _onUpOne(i, e) {
     e.preventDefault();
     const newOrder = this._newOrder(i, i - 1);
     DraftActions.updatePendingPickList(newOrder);
-  },
+  }
 
-  _onDownOne: function (i, e) {
+  _onDownOne(i, e) {
     e.preventDefault();
     const newOrder = this._newOrder(i, i + 1);
     DraftActions.updatePendingPickList(newOrder);
-  },
+  }
 
-  _onReset: function () {
+  _onReset() {
     DraftActions.resetPendingPickList();
-  },
+  }
 
-  _onSave: function () {
+  _onSave() {
     DraftActions.savePickList();
-  },
+  }
 
-  _onDrop: function (toIndex, e) {
+  _onDrop(toIndex, e) {
     e.preventDefault();
 
     const fromIndex = this.state.draggingIndex;
     const newOrder = this._newOrder(fromIndex, toIndex);
 
     DraftActions.updatePendingPickList(newOrder);
-  },
+  }
 
-  _onDragStart: function (i, e) {
+  _onDragStart(i, e) {
     this.setState({ draggingIndex: i });
-  },
+  }
 
-  _onDragEnd: function (e) {
+  _onDragEnd(e) {
     this.setState({
       draggingIndex: null,
       draggingHoverIndex: null
     });
-  },
+  }
 
-  _onDragOver: function (i, e) {
+  _onDragOver(i, e) {
     e.preventDefault();
     if (this.state.draggingHoverIndex !== i) {
       this.setState({ draggingHoverIndex: i });
     }
-  },
+  }
 
-  _onFreeTextClick: function () {
+  _onFreeTextClick() {
     this.setState({ isFreeTextMode: true });
     window.location.href = '#InlinePickListEditor';
-  },
+  }
 
-  _onFreeTextComplete: function () {
+  _onFreeTextComplete() {
     this.setState({ isFreeTextMode: false });
     window.location.href = '#InlinePickListEditor';
   }
 
-});
+};
 
 module.exports = PickListEditor;

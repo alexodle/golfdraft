@@ -11,22 +11,21 @@ function getSortedUsers() {
   return _.sortBy(UserStore.getAll(), 'name');
 }
 
-const WhoIsYou = React.createClass({
-
+class WhoIsYou extends React.Component {
   contextTypes: {
     router: React.PropTypes.object.isRequired
-  },
+  }
 
   childContextTypes: {
     location: React.PropTypes.object
-  },
+  }
 
-  getInitialState: function () {
+  getInitialState() {
     const selectedUser = getSortedUsers()[0]._id;
     return { selectedUser, password: '', isLoading: false, badAuth: false };
-  },
+  }
 
-  render: function () {
+  render() {
     const {badAuth, isLoading, password, selectedUser} = this.state;
     const submitDisabled = !password || isLoading;
     return (
@@ -77,17 +76,17 @@ const WhoIsYou = React.createClass({
         </div>
       </div>
     );
-  },
+  }
 
-  _onUserChange: function (ev) {
+  _onUserChange(ev) {
     this.setState({ selectedUser: ev.target.value });
-  },
+  }
 
-  _onPasswordChange: function (ev) {
+  _onPasswordChange(ev) {
     this.setState({ password: ev.target.value });
-  },
+  }
 
-  _onSubmit: function (ev) {
+  _onSubmit(ev) {
     ev.preventDefault();
     this.setState({ isLoading: true, badAuth: false });
 
@@ -113,6 +112,6 @@ const WhoIsYou = React.createClass({
     }.bind(this));
   }
 
-});
+};
 
 module.exports = WhoIsYou;

@@ -24,20 +24,19 @@ function getState(state, props) {
   };
 }
 
-const TourneyApp = React.createClass({
-
+class TourneyApp extends React.Component {
   propTypes: {
     currentUser: ReactPropTypes.object.isRequired,
     scores: ReactPropTypes.object.isRequired,
     draft: ReactPropTypes.object.isRequired,
     chatMessages: ReactPropTypes.array
-  },
+  }
 
-  getInitialState: function () {
+  getInitialState() {
     return getState({}, this.props);
-  },
+  }
 
-  render: function () {
+  render() {
     const userScores = ScoreLogic.calcUserScores(
       this.props.draft.draftPicks,
       this.props.scores
@@ -116,13 +115,13 @@ const TourneyApp = React.createClass({
         />
       </section>
     );
-  },
+  }
 
-  _onUserSelect: function (user) {
+  _onUserSelect(user) {
     window.location.href = '#UserDetails';
     this.setState({userDetailsUser: user});
   }
 
-});
+};
 
 module.exports = TourneyApp;

@@ -3,9 +3,8 @@
 
 const React = require('react');
 
-const GolfDraftPanel = React.createClass({
-
-  render: function () {
+class GolfDraftPanel extends React.Component {
+  render() {
     return (
       <div
         className='panel panel-default golfdraft-panel'
@@ -23,6 +22,6 @@ const GolfDraftPanel = React.createClass({
     );
   }
 
-});
+};
 
 module.exports = GolfDraftPanel;

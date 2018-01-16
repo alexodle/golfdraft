@@ -15,15 +15,14 @@ function calcHasGoodSuggestion(results) {
   return results[0].coeff >= MIN_COEFF;
 }
 
-const SuggestionSelector = React.createClass({
-
-  getInitialState: function () {
+class SuggestionSelector extends React.Component {
+  getInitialState() {
     return {
       isViewingAll: !this.props.hasGoodSuggestion
     };
-  },
+  }
 
-  render: function () {
+  render() {
     const suggestion = this.props.suggestion;
     const hasGoodSuggestion = this.props.hasGoodSuggestion;
     const isViewingAll = this.state.isViewingAll;
@@ -48,9 +47,9 @@ const SuggestionSelector = React.createClass({
         </div>
       </div>
     );
-  },
+  }
 
-  _renderSuggestion: function () {
+  _renderSuggestion() {
     const selectedValue = this.props.selectedValue;
     return (
       <section>
@@ -65,9 +64,9 @@ const SuggestionSelector = React.createClass({
         <p><a href="#" onClick={this._viewAll}>Nope</a></p>
       </section>
     );
-  },
+  }
 
-  _renderChoices: function () {
+  _renderChoices() {
     const selectedValue = this.props.selectedValue;
     const disabled = this.props.disabled;
     const hasGoodSuggestion = this.props.hasGoodSuggestion;
@@ -90,22 +89,21 @@ const SuggestionSelector = React.createClass({
         </select>
       </section>
     );
-  },
+  }
 
-  _onSelectValueChange: function (ev) {
+  _onSelectValueChange(ev) {
     this.props.onSelectionChange(ev.target.value);
-  },
+  }
 
-  _viewAll: function (ev) {
+  _viewAll(ev) {
     ev.preventDefault();
     this.setState({ isViewingAll: true });
   }
 
-});
+};
 
-const FreeTextPickListEditor = React.createClass({
-
-  getInitialState: function () {
+class FreeTextPickListEditor extends React.Component {
+  getInitialState() {
     return {
       text: '',
       isPosting: false,
@@ -113,18 +111,18 @@ const FreeTextPickListEditor = React.createClass({
       suggestionSelections: {},
       errorMessage: null
     };
-  },
+  }
 
-  render: function () {
+  render() {
     const suggestions = this.state.suggestions;
     if (!suggestions) {
       return this._renderFreeText();
     } else {
       return this._renderSuggestions();
     }
-  },
+  }
 
-  _renderSuggestions: function () {
+  _renderSuggestions() {
     const suggestions = this.state.suggestions;
     const suggestionSelections = this.state.suggestionSelections;
     const isPosting = this.state.isPosting;
@@ -173,9 +171,9 @@ const FreeTextPickListEditor = React.createClass({
         </div>
       </div>
     );
-  },
+  }
 
-  _renderFreeText: function () {
+  _renderFreeText() {
     const text = this.state.text;
     const isPosting = this.state.isPosting;
     return (
@@ -206,9 +204,9 @@ const FreeTextPickListEditor = React.createClass({
         />
       </div>
     );
-  },
+  }
 
-  _cleanedGolfers: function () {
+  _cleanedGolfers() {
     const suggestionSelections = this.state.suggestionSelections;
     return _.chain(this.state.text.split('\n'))
       .invoke('trim')
@@ -218,13 +216,13 @@ const FreeTextPickListEditor = React.createClass({
       })
       .uniq()
       .value();
-  },
+  }
 
-  _onChange: function (ev) {
+  _onChange(ev) {
     this.setState({ text: ev.target.value });
-  },
+  }
 
-  _setSuggestions: function (suggestions) {
+  _setSuggestions(suggestions) {
     const suggestionSelections = {};
     _.each(suggestions, function (suggestion) {
       let selection = suggestion.results[0].target;
@@ -242,17 +240,17 @@ const FreeTextPickListEditor = React.createClass({
       suggestionSelections: suggestionSelections,
       suggestions: suggestions
     });
-  },
+  }
 
-  _onSuggestionSelectionChange: function (source, target) {
+  _onSuggestionSelectionChange(source, target) {
     const updateObj = {};
     updateObj[source] = target;
 
     const newSuggestionSelections = _.extend({}, this.state.suggestionSelections, updateObj);
     this.setState({ suggestionSelections: newSuggestionSelections });
-  },
+  }
 
-  _onSave: function () {
+  _onSave() {
     this.setState({ isPosting: true });
 
     const data = { pickListNames: this._cleanedGolfers() };
@@ -276,6 +274,6 @@ const FreeTextPickListEditor = React.createClass({
       }.bind(this));
   }
 
-});
+};
 
 module.exports = FreeTextPickListEditor;

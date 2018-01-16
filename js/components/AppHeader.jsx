@@ -6,16 +6,15 @@ const React = require('react');
 
 const ReactPropTypes = React.PropTypes;
 
-const AppHeader = React.createClass({
-
+class AppHeader extends React.Component {
   propTypes: {
     tourneyName: ReactPropTypes.string.isRequired,
     currentUser: ReactPropTypes.object.isRequired,
     drafting: ReactPropTypes.bool,
     location: React.PropTypes.object
-  },
+  }
 
-  render: function () {
+  render() {
     return (
       <div className='page-header draft-page-header'>
         <h1>
@@ -35,6 +34,6 @@ const AppHeader = React.createClass({
   }
 
 
-});
+};
 
 module.exports = AppHeader;

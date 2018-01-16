@@ -46,16 +46,15 @@ function toggleAutoPick(userId, autoPick) {
   });
 }
 
-const PasswordInput = React.createClass({
-
-  getInitialState: function () {
+class PasswordInput extends React.Component {
+  getInitialState() {
     return {
       password: '',
       busy: false
     };
-  },
+  }
 
-  render: function () {
+  render() {
     return (
       <section>
         <form onSubmit={this._onSubmit}>
@@ -79,13 +78,13 @@ const PasswordInput = React.createClass({
         </form>
       </section>
     );
-  },
+  }
 
-  _onChange: function (ev) {
+  _onChange(ev) {
     this.setState({ password: ev.target.value });
-  },
+  }
 
-  _onSubmit: function (ev) {
+  _onSubmit(ev) {
     ev.preventDefault();
 
     const that = this;
@@ -94,26 +93,25 @@ const PasswordInput = React.createClass({
       url: '/admin/login',
       type: 'POST',
       data: { password: this.state.password },
-      success: function () {
+      success() {
         UserActions.setIsAdmin(true);
       },
-      error: function () {
+      error() {
         that.setState({ busy: false });
       }
     });
   }
 
-});
+};
 
-const AdminApp = React.createClass({
-
-  getInitialState: function () {
+class AdminApp extends React.Component {
+  getInitialState() {
     return {
       confirmingUndo: false
     };
-  },
+  }
 
-  render: function () {
+  render() {
     const props = this.props;
     const confirmingUndo = this.state.confirmingUndo;
 
@@ -252,56 +250,56 @@ const AdminApp = React.createClass({
         <DraftHistory draftPicks={props.draftPicks} />
       </section>
     );
-  },
+  }
 
-  _onStartDraft: function () {
+  _onStartDraft() {
     toggleDraftHasStarted(true);
-  },
+  }
 
-  _onUnstartDraft: function () {
+  _onUnstartDraft() {
     toggleDraftHasStarted(false);
-  },
+  }
 
-  _onPause: function () {
+  _onPause() {
     togglePause(true);
-  },
+  }
 
-  _onUnpause: function () {
+  _onUnpause() {
     togglePause(false);
-  },
+  }
 
-  _onAllowClock: function () {
+  _onAllowClock() {
     toggleAllowClock(true);
-  },
+  }
 
-  _onStopClock: function () {
+  _onStopClock() {
     toggleAllowClock(false);
-  },
+  }
 
-  _undoLastPick: function () {
+  _undoLastPick() {
     this.setState({ confirmingUndo: true });
-  },
+  }
 
-  _confirmUndoLastPick: function () {
+  _confirmUndoLastPick() {
     $.ajax({
       url: '/admin/lastPick',
       type: 'DELETE',
       contentType: 'application/json'
     });
     this._cancelUndoLastPick();
-  },
+  }
 
-  _cancelUndoLastPick: function () {
+  _cancelUndoLastPick() {
     this.setState({ confirmingUndo: false });
-  },
+  }
 
-  _forceRefresh: function () {
+  _forceRefresh() {
     $.ajax({
       url: '/admin/forceRefresh',
       type: 'PUT'
     });
   }
 
-});
+};
 
 module.exports = AdminApp;

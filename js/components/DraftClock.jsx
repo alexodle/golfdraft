@@ -15,30 +15,29 @@ const WARNING_SOUND_INTERVAL_SECONDS = 10;
 
 const pickWarningSound = new Audio(Assets.PICK_WARNING_SOUND);
 
-const DraftClock = React.createClass({
-
-  getInitialState: function () {
+class DraftClock extends React.Component {
+  getInitialState() {
     return this._getTotalMillis();
-  },
+  }
 
-  componentDidMount: function () {
+  componentDidMount() {
     this._intervalId = setInterval(function () {
       this.setState(this._getTotalMillis());
     }.bind(this), TIME_INTERVAL);
-  },
+  }
 
-  componentWillUnmount: function () {
+  componentWillUnmount() {
     if (this._intervalId) {
       clearInterval(this._intervalId);
       this._intervalId = null;
     }
-  },
+  }
 
-  componentWillReceiveProps: function (nextProps) {
+  componentWillReceiveProps(nextProps) {
     this.setState(this._getTotalMillis(nextProps));
-  },
+  }
 
-  componentDidUpdate: function (prevProps, prevState) {
+  componentDidUpdate(prevProps, prevState) {
     const displayTimeChanged = this._getDisplayTime(prevState) !== this._getDisplayTime();
     const isMyPick = this.props.isMyPick;
     const totalMillis = this.state.totalMillis;
@@ -52,9 +51,9 @@ const DraftClock = React.createClass({
     } else if (moment.utc(totalMillis).seconds() % WARNING_SOUND_INTERVAL_SECONDS === 0) {
       pickWarningSound.play();
     }
-  },
+  }
 
-  render: function () {
+  render() {
     let body = null;
 
     const totalMillis = this.state.totalMillis || 0;
@@ -75,9 +74,9 @@ const DraftClock = React.createClass({
         {body}
       </GolfDraftPanel>
     );
-  },
+  }
 
-  _getDisplayTime: function (state) {
+  _getDisplayTime(state) {
     state = state || this.state;
 
     if (state.totalMillis === null) {
@@ -86,9 +85,9 @@ const DraftClock = React.createClass({
 
     const totalMillis = state.totalMillis || 0;
     return moment.utc(totalMillis).format("mm:ss");
-  },
+  }
 
-  _getTotalMillis: function (props) {
+  _getTotalMillis(props) {
     props = props || this.props;
 
     if (_.isEmpty(props.draftPicks) || !this.props.allowClock) {
@@ -103,6 +102,6 @@ const DraftClock = React.createClass({
     };
   }
 
-});
+};
 
 module.exports = DraftClock;

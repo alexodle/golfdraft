@@ -6,17 +6,16 @@ const _ = require("lodash");
 
 const UserActions = require("../actions/UserActions");
 
-const LogoutButton = React.createClass({
-
+class LogoutButton extends React.Component {
   contextTypes: {
     router: React.PropTypes.object.isRequired
-  },
+  }
 
   proptTypes: {
     location: React.PropTypes.object
-  },
+  }
 
-  render: function () {
+  render() {
     return (
         <a
           href="#noop"
@@ -24,9 +23,9 @@ const LogoutButton = React.createClass({
           onClick={this._onClick}
         >I&#8217;m not {this.props.currentUser.name}</a>
     );
-  },
+  }
 
-  _onClick: function (ev) {
+  _onClick(ev) {
     ev.preventDefault();
     UserActions.setCurrentUser(null);
     this.context.router.replace({
@@ -35,6 +34,6 @@ const LogoutButton = React.createClass({
     });
   }
 
-});
+};
 
 module.exports = LogoutButton;

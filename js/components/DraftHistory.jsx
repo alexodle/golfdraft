@@ -8,11 +8,9 @@ const GolferLogic = require('../logic/GolferLogic');
 const GolferStore = require('../stores/GolferStore');
 const UserStore = require('../stores/UserStore');
 const React = require('react');
-const ReactCSSTransitionGroup = require('react/lib/ReactCSSTransitionGroup');
 
-const DraftHistory = React.createClass({
-
-  render: function () {
+class DraftHistory extends React.Component {
+  render() {
     const selectedUserId = this.props.selectedUserId;
     const onPersonClick = this._onPersonClick;
     let heading = 'Draft History';
@@ -61,16 +59,16 @@ const DraftHistory = React.createClass({
         </GolfDraftPanel>
       </div>
     );
-  },
+  }
 
-  _onPersonClick: function (pid) {
+  _onPersonClick(pid) {
     this.props.onSelectionChange(pid);
-  },
+  }
 
-  _onDeselectPerson: function () {
+  _onDeselectPerson() {
     this.props.onSelectionChange(null);
   }
 
-});
+};
 
 module.exports = DraftHistory;

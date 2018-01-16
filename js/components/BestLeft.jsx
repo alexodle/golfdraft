@@ -8,9 +8,8 @@ const React = require('react');
 
 const SHOW_N = 20;
 
-const BestLeft = React.createClass({
-
-  render: function () {
+class BestLeft extends React.Component {
+  render() {
     const golfersRemaining = _.chain(this.props.golfersRemaining)
       .sortBy('wgr')
       .first(SHOW_N)
@@ -26,6 +25,6 @@ const BestLeft = React.createClass({
     );
   }
 
-});
+};
 
 module.exports = BestLeft;

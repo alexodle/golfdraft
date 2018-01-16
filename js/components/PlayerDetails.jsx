@@ -10,14 +10,13 @@ const utils = require("../../common/utils");
 const UserStore = require('../stores/UserStore');
 const GolferStore = require('../stores/GolferStore');
 
-const UserDetails = React.createClass({
-
+class UserDetails extends React.Component {
   propTypes: {
     user: ReactPropTypes.string.isRequired,
     userScores: ReactPropTypes.object.isRequired
-  },
+  }
 
-  render: function () {
+  render() {
     const user = this.props.user;
     const userScore = this.props.userScores[user];
     const scoresByDay = userScore.scoresByDay;
@@ -91,6 +90,6 @@ const UserDetails = React.createClass({
     );
   }
 
-});
+};
 
 module.exports = UserDetails;

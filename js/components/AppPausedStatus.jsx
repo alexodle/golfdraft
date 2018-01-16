@@ -4,9 +4,8 @@
 const _ = require('lodash');
 const React = require('react');
 
-const AppPausedStatus = React.createClass({
-
-  render: function () {
+class AppPausedStatus extends React.Component {
+  render() {
     return (
       <div className="jumbotron">
         <h1>Pause!</h1>
@@ -40,6 +39,6 @@ const AppPausedStatus = React.createClass({
     );
   }
 
-});
+};
 
 module.exports = AppPausedStatus;

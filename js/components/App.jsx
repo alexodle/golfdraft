@@ -60,13 +60,12 @@ function getGolfersRemaining(golfers, draftPicks) {
   return golfersRemaining;
 }
 
-const DraftWrapper = React.createClass({
-
+class DraftWrapper extends React.Component {
   childContextTypes: {
     location: React.PropTypes.object
-  },
+  }
 
-  render: function () {
+  render() {
     const props = this.props;
     return (
       <section>
@@ -97,15 +96,14 @@ const DraftWrapper = React.createClass({
     );
   }
 
-});
+};
 
-const TourneyWrapper = React.createClass({
-
+class TourneyWrapper extends React.Component {
   childContextTypes: {
     location: React.PropTypes.object
-  },
+  }
 
-  render: function () {
+  render() {
     const props = this.props;
     return (
       <section>
@@ -127,15 +125,14 @@ const TourneyWrapper = React.createClass({
     );
   }
 
-});
+};
 
-const AdminWrapper = React.createClass({
-
+class AdminWrapper extends React.Component {
   childContextTypes: {
     location: React.PropTypes.object
-  },
+  }
 
-  render: function () {
+  render() {
     const props = this.props;
     return (
       <section>
@@ -161,27 +158,26 @@ const AdminWrapper = React.createClass({
     );
   }
 
-});
+};
 
-const AppNode = React.createClass({
-
-  getInitialState: function () {
+class AppNode extends React.Component {
+  getInitialState() {
     return getAppState();
-  },
+  }
 
-  componentDidMount: function () {
+  componentDidMount() {
     _.each(RELEVANT_STORES, function (S) {
       S.addChangeListener(this._onChange);
     }, this);
-  },
+  }
 
-  componentWillUnmount: function () {
+  componentWillUnmount() {
     _.each(RELEVANT_STORES, function (S) {
       S.removeChangeListener(this._onChange);
     }, this);
-  },
+  }
 
-  render: function () {
+  render() {
     const state = this.state;
 
     // Calculated here since it's used in multiple places
@@ -194,13 +190,13 @@ const AppNode = React.createClass({
       ...state,
       golfersRemaining: golfersRemaining
     });
-  },
+  }
 
-  _onChange: function () {
+  _onChange() {
     this.setState(getAppState());
   }
 
-});
+};
 
 module.exports = {
   AdminWrapper: AdminWrapper,

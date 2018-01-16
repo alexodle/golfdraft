@@ -19,18 +19,17 @@ function shouldShowPickListOption(props) {
   return isProxyPick(props) || !_.isEmpty(props.syncedPickList);
 }
 
-const DraftChooser = React.createClass({
-
-  getInitialState: function () {
+class DraftChooser extends React.Component {
+  getInitialState() {
     return this._getSelectionState(this.props);
-  },
+  }
 
-  componentWillReceiveProps: function (nextProps) {
+  componentWillReceiveProps(nextProps) {
     const newState = this._getSelectionState(nextProps);
     this.setState(newState);
-  },
+  }
 
-  render: function () {
+  render() {
     if (this._isLoading()) {
       return this._renderLoading();
     }
@@ -133,25 +132,25 @@ const DraftChooser = React.createClass({
         </form>
       </GolfDraftPanel>
     );
-  },
+  }
 
-  _renderLoading: function () {
+  _renderLoading() {
     return (
       <GolfDraftPanel heading='Draft Picker'>
         <span>Loading...</span>
       </GolfDraftPanel>
     );
-  },
+  }
 
-  _isLoading: function () {
+  _isLoading() {
     return this.props.syncedPickList === AppConstants.PROPERTY_LOADING;
-  },
+  }
 
-  _isProxyPick: function () {
+  _isProxyPick() {
     return isProxyPick(this.props);
-  },
+  }
 
-  _sortedGolfers: function (golfers, sortKey) {
+  _sortedGolfers(golfers, sortKey) {
     const isProxyPick = this._isProxyPick();
     if (sortKey === 'pickList') {
       if (isProxyPick) {
@@ -164,9 +163,9 @@ const DraftChooser = React.createClass({
       }
     }
     return _.sortBy(golfers, [sortKey, 'name']);
-  },
+  }
 
-  _getSelectionState: function (props) {
+  _getSelectionState(props) {
     const state = this.state || {};
     const golfersRemaining = props.golfersRemaining;
 
@@ -185,13 +184,13 @@ const DraftChooser = React.createClass({
       selectedGolfer: selectedGolfer,
       sortKey: sortKey
     };
-  },
+  }
 
-  _onChange: function (ev) {
+  _onChange(ev) {
     this.setState({ selectedGolfer: ev.target.value });
-  },
+  }
 
-  _setSortKey: function (sortKey) {
+  _setSortKey(sortKey) {
     if (sortKey === this.state.sortKey) return;
 
     const golfersRemaining = this.props.golfersRemaining;
@@ -201,23 +200,23 @@ const DraftChooser = React.createClass({
       sortKey: sortKey,
       selectedGolfer: selectedGolfer
     });
-  },
+  }
 
-  _onProxyPickListPick: function (ev) {
+  _onProxyPickListPick(ev) {
     ev.preventDefault();
     DraftActions.makePickListPick();
-  },
+  }
 
-  _onSubmit: function (ev) {
+  _onSubmit(ev) {
     ev.preventDefault();
     DraftActions.makePick(this.state.selectedGolfer);
-  },
+  }
 
-  _onStopTakingPick: function (ev) {
+  _onStopTakingPick(ev) {
     ev.preventDefault();
     DraftActions.stopDraftingForUser(this.props.currentPick.user);
   }
 
-});
+};
 
 module.exports = DraftChooser;
