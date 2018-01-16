@@ -2,6 +2,9 @@
 
 import sys
 import re
+import glob
+import os
+
 
 CREATE_CLASS = re.compile(r'([A-Za-z_0-9]+) *= *React\.createClass\({')
 METHOD = re.compile(r'([A-Za-z_0-9]+): function +')
@@ -69,5 +72,12 @@ def main(fp):
     f.writelines(lines)
 
 
+def run_on_dir(dir):
+  for root, dirs, files in os.walk(dir):
+    for file in files:
+        if file.endswith('.jsx'):
+             main(os.path.join(root, file))
+
+
 if __name__ == '__main__':
-  main(sys.argv[1])
+  run_on_dir('js/')
