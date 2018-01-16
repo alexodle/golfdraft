@@ -1,4 +1,5 @@
-"use strict";
+// @flow
+'use strict';
 
 const _ = require("lodash");
 const AdminApp = require("./AdminApp.jsx");

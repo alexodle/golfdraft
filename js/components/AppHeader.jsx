@@ -1,3 +1,4 @@
+// @flow
 'use strict';
 
 const LogoutButton = require("./LogoutButton.jsx");

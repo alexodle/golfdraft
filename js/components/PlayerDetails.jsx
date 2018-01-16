@@ -1,4 +1,5 @@
-"use strict";
+// @flow
+'use strict';
 
 const React = require("react");
 const ReactPropTypes = React.PropTypes;

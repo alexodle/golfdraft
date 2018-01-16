@@ -1,3 +1,4 @@
+// @flow
 'use strict';
 
 const App = require('./components/App.jsx');

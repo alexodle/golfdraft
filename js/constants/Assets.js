@@ -1,3 +1,4 @@
+// @flow
 'use strict';
 
 // HACKHACK - CDN url is just placed on window for us

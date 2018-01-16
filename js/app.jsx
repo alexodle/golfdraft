@@ -1,3 +1,4 @@
+// @flow
 'use strict';
 
 // load css right away

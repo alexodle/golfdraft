@@ -1,4 +1,5 @@
-"use strict";
+// @flow
+'use strict';
 
 const _ = require("lodash");
 const _string = require("underscore.string");
@@ -15,7 +16,7 @@ function _forEachWordPermutation(words, callback, output) {
   _.each(words, function (w, i) {
     const newWords = words.slice(0, i).concat(words.slice(i + 1, words.length));
     return _forEachWordPermutation(newWords, callback, output.concat([w]));
-  }); 
+  });
 }
 
 function runAll(sourceList, targetList) {

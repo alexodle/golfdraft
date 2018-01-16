@@ -1,3 +1,4 @@
+// @flow
 'use strict';
 
 // Refreshes users, pick order, draft picks, and chat
