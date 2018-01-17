@@ -1,12 +1,17 @@
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 module.exports = {
-  entry: "./js/app.jsx",
+  entry: "./js/app.tsx",
   plugins: [
     new ExtractTextPlugin("bundle.css")
   ],
+  resolve: {
+    // Add '.ts' and '.tsx' as resolvable extensions.
+    extensions: [".ts", ".tsx", ".js", ".jsx", ".json"]
+  },
   module: {
     rules: [
+      { test: /\.tsx?$/, loader: ["babel-loader", "awesome-typescript-loader" ]},
       { test: /\.eot($|\?)/, use: "url-loader" },
       { test: /\.gif($|\?)/, use: "url-loader?limit=10000&minetype=image/gif" },
       { test: /\.jpg($|\?)/, use: "url-loader?limit=10000&minetype=image/jpg" },

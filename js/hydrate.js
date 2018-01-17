@@ -28,7 +28,6 @@ function hydrate(seedData) {
   }
 }
 
-module.exports = _.chain(hydrate)
-  .partial(window.golfDraftSeed)
-  .once()
-  .value();
+export default _.once(() => {
+  hydrate(window.golfDraftSeed);
+});

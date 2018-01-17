@@ -38,4 +38,4 @@ function startSocketUpdates() {
   });
 }
 
-module.exports = _.once(startSocketUpdates);
+export default _.once(startSocketUpdates);

@@ -1,0 +1,11 @@
+**find/replace
+const React = require('react');
+import * as React from 'react';
+
+**find/replace
+const ReactDOM = require('react-dom');
+import * as ReactDOM from 'react-dom';
+
+**find/replace
+import \1 from '\2';
+import \1 from '\2';

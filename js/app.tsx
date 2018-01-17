@@ -3,24 +3,22 @@
 // @flow
 
 // load css right away
-require('bootstrap/dist/css/bootstrap.css');
-require('font-awesome/css/font-awesome.css');
-require('../less/app.less');
+import 'bootstrap/dist/css/bootstrap.css';
+import 'font-awesome/css/font-awesome.css';
+import '../less/app.less';
 
-const $ = require('jquery');
-const AppNode = require('./components/App.jsx').AppNode;
-const ChatActions = require('./actions/ChatActions');
-const React = require('react');
-const ReactDOM = require('react-dom');
-const Router = require('react-router-dom');
+import * as $ from 'jquery';;
+import {AppNode} from './components/App.jsx';
+import * as ChatActions from './actions/ChatActions';
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
+import {BrowserRouter, Route} from 'react-router-dom';
+import hydrate from './hydrate';
+import startSocketUpdates from './startSocketUpdates';
 
-const BrowserRouter = Router.BrowserRouter;
-const Route = Router.Route;
-
-
-function render(rootNode) {
-  // Hydrate the app with seed data before running
-  require('./hydrate')();
+function render(rootNode: Element) {
+  // hydrate BEFORE rendering
+  hydrate();
 
   ReactDOM.render(
     (<BrowserRouter>
@@ -34,7 +32,7 @@ function render(rootNode) {
     </BrowserRouter>), rootNode);
 
   // Begin listening for live socket updates
-  require('./startSocketUpdates')();
+  startSocketUpdates();
 
   // Lazily get chat messages
   //
