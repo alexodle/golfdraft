@@ -1,10 +1,8 @@
-'use strict';
-
-const _ = require('lodash');
-const Assets = require('../constants/Assets');
-const GolfDraftPanel = require('./GolfDraftPanel.jsx');
-const moment = require('moment');
-const React = require('react');
+import * as _ from 'lodash';
+import * as Assets from '../constants/Assets';
+import GolfDraftPanel from './GolfDraftPanel';
+import * as moment from 'moment';
+import * as React from 'react';
 
 const TIME_INTERVAL = 1000;
 const WARNING_TIME = 1000 * 60 * 2;
@@ -14,27 +12,48 @@ const WARNING_SOUND_INTERVAL_SECONDS = 10;
 
 const pickWarningSound = new Audio(Assets.PICK_WARNING_SOUND);
 
-class DraftClock extends React.Component {
+// TODO: separate file
+export interface DraftPick {
+  user: string;
+  golfer: string;
+  pickNumber: number;
+  timestamp: Date;
+  clientTimestamp: Date;
+}
 
-  constructor(props) {
+export interface DraftClockProps {
+  isMyPick: boolean;
+  allowClock: boolean;
+  draftPicks: DraftPick[];
+}
+
+interface DraftClockState {
+  totalMillis: number;
+  intervalId?: number;
+}
+
+class DraftClock extends React.Component<DraftClockProps, DraftClockState> {
+
+  constructor(props: DraftClockProps) {
     super(props);
     this.state = this._getInitialState();
   }
 
   _getInitialState() {
-    return this._getTotalMillis();
+    return _.exend({ intervalId: null }, this._getTotalMillis());
   }
 
   componentDidMount() {
-    this._intervalId = setInterval(function () {
+    const intervalId = window.setInterval(() => {
       this.setState(this._getTotalMillis());
-    }.bind(this), TIME_INTERVAL);
+    }, TIME_INTERVAL);
+    this.setState({ intervalId });
   }
 
   componentWillUnmount() {
-    if (this._intervalId) {
-      clearInterval(this._intervalId);
-      this._intervalId = null;
+    if (this.state.intervalId) {
+      window.clearInterval(this.state.intervalId);
+      this.setState({ intervalId: null });
     }
   }
 
@@ -81,7 +100,7 @@ class DraftClock extends React.Component {
     );
   }
 
-  _getDisplayTime(state) {
+  _getDisplayTime(state?) {
     state = state || this.state;
 
     if (state.totalMillis === null) {
@@ -92,7 +111,7 @@ class DraftClock extends React.Component {
     return moment.utc(totalMillis).format("mm:ss");
   }
 
-  _getTotalMillis(props) {
+  _getTotalMillis(props? : DraftClockProps) {
     props = props || this.props;
 
     if (_.isEmpty(props.draftPicks) || !this.props.allowClock) {
@@ -101,12 +120,10 @@ class DraftClock extends React.Component {
 
     const lastPick = _.last(props.draftPicks);
     const currentTime = new Date();
-    const totalMillis = Math.max(0, currentTime - lastPick.clientTimestamp);
+    const totalMillis = Math.max(0, currentTime.getTime() - lastPick.clientTimestamp.getTime());
     return {
       totalMillis: totalMillis
     };
   }
 
 };
-
-module.exports = DraftClock;

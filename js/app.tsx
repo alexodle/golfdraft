@@ -1,7 +1,3 @@
-'use strict';
-
-// @flow
-
 // load css right away
 import 'bootstrap/dist/css/bootstrap.css';
 import 'font-awesome/css/font-awesome.css';

@@ -2,7 +2,7 @@
 
 const _ = require('lodash');
 const DraftStore = require('../stores/DraftStore');
-const GolfDraftPanel = require('./GolfDraftPanel.jsx');
+import GolfDraftPanel from './GolfDraftPanel';
 const GolferLogic = require('../logic/GolferLogic');
 const GolferStore = require('../stores/GolferStore');
 const UserStore = require('../stores/UserStore');

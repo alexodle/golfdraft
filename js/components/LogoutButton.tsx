@@ -1,11 +1,22 @@
-'use strict';
+import * as _ from 'lodash';
+import * as React from 'react';
+import * as UserActions from '../actions/UserActions';
+import {Redirect} from 'react-router';
 
-const React = require("react");
-const _ = require("lodash");
+// TODO: Move to separate file
+export interface User {
+  name: string;
+}
 
-const UserActions = require("../actions/UserActions");
+export interface LogoutButtonProps {
+  currentUser: User;
+}
 
-class LogoutButton extends React.Component {
+interface LogoutButtonState {
+  redirectTo?: string;
+}
+
+export default class LogoutButton extends React.Component<LogoutButtonProps, LogoutButtonState> {
 
   constructor(props) {
     super(props);
@@ -38,5 +49,3 @@ class LogoutButton extends React.Component {
   }
 
 };
-
-module.exports = LogoutButton;

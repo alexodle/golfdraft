@@ -3,7 +3,7 @@
 const _ = require('lodash');
 const cx = require('classnames');
 const DraftStore = require('../stores/DraftStore');
-const GolfDraftPanel = require('./GolfDraftPanel.jsx');
+import GolfDraftPanel from './GolfDraftPanel';
 const React = require('react');
 const UserStore = require('../stores/UserStore');
 

@@ -1,17 +1,9 @@
 'use strict';
 
-const LogoutButton = require("./LogoutButton.jsx");
-const React = require('react');
-
-const ReactPropTypes = React.PropTypes;
+import LogoutButton from './LogoutButton';
+import * as React from 'react';
 
 class AppHeader extends React.Component {
-  propTypes: {
-    tourneyName: ReactPropTypes.string.isRequired,
-    currentUser: ReactPropTypes.object.isRequired,
-    drafting: ReactPropTypes.bool,
-    location: React.PropTypes.object
-  }
 
   render() {
     return (
@@ -31,7 +23,6 @@ class AppHeader extends React.Component {
       </div>
     );
   }
-
 
 };
 

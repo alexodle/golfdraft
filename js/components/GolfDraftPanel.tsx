@@ -1,8 +1,11 @@
-'use strict';
+import * as React from 'react';
 
-const React = require('react');
+export interface GolfDraftPanelProps {
+  heading?: JSX.Element | string;
+  height?: string;
+}
 
-class GolfDraftPanel extends React.Component {
+export default class GolfDraftPanel extends React.Component<GolfDraftPanelProps, {}> {
   render() {
     return (
       <div
@@ -22,5 +25,3 @@ class GolfDraftPanel extends React.Component {
   }
 
 };
-
-module.exports = GolfDraftPanel;
