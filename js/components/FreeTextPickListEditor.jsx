@@ -67,7 +67,7 @@ class SuggestionSelector extends React.Component {
             <b>{selectedValue}</b>
           </div>
         </div>
-        <p><a href="#" onClick={this._viewAll}>Nope</a></p>
+        <p><a href="#" onClick={this._onViewAll}>Nope</a></p>
       </section>
     );
   }
@@ -97,11 +97,11 @@ class SuggestionSelector extends React.Component {
     );
   }
 
-  _onSelectValueChange(ev) {
+  _onSelectValueChange = (ev) => {
     this.props.onSelectionChange(ev.target.value);
   }
 
-  _viewAll(ev) {
+  _onViewAll = (ev) => {
     ev.preventDefault();
     this.setState({ isViewingAll: true });
   }
@@ -230,7 +230,7 @@ class FreeTextPickListEditor extends React.Component {
       .value();
   }
 
-  _onChange(ev) {
+  _onChange = (ev) => {
     this.setState({ text: ev.target.value });
   }
 
@@ -254,7 +254,7 @@ class FreeTextPickListEditor extends React.Component {
     });
   }
 
-  _onSuggestionSelectionChange(source, target) {
+  _onSuggestionSelectionChange = (source, target) => {
     const updateObj = {};
     updateObj[source] = target;
 
@@ -262,7 +262,7 @@ class FreeTextPickListEditor extends React.Component {
     this.setState({ suggestionSelections: newSuggestionSelections });
   }
 
-  _onSave() {
+  _onSave = () => {
     this.setState({ isPosting: true });
 
     const data = { pickListNames: this._cleanedGolfers() };

@@ -10,6 +10,12 @@ const GolferStore = require("../stores/GolferStore");
 const React = require("react");
 
 class PickListEditor extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = this._getInitialState();
+  }
+
   _getInitialState() {
     return {
       draggingIndex: null,
@@ -166,27 +172,27 @@ class PickListEditor extends React.Component {
     return newOrder;
   }
 
-  _onUpOne(i, e) {
+  _onUpOne = (i, e) => {
     e.preventDefault();
     const newOrder = this._newOrder(i, i - 1);
     DraftActions.updatePendingPickList(newOrder);
   }
 
-  _onDownOne(i, e) {
+  _onDownOne = (i, e) => {
     e.preventDefault();
     const newOrder = this._newOrder(i, i + 1);
     DraftActions.updatePendingPickList(newOrder);
   }
 
-  _onReset() {
+  _onReset = () => {
     DraftActions.resetPendingPickList();
   }
 
-  _onSave() {
+  _onSave = () => {
     DraftActions.savePickList();
   }
 
-  _onDrop(toIndex, e) {
+  _onDrop = (toIndex, e) => {
     e.preventDefault();
 
     const fromIndex = this.state.draggingIndex;
@@ -195,30 +201,30 @@ class PickListEditor extends React.Component {
     DraftActions.updatePendingPickList(newOrder);
   }
 
-  _onDragStart(i, e) {
+  _onDragStart = (i, e) => {
     this.setState({ draggingIndex: i });
   }
 
-  _onDragEnd(e) {
+  _onDragEnd = (e) => {
     this.setState({
       draggingIndex: null,
       draggingHoverIndex: null
     });
   }
 
-  _onDragOver(i, e) {
+  _onDragOver = (i, e) => {
     e.preventDefault();
     if (this.state.draggingHoverIndex !== i) {
       this.setState({ draggingHoverIndex: i });
     }
   }
 
-  _onFreeTextClick() {
+  _onFreeTextClick = () => {
     this.setState({ isFreeTextMode: true });
     window.location.href = '#InlinePickListEditor';
   }
 
-  _onFreeTextComplete() {
+  _onFreeTextComplete = () => {
     this.setState({ isFreeTextMode: false });
     window.location.href = '#InlinePickListEditor';
   }

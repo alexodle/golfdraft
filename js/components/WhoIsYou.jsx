@@ -83,15 +83,15 @@ class WhoIsYou extends React.Component {
     );
   }
 
-  _onUserChange(ev) {
+  _onUserChange = (ev) => {
     this.setState({ selectedUser: ev.target.value });
   }
 
-  _onPasswordChange(ev) {
+  _onPasswordChange = (ev) => {
     this.setState({ password: ev.target.value });
   }
 
-  _onSubmit(ev) {
+  _onSubmit = (ev) => {
     ev.preventDefault();
     this.setState({ isLoading: true, badAuth: false });
 

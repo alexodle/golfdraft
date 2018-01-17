@@ -25,7 +25,7 @@ class LogoutButton extends React.Component {
     );
   }
 
-  _onClick(ev) {
+  _onClick = (ev) => {
     ev.preventDefault();
     UserActions.setCurrentUser(null);
     this.context.router.replace({

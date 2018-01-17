@@ -60,7 +60,7 @@ class DraftPickOrder extends React.Component {
     );
   }
 
-  _onSelect(pid) {
+  _onSelect = (pid) => {
     this.props.onUserSelected(pid);
   }
 

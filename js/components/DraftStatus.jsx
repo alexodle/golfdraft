@@ -20,7 +20,7 @@ class DraftStatus extends React.Component {
     );
   }
 
-  _onTakePick(ev) {
+  _onTakePick = (ev) => {
     ev.preventDefault();
     DraftActions.draftForUser(this.props.currentPick.user);
   }

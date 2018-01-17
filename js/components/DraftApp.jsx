@@ -224,7 +224,7 @@ class DraftApp extends React.Component {
     );
   }
 
-  _onDraftHistorySelectionChange(userId) {
+  _onDraftHistorySelectionChange = (userId) => {
     this.setState({ draftHistoryUserId: userId });
   }
 

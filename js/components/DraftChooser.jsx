@@ -77,7 +77,7 @@ class DraftChooser extends React.Component {
                 "btn btn-default": true,
                 "active": sortKey === 'pickList'
               })}
-              onClick={_.partial(this._setSortKey, 'pickList')}
+              onClick={() => this._setSortKey('pickList')}
             >User Pick List</button>
           )}
           <button
@@ -86,7 +86,7 @@ class DraftChooser extends React.Component {
               "btn btn-default": true,
               "active": sortKey === 'name'
             })}
-            onClick={_.partial(this._setSortKey, 'name')}
+            onClick={() => this._setSortKey('name')}
           >First Name</button>
           <button
             type="button"
@@ -94,7 +94,7 @@ class DraftChooser extends React.Component {
               "btn btn-default": true,
               "active": sortKey === 'wgr'
             })}
-            onClick={_.partial(this._setSortKey, 'wgr')}
+            onClick={() => this._setSortKey('wgr')}
           >World Golf Ranking</button>
         </div>
 
@@ -192,7 +192,7 @@ class DraftChooser extends React.Component {
     };
   }
 
-  _onChange(ev) {
+  _onChange = (ev) => {
     this.setState({ selectedGolfer: ev.target.value });
   }
 
@@ -208,17 +208,17 @@ class DraftChooser extends React.Component {
     });
   }
 
-  _onProxyPickListPick(ev) {
+  _onProxyPickListPick = (ev) => {
     ev.preventDefault();
     DraftActions.makePickListPick();
   }
 
-  _onSubmit(ev) {
+  _onSubmit = (ev) => {
     ev.preventDefault();
     DraftActions.makePick(this.state.selectedGolfer);
   }
 
-  _onStopTakingPick(ev) {
+  _onStopTakingPick = (ev) => {
     ev.preventDefault();
     DraftActions.stopDraftingForUser(this.props.currentPick.user);
   }

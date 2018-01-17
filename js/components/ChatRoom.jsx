@@ -100,7 +100,7 @@ class AutoComplete extends React.PureComponent {
     this._move(-1);
   }
 
-  _onChange(ev) {
+  _onChange = (ev) => {
     this.setState({ selectedIndex: ev.currentTarget.selectedIndex });
   }
 
@@ -129,11 +129,11 @@ class AutoComplete extends React.PureComponent {
     return choices;
   }
 
-  _onClick(ev) {
+  _onClick = (ev) => {
     this.forceSelect();
   }
 
-  _onKeyUp(ev) {
+  _onKeyUp = (ev) => {
     if (ev.keyCode === ENTER_KEY) {
       this.forceSelect();
     }
@@ -164,7 +164,7 @@ class ChatRoomInput extends React.PureComponent {
               ref='input'
               className='form-control'
               value={text}
-              onChange={this._updateText}
+              onChange={this._onUpdateText}
               onKeyUp={this._onKeyUp}
             />
             {!nameTag ? null : (
@@ -183,7 +183,7 @@ class ChatRoomInput extends React.PureComponent {
     );
   }
 
-  _onKeyUp(ev) {
+  _onKeyUp = (ev) => {
     if (this.state.taggingText) {
       if (ev.keyCode === UP_KEY) {
         this.refs.nameTagger.forceUp();
@@ -195,7 +195,7 @@ class ChatRoomInput extends React.PureComponent {
     }
   }
 
-  _updateText(ev) {
+  _onUpdateText = (ev) => {
     const newText = ev.target.value;
     this.setState({
       text: newText,
@@ -203,14 +203,14 @@ class ChatRoomInput extends React.PureComponent {
     });
   }
 
-  _onTag(ev) {
+  _onTag = (ev) => {
     const newText = this.state.text.replace(NAME_TAG_RE, "~[" + ev.value + "] ");
     this.setState({ text: newText, taggingText: null });
 
     $(this.refs.input).focus();
   }
 
-  _onSend(ev) {
+  _onSend = (ev) => {
     ev.preventDefault();
 
     if (this.state.taggingText) {

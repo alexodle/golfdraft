@@ -86,11 +86,11 @@ class PasswordInput extends React.Component {
     );
   }
 
-  _onChange(ev) {
+  _onChange = (ev) => {
     this.setState({ password: ev.target.value });
   }
 
-  _onSubmit(ev) {
+  _onSubmit = (ev) => {
     ev.preventDefault();
 
     const that = this;
@@ -228,7 +228,7 @@ class AdminApp extends React.Component {
               <button
                 className='btn btn-default'
                   type='button'
-                onClick={this._undoLastPick}
+                onClick={this._onUndoLastPick}
               >Undo Pick</button>
             )}
             {!confirmingUndo ? null : (
@@ -237,13 +237,13 @@ class AdminApp extends React.Component {
                 <button
                   className='btn btn-default'
                   type='button'
-                  onClick={this._confirmUndoLastPick}
+                  onClick={this._onConfirmUndoLastPick}
                 >I'm sure</button>
                 <span> </span>
                 <button
                   className='btn btn-default'
                   type='button'
-                  onClick={this._cancelUndoLastPick}
+                  onClick={this._onCancelUndoLastPick}
                 >Cancel</button>
               </span>
             )}
@@ -264,44 +264,44 @@ class AdminApp extends React.Component {
     );
   }
 
-  _onStartDraft() {
+  _onStartDraft = () => {
     toggleDraftHasStarted(true);
   }
 
-  _onUnstartDraft() {
+  _onUnstartDraft = () => {
     toggleDraftHasStarted(false);
   }
 
-  _onPause() {
+  _onPause = () => {
     togglePause(true);
   }
 
-  _onUnpause() {
+  _onUnpause = () => {
     togglePause(false);
   }
 
-  _onAllowClock() {
+  _onAllowClock = () => {
     toggleAllowClock(true);
   }
 
-  _onStopClock() {
+  _onStopClock = () => {
     toggleAllowClock(false);
   }
 
-  _undoLastPick() {
+  _onUndoLastPick = () => {
     this.setState({ confirmingUndo: true });
   }
 
-  _confirmUndoLastPick() {
+  _onConfirmUndoLastPick = () => {
     $.ajax({
       url: '/admin/lastPick',
       type: 'DELETE',
       contentType: 'application/json'
     });
-    this._cancelUndoLastPick();
+    this._onCancelUndoLastPick();
   }
 
-  _cancelUndoLastPick() {
+  _onCancelUndoLastPick = () => {
     this.setState({ confirmingUndo: false });
   }
 

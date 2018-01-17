@@ -86,7 +86,7 @@ class UserStandings extends React.Component {
     );
   }
 
-  _onUserSelect(pid) {
+  _onUserSelect = (pid) => {
     this.props.onUserSelect(pid);
   }
 

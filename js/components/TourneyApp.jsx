@@ -122,7 +122,7 @@ class TourneyApp extends React.Component {
     );
   }
 
-  _onUserSelect(user) {
+  _onUserSelect = (user) => {
     window.location.href = '#UserDetails';
     this.setState({userDetailsUser: user});
   }

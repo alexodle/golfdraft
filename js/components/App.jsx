@@ -17,7 +17,7 @@ const TourneyStore = require("../stores/TourneyStore");
 const UserStore = require("../stores/UserStore");
 const WhoIsYou = require("./WhoIsYou.jsx");
 
-const Route = Router.Route;
+const {Route, Switch, Redirect} = Router;
 
 const RELEVANT_STORES = [
   AppSettingsStore,
@@ -55,25 +55,6 @@ function getAppState() {
     draftHasStarted: AppSettingsStore.getDraftHasStarted(),
     autoPickUsers: AppSettingsStore.getAutoPickUsers()
   };
-}
-
-function requireAuth(nextState, replace) {
-  if (!UserStore.getCurrentUser()) {
-    replace({
-      pathname: '/whoisyou',
-      state: { nextPathname: nextState.location.pathname }
-    });
-    return false;
-  }
-  return true;
-}
-
-function requireDraftDone(nextState, replace) {
-  if (DraftStore.getCurrentPick()) {
-    replace('/draft');
-    return false;
-  }
-  return true;
 }
 
 function getGolfersRemaining(golfers, draftPicks) {
@@ -205,6 +186,18 @@ class AppNode extends React.Component {
     }, this);
   }
 
+  _requireCurrentUser() {
+    if (!this.state.currentUser) {
+      return (<Redirect to="/whoisyou" />);
+    }
+  }
+
+  _requireDraftComplete() {
+    if (this.state.draft.currentPick) {
+      return (<Redirect to="/draft" />);
+    }
+  }
+
   render() {
     const state = this.state;
 
@@ -214,36 +207,27 @@ class AppNode extends React.Component {
       state.draft.draftPicks
     );
 
-    function connect(Component) {
-      return class extends React.Component {
-        render() {
-          return (<Component {...this.props} {...state} golfersRemaining={golfersRemaining} />);
-        }
-      };
-    }
-
     return (
-      <div>
-        <Route
-          component={connect(TourneyWrapper)}
-          onEnter={function (nextState, replace) {
-            requireAuth(nextState, replace) && requireDraftDone(nextState, replace);
-          }}
-          path="/"
-        />
-        <Route path="draft" component={connect(DraftWrapper)} onEnter={requireAuth} />
-        <Route path="whoisyou" component={connect(WhoIsYou)} />
-        <Route path="admin" component={connect(AdminWrapper)} />
-      </div>
+      <Switch>
+        <Route exact path="/" render={(props) =>
+          this._requireCurrentUser() || this._requireDraftComplete() || (
+            <TourneyWrapper {...props} {...state} golfersRemaining={golfersRemaining} />
+        )}/>
+        <Route exact path="/draft" render={(props) =>
+          this._requireCurrentUser() || (
+            <DraftWrapper {...props} {...state} golfersRemaining={golfersRemaining} />
+        )}/>
+        <Route exact path="/whoisyou" render={(props) => (
+          <WhoIsYou {...props} {...state} golfersRemaining={golfersRemaining} />
+        )}/>
+        <Route exact path="/admin" render={(props) => (
+          <AdminWrapper {...props} {...state} golfersRemaining={golfersRemaining} />
+        )}/>
+      </Switch>
     );
-
-    return React.cloneElement(this.props.children, {
-      ...state,
-      golfersRemaining: golfersRemaining
-    });
   }
 
-  _onChange() {
+  _onChange = () => {
     this.setState(getAppState());
   }
 

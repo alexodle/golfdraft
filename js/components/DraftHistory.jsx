@@ -61,11 +61,11 @@ class DraftHistory extends React.Component {
     );
   }
 
-  _onPersonClick(pid) {
+  _onPersonClick = (pid) => {
     this.props.onSelectionChange(pid);
   }
 
-  _onDeselectPerson() {
+  _onDeselectPerson = () => {
     this.props.onSelectionChange(null);
   }
 
