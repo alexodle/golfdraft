@@ -1,17 +1,17 @@
 'use strict';
 
 const _ = require('lodash');
-const AppPausedStatus = require('./AppPausedStatus.jsx');
+import AppPausedStatus from './AppPausedStatus';
 const Assets = require('../constants/Assets');
-const ChatRoom = require('./ChatRoom.jsx');
-const DraftChooser = require('./DraftChooser.jsx');
+const ChatRoom = require('./ChatRoom');
+const DraftChooser = require('./DraftChooser');
 import DraftClock from './DraftClock';
-const DraftHistory = require('./DraftHistory.jsx');
-const DraftPickOrder = require('./DraftPickOrder.jsx');
-const DraftStatus = require('./DraftStatus.jsx');
+const DraftHistory = require('./DraftHistory');
+const DraftPickOrder = require('./DraftPickOrder');
+const DraftStatus = require('./DraftStatus');
 import GolfDraftPanel from './GolfDraftPanel';
 const Link = require('react-router').Link;
-const PickListEditor = require('./PickListEditor.jsx');
+const PickListEditor = require('./PickListEditor');
 const React = require('react');
 
 const myTurnSound = new Audio(Assets.MY_TURN_SOUND);

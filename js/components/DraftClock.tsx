@@ -32,7 +32,7 @@ interface DraftClockState {
   intervalId?: number;
 }
 
-class DraftClock extends React.Component<DraftClockProps, DraftClockState> {
+export default class DraftClock extends React.Component<DraftClockProps, DraftClockState> {
 
   constructor(props: DraftClockProps) {
     super(props);
@@ -40,7 +40,7 @@ class DraftClock extends React.Component<DraftClockProps, DraftClockState> {
   }
 
   _getInitialState() {
-    return _.exend({ intervalId: null }, this._getTotalMillis());
+    return _.extend({ intervalId: null }, this._getTotalMillis());
   }
 
   componentDidMount() {

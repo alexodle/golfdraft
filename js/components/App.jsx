@@ -1,20 +1,20 @@
 'use strict';
 
 const _ = require('lodash');
-const AdminApp = require('./AdminApp.jsx');
-const AppHeader = require('./AppHeader.jsx');
+const AdminApp = require('./AdminApp');
+import AppHeader from './AppHeader';
 const AppSettingsStore = require('../stores/AppSettingsStore');
 const ChatStore = require('../stores/ChatStore');
-const DraftApp = require('./DraftApp.jsx');
+const DraftApp = require('./DraftApp');
 const DraftStore = require('../stores/DraftStore');
 const GolferStore = require('../stores/GolferStore');
 const React = require('react');
 const Router = require('react-router-dom');
 const ScoreStore = require('../stores/ScoreStore');
-const TourneyApp = require('./TourneyApp.jsx');
+const TourneyApp = require('./TourneyApp');
 const TourneyStore = require('../stores/TourneyStore');
 const UserStore = require('../stores/UserStore');
-const WhoIsYou = require('./WhoIsYou.jsx');
+const WhoIsYou = require('./WhoIsYou');
 
 const {Route, Switch, Redirect} = Router;
 

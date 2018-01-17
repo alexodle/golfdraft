@@ -3,7 +3,7 @@
 const React = require("react");
 const _ = require("lodash");
 
-const DraftChooser = require("./DraftChooser.jsx");
+const DraftChooser = require("./DraftChooser");
 
 class DebugFooter extends React.Component {
   render() {

@@ -1,9 +1,9 @@
 'use strict';
 
-const _ = require('lodash');
-const React = require('react');
+import * as _ from 'lodash';
+import * as React from 'react';
 
-class AppPausedStatus extends React.Component {
+export default class AppPausedStatus extends React.Component {
   render() {
     return (
       <div className="jumbotron">
@@ -39,5 +39,3 @@ class AppPausedStatus extends React.Component {
   }
 
 };
-
-module.exports = AppPausedStatus;

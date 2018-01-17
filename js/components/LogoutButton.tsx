@@ -1,12 +1,8 @@
 import * as _ from 'lodash';
 import * as React from 'react';
 import * as UserActions from '../actions/UserActions';
+import {User} from '../types/Types';
 import {Redirect} from 'react-router';
-
-// TODO: Move to separate file
-export interface User {
-  name: string;
-}
 
 export interface LogoutButtonProps {
   currentUser: User;

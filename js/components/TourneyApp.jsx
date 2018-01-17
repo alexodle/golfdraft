@@ -1,14 +1,14 @@
 'use strict';
 
 const _ = require('lodash');
-const ChatRoom = require('./ChatRoom.jsx');
+const ChatRoom = require('./ChatRoom');
 const constants = require('../../common/constants');
 import GolfDraftPanel from './GolfDraftPanel';
 const GolferLogic = require('../logic/GolferLogic');
 const GolferStore = require('../stores/GolferStore');
 const moment = require('moment');
-const UserDetails = require('./UserDetails.jsx');
-const UserStandings = require('./UserStandings.jsx');
+const UserDetails = require('./UserDetails');
+const UserStandings = require('./UserStandings');
 const React = require('react');
 const ScoreLogic = require('../logic/ScoreLogic');
 const utils = require('../../common/utils');
