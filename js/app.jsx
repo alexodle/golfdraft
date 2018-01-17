@@ -1,5 +1,6 @@
-// @flow
 'use strict';
+
+// @flow
 
 // load css right away
 require('bootstrap/dist/css/bootstrap.css');
@@ -16,28 +17,34 @@ const Router = require('react-router-dom');
 const BrowserRouter = Router.BrowserRouter;
 const Route = Router.Route;
 
-// Hydrate the app with seed data before running
-require('./hydrate')();
 
-const node = document.getElementById('golfdraftapp');
-ReactDOM.render(
-  (<BrowserRouter>
-    <div className="container">
-      <div className="row">
-        <div className="col-md-offset-1 col-md-10">
-          <Route component={AppNode} path="/" />
+function render(rootNode) {
+  // Hydrate the app with seed data before running
+  require('./hydrate')();
+
+  ReactDOM.render(
+    (<BrowserRouter>
+      <div className="container">
+        <div className="row">
+          <div className="col-md-offset-1 col-md-10">
+            <Route component={AppNode} path="/" />
+          </div>
         </div>
       </div>
-    </div>
-  </BrowserRouter>),
-  node
-);
+    </BrowserRouter>), rootNode);
 
+  // Begin listening for live socket updates
+  require('./startSocketUpdates')();
 
-// Begin listening for live socket updates
-require('./startSocketUpdates')();
+  // Lazily get chat messages
+  //
+  // TODO - move to separate server sync
+  $.getJSON('/chat/messages').success(ChatActions.setMessages);
+}
 
-// Lazily get chat messages
-//
-// TODO - move to separate server sync
-$.getJSON('/chat/messages').success(ChatActions.setMessages);
+const node = document.getElementById('golfdraftapp');
+if (node === null) {
+  console.log('root node not found! golfdraftapp');
+} else {
+  render(node);
+}

@@ -1,6 +1,5 @@
 module.exports = function (grunt) {
-  // @flow
-'use strict';
+  'use strict';
 
   // Load grunt tasks automatically
   require('load-grunt-tasks')(grunt);

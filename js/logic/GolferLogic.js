@@ -1,4 +1,3 @@
-// @flow
 'use strict';
 
 const constants = require('../../common/constants');

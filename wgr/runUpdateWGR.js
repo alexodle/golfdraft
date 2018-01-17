@@ -1,4 +1,3 @@
-// @flow
 'use strict';
 
 // Simple one off script that we should only have to run manually once in a while

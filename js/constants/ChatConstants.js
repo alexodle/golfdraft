@@ -1,4 +1,3 @@
-// @flow
 'use strict';
 
 const keyMirror = require('fbjs/lib/keyMirror');

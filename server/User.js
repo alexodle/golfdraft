@@ -1,4 +1,3 @@
-// @flow
 'use strict';
 
 const mongoose = require('./mongooseUtil').mongoose;
