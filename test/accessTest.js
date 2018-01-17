@@ -5,10 +5,8 @@ const _ = require('lodash');
 const access = require('../server/access');
 const Promise = require('promise');
 const tourneyUtils = require('../server/tourneyUtils');
-const mongoose = require('mongoose');
+const ObjectId = require('../server/mongooseUtil').mongoose.Types.ObjectId;
 const should = require('should');
-
-const ObjectId = mongoose.Types.ObjectId;
 
 function ensureEmptyDraft() {
   return access.getDraft().then(function (draft) {
@@ -152,6 +150,15 @@ describe('access', function () {
     let golfers = null;
 
     beforeEach(function () {
+      console.log('hihi');
+      return access.getGolfers()
+        .then(function (golfers) {
+          console.log('hihi.golfersSHouldBeEMpty');
+          console.dir(golfers);
+        })
+
+      .then(function () {
+
       return Promise.all([
         access.ensureUsers([{ name: 'User1' }, { name: 'User2' }])
           .then(access.getUsers)
@@ -177,6 +184,7 @@ describe('access', function () {
           { name: 'Golfer1', wgr: 2 }
         ])
       ]);
+    });
     });
 
     afterEach(function () {

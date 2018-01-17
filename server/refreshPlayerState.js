@@ -6,7 +6,7 @@
 const _ = require('lodash');
 const access = require('./access');
 const config = require('./config');
-const mongoose = require('mongoose');
+const mongooseUtil = require('./mongooseUtil');
 const Promise = require('promise');
 const tourneyConfigReader = require('./tourneyConfigReader');
 const tourneyUtils = require('./tourneyUtils');
@@ -38,17 +38,17 @@ function refreshUserState(pickOrderNames) {
 }
 
 if (require.main === module) {
-  mongoose.set('debug', true);
-  mongoose.connect(config.mongo_url);
-
-  const db = mongoose.connection;
-  db.on('error', console.error.bind(console, 'connection error:'));
-  db.once('open', function callback () {
-    const tourneyCfg = tourneyConfigReader.loadConfig();
-    refreshUserState(tourneyCfg.draftOrder).then(function () {
-      process.exit(0);
+  mongooseUtil.connect()
+    .then(function () {
+      const tourneyCfg = tourneyConfigReader.loadConfig();
+      return refreshUserState(tourneyCfg.draftOrder);
+    })
+    .then(function () {
+      mongooseUtil.close();
+    })
+    .catch(function (err) {
+      console.log(err);
     });
-  });
 }
 
 module.exports = refreshUserState;

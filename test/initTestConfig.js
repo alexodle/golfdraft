@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const config = require('../server/config');
 const models = require('../server/models');
+const mongooseUtil = require('../server/mongooseUtil');
 const Promise = require('promise');
 const should = require('should');
 
@@ -21,21 +22,10 @@ _.extend(config, {
 });
 
 function initDb() {
-  // set up db connection
-  const mongoose = require('mongoose');
-  mongoose.connect(config.mongo_url);
-
-  return new Promise(function (fulfill, reject) {
-    mongoose.connection.once('open', function () {
-      testTourney.save(function (err) {
-        if (err) {
-          reject(err);
-        } else {
-          fulfill();
-        }
-      });
+  mongooseUtil.connect()
+    .then(function () {
+      return testTourney.save();
     });
-  });
 }
 
 module.exports = {

@@ -1,15 +1,9 @@
 const _ = require('lodash');
 const access = require('./server/access');
 const config = require('./server/config');
-const mongoose = require('mongoose');
+const mongooseUtil = require('./server/mongooseUtil');
 
 const TIMEOUT = 30 * 1000; // 30 seconds
-
-mongoose.connect(config.mongo_url);
-
-function end() {
-  mongoose.connection.close();
-}
 
 function printScoresForFrank() {
   Promise.all([
@@ -33,9 +27,11 @@ function printScoresForFrank() {
     console.log(err.stack);
     console.log(err);
   })
-  .then(end);
+  .then(mongooseUtil.close);
 }
 
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', printScoresForFrank);
+mongooseUtil.connect()
+  .then(printScoresForFrank)
+  .catch(function (err) {
+    console.log(err);
+  });

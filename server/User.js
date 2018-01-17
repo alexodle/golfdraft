@@ -1,7 +1,7 @@
 // @flow
 'use strict';
 
-const mongoose = require('mongoose');
+const mongoose = require('./mongooseUtil').mongoose;
 const passportLocalMongoose = require('passport-local-mongoose');
 
 const Schema = mongoose.Schema;

@@ -13,7 +13,7 @@ const express = require('express');
 const io = require('./socketIO');
 const logfmt = require("logfmt");
 const User = require('./models').User;
-const mongoose = require('mongoose');
+const mongooseUtil = require('./mongooseUtil');
 const passport = require('passport');
 const Promise = require('promise');
 const redis = require("./redis");
@@ -32,8 +32,6 @@ const ENSURE_AUTO_PICK_DELAY_MILLIS = 500;
 const AUTO_PICK_STARTUP_DELAY = 1000 * 5;
 
 const NOT_AN_ERROR = {};
-
-mongoose.connect(config.mongo_url);
 
 // Temp temp - remove this when we have multiple nodes
 UserAccess.refresh();
@@ -76,7 +74,6 @@ app.set('view engine', 'handlebars');
 
 // Static routes
 if (!config.prod) {
-  mongoose.set('debug', true);
   app.set('views', './distd/views/');
   app.use('/dist', express.static(__dirname + '/../distd'));
 } else {
@@ -115,11 +112,8 @@ app.use(function updateUserActivity(req, res, next) {
   next();
 });
 
-const tourneyCfg = tourneyConfigReader.loadConfig();
-
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function callback () {
+function defineRoutes() {
+  const tourneyCfg = tourneyConfigReader.loadConfig();
 
   redisPubSubClient.on("message", function (channel, message) {
     // Scores updated, alert clients
@@ -387,23 +381,7 @@ db.once('open', function callback () {
     io.sockets.emit('action:forcerefresh');
     res.sendStatus(200);
   });
-
-  // END
-  app.use(function (err, req, res, next) {
-    if (err) {
-      console.log(err);
-      next();
-    }
-  });
-
-  require('./expressServer').listen(port);
-  redisPubSubClient.subscribe("scores:update");
-
-  // Give some time to settle, and then start ensuring we run auto picks
-  setTimeout(ensureNextAutoPick, AUTO_PICK_STARTUP_DELAY);
-
-  console.log('I am fully running now!');
-});
+}
 
 // HELPERS
 
@@ -549,3 +527,26 @@ function updateClients(draft) {
     action: 'draft:pick'
   });
 }
+
+mongooseUtil.connect()
+  .then(defineRoutes)
+  .then(function () {
+    app.use(function (err, req, res, next) {
+      if (err) {
+        console.log(err);
+        next();
+      }
+    });
+
+    require('./expressServer').listen(port);
+    redisPubSubClient.subscribe("scores:update");
+
+    // Give some time to settle, and then start ensuring we run auto picks
+    setTimeout(ensureNextAutoPick, AUTO_PICK_STARTUP_DELAY);
+
+    console.log('I am fully running now!');
+  })
+  .catch(function (err) {
+    console.log(err);
+    mongooseUtil.close();
+  });

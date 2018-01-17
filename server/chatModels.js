@@ -1,7 +1,7 @@
 // @flow
 'use strict';
 
-const mongoose = require('mongoose');
+const mongoose = require('./mongooseUtil').mongoose;
 
 const messageSchema = mongoose.Schema({
   tourneyId: mongoose.Schema.ObjectId,

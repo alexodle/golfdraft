@@ -6,15 +6,12 @@
 const _ = require('lodash');
 const access = require('../server/access');
 const config = require('../server/config');
-const mongoose = require('mongoose');
+const mongooseUtil = require('../server/mongooseUtil');
 const rawWgrReader = require('./rawWgrReader');
 const tourneyConfigReader = require('../server/tourneyConfigReader');
 
-mongoose.set('debug', true);
-mongoose.connect(config.mongo_url);
-
 function end() {
-  mongoose.connection.close();
+  mongooseUtil.close();
 }
 
 function updateWGR() {
@@ -49,6 +46,9 @@ function updateWGR() {
     });
 }
 
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', updateWGR);
+mongooseUtil.connect()
+  .then(updateWGR)
+  .catch(function (err) {
+    console.log(err);
+    end();
+  });

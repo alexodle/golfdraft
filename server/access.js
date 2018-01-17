@@ -438,7 +438,7 @@ _.extend(access, {
   clearAppState: createBasicClearer(models.AppState),
 
   clearUsers: function () {
-    return model.remove({}).exec();
+    return models.User.remove({}).exec();
   },
 
   resetTourney: function () {

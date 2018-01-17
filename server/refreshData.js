@@ -4,15 +4,12 @@
 const _ = require('lodash');
 const access = require('./access');
 const config = require('./config');
-const mongoose = require('mongoose');
+const mongooseUtil = require('./mongooseUtil');
 const Promise = require('promise');
 const readerConfig = require('../scores_sync/readerConfig');
 const tourneyConfigReader = require('./tourneyConfigReader');
 const tourneyUtils = require('./tourneyUtils');
 const updateScore = require('../scores_sync/updateScore');
-
-mongoose.set('debug', true);
-mongoose.connect(config.mongo_url);
 
 function printState() {
   return access.getTourney().then(function (tourney) {
@@ -37,55 +34,57 @@ function refreshData(pickOrderNames, reader, url) {
   console.log("");
 
   printState()
-  .then(function () {
-    console.log("Clearing current state");
-    return access.resetTourney();
-  })
-  .then(function () {
-    console.log("Adding users");
-    console.log("");
-    const users = _.map(pickOrderNames, function (name) {
-      return {name: name};
-    });
-    return access.ensureUsers(users);
-  })
-  .then(function () {
-    return access.getUsers().then(function (users) {
-      return _.sortBy(users, function (p) {
-        return _.indexOf(pickOrderNames, p.name);
+    .then(function () {
+      console.log("Clearing current state");
+      return access.resetTourney();
+    })
+    .then(function () {
+      console.log("Adding users");
+      console.log("");
+      const users = _.map(pickOrderNames, function (name) {
+        return {name: name};
       });
+      return access.ensureUsers(users);
+    })
+    .then(function () {
+      return access.getUsers().then(function (users) {
+        return _.sortBy(users, function (p) {
+          return _.indexOf(pickOrderNames, p.name);
+        });
+      });
+    })
+    .then(function (sortedUsers) {
+      console.log("Updating pickOrder");
+      const pickOrder = tourneyUtils.snakeDraftOrder(sortedUsers);
+      return access.setPickOrder(pickOrder);
+    })
+    .then(function () {
+      console.log("END Refreshing all data...");
+    })
+    .then(printState)
+    .then(function () {
+      console.log("BEGIN Updating scores");
+      return updateScore.run(readerConfig[reader].reader, url).then(function () {
+        console.log("END Updating scores");
+      });
+    })
+    .catch(function (err) {
+      if (err.stack) {
+        console.log(err.stack);
+      } else {
+        console.log(err);
+      }
+    })
+    .then(function () {
+      mongooseUtil.close();
     });
-  })
-  .then(function (sortedUsers) {
-    console.log("Updating pickOrder");
-    const pickOrder = tourneyUtils.snakeDraftOrder(sortedUsers);
-    return access.setPickOrder(pickOrder);
-  })
-  .then(function () {
-    console.log("END Refreshing all data...");
-  })
-  .then(printState)
-  .then(function () {
-    console.log("BEGIN Updating scores");
-    return updateScore.run(readerConfig[reader].reader, url).then(function () {
-      console.log("END Updating scores");
-    });
-  })
-  .catch(function (err) {
-    if (err.stack) {
-      console.log(err.stack);
-    } else {
-      console.log(err);
-    }
-  })
-  .then(function () {
-    process.exit(0);
-  });
 }
 
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function callback () {
-  const tourneyCfg = tourneyConfigReader.loadConfig();
-  refreshData(tourneyCfg.draftOrder, tourneyCfg.scores.type, tourneyCfg.scores.url);
-});
+mongooseUtil.connect()
+  .then(function () {
+    const tourneyCfg = tourneyConfigReader.loadConfig();
+    refreshData(tourneyCfg.draftOrder, tourneyCfg.scores.type, tourneyCfg.scores.url);
+  })
+  .catch(function (err) {
+    console.log(err);
+  });

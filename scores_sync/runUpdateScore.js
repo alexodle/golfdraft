@@ -2,7 +2,7 @@
 'use strict';
 
 const config = require('../server/config');
-const mongoose = require('mongoose');
+const mongooseUtil = require('./server/mongooseUtil');
 const readerConfig = require('./readerConfig');
 const redis = require("../server/redis");
 const tourneyConfigReader = require('../server/tourneyConfigReader');
@@ -17,11 +17,8 @@ console.log(tourneyCfg.scores.type);
 console.log(reader);
 const url = tourneyCfg.scores.url;
 
-mongoose.set('debug', true);
-mongoose.connect(config.mongo_url);
-
 function end() {
-  mongoose.connection.close();
+  mongooseUtil.close();
   redis.unref();
 }
 
@@ -45,6 +42,9 @@ function updateScores() {
   });
 }
 
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', updateScores);
+mongooseUtil.connect()
+  .then(updateScores)
+  .catch(function (err) {
+    console.log(err);
+    end();
+  });

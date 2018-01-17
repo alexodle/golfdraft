@@ -1,20 +1,17 @@
 // @flow
 'use strict';
 
-const mongoose = require('mongoose');
+const mongoose = require('./mongooseUtil').mongoose;
 const Promise = require('promise');
 const User = require('./User');
 
-
 const SchemaTypes = mongoose.Schema.Types;
-mongoose.Promise = Promise;
-
 
 const golferSchema = mongoose.Schema({
   tourneyId: { type: SchemaTypes.ObjectId, required: true },
-  name: { type: String, required: true, unique: true }
+  name: { type: String, required: true }
 });
-golferSchema.index({ name: 1, tourneyId: 1 });
+golferSchema.index({ name: 1, tourneyId: 1 }, { unique: true });
 
 // Keep this separate for now, that way I don't have to change it often
 const wgrSchema = mongoose.Schema({
