@@ -279,7 +279,7 @@ class FreeTextPickListEditor extends React.Component {
         } else {
           this.setState({
             isPosting: false,
-            errorMessage: 'Failed to save pickList. Try again in a minute. If that doesn&#39;t work, contact Odle.'
+            errorMessage: 'Failed to save pickList. Try again in a minute. If that doesn\'t work, contact Odle.'
           });
         }
         window.location.href = '#InlinePickListEditor';
