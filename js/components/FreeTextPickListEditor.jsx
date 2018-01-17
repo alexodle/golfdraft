@@ -98,7 +98,8 @@ class SuggestionSelector extends React.Component {
   }
 
   _onSelectValueChange = (ev) => {
-    this.props.onSelectionChange(ev.target.value);
+    const target = _.find(this.props.suggestion.results, { target: ev.target.value });
+    this.props.onSelectionChange(target);
   }
 
   _onViewAll = (ev) => {
@@ -161,7 +162,7 @@ class FreeTextPickListEditor extends React.Component {
               disabled={isPosting}
               key={suggestion.source}
               suggestion={suggestion}
-              selectedValue={suggestionSelections[suggestion.source]}
+              selectedValue={suggestionSelections[suggestion.source].target}
               onSelectionChange={this._onSuggestionSelectionChange.bind(this, suggestion.source)}
             />
           );
@@ -224,7 +225,7 @@ class FreeTextPickListEditor extends React.Component {
       .invoke('trim')
       .reject(_.isEmpty)
       .map(function (name) {
-        return suggestionSelections[name] || name;
+        return suggestionSelections[name] ? suggestionSelections[name].target : name;
       })
       .uniq()
       .value();
@@ -237,7 +238,7 @@ class FreeTextPickListEditor extends React.Component {
   _setSuggestions(suggestions) {
     const suggestionSelections = {};
     _.each(suggestions, function (suggestion) {
-      let selection = suggestion.results[0].target;
+      let selection = suggestion.results[0];
       if (!calcHasGoodSuggestion(suggestion.results)) {
         selection = _.chain(suggestion.results)
           .sortBy('target')
@@ -255,10 +256,7 @@ class FreeTextPickListEditor extends React.Component {
   }
 
   _onSuggestionSelectionChange = (source, target) => {
-    const updateObj = {};
-    updateObj[source] = target;
-
-    const newSuggestionSelections = _.extend({}, this.state.suggestionSelections, updateObj);
+    const newSuggestionSelections = _.extend({}, this.state.suggestionSelections, { [source]: target });
     this.setState({ suggestionSelections: newSuggestionSelections });
   }
 
