@@ -1,20 +1,20 @@
 'use strict';
 
-const _ = require("lodash");
-const AdminApp = require("./AdminApp.jsx");
-const AppHeader = require("./AppHeader.jsx");
+const _ = require('lodash');
+const AdminApp = require('./AdminApp.jsx');
+const AppHeader = require('./AppHeader.jsx');
 const AppSettingsStore = require('../stores/AppSettingsStore');
-const ChatStore = require("../stores/ChatStore");
-const DraftApp = require("./DraftApp.jsx");
-const DraftStore = require("../stores/DraftStore");
-const GolferStore = require("../stores/GolferStore");
-const React = require("react");
+const ChatStore = require('../stores/ChatStore');
+const DraftApp = require('./DraftApp.jsx');
+const DraftStore = require('../stores/DraftStore');
+const GolferStore = require('../stores/GolferStore');
+const React = require('react');
 const Router = require('react-router-dom');
 const ScoreStore = require('../stores/ScoreStore');
-const TourneyApp = require("./TourneyApp.jsx");
-const TourneyStore = require("../stores/TourneyStore");
-const UserStore = require("../stores/UserStore");
-const WhoIsYou = require("./WhoIsYou.jsx");
+const TourneyApp = require('./TourneyApp.jsx');
+const TourneyStore = require('../stores/TourneyStore');
+const UserStore = require('../stores/UserStore');
+const WhoIsYou = require('./WhoIsYou.jsx');
 
 const {Route, Switch, Redirect} = Router;
 
@@ -57,15 +57,12 @@ function getAppState() {
 }
 
 function getGolfersRemaining(golfers, draftPicks) {
-  const pickedGolfers = _.pluck(draftPicks, "golfer");
+  const pickedGolfers = _.pluck(draftPicks, 'golfer');
   const golfersRemaining = _.omit(golfers, pickedGolfers);
   return golfersRemaining;
 }
 
 class DraftWrapper extends React.Component {
-  childContextTypes: {
-    location: React.PropTypes.object
-  }
 
   render() {
     const props = this.props;
@@ -101,9 +98,6 @@ class DraftWrapper extends React.Component {
 };
 
 class TourneyWrapper extends React.Component {
-  childContextTypes: {
-    location: React.PropTypes.object
-  }
 
   render() {
     const props = this.props;
@@ -130,9 +124,6 @@ class TourneyWrapper extends React.Component {
 };
 
 class AdminWrapper extends React.Component {
-  childContextTypes: {
-    location: React.PropTypes.object
-  }
 
   render() {
     const props = this.props;
@@ -185,15 +176,15 @@ class AppNode extends React.Component {
     }, this);
   }
 
-  _requireCurrentUser() {
+  _requireCurrentUser(from) {
     if (!this.state.currentUser) {
-      return (<Redirect to="/whoisyou" />);
+      return (<Redirect to={{ pathname: '/whoisyou', state: { from: from }}} />);
     }
   }
 
-  _requireDraftComplete() {
+  _requireDraftComplete(from) {
     if (this.state.draft.currentPick) {
-      return (<Redirect to="/draft" />);
+      return (<Redirect to={{ pathname: '/draft', state: { from: from }}} />);
     }
   }
 
@@ -206,22 +197,27 @@ class AppNode extends React.Component {
       state.draft.draftPicks
     );
 
+    const renderTourneyWrapper = (props) => {
+      return this._requireCurrentUser(props.location.pathname) || this._requireDraftComplete(props.location) || (
+        <TourneyWrapper {...props} {...state} golfersRemaining={golfersRemaining} />
+      );
+    }
+
+    const renderDraftWrapper = (props) => {
+      return this._requireCurrentUser(props.location.pathname) || (
+        <DraftWrapper {...props} {...state} golfersRemaining={golfersRemaining} />
+      );
+    }
+
+    const renderWhoIsYou = (props) => (<WhoIsYou {...props} {...state} golfersRemaining={golfersRemaining} />);
+    const renderAdminWrapper = (props) => (<AdminWrapper {...props} {...state} golfersRemaining={golfersRemaining} />);
+
     return (
       <Switch>
-        <Route exact path="/" render={(props) =>
-          this._requireCurrentUser() || this._requireDraftComplete() || (
-            <TourneyWrapper {...props} {...state} golfersRemaining={golfersRemaining} />
-        )}/>
-        <Route exact path="/draft" render={(props) =>
-          this._requireCurrentUser() || (
-            <DraftWrapper {...props} {...state} golfersRemaining={golfersRemaining} />
-        )}/>
-        <Route exact path="/whoisyou" render={(props) => (
-          <WhoIsYou {...props} {...state} golfersRemaining={golfersRemaining} />
-        )}/>
-        <Route exact path="/admin" render={(props) => (
-          <AdminWrapper {...props} {...state} golfersRemaining={golfersRemaining} />
-        )}/>
+        <Route exact path='/' render={renderTourneyWrapper} />
+        <Route exact path='/draft' render={renderDraftWrapper}/>
+        <Route exact path='/whoisyou' render={renderWhoIsYou}/>
+        <Route exact path='/admin' render={renderAdminWrapper}/>
       </Switch>
     );
   }

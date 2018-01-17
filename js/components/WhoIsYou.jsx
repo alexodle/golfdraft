@@ -3,6 +3,7 @@
 const $ = require('jquery');
 const _ = require('lodash');
 const React = require('react');
+const Redirect = require('react-router-dom').Redirect;
 const UserActions = require('../actions/UserActions');
 const UserStore = require('../stores/UserStore');
 
@@ -11,13 +12,6 @@ function getSortedUsers() {
 }
 
 class WhoIsYou extends React.Component {
-  contextTypes: {
-    router: React.PropTypes.object.isRequired
-  }
-
-  childContextTypes: {
-    location: React.PropTypes.object
-  }
 
   constructor(props) {
     super(props);
@@ -26,11 +20,21 @@ class WhoIsYou extends React.Component {
 
   _getInitialState() {
     const selectedUser = getSortedUsers()[0]._id;
-    return { selectedUser, password: '', isLoading: false, badAuth: false };
+    return {
+      selectedUser,
+      password: '',
+      isLoading: false,
+      badAuth: false,
+      redirectTo: null
+    };
   }
 
   render() {
-    const {badAuth, isLoading, password, selectedUser} = this.state;
+    const {badAuth, isLoading, password, selectedUser, redirectTo} = this.state;
+    if (redirectTo) {
+      return (<Redirect to={redirectTo} />);
+    }
+
     const submitDisabled = !password || isLoading;
     return (
       <div>
@@ -107,12 +111,9 @@ class WhoIsYou extends React.Component {
     xhr.done(function () {
       UserActions.setCurrentUser(this.state.selectedUser);
 
-      const location = this.props.location;
-      if (location.state && location.state.nextPathname) {
-        this.context.router.replace(location.state.nextPathname);
-      } else {
-        this.context.router.replace('/');
-      }
+      const locationState = this.props.location.state;
+      const redirectTo = (locationState && locationState.from) || '/';
+      this.setState({ redirectTo });
     }.bind(this));
   }
 
