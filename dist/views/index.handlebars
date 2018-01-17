@@ -13,30 +13,17 @@
       sd.CDN_URL = '{{cdnUrl}}';
 
       sd.golfers = {{{golfers}}};
-      sd.players = {{{players}}};
+      sd.users = {{{users}}};
       sd.draft = {{{draft}}};
       sd.scores = {{{scores}}};
       sd.tourney = {{{tourney}}};
       sd.appState = {{{appState}}};
-      sd.pickListPlayers = {{{pickListPlayers}}};
       sd.user = {{{or user "null"}}};
       sd.tourneyName = "{{{tourneyName}}}";
-
-      [
-        sd.golfers,
-        sd.players,
-        sd.scores,
-        [sd.draft],
-        [sd.tourney]
-      ].forEach(function (mongoObjs) {
-        mongoObjs.forEach(function (o) {
-          o.id = o._id;
-        });
-      });
     </script>
   </head>
   <body>
     <section id="golfdraftapp" />
-    <script src="{{cdnUrl}}/dist/bundle.f554ab63.js"></script>
+    <script src="{{cdnUrl}}/dist/bundle.21e7b102.js"></script>
   </body>
 </html>
