@@ -43,3 +43,10 @@ export interface UserScore {
   scoresByGolfer: { [key: string]: GolferScore };
   scoresByDay: { [key: string]: UserDayScore };
 }
+
+export interface ChatMessage {
+  user: string;
+  isBot: boolean;
+  message: string;
+  date: string;
+}

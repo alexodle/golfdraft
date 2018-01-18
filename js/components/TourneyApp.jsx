@@ -73,7 +73,7 @@ class TourneyApp extends React.Component {
       <section>
         <p>
           <small>
-            Scores sync every 10 minutes. Last sync: <b>{moment.default(this.props.lastScoresUpdate).calendar()}</b>
+            Scores sync every 10 minutes. Last sync: <b>{moment(this.props.lastScoresUpdate).calendar()}</b>
           </small>
         </p>
 

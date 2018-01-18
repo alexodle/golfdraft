@@ -1,18 +1,13 @@
-'use strict';
-
 import * as _ from 'lodash';
+import * as moment from 'moment';
+import * as React from 'react';
 import Assets from '../constants/Assets';
 import ChatActions from '../actions/ChatActions';
 import GolfDraftPanel from './GolfDraftPanel';
-import * as moment from 'moment';
-import * as React from 'react';
 import UserStore from '../stores/UserStore';
+import {User, ChatMessage} from '../types/Types';
 
 const BOT_NAME = 'DraftBot';
-
-const ReactPropTypes = React.PropTypes;
-
-const newMessageSound = new Audio(Assets.NEW_CHAT_MESSAGE_SOUND);
 
 const NAME_TAG_RE = /@[a-z]* *[a-z]*$/i;
 const TAG_TO_NAME_RE = /~\[([^\]]+)\]/ig;
@@ -22,17 +17,23 @@ const ENTER_KEY = 13;
 const DOWN_KEY = 40;
 const UP_KEY = 38;
 
-class AutoComplete extends React.PureComponent {
+const newMessageSound = new Audio(Assets.NEW_CHAT_MESSAGE_SOUND);
+
+interface AutoCompleteProps {
+  text: string;
+  allChoices: User[];
+  onChoose: ({ value: string }) => void;
+}
+
+interface AutoCompleteState {
+  selectedIndex: number;
+}
+
+class AutoComplete extends React.PureComponent<AutoCompleteProps, AutoCompleteState> {
 
   constructor(props) {
     super(props);
-    this.state = this._getInitialState();
-  }
-
-  _getInitialState() {
-    return {
-      selectedIndex: 0
-    };
+    this.state = { selectedIndex: 0 };
   }
 
   componentWillUpdate(nextProps, nextState) {
@@ -114,7 +115,7 @@ class AutoComplete extends React.PureComponent {
     this.setState({ selectedIndex: newIndex });
   }
 
-  _getChoices(props) {
+  _getChoices(props?: AutoCompleteProps) {
     props = props || this.props;
 
     const text = props.text.toLowerCase();
@@ -139,15 +140,16 @@ class AutoComplete extends React.PureComponent {
 
 };
 
-class ChatRoomInput extends React.PureComponent {
+interface ChatRoomInputState {
+  text: string;
+  taggingText?: string;
+}
+
+class ChatRoomInput extends React.PureComponent<{}, ChatRoomInputState> {
 
   constructor(props) {
     super(props);
-    this.state = this._getInitialState();
-  }
-
-  _getInitialState() {
-    return { text: '', taggingText: null };
+    this.state = { text: '', taggingText: null };
   }
 
   render() {
@@ -181,13 +183,21 @@ class ChatRoomInput extends React.PureComponent {
     );
   }
 
+  _focus() {
+    (this.refs.input as HTMLInputElement).focus();
+  }
+
+  _getNameTagger() {
+    return this.refs.nameTagger as AutoComplete;
+  }
+
   _onKeyUp = (ev) => {
     if (this.state.taggingText) {
       if (ev.keyCode === UP_KEY) {
-        this.refs.nameTagger.forceUp();
+        this._getNameTagger().forceUp();
         ev.preventDefault();
       } else if (ev.keyCode === DOWN_KEY) {
-        this.refs.nameTagger.forceDown();
+        this._getNameTagger().forceDown();
         ev.preventDefault();
       }
     }
@@ -205,14 +215,14 @@ class ChatRoomInput extends React.PureComponent {
     const newText = this.state.text.replace(NAME_TAG_RE, "~[" + ev.value + "] ");
     this.setState({ text: newText, taggingText: null });
 
-    this.refs.input.focus();
+    this._focus();
   }
 
   _onSend = (ev) => {
     ev.preventDefault();
 
     if (this.state.taggingText) {
-      this.refs.nameTagger.forceSelect();
+      this._getNameTagger().forceSelect();
       return;
     }
 
@@ -222,12 +232,16 @@ class ChatRoomInput extends React.PureComponent {
     ChatActions.createMessage(text);
     this.setState({ text: '', taggingText: null });
 
-    this.refs.input.focus();
+    this._focus();
   }
 
 };
 
-class Message extends React.PureComponent {
+interface MessageProps {
+  text: string;
+}
+
+class Message extends React.PureComponent<MessageProps, {}> {
 
   render() {
     // Escape html BEFORE adding tags
@@ -250,11 +264,13 @@ class Message extends React.PureComponent {
 
 };
 
-class ChatRoom extends React.PureComponent {
+export interface ChatRoomProps {
+  messages: ChatMessage[];
+  activeUsers: string[];
+  currentUser: User;
+}
 
-  propTypes: {
-    messages: ReactPropTypes.array
-  }
+export default class ChatRoom extends React.PureComponent<ChatRoomProps, {}> {
 
   componentDidMount() {
     this._forceScroll();
@@ -307,7 +323,7 @@ class ChatRoom extends React.PureComponent {
               (
                 <dt key={'dt' + i} className={className}>
                   {displayName} <span className='message-date'>
-                    ({moment.default(message.date).calendar()})
+                    ({moment(message.date).calendar()})
                   </span>:
                 </dt>
               ),
@@ -361,9 +377,7 @@ class ChatRoom extends React.PureComponent {
 
   _forceScroll() {
     const refs = this.refs;
-    refs.chatPanel.scrollTop = refs.chatPanelBody.height;
+    (refs.chatPanel as HTMLDivElement).scrollTop = (refs.chatPanelBody as HTMLDivElement).offsetHeight;
   }
 
 };
-
-export default ChatRoom;
