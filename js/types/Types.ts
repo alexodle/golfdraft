@@ -8,3 +8,11 @@ export interface Location {
     from?: string;
   };
 }
+
+export interface DraftPick {
+  user: string;
+  golfer: string;
+  pickNumber: number;
+  timestamp: Date;
+  clientTimestamp: Date;
+}

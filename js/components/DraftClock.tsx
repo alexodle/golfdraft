@@ -1,8 +1,9 @@
 import * as _ from 'lodash';
 import * as Assets from '../constants/Assets';
-import GolfDraftPanel from './GolfDraftPanel';
 import * as moment from 'moment';
 import * as React from 'react';
+import GolfDraftPanel from './GolfDraftPanel';
+import {DraftPick} from '../types/Types';
 
 const TIME_INTERVAL = 1000;
 const WARNING_TIME = 1000 * 60 * 2;
@@ -11,15 +12,6 @@ const FINAL_COUNTDOWN_THRESHOLD = 1000 * 15;
 const WARNING_SOUND_INTERVAL_SECONDS = 10;
 
 const pickWarningSound = new Audio(Assets.PICK_WARNING_SOUND);
-
-// TODO: separate file
-export interface DraftPick {
-  user: string;
-  golfer: string;
-  pickNumber: number;
-  timestamp: Date;
-  clientTimestamp: Date;
-}
 
 export interface DraftClockProps {
   isMyPick: boolean;

@@ -1,20 +1,27 @@
-'use strict';
-
-const _ = require('lodash');
-const DraftStore = require('../stores/DraftStore');
+import * as DraftStore from '../stores/DraftStore';;
+import * as GolferLogic from '../logic/GolferLogic';;
+import * as GolferStore from '../stores/GolferStore';;
+import * as React from 'react';
+import * as UserStore from '../stores/UserStore';;
+import * as _ from 'lodash';;
 import GolfDraftPanel from './GolfDraftPanel';
-const GolferLogic = require('../logic/GolferLogic');
-const GolferStore = require('../stores/GolferStore');
-const UserStore = require('../stores/UserStore');
-const React = require('react');
+import {DraftPick} from '../types/Types';
 
-class DraftHistory extends React.Component {
+export interface DraftHistoryProps {
+  selectedUserId: string;
+  draftPicks: DraftPick[];
+  onSelectionChange: (pid?: string) => void;
+}
+
+export default class DraftHistory extends React.Component<DraftHistoryProps, {}> {
+
   render() {
     const selectedUserId = this.props.selectedUserId;
     const onPersonClick = this._onPersonClick;
-    let heading = 'Draft History';
     let draftPicks = _.clone(this.props.draftPicks).reverse();
+    let heading: JSX.Element | string;
 
+    heading = 'Draft History';
     if (selectedUserId) {
       draftPicks = _.where(draftPicks, { user: selectedUserId });
       heading = (
@@ -27,7 +34,7 @@ class DraftHistory extends React.Component {
 
     return (
       <div>
-        <a name='DraftHistory' />
+        <a id='DraftHistory' />
         <GolfDraftPanel heading={heading}>
           {!selectedUserId ? null : (
             <p><small>
@@ -69,5 +76,3 @@ class DraftHistory extends React.Component {
   }
 
 };
-
-module.exports = DraftHistory;

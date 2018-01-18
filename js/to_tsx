@@ -8,4 +8,4 @@ import * as ReactDOM from 'react-dom';
 
 **find/replace
 const (.*) = require\(['"](.+)['"]\)
-import \1 from '\2';
+import * as \1 from '\2';

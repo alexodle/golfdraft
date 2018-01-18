@@ -6,7 +6,7 @@ const Assets = require('../constants/Assets');
 const ChatRoom = require('./ChatRoom');
 const DraftChooser = require('./DraftChooser');
 import DraftClock from './DraftClock';
-const DraftHistory = require('./DraftHistory');
+import DraftHistory from './DraftHistory';
 const DraftPickOrder = require('./DraftPickOrder');
 const DraftStatus = require('./DraftStatus');
 import GolfDraftPanel from './GolfDraftPanel';
