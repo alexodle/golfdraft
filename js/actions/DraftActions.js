@@ -1,8 +1,8 @@
 'use strict';
 
-const _ = require("lodash");
-const AppDispatcher = require('../dispatcher/AppDispatcher');
-const DraftConstants = require('../constants/DraftConstants');
+import _ from 'lodash';
+import AppDispatcher from '../dispatcher/AppDispatcher';
+import DraftConstants from '../constants/DraftConstants';
 
 const DraftActions = {
 
@@ -68,4 +68,4 @@ const DraftActions = {
 
 };
 
-module.exports = DraftActions;
+export default DraftActions;

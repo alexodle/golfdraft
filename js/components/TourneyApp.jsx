@@ -1,17 +1,17 @@
 'use strict';
 
-const _ = require('lodash');
-const ChatRoom = require('./ChatRoom');
-const constants = require('../../common/constants');
+import * as _ from 'lodash';
+import ChatRoom from './ChatRoom';
+import constants from '../../common/constants';
 import GolfDraftPanel from './GolfDraftPanel';
-const GolferLogic = require('../logic/GolferLogic');
-const GolferStore = require('../stores/GolferStore');
-const moment = require('moment');
-const UserDetails = require('./UserDetails');
-const UserStandings = require('./UserStandings');
-const React = require('react');
-const ScoreLogic = require('../logic/ScoreLogic');
-const utils = require('../../common/utils');
+import GolferLogic from '../logic/GolferLogic';
+import GolferStore from '../stores/GolferStore';
+import * as moment from 'moment';
+import UserDetails from './UserDetails';
+import UserStandings from './UserStandings';
+import * as React from 'react';
+import ScoreLogic from '../logic/ScoreLogic';
+import utils from '../../common/utils';
 
 const ReactPropTypes = React.PropTypes;
 
@@ -73,7 +73,7 @@ class TourneyApp extends React.Component {
       <section>
         <p>
           <small>
-            Scores sync every 10 minutes. Last sync: <b>{moment(this.props.lastScoresUpdate).calendar()}</b>
+            Scores sync every 10 minutes. Last sync: <b>{moment.default(this.props.lastScoresUpdate).calendar()}</b>
           </small>
         </p>
 
@@ -128,4 +128,4 @@ class TourneyApp extends React.Component {
 
 };
 
-module.exports = TourneyApp;
+export default TourneyApp;

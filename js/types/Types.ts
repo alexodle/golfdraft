@@ -16,3 +16,8 @@ export interface DraftPick {
   timestamp: Date;
   clientTimestamp: Date;
 }
+
+export interface Golfer {
+  name: string;
+  _id: string;
+}

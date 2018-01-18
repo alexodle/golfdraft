@@ -1,10 +1,10 @@
 'use strict';
 
-const _ = require('lodash');
-const AppDispatcher = require('../dispatcher/AppDispatcher');
-const ScoreConstants = require('../constants/ScoreConstants');
-const ScoreLogic = require('../logic/ScoreLogic');
-const Store = require('./Store');
+import * as _ from 'lodash';
+import AppDispatcher from '../dispatcher/AppDispatcher';
+import ScoreConstants from '../constants/ScoreConstants';
+import ScoreLogic from '../logic/ScoreLogic';
+import Store from './Store';
 
 // Indexed by golfer id
 let _scores = {};
@@ -42,4 +42,4 @@ AppDispatcher.register(function (payload) {
   return true; // No errors. Needed by promise in Dispatcher.
 });
 
-module.exports = ScoreStore;
+export default ScoreStore;

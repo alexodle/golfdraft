@@ -1,12 +1,12 @@
 'use strict';
 
-const $ = require('jquery');
-const _ = require('lodash');
-const AppDispatcher = require('../dispatcher/AppDispatcher');
-const AppConstants = require('../constants/AppConstants');
-const DraftConstants = require('../constants/DraftConstants');
-const Store = require('./Store');
-const UserStore = require('./UserStore');
+import * as $ from 'jquery';
+import * as _ from 'lodash';
+import AppDispatcher from '../dispatcher/AppDispatcher';
+import AppConstants from '../constants/AppConstants';
+import DraftConstants from '../constants/DraftConstants';
+import Store from './Store';
+import UserStore from './UserStore';
 
 let _picks = [];
 let _pickOrder = [];
@@ -158,7 +158,7 @@ AppDispatcher.register(function (payload) {
 
     case AppConstants.CURRENT_USER_CHANGE_SYNCED:
       const currentUser = UserStore.getCurrentUser();
-      if (!!currentUser) {
+      if (currentUser) {
         // TODO - Move to separate server sync
         $.get('/draft/pickList')
         .done(function (data) {
@@ -207,4 +207,4 @@ AppDispatcher.register(function (payload) {
   return true; // No errors.  Needed by promise in Dispatcher.
 });
 
-module.exports = DraftStore;
+export default DraftStore;

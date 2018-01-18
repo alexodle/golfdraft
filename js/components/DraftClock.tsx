@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import * as Assets from '../constants/Assets';
+import Assets from '../constants/Assets';
 import * as moment from 'moment';
 import * as React from 'react';
 import GolfDraftPanel from './GolfDraftPanel';

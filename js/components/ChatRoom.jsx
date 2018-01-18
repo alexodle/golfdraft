@@ -1,13 +1,12 @@
 'use strict';
 
-const $ = require('jquery');
-const _ = require('lodash');
-const Assets = require('../constants/Assets');
-const ChatActions = require('../actions/ChatActions');
+import * as _ from 'lodash';
+import Assets from '../constants/Assets';
+import ChatActions from '../actions/ChatActions';
 import GolfDraftPanel from './GolfDraftPanel';
-const moment = require('moment');
-const React = require('react');
-const UserStore = require('../stores/UserStore');
+import * as moment from 'moment';
+import * as React from 'react';
+import UserStore from '../stores/UserStore';
 
 const BOT_NAME = 'DraftBot';
 
@@ -206,7 +205,7 @@ class ChatRoomInput extends React.PureComponent {
     const newText = this.state.text.replace(NAME_TAG_RE, "~[" + ev.value + "] ");
     this.setState({ text: newText, taggingText: null });
 
-    $(this.refs.input).focus();
+    this.refs.input.focus();
   }
 
   _onSend = (ev) => {
@@ -223,7 +222,7 @@ class ChatRoomInput extends React.PureComponent {
     ChatActions.createMessage(text);
     this.setState({ text: '', taggingText: null });
 
-    $(this.refs.input).focus();
+    this.refs.input.focus();
   }
 
 };
@@ -308,7 +307,7 @@ class ChatRoom extends React.PureComponent {
               (
                 <dt key={'dt' + i} className={className}>
                   {displayName} <span className='message-date'>
-                    ({moment(message.date).calendar()})
+                    ({moment.default(message.date).calendar()})
                   </span>:
                 </dt>
               ),
@@ -362,11 +361,9 @@ class ChatRoom extends React.PureComponent {
 
   _forceScroll() {
     const refs = this.refs;
-    const $panel = $(refs.chatPanel);
-    const $body = $(refs.chatPanelBody);
-    $panel.scrollTop($body.height());
+    refs.chatPanel.scrollTop = refs.chatPanelBody.height;
   }
 
 };
 
-module.exports = ChatRoom;
+export default ChatRoom;

@@ -1,7 +1,7 @@
 'use strict';
 
-const AppDispatcher = require('../dispatcher/AppDispatcher');
-const AppConstants = require('../constants/AppConstants');
+import AppDispatcher from '../dispatcher/AppDispatcher';
+import AppConstants from '../constants/AppConstants';
 
 const AppActions = {
 
@@ -28,4 +28,4 @@ const AppActions = {
 
 };
 
-module.exports = AppActions;
+export default AppActions;

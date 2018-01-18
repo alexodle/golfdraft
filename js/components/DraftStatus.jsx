@@ -1,9 +1,9 @@
 'use strict';
 
-const _ = require('lodash');
-const DraftActions = require('../actions/DraftActions');
-const UserStore = require('../stores/UserStore');
-const React = require('react');
+import * as _ from 'lodash';
+import DraftActions from '../actions/DraftActions';
+import UserStore from '../stores/UserStore';
+import * as React from 'react';
 
 class DraftStatus extends React.Component {
   render() {
@@ -26,4 +26,4 @@ class DraftStatus extends React.Component {
 
 };
 
-module.exports = DraftStatus;
+export default DraftStatus;

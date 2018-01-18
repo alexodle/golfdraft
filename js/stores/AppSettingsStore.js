@@ -1,10 +1,10 @@
 'use strict';
 
-const _ = require('lodash');
+import * as _ from 'lodash';
 
-const Store = require('./Store');
-const AppDispatcher = require('../dispatcher/AppDispatcher');
-const AppConstants = require('../constants/AppConstants');
+import Store from './Store';
+import AppDispatcher from '../dispatcher/AppDispatcher';
+import AppConstants from '../constants/AppConstants';
 
 let _appState = {};
 
@@ -52,4 +52,4 @@ AppDispatcher.register(function (payload) {
   return true; // No errors.  Needed by promise in Dispatcher.
 });
 
-module.exports = AppSettingsStore;
+export default AppSettingsStore;

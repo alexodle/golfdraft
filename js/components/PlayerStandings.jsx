@@ -1,11 +1,11 @@
 'use strict';
 
-const _ = require("lodash");
-const cx = require('classnames');
-const GolferStore = require('../stores/GolferStore');
-const UserStore = require('../stores/UserStore');
-const React = require("react");
-const utils = require('../../common/utils');
+import * as _ from 'lodash';
+import * as cx from 'classnames';
+import GolferStore from '../stores/GolferStore';
+import UserStore from '../stores/UserStore';
+import * as React from 'react';
+import utils from '../../common/utils';
 
 const ReactPropTypes = React.PropTypes;
 
@@ -91,4 +91,4 @@ class UserStandings extends React.Component {
 
 };
 
-module.exports = UserStandings;
+export default UserStandings;

@@ -1,11 +1,11 @@
 **find/replace
-const React = require('react');
+import React from 'react';
 import * as React from 'react';
 
 **find/replace
-const ReactDOM = require('react-dom');
+import ReactDOM from 'react-dom';
 import * as ReactDOM from 'react-dom';
 
 **find/replace
-const (.*) = require\(['"](.+)['"]\)
+const (.*) = require\(['"](.+)['"]\);
 import * as \1 from '\2';

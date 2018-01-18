@@ -1,8 +1,8 @@
 'use strict';
 
-const _ = require('lodash');
-const constants = require('../../common/constants');
-const utils = require('../../common/utils');
+import * as _ from 'lodash';
+import constants from '../../common/constants';
+import utils from '../../common/utils';
 
 const NDAYS = constants.NDAYS;
 const MISSED_CUT = constants.MISSED_CUT;
@@ -132,4 +132,4 @@ const ScoreLogic = {
 };
 
 
-module.exports = ScoreLogic;
+export default ScoreLogic;

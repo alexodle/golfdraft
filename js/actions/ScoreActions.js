@@ -1,7 +1,7 @@
 'use strict';
 
-const AppDispatcher = require('../dispatcher/AppDispatcher');
-const ScoreConstants = require('../constants/ScoreConstants');
+import AppDispatcher from '../dispatcher/AppDispatcher';
+import ScoreConstants from '../constants/ScoreConstants';
 
 const ScoreActions = {
 
@@ -15,4 +15,4 @@ const ScoreActions = {
 
 };
 
-module.exports = ScoreActions;
+export default ScoreActions;

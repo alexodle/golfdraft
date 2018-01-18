@@ -1,11 +1,11 @@
 'use strict';
 
-const $ = require('jquery');
-const _ = require('lodash');
-const DraftActions = require('../actions/DraftActions');
-const GolferLogic = require('../logic/GolferLogic');
-const GolferStore = require('../stores/GolferStore');
-const React = require('react');
+import * as $ from 'jquery';
+import * as _ from 'lodash';
+import DraftActions from '../actions/DraftActions';
+import GolferLogic from '../logic/GolferLogic';
+import GolferStore from '../stores/GolferStore';
+import * as React from 'react';
 
 const MIN_COEFF = 0.5;
 const TEXTAREA_PLACEHOLDER = "Sergio Garcia\nPhil Mickelson\nTiger Woods\nDustin Johnson\nJason Day\n...";
@@ -285,4 +285,4 @@ class FreeTextPickListEditor extends React.Component {
 
 };
 
-module.exports = FreeTextPickListEditor;
+export default FreeTextPickListEditor;

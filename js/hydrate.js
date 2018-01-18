@@ -1,12 +1,12 @@
 'use strict';
 
-const _ = require('lodash');
-const AppActions = require('./actions/AppActions');
-const DraftActions = require('./actions/DraftActions');
-const DraftParser = require('./logic/DraftParser');
-const ScoreActions = require('./actions/ScoreActions');
-const SettingsActions = require('./actions/SettingsActions');
-const UserActions = require('./actions/UserActions');
+import * as _ from 'lodash';
+import AppActions from './actions/AppActions';
+import DraftActions from './actions/DraftActions';
+import DraftParser from './logic/DraftParser';
+import ScoreActions from './actions/ScoreActions';
+import SettingsActions from './actions/SettingsActions';
+import UserActions from './actions/UserActions';
 
 /** Hydrates the app with data stamped on initial page load
 */

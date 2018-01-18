@@ -1,13 +1,13 @@
 'use strict';
 
-const React = require("react");
+import * as React from 'react';
 const ReactPropTypes = React.PropTypes;
-const cx = require('classnames');
-const _ = require("lodash");
-const utils = require("../../common/utils");
+import * as cx from 'classnames';
+import * as _ from 'lodash';
+import utils from '../../common/utils';
 
-const UserStore = require('../stores/UserStore');
-const GolferStore = require('../stores/GolferStore');
+import UserStore from '../stores/UserStore';
+import GolferStore from '../stores/GolferStore';
 
 class UserDetails extends React.Component {
   propTypes: {
@@ -91,4 +91,4 @@ class UserDetails extends React.Component {
 
 };
 
-module.exports = UserDetails;
+export default UserDetails;

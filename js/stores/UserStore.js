@@ -1,11 +1,11 @@
 'use strict';
 
-const $ = require('jquery');
-const _ = require('lodash');
-const AppConstants = require('../constants/AppConstants');
-const AppDispatcher = require('../dispatcher/AppDispatcher');
-const Store = require('./Store');
-const UserActions = require('../actions/UserActions');
+import * as $ from 'jquery';
+import * as _ from 'lodash';
+import AppConstants from '../constants/AppConstants';
+import AppDispatcher from '../dispatcher/AppDispatcher';
+import Store from './Store';
+import UserActions from '../actions/UserActions';
 
 let _currentUser = null;
 let _users = null;
@@ -86,4 +86,4 @@ AppDispatcher.register(function (payload) {
   return true; // No errors.  Needed by promise in Dispatcher.
 });
 
-module.exports = UserStore;
+export default UserStore;

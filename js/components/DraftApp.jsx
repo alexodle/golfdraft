@@ -1,18 +1,18 @@
 'use strict';
 
-const _ = require('lodash');
+import * as _ from 'lodash';
 import AppPausedStatus from './AppPausedStatus';
-const Assets = require('../constants/Assets');
-const ChatRoom = require('./ChatRoom');
-const DraftChooser = require('./DraftChooser');
+import Assets from '../constants/Assets';
+import ChatRoom from './ChatRoom';
+import DraftChooser from './DraftChooser';
 import DraftClock from './DraftClock';
 import DraftHistory from './DraftHistory';
-const DraftPickOrder = require('./DraftPickOrder');
-const DraftStatus = require('./DraftStatus');
+import DraftPickOrder from './DraftPickOrder';
+import DraftStatus from './DraftStatus';
 import GolfDraftPanel from './GolfDraftPanel';
 const Link = require('react-router').Link;
-const PickListEditor = require('./PickListEditor');
-const React = require('react');
+import PickListEditor from './PickListEditor';
+import * as React from 'react';
 
 const myTurnSound = new Audio(Assets.MY_TURN_SOUND);
 const pickMadeSound = new Audio(Assets.PICK_MADE_SOUND);
@@ -228,4 +228,4 @@ class DraftApp extends React.Component {
 
 };
 
-module.exports = DraftApp;
+export default DraftApp;

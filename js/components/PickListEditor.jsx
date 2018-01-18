@@ -1,12 +1,12 @@
 'use strict';
 
-const _ = require("lodash");
-const AppConstants = require('../constants/AppConstants');
-const DraftActions = require("../actions/DraftActions");
-const FreeTextPickListEditor = require("./FreeTextPickListEditor");
-const GolferLogic = require("../logic/GolferLogic");
-const GolferStore = require("../stores/GolferStore");
-const React = require("react");
+import * as _ from 'lodash';
+import AppConstants from '../constants/AppConstants';
+import DraftActions from '../actions/DraftActions';
+import FreeTextPickListEditor from './FreeTextPickListEditor';
+import GolferLogic from '../logic/GolferLogic';
+import GolferStore from '../stores/GolferStore';
+import * as React from 'react';
 
 class PickListEditor extends React.Component {
 
@@ -230,4 +230,4 @@ class PickListEditor extends React.Component {
 
 };
 
-module.exports = PickListEditor;
+export default PickListEditor;

@@ -1,10 +1,10 @@
 'use strict';
 
-const $ = require('jquery');
-const _ = require('lodash');
-const AppDispatcher = require('../dispatcher/AppDispatcher');
-const ChatConstants = require('../constants/ChatConstants');
-const Store = require('./Store');
+import * as $ from 'jquery';
+import * as _ from 'lodash';
+import AppDispatcher from '../dispatcher/AppDispatcher';
+import ChatConstants from '../constants/ChatConstants';
+import Store from './Store';
 
 let _messages = null;
 
@@ -53,4 +53,4 @@ AppDispatcher.register(function (payload) {
   }
 });
 
-module.exports = ChatStore;
+export default ChatStore;

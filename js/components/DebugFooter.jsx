@@ -1,9 +1,9 @@
 'use strict';
 
-const React = require("react");
-const _ = require("lodash");
+import * as React from 'react';
+import * as _ from 'lodash';
 
-const DraftChooser = require("./DraftChooser");
+import DraftChooser from './DraftChooser';
 
 class DebugFooter extends React.Component {
   render() {
@@ -20,4 +20,4 @@ class DebugFooter extends React.Component {
 
 };
 
-module.exports = DebugFooter;
+export default DebugFooter;

@@ -1,6 +1,6 @@
 'use strict';
 
-const keyMirror = require('fbjs/lib/keyMirror');
+import keyMirror from 'fbjs/lib/keyMirror';
 
 module.exports = keyMirror({
   DRAFT_FOR_USER: null,

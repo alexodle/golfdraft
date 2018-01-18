@@ -1,8 +1,8 @@
-import * as DraftStore from '../stores/DraftStore';;
-import * as GolferLogic from '../logic/GolferLogic';;
-import * as GolferStore from '../stores/GolferStore';;
+import DraftStore from '../stores/DraftStore';;
+import GolferLogic from '../logic/GolferLogic';;
+import GolferStore from '../stores/GolferStore';;
 import * as React from 'react';
-import * as UserStore from '../stores/UserStore';;
+import UserStore from '../stores/UserStore';;
 import * as _ from 'lodash';;
 import GolfDraftPanel from './GolfDraftPanel';
 import {DraftPick} from '../types/Types';

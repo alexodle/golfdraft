@@ -1,7 +1,7 @@
 'use strict';
 
 const EventEmitter = require('events').EventEmitter;
-const _ = require('lodash');
+import * as _ from 'lodash';
 
 function Store() {}
 
@@ -21,4 +21,4 @@ _.extend(Store.prototype, EventEmitter.prototype, {
 
 });
 
-module.exports = Store;
+export default Store;

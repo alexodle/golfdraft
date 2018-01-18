@@ -1,9 +1,9 @@
 'use strict';
 
-const _ = require('lodash');
-const AppConstants = require('../constants/AppConstants');
-const AppDispatcher = require('../dispatcher/AppDispatcher');
-const Store = require('./Store');
+import * as _ from 'lodash';
+import AppConstants from '../constants/AppConstants';
+import AppDispatcher from '../dispatcher/AppDispatcher';
+import Store from './Store';
 
 let _golfers = {};
 
@@ -33,4 +33,4 @@ AppDispatcher.register(function (payload) {
   }
 });
 
-module.exports = GolferStore;
+export default GolferStore;

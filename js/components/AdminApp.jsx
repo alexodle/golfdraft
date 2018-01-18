@@ -1,13 +1,13 @@
 'use strict';
 
-const $ = require('jquery');
-const _ = require('lodash');
-const DraftActions = require('../actions/DraftActions');
+import * as $ from 'jquery';
+import * as _ from 'lodash';
+import DraftActions from '../actions/DraftActions';
 import DraftHistory from './DraftHistory';
-const DraftStatus = require('./DraftStatus');
-const DraftStore = require('../stores/DraftStore');
-const React = require('react');
-const UserActions = require('../actions/UserActions');
+import DraftStatus from './DraftStatus';
+import DraftStore from '../stores/DraftStore';
+import * as React from 'react';
+import UserActions from '../actions/UserActions';
 
 function togglePause(isPaused) {
   $.ajax({
@@ -313,4 +313,4 @@ class AdminApp extends React.Component {
 
 };
 
-module.exports = AdminApp;
+export default AdminApp;

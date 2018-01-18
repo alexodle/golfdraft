@@ -1,11 +1,11 @@
 'use strict';
 
-const $ = require('jquery');
-const _ = require('lodash');
-const React = require('react');
+import * as $ from 'jquery';
+import * as _ from 'lodash';
+import * as React from 'react';
 const Redirect = require('react-router-dom').Redirect;
-const UserActions = require('../actions/UserActions');
-const UserStore = require('../stores/UserStore');
+import UserActions from '../actions/UserActions';
+import UserStore from '../stores/UserStore';
 
 function getSortedUsers() {
   return _.sortBy(UserStore.getAll(), 'name');
@@ -119,4 +119,4 @@ class WhoIsYou extends React.Component {
 
 };
 
-module.exports = WhoIsYou;
+export default WhoIsYou;

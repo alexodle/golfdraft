@@ -1,20 +1,20 @@
 'use strict';
 
-const _ = require('lodash');
-const AdminApp = require('./AdminApp');
+import * as _ from 'lodash';
+import AdminApp from './AdminApp';
 import AppHeader from './AppHeader';
-const AppSettingsStore = require('../stores/AppSettingsStore');
-const ChatStore = require('../stores/ChatStore');
-const DraftApp = require('./DraftApp');
-const DraftStore = require('../stores/DraftStore');
-const GolferStore = require('../stores/GolferStore');
-const React = require('react');
-const Router = require('react-router-dom');
-const ScoreStore = require('../stores/ScoreStore');
-const TourneyApp = require('./TourneyApp');
-const TourneyStore = require('../stores/TourneyStore');
-const UserStore = require('../stores/UserStore');
-const WhoIsYou = require('./WhoIsYou');
+import AppSettingsStore from '../stores/AppSettingsStore';
+import ChatStore from '../stores/ChatStore';
+import DraftApp from './DraftApp';
+import DraftStore from '../stores/DraftStore';
+import GolferStore from '../stores/GolferStore';
+import * as React from 'react';
+import * as Router from 'react-router-dom';
+import ScoreStore from '../stores/ScoreStore';
+import TourneyApp from './TourneyApp';
+import TourneyStore from '../stores/TourneyStore';
+import UserStore from '../stores/UserStore';
+import WhoIsYou from './WhoIsYou';
 
 const {Route, Switch, Redirect} = Router;
 

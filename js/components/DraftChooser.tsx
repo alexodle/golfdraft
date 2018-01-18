@@ -1,24 +1,37 @@
 'use strict';
 
-const _ = require('lodash');
-const AppConstants = require('../constants/AppConstants');
-const cx = require('classnames');
-const DraftActions = require('../actions/DraftActions');
+import * as _ from 'lodash';
+import AppConstants from '../constants/AppConstants';
+import * as cx from 'classnames';
+import DraftActions from '../actions/DraftActions';
+import GolferLogic from '../logic/GolferLogic';
+import GolferStore from '../stores/GolferStore';
+import * as React from 'react';
+import UserStore from '../stores/UserStore';
 import GolfDraftPanel from './GolfDraftPanel';
-const GolferLogic = require('../logic/GolferLogic');
-const GolferStore = require('../stores/GolferStore');
-const UserStore = require('../stores/UserStore');
-const React = require('react');
+import {Golfer, DraftPick, User} from '../types/Types';
 
-function isProxyPick(props) {
+export interface DraftChooserProps {
+  golfersRemaining: Golfer[];
+  currentPick: DraftPick;
+  syncedPickList: string[];
+  currentUser: User;
+}
+
+interface DraftChooserState {
+  sortKey: string;
+  selectedGolfer: string;
+}
+
+function isProxyPick(props: DraftChooserProps) {
   return props.currentUser._id !== props.currentPick.user;
 }
 
-function shouldShowPickListOption(props) {
+function shouldShowPickListOption(props: DraftChooserProps) {
   return isProxyPick(props) || !_.isEmpty(props.syncedPickList);
 }
 
-class DraftChooser extends React.Component {
+export default class DraftChooser extends React.Component<DraftChooserProps, DraftChooserState> {
 
   constructor(props) {
     super(props);
@@ -55,7 +68,7 @@ class DraftChooser extends React.Component {
         <section>
           <h4>Make a pick for: {userName}</h4>
           <p>
-            <a href="#" onClick={this._onStopTakingPick}>
+            <a href='#' onClick={this._onStopTakingPick}>
               I&#39;ll stop making picks for {userName}
             </a>
           </p>
@@ -67,55 +80,55 @@ class DraftChooser extends React.Component {
       <GolfDraftPanel heading='Draft Picker'>
         {header}
 
-        <div className="btn-group" role="group" aria-label="Sorting choices">
+        <div className='btn-group' role='group' aria-label='Sorting choices'>
           <label>Sort users by:</label><br />
           {!showPickListOption ? null : (
             <button
-              type="button"
+              type='button'
               className={cx({
-                "btn btn-default": true,
-                "active": sortKey === 'pickList'
+                'btn btn-default': true,
+                'active': sortKey === 'pickList'
               })}
               onClick={() => this._setSortKey('pickList')}
             >User Pick List</button>
           )}
           <button
-            type="button"
+            type='button'
             className={cx({
-              "btn btn-default": true,
-              "active": sortKey === 'name'
+              'btn btn-default': true,
+              'active': sortKey === 'name'
             })}
             onClick={() => this._setSortKey('name')}
           >First Name</button>
           <button
-            type="button"
+            type='button'
             className={cx({
-              "btn btn-default": true,
-              "active": sortKey === 'wgr'
+              'btn btn-default': true,
+              'active': sortKey === 'wgr'
             })}
             onClick={() => this._setSortKey('wgr')}
           >World Golf Ranking</button>
         </div>
 
-        <form role="form">
+        <form role='form'>
         {isProxyPick && sortKey === 'pickList' ? (
-          <div style={{marginTop: "1em"}}>
+          <div style={{marginTop: '1em'}}>
             <small>* If no pick list is set, uses next WGR</small><br />
             <button
-              className="btn btn-default btn-primary"
+              className='btn btn-default btn-primary'
               onClick={this._onProxyPickListPick}
             >Select next user on pick list</button>
           </div>
         ) : (
           <div>
-            <div className="form-group">
-              <label labelFor="golfersRemaining">Select your user:</label>
+            <div className='form-group'>
+              <label htmlFor='golfersRemaining'>Select your user:</label>
               <select
-                id="golfersRemaining"
+                id='golfersRemaining'
                 value={this.state.selectedGolfer}
                 onChange={this._onChange}
-                size="10"
-                className="form-control"
+                size={10}
+                className='form-control'
               >
                 {_.map(sortedGolfers, function (g) {
                   return (
@@ -127,7 +140,7 @@ class DraftChooser extends React.Component {
               </select>
             </div>
             <button
-              className="btn btn-default btn-primary"
+              className='btn btn-default btn-primary'
               onClick={this._onSubmit}
             >
               Pick
@@ -171,7 +184,7 @@ class DraftChooser extends React.Component {
   }
 
   _getSelectionState(props) {
-    const state = this.state || {};
+    const state = this.state || {} as DraftChooserState;
     const golfersRemaining = props.golfersRemaining;
 
     let sortKey = state.sortKey;
@@ -223,5 +236,3 @@ class DraftChooser extends React.Component {
   }
 
 };
-
-module.exports = DraftChooser;

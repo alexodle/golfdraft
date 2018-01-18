@@ -5,7 +5,7 @@ import '../less/app.less';
 
 import * as $ from 'jquery';;
 import {AppNode} from './components/App.jsx';
-import * as ChatActions from './actions/ChatActions';
+import ChatActions from './actions/ChatActions';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import {BrowserRouter, Route} from 'react-router-dom';
@@ -33,7 +33,7 @@ function render(rootNode: Element) {
   // Lazily get chat messages
   //
   // TODO - move to separate server sync
-  $.getJSON('/chat/messages').success(ChatActions.setMessages);
+  $.getJSON('/chat/messages').done(ChatActions.setMessages);
 }
 
 const node = document.getElementById('golfdraftapp');

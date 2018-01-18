@@ -18,8 +18,8 @@
  * A singleton that operates as the central hub for application updates.
  */
 
-const Dispatcher = require('./Dispatcher');
-const _ = require('lodash');
+import Dispatcher from './Dispatcher';
+import * as _ from 'lodash';
 
 const AppDispatcher =  _.extend({}, Dispatcher.prototype, {
 
@@ -46,4 +46,4 @@ const AppDispatcher =  _.extend({}, Dispatcher.prototype, {
 
 });
 
-module.exports = AppDispatcher;
+export default AppDispatcher;

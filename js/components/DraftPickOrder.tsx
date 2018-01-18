@@ -1,22 +1,22 @@
 'use strict';
 
-const _ = require('lodash');
-const cx = require('classnames');
-const DraftStore = require('../stores/DraftStore');
+import * as _ from 'lodash';
+import * as cx from 'classnames';
+import DraftStore from '../stores/DraftStore';
+import * as React from 'react';
+import UserStore from '../stores/UserStore';
 import GolfDraftPanel from './GolfDraftPanel';
-const React = require('react');
-const UserStore = require('../stores/UserStore');
+import {DraftPick, User} from '../types/Types';
 
-const ReactPropTypes = React.PropTypes;
+export interface DraftPickOrderProps {
+  pickingForUsers: string[];
+  currentPick?: DraftPick;
+  currentUser: User;
+  autoPickUsers: string[];
+  onUserSelected: (pid: string) => void;
+}
 
-class DraftPickOrder extends React.Component {
-  propTypes: {
-    currentUser: ReactPropTypes.object.isRequired,
-    pickingForUsers: ReactPropTypes.array.isRequired,
-    onUserSelected: ReactPropTypes.func.isRequired,
-    currentPick: ReactPropTypes.object,
-    autoPickUsers: ReactPropTypes.object
-  }
+export default class DraftPickOrder extends React.Component<DraftPickOrderProps, {}> {
 
   render() {
     const {pickingForUsers, currentPick, currentUser, autoPickUsers} = this.props;
@@ -43,7 +43,7 @@ class DraftPickOrder extends React.Component {
                     myUser === pick.user ||
                     _.contains(pickingForUsers, pick.user)
                   ),
-                  'current-user': myUser === pick.user
+                  'current-user': currentPick.user === pick.user
                 })}
               >
                 {!autoPickUsers[pick.user] ? null : (
@@ -64,5 +64,3 @@ class DraftPickOrder extends React.Component {
   }
 
 };
-
-module.exports = DraftPickOrder;

@@ -1,6 +1,6 @@
 'use strict';
 
-const keyMirror = require('fbjs/lib/keyMirror');
+import keyMirror from 'fbjs/lib/keyMirror';
 
 const AppConstants = keyMirror({
   CURRENT_USER_CHANGE: null,
@@ -15,4 +15,4 @@ const AppConstants = keyMirror({
 
 AppConstants.PROPERTY_LOADING = { 'PROPERTY_LOADING': 'PROPERTY_LOADING' };
 
-module.exports = AppConstants;
+export default AppConstants;

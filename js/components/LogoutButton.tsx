@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import * as React from 'react';
-import * as UserActions from '../actions/UserActions';
+import UserActions from '../actions/UserActions';
 import {User} from '../types/Types';
 import {Redirect} from 'react-router';
 

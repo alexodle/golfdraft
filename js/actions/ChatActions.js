@@ -1,7 +1,7 @@
 'use strict';
 
-const AppDispatcher = require('../dispatcher/AppDispatcher');
-const ChatConstants = require('../constants/ChatConstants');
+import AppDispatcher from '../dispatcher/AppDispatcher';
+import ChatConstants from '../constants/ChatConstants';
 
 const ChatActions = {
 
@@ -28,4 +28,4 @@ const ChatActions = {
 
 };
 
-module.exports = ChatActions;
+export default ChatActions;

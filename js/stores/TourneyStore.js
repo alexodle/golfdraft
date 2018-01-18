@@ -1,9 +1,9 @@
 'use strict';
 
-const _ = require('lodash');
-const Store = require('./Store');
-const AppConstants = require('../constants/AppConstants');
-const AppDispatcher = require('../dispatcher/AppDispatcher');
+import * as _ from 'lodash';
+import Store from './Store';
+import AppConstants from '../constants/AppConstants';
+import AppDispatcher from '../dispatcher/AppDispatcher';
 
 let _tourneyName = null;
 
@@ -29,4 +29,4 @@ AppDispatcher.register(function (payload) {
   return true; // No errors. Needed by promise in Dispatcher.
 });
 
-module.exports = TourneyStore;
+export default TourneyStore;

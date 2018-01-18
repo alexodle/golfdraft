@@ -22,7 +22,7 @@
  */
 
 const Promise = require('es6-promise').Promise;
-const _ = require('lodash');
+import * as _ from 'lodash';
 
 const _callbacks = [];
 let _promises = [];
@@ -116,4 +116,4 @@ Dispatcher.prototype =  _.extend({}, Dispatcher.prototype, {
 
 });
 
-module.exports = Dispatcher;
+export default Dispatcher;

@@ -1,6 +1,6 @@
 'use strict';
 
-const constants = require('../../common/constants');
+import constants from '../../common/constants';
 
 const UNKNOWN_WGR = constants.UNKNOWN_WGR;
 
@@ -13,4 +13,4 @@ const GolferLogic = {
 
 };
 
-module.exports = GolferLogic;
+export default GolferLogic;
