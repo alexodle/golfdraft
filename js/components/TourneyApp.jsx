@@ -86,11 +86,11 @@ class TourneyApp extends React.Component {
           />
         </GolfDraftPanel>
 
-        <a name='UserDetails' />
+        <a id='UserDetails' />
         <GolfDraftPanel heading='Score Details'>
 
           <UserDetails
-            user={this.state.userDetailsUser}
+            userId={this.state.userDetailsUser}
             userScores={userScores}
             draftPicks={this.props.draft.draftPicks}
           />

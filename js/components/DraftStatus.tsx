@@ -1,11 +1,14 @@
-'use strict';
-
 import * as _ from 'lodash';
 import DraftActions from '../actions/DraftActions';
 import UserStore from '../stores/UserStore';
 import * as React from 'react';
+import {DraftPick} from '../types/Types';
 
-class DraftStatus extends React.Component {
+export interface DraftStatusProps {
+  currentPick: DraftPick;
+}
+
+export default class DraftStatus extends React.Component<DraftStatusProps, {}> {
   render() {
     const currentPick = this.props.currentPick;
     const userName = UserStore.getUser(currentPick.user).name;
@@ -25,5 +28,3 @@ class DraftStatus extends React.Component {
   }
 
 };
-
-export default DraftStatus;

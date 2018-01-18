@@ -1,23 +1,22 @@
-'use strict';
-
-import * as React from 'react';
-const ReactPropTypes = React.PropTypes;
-import * as cx from 'classnames';
 import * as _ from 'lodash';
-import utils from '../../common/utils';
-
-import UserStore from '../stores/UserStore';
+import * as cx from 'classnames';
+import * as React from 'react';
+import * as utils from '../../common/utils';
 import GolferStore from '../stores/GolferStore';
+import UserStore from '../stores/UserStore';
+import {User, DraftPick, UserScore} from '../types/Types';
 
-class UserDetails extends React.Component {
-  propTypes: {
-    user: ReactPropTypes.string.isRequired,
-    userScores: ReactPropTypes.object.isRequired
-  }
+export interface UserDetailsProps {
+  userId: string;
+  draftPicks: DraftPick[];
+  userScores: { [key: string]: UserScore };
+}
+
+export default class UserDetails extends React.Component<UserDetailsProps, {}> {
 
   render() {
-    const user = this.props.user;
-    const userScore = this.props.userScores[user];
+    const userId = this.props.userId;
+    const userScore = this.props.userScores[userId];
     const scoresByDay = userScore.scoresByDay;
     const draftPicksByGolfer = _.indexBy(this.props.draftPicks, 'golfer');
 
@@ -68,7 +67,7 @@ class UserDetails extends React.Component {
     return (
       <section>
         <h2>
-          {UserStore.getUser(user).name}
+          {UserStore.getUser(userId).name}
           <span> </span>({utils.toGolferScoreStr(userScore.total)})
           <small> {utils.getOrdinal(userRank + 1)} place {tieText}</small>
         </h2>
@@ -90,5 +89,3 @@ class UserDetails extends React.Component {
   }
 
 };
-
-export default UserDetails;

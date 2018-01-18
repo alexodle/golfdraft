@@ -1,20 +1,17 @@
-'use strict';
-
 import * as _ from 'lodash';
 import * as cx from 'classnames';
+import * as React from 'react';
+import * as utils from '../../common/utils';
 import GolferStore from '../stores/GolferStore';
 import UserStore from '../stores/UserStore';
-import * as React from 'react';
-import utils from '../../common/utils';
+import {User, DraftPick, UserScore} from '../types/Types';
 
-const ReactPropTypes = React.PropTypes;
+export interface UserStandingsProps {
+  userScores: { [key: string]: UserScore };
+  onUserSelect: (pid: string) => void;
+}
 
-class UserStandings extends React.Component {
-  propTypes: {
-    currentUser: ReactPropTypes.object.isRequired,
-    userScores: ReactPropTypes.object.isRequired,
-    selectedUser: ReactPropTypes.string.isRequired
-  }
+export default class UserStandings extends React.Component<UserStandingsProps, {}> {
 
   render() {
     const userScores = _.sortBy(this.props.userScores, 'total');
@@ -90,5 +87,3 @@ class UserStandings extends React.Component {
   }
 
 };
-
-export default UserStandings;

@@ -1,17 +1,28 @@
-'use strict';
-
 import * as $ from 'jquery';
 import * as _ from 'lodash';
 import * as React from 'react';
-const Redirect = require('react-router-dom').Redirect;
 import UserActions from '../actions/UserActions';
 import UserStore from '../stores/UserStore';
+import {Redirect} from 'react-router-dom';
+import {Location} from '../types/Types';
+
+export interface WhoIsYouProps {
+  location: Location;
+}
+
+interface WhoIsYouState {
+  selectedUser: string;
+  password: string;
+  isLoading: boolean;
+  badAuth: boolean;
+  redirectTo?: string;
+}
 
 function getSortedUsers() {
   return _.sortBy(UserStore.getAll(), 'name');
 }
 
-class WhoIsYou extends React.Component {
+export default class WhoIsYou extends React.Component<WhoIsYouProps, WhoIsYouState> {
 
   constructor(props) {
     super(props);
@@ -52,7 +63,7 @@ class WhoIsYou extends React.Component {
                   id='userSelect'
                   value={this.state.selectedUser}
                   onChange={this._onUserChange}
-                  size='15'
+                  size={15}
                   className='form-control'
                 >
                   {_.map(getSortedUsers(), function (u) {
@@ -96,6 +107,7 @@ class WhoIsYou extends React.Component {
 
   _onSubmit = (ev) => {
     ev.preventDefault();
+
     this.setState({ isLoading: true, badAuth: false });
 
     const xhr = $.post('/login', {
@@ -103,20 +115,18 @@ class WhoIsYou extends React.Component {
       password: this.state.password
     });
 
-    xhr.fail(function () {
+    xhr.fail(() => {
       this.setState({ isLoading: false, badAuth: true, password: '' });
-      this.refs.passwordInput.focus();
-    }.bind(this));
+      (this.refs.passwordInput as HTMLInputElement).focus();
+    });
 
-    xhr.done(function () {
+    xhr.done(() => {
       UserActions.setCurrentUser(this.state.selectedUser);
 
       const locationState = this.props.location.state;
       const redirectTo = (locationState && locationState.from) || '/';
       this.setState({ redirectTo });
-    }.bind(this));
+    });
   }
 
 };
-
-export default WhoIsYou;
