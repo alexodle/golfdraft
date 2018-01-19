@@ -54,4 +54,4 @@ function run(s1, s2) {
 module.exports = {
   run: run,
   runAll: runAll
-}
+};

@@ -12,9 +12,9 @@ import GolfDraftPanel from './GolfDraftPanel';
 import {Golfer, DraftPick, User} from '../types/Types';
 
 export interface DraftChooserProps {
-  golfersRemaining: Golfer[];
+  golfersRemaining: string[];
   currentPick: DraftPick;
-  syncedPickList: string[];
+  syncedPickList: string[] | {};
   currentUser: User;
 }
 

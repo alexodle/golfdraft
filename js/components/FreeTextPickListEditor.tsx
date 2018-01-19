@@ -1,30 +1,45 @@
-'use strict';
-
 import * as $ from 'jquery';
 import * as _ from 'lodash';
+import * as React from 'react';
 import DraftActions from '../actions/DraftActions';
 import GolferLogic from '../logic/GolferLogic';
 import GolferStore from '../stores/GolferStore';
-import * as React from 'react';
 
 const MIN_COEFF = 0.5;
 const TEXTAREA_PLACEHOLDER = "Sergio Garcia\nPhil Mickelson\nTiger Woods\nDustin Johnson\nJason Day\n...";
 
-function calcHasGoodSuggestion(results) {
+interface SuggestionOption {
+  target: string;
+  dist: number;
+  coeff: number;
+}
+
+interface Suggestion {
+  source: string;
+  results: SuggestionOption[];
+}
+
+interface SuggestionSelectorProps {
+  suggestion: Suggestion;
+  hasGoodSuggestion: boolean;
+  selectedValue: string;
+  disabled: boolean;
+  onSelectionChange: (target: string) => void;
+}
+
+interface SuggestionSelectorState {
+  isViewingAll: boolean;
+}
+
+function calcHasGoodSuggestion(results: SuggestionOption[]) {
   return results[0].coeff >= MIN_COEFF;
 }
 
-class SuggestionSelector extends React.Component {
+class SuggestionSelector extends React.Component<SuggestionSelectorProps, SuggestionSelectorState> {
 
   constructor(props) {
     super(props);
-    this.state = this._getInitialState();
-  }
-
-  _getInitialState() {
-    return {
-      isViewingAll: !this.props.hasGoodSuggestion
-    };
+    this.state = { isViewingAll: !this.props.hasGoodSuggestion };
   }
 
   render() {
@@ -85,7 +100,11 @@ class SuggestionSelector extends React.Component {
         {hasGoodSuggestion ? null : (
           <p className='text-danger'><em>Could not find a potential match.. Please select golfer from list:</em></p>
         )}
-        <select disabled={disabled} className='form-control' value={selectedValue} onChange={this._onSelectValueChange}>
+        <select
+          className='form-control'
+          value={selectedValue}
+          onChange={this._onSelectValueChange}
+        >
           {_.map(suggestions, function (targetName, i) {
             return (
               <option key={targetName} value={targetName}>{targetName}</option>
@@ -97,8 +116,7 @@ class SuggestionSelector extends React.Component {
   }
 
   _onSelectValueChange = (ev) => {
-    const target = _.find(this.props.suggestion.results, { target: ev.target.value });
-    this.props.onSelectionChange(target);
+    this.props.onSelectionChange(ev.target.value);
   }
 
   _onViewAll = (ev) => {
@@ -108,15 +126,24 @@ class SuggestionSelector extends React.Component {
 
 };
 
-class FreeTextPickListEditor extends React.Component {
+export interface FreeTextPickListEditorProps {
+  onCancel: () => void;
+  onComplete: () => void;
+}
+
+interface FreeTextPickListEditorState {
+  text: string;
+  isPosting: boolean;
+  suggestions?: Suggestion[];
+  suggestionSelections: { [key: string]: SuggestionOption };
+  errorMessage?: string;
+}
+
+export default class FreeTextPickListEditor extends React.Component<FreeTextPickListEditorProps, FreeTextPickListEditorState> {
 
   constructor(props) {
     super(props);
-    this.state = this._getInitialState();
-  }
-
-  _getInitialState() {
-    return {
+    this.state = {
       text: '',
       isPosting: false,
       suggestions: null,
@@ -153,19 +180,19 @@ class FreeTextPickListEditor extends React.Component {
           <div className='alert alert-danger'>{errorMessage}</div>
         )}
         <div className='alert alert-warning'>Could not find an exact match for all golfers. Please verify the following matches are correct:</div>
-        {_.map(suggestions, function (suggestion) {
+        {_.map(suggestions, (suggestion: Suggestion) => {
           const hasGoodSuggestion = calcHasGoodSuggestion(suggestion.results);
           return (
             <SuggestionSelector
+              key={suggestion.source}
               hasGoodSuggestion={hasGoodSuggestion}
               disabled={isPosting}
-              key={suggestion.source}
               suggestion={suggestion}
               selectedValue={suggestionSelections[suggestion.source].target}
-              onSelectionChange={this._onSuggestionSelectionChange.bind(this, suggestion.source)}
+              onSelectionChange={(target: string) => this._onSuggestionSelectionChange(suggestion.source, target)}
             />
           );
-        }, this)}
+        })}
         <div className='text-right'>
           <button
             className='btn btn-default'
@@ -254,7 +281,7 @@ class FreeTextPickListEditor extends React.Component {
     });
   }
 
-  _onSuggestionSelectionChange = (source, target) => {
+  _onSuggestionSelectionChange = (source: string, target: string) => {
     const newSuggestionSelections = _.extend({}, this.state.suggestionSelections, { [source]: target });
     this.setState({ suggestionSelections: newSuggestionSelections });
   }
@@ -265,12 +292,12 @@ class FreeTextPickListEditor extends React.Component {
     const data = { pickListNames: this._cleanedGolfers() };
     $.post('/draft/pickList', data)
 
-      .done(function (result) {
+      .done((result) => {
         DraftActions.setPickList(result.pickList);
         this.props.onComplete();
-      }.bind(this))
+      })
 
-      .fail(function (err) {
+      .fail((err) => {
         if (err.status === 300) {
           this._setSuggestions(err.responseJSON.suggestions);
         } else {
@@ -280,9 +307,7 @@ class FreeTextPickListEditor extends React.Component {
           });
         }
         window.location.href = '#InlinePickListEditor';
-      }.bind(this));
+      });
   }
 
 };
-
-export default FreeTextPickListEditor;

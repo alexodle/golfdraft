@@ -1,22 +1,30 @@
-'use strict';
-
 import * as _ from 'lodash';
+import * as React from 'react';
 import AppConstants from '../constants/AppConstants';
 import DraftActions from '../actions/DraftActions';
 import FreeTextPickListEditor from './FreeTextPickListEditor';
 import GolferLogic from '../logic/GolferLogic';
 import GolferStore from '../stores/GolferStore';
-import * as React from 'react';
 
-class PickListEditor extends React.Component {
+export interface PickListEditorProps {
+  syncedPickList: string[] | {};
+  pendingPickList: string[] | {};
+  preDraftMode?: boolean;
+  height?: string;
+  golfersRemaining: string[];
+}
+
+interface PickListEditorState {
+  draggingIndex?: number;
+  draggingHoverIndex?: number;
+  isFreeTextMode: boolean;
+}
+
+export default class PickListEditor extends React.Component<PickListEditorProps, PickListEditorState> {
 
   constructor(props) {
     super(props);
-    this.state = this._getInitialState();
-  }
-
-  _getInitialState() {
-    return {
+    this.state = {
       draggingIndex: null,
       draggingHoverIndex: null,
       isFreeTextMode: false
@@ -43,7 +51,7 @@ class PickListEditor extends React.Component {
     const draggingIndex = this.state.draggingIndex;
     const draggingHoverIndex = this.state.draggingHoverIndex;
     const unsavedChanges = this.props.syncedPickList !== this.props.pendingPickList;
-    const preDraftMode = !!this.props.preDraftMode;
+    const preDraftMode = this.props.preDraftMode;
     const draggingGolferId = _.isNumber(draggingIndex) ? pickList[draggingIndex] : null;
 
     if (_.isNumber(draggingHoverIndex)) {
@@ -229,5 +237,3 @@ class PickListEditor extends React.Component {
   }
 
 };
-
-export default PickListEditor;

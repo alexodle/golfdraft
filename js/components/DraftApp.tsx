@@ -1,6 +1,5 @@
-'use strict';
-
 import * as _ from 'lodash';
+import * as React from 'react';
 import AppPausedStatus from './AppPausedStatus';
 import Assets from '../constants/Assets';
 import ChatRoom from './ChatRoom';
@@ -10,27 +9,42 @@ import DraftHistory from './DraftHistory';
 import DraftPickOrder from './DraftPickOrder';
 import DraftStatus from './DraftStatus';
 import GolfDraftPanel from './GolfDraftPanel';
-const Link = require('react-router').Link;
 import PickListEditor from './PickListEditor';
-import * as React from 'react';
+import {Link} from 'react-router';
+import {DraftPick, User, ChatMessage} from '../types/Types';
 
 const myTurnSound = new Audio(Assets.MY_TURN_SOUND);
 const pickMadeSound = new Audio(Assets.PICK_MADE_SOUND);
 
-class DraftApp extends React.Component {
+export interface DraftAppProps {
+  draftPicks: DraftPick[];
+  isMyDraftPick: boolean;
+  golfersRemaining: string[];
+  syncedPickList: string[] | {};
+  pendingPickList: string[] | {};
+  currentUser: User;
+  chatMessages: ChatMessage[];
+  activeUsers: string[];
+  currentPick: DraftPick;
+  pickingForUsers: string[];
+  autoPickUsers: string[];
+  allowClock: boolean;
+  draftHasStarted: boolean;
+  isPaused: boolean;
+}
+
+export interface DraftAppState {
+  draftHistoryUserId?: string;
+}
+
+export default class DraftApp extends React.Component<DraftAppProps, DraftAppState> {
 
   constructor(props) {
     super(props);
-    this.state = this._getInitialState();
+    this.state = { draftHistoryUserId: null };
   }
 
-  _getInitialState() {
-    return {
-      draftHistoryUserId: null
-    };
-  }
-
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps(nextProps: DraftAppProps) {
     const props = this.props;
     if (!props.isMyDraftPick && nextProps.isMyDraftPick) {
       myTurnSound.play();
@@ -63,7 +77,7 @@ class DraftApp extends React.Component {
 
         <div className='row'>
           <div className='col-md-12'>
-            <a name='InlinePickListEditor' />
+            <a id='InlinePickListEditor' />
             <GolfDraftPanel heading={this._renderPickListHeader()}>
               <PickListEditor
                 preDraftMode
@@ -174,7 +188,7 @@ class DraftApp extends React.Component {
 
           <div className='col-md-4'>
             <GolfDraftPanel heading='Draft Order'>
-              <a name='InlineDraftPickListEditor' />
+              <a id='InlineDraftPickListEditor' />
               <DraftPickOrder
                 currentUser={this.props.currentUser}
                 currentPick={this.props.currentPick}
@@ -222,10 +236,8 @@ class DraftApp extends React.Component {
     );
   }
 
-  _onDraftHistorySelectionChange = (userId) => {
+  _onDraftHistorySelectionChange = (userId: string) => {
     this.setState({ draftHistoryUserId: userId });
   }
 
 };
-
-export default DraftApp;

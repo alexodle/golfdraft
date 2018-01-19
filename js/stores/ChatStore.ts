@@ -1,12 +1,11 @@
-'use strict';
-
 import * as $ from 'jquery';
 import * as _ from 'lodash';
 import AppDispatcher from '../dispatcher/AppDispatcher';
 import ChatConstants from '../constants/ChatConstants';
 import Store from './Store';
+import {ChatMessage} from '../types/Types';
 
-let _messages = null;
+let _messages: ChatMessage[] = null;
 
 const ChatStore =  _.extend({}, Store.prototype, {
 

@@ -1,10 +1,7 @@
-'use strict';
-
 import * as _ from 'lodash';
-
-import Store from './Store';
-import AppDispatcher from '../dispatcher/AppDispatcher';
 import AppConstants from '../constants/AppConstants';
+import AppDispatcher from '../dispatcher/AppDispatcher';
+import Store from './Store';
 
 let _appState = {};
 
