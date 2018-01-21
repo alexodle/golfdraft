@@ -18,10 +18,10 @@ export default class UserDetails extends React.Component<UserDetailsProps, {}> {
     const userId = this.props.userId;
     const userScore = this.props.userScores[userId];
     const scoresByDay = userScore.scoresByDay;
-    const draftPicksByGolfer = _.indexBy(this.props.draftPicks, 'golfer');
+    const draftPicksByGolfer = _.keyBy(this.props.draftPicks, 'golfer');
 
     const sortedScores = _.chain(this.props.userScores)
-      .pluck("total")
+      .map("total")
       .sortBy()
       .value();
     const userRank = _.sortedIndex(sortedScores, userScore.total);
@@ -39,8 +39,8 @@ export default class UserDetails extends React.Component<UserDetailsProps, {}> {
           {_.map(gs.scores, function (s, i) {
             const missedCut = gs.missedCuts[i];
             const scoreUsed = _.chain(scoresByDay[i].usedScores)
-              .pluck('golfer')
-              .contains(gs.golfer)
+              .map('golfer')
+              .includes(gs.golfer)
               .value();
             const currentDay = gs.day === i + 1;
             return (

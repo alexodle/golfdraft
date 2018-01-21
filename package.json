@@ -2,7 +2,9 @@
   "name": "golfdraft-react-flux",
   "main": "js/app.js",
   "dependencies": {
+    "@types/events": "^1.1.0",
     "@types/jquery": "^3.2.18",
+    "@types/lodash": "^4.14.93",
     "@types/moment": "^2.13.0",
     "@types/react": "^16.0.34",
     "@types/react-dom": "^16.0.3",
@@ -24,7 +26,7 @@
     "jquery": "^3.2.1",
     "jsdom": "^11.5.1",
     "json-loader": "^0.5.4",
-    "lodash": "^2.4.1",
+    "lodash": "^4.17.4",
     "logfmt": "^1.1.2",
     "moment": "^2.20.1",
     "mongoose": "^4.13.8",

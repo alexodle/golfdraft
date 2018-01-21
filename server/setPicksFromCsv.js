@@ -34,7 +34,7 @@ function setPicksFromCsv(csvPicks) {
 
       const pickOrder = _(picks)
         .take(picks.length / constants.NGOLFERS)
-        .pluck(0)
+        .map(0)
         .value();
 
       const userLookup, golferLookup;
@@ -43,13 +43,13 @@ function setPicksFromCsv(csvPicks) {
           return access.getUsers();
         })
         .then(function (users) {
-          userLookup = _.indexBy(users, 'name');
+          userLookup = _.keyBy(users, 'name');
         })
         .then(function () {
           return access.getGolfers();
         })
         .then(function (golfers) {
-          golferLookup = _.indexBy(golfers, function (g) {
+          golferLookup = _.keyBy(golfers, function (g) {
             return cleanName(g.name);
           });
 

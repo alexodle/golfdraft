@@ -82,7 +82,7 @@ describe('access', function () {
         { name: 'Jack Nicklaus' }
       ])
       .then(access.getGolfers)
-      .then(_.partialRight(_.indexBy, 'name'))
+      .then(_.partialRight(_.keyBy, 'name'))
       .then(function (_golfers) {
         golfers = _golfers;
       });
@@ -162,7 +162,7 @@ describe('access', function () {
       return Promise.all([
         access.ensureUsers([{ name: 'User1' }, { name: 'User2' }])
           .then(access.getUsers)
-          .then(_.partialRight(_.indexBy, 'name'))
+          .then(_.partialRight(_.keyBy, 'name'))
           .then(function (_users) {
             users = _users;
             const pickOrder = tourneyUtils.snakeDraftOrder([
@@ -174,7 +174,7 @@ describe('access', function () {
 
         access.ensureGolfers([{ name: 'Golfer1' }, { name: 'Golfer2' }])
           .then(access.getGolfers)
-          .then(_.partialRight(_.indexBy, 'name'))
+          .then(_.partialRight(_.keyBy, 'name'))
           .then(function (_golfers) {
             golfers = _golfers;
           }),
@@ -241,7 +241,7 @@ describe('access', function () {
       return Promise.all([
         access.ensureUsers([{ name: 'User1' }, { name: 'User2' }])
           .then(access.getUsers)
-          .then(_.partialRight(_.indexBy, 'name'))
+          .then(_.partialRight(_.keyBy, 'name'))
           .then(function (_users) {
             users = _users;
             const pickOrder = tourneyUtils.snakeDraftOrder([
@@ -253,7 +253,7 @@ describe('access', function () {
 
         access.ensureGolfers([{ name: 'Golfer1' }, { name: 'Golfer2' }])
           .then(access.getGolfers)
-          .then(_.partialRight(_.indexBy, 'name'))
+          .then(_.partialRight(_.keyBy, 'name'))
           .then(function (_golfers) {
             golfers = _golfers;
           })

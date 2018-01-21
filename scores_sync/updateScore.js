@@ -13,7 +13,7 @@ const OVERRIDE_KEYS = ['golfer', 'day', 'scores'];
 const UpdateScore = {
 
   validate: function (d) {
-    if (_.has(d, 'par') && !_.contains([70, 71, 72, 73], d.par)) {
+    if (_.has(d, 'par') && !_.includes([70, 71, 72, 73], d.par)) {
       console.log("ERROR - Par invalid:" + d.par);
       return false;
     }
@@ -33,7 +33,7 @@ const UpdateScore = {
       } else if (!validScores) {
         console.log("ERROR - Invalid golfer scores");
         inv = true;
-      } else if (!_.contains(_.range(DAYS + 1), g.day)) {
+      } else if (!_.includes(_.range(DAYS + 1), g.day)) {
         console.log("ERROR - Invalid golfer day");
         inv = true;
       }
@@ -57,7 +57,7 @@ const UpdateScore = {
           .pick(OVERRIDE_KEYS)
           .value();
       })
-      .indexBy(function (o) {
+      .keyBy(function (o) {
         return o.golfer.toString();
       })
       .value();
@@ -107,7 +107,7 @@ const UpdateScore = {
         const scoreOverrides = results[1];
 
         // Build scores with golfer id
-        const golfersByName = _.indexBy(gs, "name");
+        const golfersByName = _.keyBy(gs, "name");
         let scores = _.map(rawTourney.golfers, function (g) {
           const golfer = golfersByName[g.golfer]._id;
           return {

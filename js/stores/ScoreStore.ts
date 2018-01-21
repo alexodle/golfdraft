@@ -1,28 +1,19 @@
-'use strict';
-
 import * as _ from 'lodash';
 import AppDispatcher from '../dispatcher/AppDispatcher';
 import ScoreConstants from '../constants/ScoreConstants';
 import ScoreLogic from '../logic/ScoreLogic';
 import Store from './Store';
+import {GolferScore} from '../types/Types';
 
-// Indexed by golfer id
-let _scores = {};
-let _lastUpdated = null;
+let _scores: {[golferId: string]: GolferScore} = {};
+let _lastUpdated: Date = null;
 
-const ScoreStore =  _.extend({}, Store.prototype, {
-
-  changeEvent: 'ScoreStore:change',
-
-  getScores: function () {
-    return _scores;
-  },
-
-  getLastUpdated: function () {
-    return _lastUpdated;
-  }
-
-});
+class ScoreStoreImpl extends Store {
+  changeEvent() { return 'ScoreStore:change'; }
+  getScores() { return _scores; }
+  getLastUpdated() { return _lastUpdated; }
+}
+const ScoreStore = new ScoreStoreImpl();
 
 // Register to handle all updates
 AppDispatcher.register(function (payload) {
@@ -32,7 +23,7 @@ AppDispatcher.register(function (payload) {
     case ScoreConstants.SCORE_UPDATE:
       const scores = ScoreLogic.fillMissedCutScores(action.scores);
 
-      _scores = _.indexBy(scores, "golfer");
+      _scores = _.keyBy(scores, "golfer");
       _lastUpdated = action.lastUpdated;
 
       ScoreStore.emitChange();

@@ -60,7 +60,7 @@ describe('updateScore', function () {
   describe('mergeOverrides', function () {
 
     it('merges override scores', function () {
-      const merged = _.indexBy(updater.mergeOverrides(
+      const merged = _.keyBy(updater.mergeOverrides(
         [
           { golfer: 'golferid_1', day: 4, scores: [-1, -20, -30, 0] },
           { golfer: 'golferid_2', day: 4, scores: [-1, 2, -2, 0] },

@@ -1,19 +1,14 @@
-'use strict';
-
-import * as _ from 'lodash';
 import Store from './Store';
 import AppConstants from '../constants/AppConstants';
 import AppDispatcher from '../dispatcher/AppDispatcher';
 
-let _tourneyName = null;
+let _tourneyName: string = null;
 
-const TourneyStore =  _.extend({}, Store.prototype, {
-
-  getTourneyName: function () {
-    return _tourneyName;
-  }
-
-});
+class TourneyStoreImpl extends Store {
+  changeEvent() { return 'TourneyStore:change'; }
+  getTourneyName() { return _tourneyName; }
+}
+const TourneyStore = new TourneyStoreImpl();
 
 // Register to handle all updates
 AppDispatcher.register(function (payload) {

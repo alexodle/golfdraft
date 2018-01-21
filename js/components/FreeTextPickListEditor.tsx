@@ -91,7 +91,7 @@ class SuggestionSelector extends React.Component<SuggestionSelectorProps, Sugges
     const disabled = this.props.disabled;
     const hasGoodSuggestion = this.props.hasGoodSuggestion;
     const suggestions = _.chain(this.props.suggestion.results)
-      .pluck('target')
+      .map('target')
       .sortBy()
       .value();
 

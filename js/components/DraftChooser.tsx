@@ -1,5 +1,3 @@
-'use strict';
-
 import * as _ from 'lodash';
 import AppConstants from '../constants/AppConstants';
 import * as cx from 'classnames';
@@ -12,9 +10,9 @@ import GolfDraftPanel from './GolfDraftPanel';
 import {Golfer, DraftPick, User} from '../types/Types';
 
 export interface DraftChooserProps {
-  golfersRemaining: string[];
+  golfersRemaining: {[key: string]: Golfer};
   currentPick: DraftPick;
-  syncedPickList: string[] | {};
+  syncedPickList: string[];
   currentUser: User;
 }
 
@@ -130,7 +128,7 @@ export default class DraftChooser extends React.Component<DraftChooserProps, Dra
                 size={10}
                 className='form-control'
               >
-                {_.map(sortedGolfers, function (g) {
+                {_.map(sortedGolfers, (g) => {
                   return (
                     <option key={g._id} value={g._id}>
                       {GolferLogic.renderGolfer(g)}
@@ -168,7 +166,7 @@ export default class DraftChooser extends React.Component<DraftChooserProps, Dra
     return isProxyPick(this.props);
   }
 
-  _sortedGolfers(golfers, sortKey) {
+  _sortedGolfers(golfers: {[key: string]: Golfer}, sortKey: string): Golfer[]  {
     const isProxyPick = this._isProxyPick();
     if (sortKey === 'pickList') {
       if (isProxyPick) {
@@ -183,7 +181,7 @@ export default class DraftChooser extends React.Component<DraftChooserProps, Dra
     return _.sortBy(golfers, [sortKey, 'name']);
   }
 
-  _getSelectionState(props) {
+  _getSelectionState(props: DraftChooserProps) {
     const state = this.state || {} as DraftChooserState;
     const golfersRemaining = props.golfersRemaining;
 

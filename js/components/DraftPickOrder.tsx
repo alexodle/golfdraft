@@ -1,5 +1,3 @@
-'use strict';
-
 import * as _ from 'lodash';
 import * as cx from 'classnames';
 import DraftStore from '../stores/DraftStore';
@@ -23,7 +21,7 @@ export default class DraftPickOrder extends React.Component<DraftPickOrderProps,
     const myUser = currentUser._id;
 
     let pickOrder = DraftStore.getPickOrder();
-    pickOrder = _.first(DraftStore.getPickOrder(), pickOrder.length / 4);
+    pickOrder = _.take(DraftStore.getPickOrder(), pickOrder.length / 4);
 
     return (
       <div>
@@ -34,14 +32,14 @@ export default class DraftPickOrder extends React.Component<DraftPickOrderProps,
           <b>Pro Tip:</b> click on a user to see their picks
         </small></p>
         <ol className='pick-order-list'>
-          {_.map(pickOrder, function (pick, i) {
+          {_.map(pickOrder, (pick, i) => {
             return (
               <li
                 key={pick.user}
                 className={cx({
                   'my-user': (
                     myUser === pick.user ||
-                    _.contains(pickingForUsers, pick.user)
+                    _.includes(pickingForUsers, pick.user)
                   ),
                   'current-user': currentPick.user === pick.user
                 })}
@@ -53,7 +51,7 @@ export default class DraftPickOrder extends React.Component<DraftPickOrderProps,
                   {UserStore.getUser(pick.user).name}
                 </a>
               </li>);
-          }, this)}
+          })}
         </ol>
       </div>
     );

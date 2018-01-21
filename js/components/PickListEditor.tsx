@@ -5,13 +5,14 @@ import DraftActions from '../actions/DraftActions';
 import FreeTextPickListEditor from './FreeTextPickListEditor';
 import GolferLogic from '../logic/GolferLogic';
 import GolferStore from '../stores/GolferStore';
+import {Golfer} from '../types/Types';
 
 export interface PickListEditorProps {
-  syncedPickList: string[] | {};
-  pendingPickList: string[] | {};
+  syncedPickList: string[];
+  pendingPickList: string[];
   preDraftMode?: boolean;
   height?: string;
-  golfersRemaining: string[];
+  golfersRemaining: {[key: string]: Golfer};
 }
 
 interface PickListEditorState {
@@ -104,7 +105,7 @@ export default class PickListEditor extends React.Component<PickListEditorProps,
             <table className="table table-condensed table-striped">
               <thead></thead>
               <tbody>
-                {_.map(pickList, function (gid, i) {
+                {_.map(pickList, (gid, i) => {
                   const g = GolferStore.getGolfer(gid);
                   return (
                     <tr
@@ -117,7 +118,6 @@ export default class PickListEditor extends React.Component<PickListEditorProps,
                         onDrop={this._onDrop.bind(this, i)}
                         onDragEnd={this._onDragEnd}
                         onDragOver={this._onDragOver.bind(this, i)}
-                        onDragLeave={this._onDragLeave}
                       >
 
                         <span className="hidden-xs">
@@ -135,7 +135,7 @@ export default class PickListEditor extends React.Component<PickListEditorProps,
                       </td>
                     </tr>
                   );
-                }, this)}
+                })}
               </tbody>
             </table>
           </div>
@@ -162,11 +162,9 @@ export default class PickListEditor extends React.Component<PickListEditorProps,
 
   _getDisplayPickList() {
     const pendingPickList = this.props.pendingPickList;
-    if (pendingPickList === AppConstants.PROPERTY_LOADING) return pendingPickList;
-
-    return !_.isEmpty(pendingPickList) ? pendingPickList : _.chain(this.props.golfersRemaining)
+    return !_.isEmpty(pendingPickList) ? [] : _.chain(this.props.golfersRemaining)
       .sortBy(['wgr', 'name'])
-      .pluck('_id')
+      .map('_id')
       .value();
   }
 

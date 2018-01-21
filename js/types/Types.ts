@@ -1,5 +1,13 @@
+export interface AppState {
+  isDraftPaused: boolean;
+  allowClock: boolean;
+  draftHasStarted: boolean;
+  autoPickUsers: {[userId: string]: string}
+}
+
 export interface User {
   name: string;
+  username: string;
   _id: string;
 }
 
@@ -15,6 +23,11 @@ export interface DraftPick {
   pickNumber: number;
   timestamp: Date;
   clientTimestamp: Date;
+}
+
+export interface DraftPickOrder {
+  user: string;
+  pickNumber: number;
 }
 
 export interface Golfer {
@@ -39,7 +52,9 @@ export interface UserDayScore {
 }
 
 export interface UserScore {
+  user: string;
   total: number;
+  pickNumber: number;
   scoresByGolfer: { [key: string]: GolferScore };
   scoresByDay: { [key: string]: UserDayScore };
 }

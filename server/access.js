@@ -116,7 +116,7 @@ _.extend(access, {
   updatePickListFromNames: function (userId, pickListNames) {
     return access.getGolfers()
     .then(function (golfers) {
-      const golfersByLcName = _.indexBy(golfers, function (g) {
+      const golfersByLcName = _.keyBy(golfers, function (g) {
         return g.name.toLowerCase();
       });
 
@@ -137,7 +137,7 @@ _.extend(access, {
 
       // Did not find at at least one golfer by name. Calculate closest matches and provide those
       // suggestions to the client.
-      const suggestions = levenshteinDistance.runAll(notFoundGolferNames, _.pluck(golfers, 'name'));
+      const suggestions = levenshteinDistance.runAll(notFoundGolferNames, _.map(golfers, 'name'));
       return {
         completed: false,
         suggestions: suggestions
@@ -191,7 +191,7 @@ _.extend(access, {
         models.Golfer.find(FK_TOURNEY_ID_QUERY).exec(),
       ])
       .then(function (results) {
-        const wgrs = _.indexBy(results[0], 'name');
+        const wgrs = _.keyBy(results[0], 'name');
         const golfers = _.map(results[1], function (g) {
           return mergeWGR(g, wgrs[g.name]);
         });
@@ -236,8 +236,8 @@ _.extend(access, {
       const picks = results[2];
 
       const pickedGolfers = _.chain(picks)
-        .pluck('golfer')
-        .indexBy()
+        .map('golfer')
+        .keyBy()
         .value();
 
       let golferToPick = _.chain(pickList)
@@ -252,7 +252,7 @@ _.extend(access, {
       let isPickListPick = !!golferToPick;
       golferToPick = golferToPick || _.chain(golfers)
         .sortBy(['wgr', 'name'])
-        .pluck('_id')
+        .map('_id')
         .invoke('toString')
         .filter(function (gid) {
           return !pickedGolfers[gid];
@@ -360,7 +360,7 @@ _.extend(access, {
     });
     return access.getUsers()
       .then(function (users) {
-        const existingUsersByName = _.indexBy(users, 'name');
+        const existingUsersByName = _.keyBy(users, 'name');
         const usersToAdd = _.filter(userJsons, function (json) {
           return !existingUsersByName[json.name];
         });

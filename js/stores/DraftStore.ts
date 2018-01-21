@@ -1,5 +1,3 @@
-'use strict';
-
 import * as $ from 'jquery';
 import * as _ from 'lodash';
 import AppDispatcher from '../dispatcher/AppDispatcher';
@@ -7,13 +5,14 @@ import AppConstants from '../constants/AppConstants';
 import DraftConstants from '../constants/DraftConstants';
 import Store from './Store';
 import UserStore from './UserStore';
+import {DraftPick, DraftPickOrder} from '../types/Types';
 
-let _picks = [];
-let _pickOrder = [];
-let _pickForUsers = [];
+let _picks: DraftPick[] = [];
+let _pickOrder: DraftPickOrder[] = [];
+let _pickForUsers: string[] = [];
 
-let _pickList = null;
-let _pendingPickList = null;
+let _pickList: string[] = null;
+let _pendingPickList: string[] = null;
 resetPickList();
 
 function resetPickList() {
@@ -50,7 +49,7 @@ function addPick(golfer) {
 function filterPicksFromPickLists() {
   if (_pickList == AppConstants.PROPERTY_LOADING) return;
 
-  const pickedGids = _.pluck(_picks, 'golfer');
+  const pickedGids = _.map(_picks, 'golfer');
   if (_pickList !== _pendingPickList) {
     _pickList = _.difference(_pickList, pickedGids);
     _pendingPickList = _.difference(_pendingPickList, pickedGids);
@@ -60,44 +59,26 @@ function filterPicksFromPickLists() {
   }
 }
 
-const DraftStore =  _.extend({}, Store.prototype, {
-
-  changeEvent: 'DraftStore:change',
-
-  getCurrentPick: getCurrentPick,
-
-  getPickOrder: function () {
-    return _pickOrder;
-  },
-
-  getDraftPicks: function () {
-    return _picks;
-  },
-
-  getIsMyDraftPick: function () {
+class DraftStoreImpl extends Store {
+  changeEvent() { return 'DraftStore:change'; }
+  getCurrentPick() { return getCurrentPick(); }
+  getDraftPicks() { return _picks }
+  getPickOrder() { return _pickOrder }
+  getIsMyDraftPick() {
     const currentPick = getCurrentPick();
     const currentUser = UserStore.getCurrentUser();
     if (!currentPick || !currentUser) return false;
 
     return (
       currentPick.user === currentUser._id ||
-      _.contains(_pickForUsers, currentPick.user)
+      _.includes(_pickForUsers, currentPick.user)
     );
-  },
-
-  getPickingForUsers: function () {
-    return _pickForUsers;
-  },
-
-  getPickList: function () {
-    return _pickList;
-  },
-
-  getPendingPickList: function () {
-    return _pendingPickList;
   }
-
-});
+  getPickingForUsers() { return _pickForUsers }
+  getPickList() { return _pickList }
+  getPendingPickList() { return _pendingPickList }
+}
+const DraftStore = new DraftStoreImpl();
 
 // Register to handle all updates
 AppDispatcher.register(function (payload) {
@@ -124,11 +105,8 @@ AppDispatcher.register(function (payload) {
       const partialPick = getCurrentPick();
 
       // TODO - Move to separate server sync
-      $.post('/draft/pickPickListGolfer', partialPick)
-      .fail(function () {
-        // No real error handling here, just reload the page to make sure we
-        // don't get people in a weird state.
-        window.location.reload();
+      $.post('/draft/pickPickListGolfer', {
+        fail: () => window.location.reload()
       });
       break;
 

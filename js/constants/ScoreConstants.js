@@ -2,6 +2,6 @@
 
 import keyMirror from 'fbjs/lib/keyMirror';
 
-module.exports = keyMirror({
+export default keyMirror({
   SCORE_UPDATE: null
 });

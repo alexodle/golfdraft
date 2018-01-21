@@ -2,34 +2,18 @@ import * as _ from 'lodash';
 import AppConstants from '../constants/AppConstants';
 import AppDispatcher from '../dispatcher/AppDispatcher';
 import Store from './Store';
+import {AppState} from '../types/Types';
 
-let _appState = {};
+let _appState: AppState = null;
 
-function valueOr(key, orValue) {
-  return _.has(_appState, key) ? _appState[key] : orValue;
+class AppSettingsStoreImpl extends Store {
+  changeEvent() { return 'AppSettingsStore:change'; }
+  getIsPaused() { return _appState.isDraftPaused; }
+  getAllowClock() { return _appState.allowClock; }
+  getDraftHasStarted() { return _appState.draftHasStarted; }
+  getAutoPickUsers() { return _appState.autoPickUsers; }
 }
-
-const AppSettingsStore =  _.extend({}, Store.prototype, {
-
-  changeEvent: 'AppSettingsStore:change',
-
-  getIsPaused: function () {
-    return valueOr('isDraftPaused', false);
-  },
-
-  getAllowClock: function () {
-    return valueOr('allowClock', true);
-  },
-
-  getDraftHasStarted: function () {
-    return valueOr('draftHasStarted', false);
-  },
-
-  getAutoPickUsers: function () {
-    return valueOr('autoPickUsers', {});
-  }
-
-});
+const AppSettingsStore = new AppSettingsStoreImpl();
 
 // Register to handle all updates
 AppDispatcher.register(function (payload) {
@@ -39,7 +23,7 @@ AppDispatcher.register(function (payload) {
 
     case AppConstants.SET_APP_STATE:
       _appState = _.extend({}, action.appState, {
-        autoPickUsers: _.indexBy(action.appState.autoPickUsers)
+        autoPickUsers: _.keyBy(action.appState.autoPickUsers)
       });
       AppSettingsStore.emitChange();
       break;

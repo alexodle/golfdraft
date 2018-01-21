@@ -1,46 +1,26 @@
-'use strict';
-
 import * as $ from 'jquery';
 import * as _ from 'lodash';
 import AppConstants from '../constants/AppConstants';
 import AppDispatcher from '../dispatcher/AppDispatcher';
 import Store from './Store';
 import UserActions from '../actions/UserActions';
+import {User} from '../types/Types';
 
-let _currentUser = null;
-let _users = null;
-let _isAdmin = false;
-let _activeUsers = null;
+let _currentUser: string = null;
+let _users: {[userId: string]: User} = null;
+let _isAdmin: boolean = false;
+let _activeUsers: {[userId: string]: number} = null;
 
-const UserStore =  _.extend({}, Store.prototype, {
-
-  changeEvent: 'UserStore:change',
-
-  getCurrentUser: function () {
-    return _users[_currentUser];
-  },
-
-  getUser: function (user) {
-    return _users[user];
-  },
-
-  getUserByName: function (name) {
-    return _.find(_users, { name: name });
-  },
-
-  isAdmin: function () {
-    return _isAdmin;
-  },
-
-  getAll: function () {
-    return _.values(_users);
-  },
-
-  getActive: function () {
-    return _activeUsers;
-  }
-
-});
+class UserStoreImpl extends Store {
+  changeEvent() { return 'UserStore:change'; }
+  getCurrentUser() { return _users[_currentUser]; }
+  getUser(userId: string) { return _users[userId]; }
+  getUserByName(name: string) { return _.find(_users, { name }); }
+  isAdmin() { return _isAdmin; }
+  getAll() { return _.values(_users); }
+  getActive() { return _activeUsers; }
+}
+const UserStore = new UserStoreImpl();
 
 // Register to handle all updates
 AppDispatcher.register(function (payload) {
@@ -49,7 +29,7 @@ AppDispatcher.register(function (payload) {
   switch(action.actionType) {
 
     case AppConstants.SET_USERS:
-      _users = _.indexBy(action.users, '_id');
+      _users = _.keyBy(action.users, '_id');
       UserStore.emitChange();
       break;
 

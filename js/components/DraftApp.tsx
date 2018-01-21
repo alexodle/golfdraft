@@ -11,7 +11,7 @@ import DraftStatus from './DraftStatus';
 import GolfDraftPanel from './GolfDraftPanel';
 import PickListEditor from './PickListEditor';
 import {Link} from 'react-router';
-import {DraftPick, User, ChatMessage} from '../types/Types';
+import {DraftPick, User, ChatMessage, Golfer} from '../types/Types';
 
 const myTurnSound = new Audio(Assets.MY_TURN_SOUND);
 const pickMadeSound = new Audio(Assets.PICK_MADE_SOUND);
@@ -19,12 +19,12 @@ const pickMadeSound = new Audio(Assets.PICK_MADE_SOUND);
 export interface DraftAppProps {
   draftPicks: DraftPick[];
   isMyDraftPick: boolean;
-  golfersRemaining: string[];
-  syncedPickList: string[] | {};
-  pendingPickList: string[] | {};
+  golfersRemaining: {[key: string]: Golfer};
+  syncedPickList: string[];
+  pendingPickList: string[];
   currentUser: User;
   chatMessages: ChatMessage[];
-  activeUsers: string[];
+  activeUsers: {[userId: string]: number};
   currentPick: DraftPick;
   pickingForUsers: string[];
   autoPickUsers: string[];

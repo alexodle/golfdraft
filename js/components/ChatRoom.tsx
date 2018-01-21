@@ -266,7 +266,7 @@ class Message extends React.PureComponent<MessageProps, {}> {
 
 export interface ChatRoomProps {
   messages: ChatMessage[];
-  activeUsers: string[];
+  activeUsers: {[userId: string]: number};
   currentUser: User;
 }
 
@@ -355,11 +355,11 @@ export default class ChatRoom extends React.PureComponent<ChatRoomProps, {}> {
                 <b>Online:</b>
                 <ul className='list-unstyled'>
                   {_.chain(this.props.activeUsers)
-                    .map(function (count, user) {
-                      return UserStore.getUser(user).name;
+                    .map((count, userId) => {
+                      return UserStore.getUser(userId).name;
                     })
                     .sort()
-                    .map(function (userName) {
+                    .map((userName) => {
                       return (
                         <li key={userName}>{userName}</li>
                       );

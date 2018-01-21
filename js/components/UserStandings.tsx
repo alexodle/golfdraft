@@ -9,22 +9,24 @@ import {User, DraftPick, UserScore} from '../types/Types';
 export interface UserStandingsProps {
   userScores: { [key: string]: UserScore };
   onUserSelect: (pid: string) => void;
+  currentUser: User;
+  selectedUser: string;
 }
 
 export default class UserStandings extends React.Component<UserStandingsProps, {}> {
 
   render() {
     const userScores = _.sortBy(this.props.userScores, 'total');
-    const userTotals = _.pluck(userScores, 'total');
+    const userTotals = _.map(userScores, 'total');
     const topScore = userTotals[0];
 
-    const trs = _.map(userScores, function (ps) {
+    const trs = _.map(userScores, (ps) => {
       const p = UserStore.getUser(ps.user);
       const userIsMe = this.props.currentUser._id === p._id;
       const userIsSelected = this.props.selectedUser === p._id;
       const viewUser = _.partial(this._onUserSelect, p._id);
-      const holesLeft = _.sum(ps.scoresByGolfer, function (gs) {
-        if (_.any(gs.missedCuts)) {
+      const holesLeft = _.sumBy(_.values(ps.scoresByGolfer), function (gs) {
+        if (_.some(gs.missedCuts)) {
           return 0;
         } else if (gs.thru === null) {
           return 18;
@@ -52,7 +54,7 @@ export default class UserStandings extends React.Component<UserStandingsProps, {
           <td className='visible-xs'><a href='#UserDetails' onClick={viewUser}>Details</a></td>
         </tr>
       );
-    }, this);
+    });
 
     return (
       <section>

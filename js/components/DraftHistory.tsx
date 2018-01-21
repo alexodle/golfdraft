@@ -23,7 +23,7 @@ export default class DraftHistory extends React.Component<DraftHistoryProps, {}>
 
     heading = 'Draft History';
     if (selectedUserId) {
-      draftPicks = _.where(draftPicks, { user: selectedUserId });
+      draftPicks = _.filter(draftPicks, { user: selectedUserId });
       heading = (
         <span>
           <a href='#DraftHistory' onClick={this._onDeselectPerson}>Draft History</a>

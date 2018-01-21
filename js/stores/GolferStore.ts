@@ -1,25 +1,19 @@
-'use strict';
-
 import * as _ from 'lodash';
 import AppConstants from '../constants/AppConstants';
 import AppDispatcher from '../dispatcher/AppDispatcher';
 import Store from './Store';
+import {Golfer} from '../types/Types';
 
-let _golfers = {};
+let _golfers: {[key: string]: Golfer} = null;
 
-const GolferStore =  _.extend({}, Store.prototype, {
-
-  changeEvent: 'GolferStore:change',
-
-  getAll: function () {
-    return _golfers;
-  },
-
-  getGolfer: function (id) {
+class GolferStoreImpl extends Store {
+  changeEvent() { return 'GolferStore:change'; }
+  getAll() { return _golfers; }
+  getGolfer(id: string) {
     return _golfers[id];
   }
-
-});
+}
+const GolferStore = new GolferStoreImpl();
 
 // Register to handle all updates
 AppDispatcher.register(function (payload) {
@@ -27,7 +21,7 @@ AppDispatcher.register(function (payload) {
 
   switch(action.actionType) {
     case AppConstants.SET_GOLFERS:
-      _golfers = _.indexBy(action.golfers, '_id');
+      _golfers = _.keyBy(action.golfers, '_id');
       GolferStore.emitChange();
       break;
   }

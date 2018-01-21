@@ -2,13 +2,6 @@ const _ = require('lodash');
 
 _.mixin({
 
-  sum: function (arr, it, context) {
-    it = _.createCallback(it);
-    return _.reduce(arr, function (memo, value, index, list) {
-      return memo + it.call(context, value, index, list);
-    }, 0, context);
-  },
-
   lock: function (fn) {
     return function () {
       return fn();
@@ -51,7 +44,7 @@ const utils = {
   },
 
   containsObjectId: function (oidList, targetOid) {
-    return _.any(oidList, _.partial(utils.oidsAreEqual, targetOid));
+    return _.some(oidList, _.partial(utils.oidsAreEqual, targetOid));
   }
 
 };

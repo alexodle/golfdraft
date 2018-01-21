@@ -77,7 +77,7 @@ const YahooReader = {
         s === "-"
       ) {
         return 0;
-      } else if (_.contains([MISSED_CUT, "WD", "MDF", "DQ", "CUT"], s)) {
+      } else if (_.includes([MISSED_CUT, "WD", "MDF", "DQ", "CUT"], s)) {
         return MISSED_CUT;
       } else {
         day++;
@@ -85,7 +85,7 @@ const YahooReader = {
       }
     });
 
-    const missedCut = _.contains(g.scores, MISSED_CUT);
+    const missedCut = _.includes(g.scores, MISSED_CUT);
     if (missedCut) {
       g.day = g.scores.length;
     } else {
@@ -97,7 +97,7 @@ const YahooReader = {
 
   relativeToPar: function (g, tourney) {
     const par = tourney.par;
-    const missedCut = _.contains(g.scores, MISSED_CUT);
+    const missedCut = _.includes(g.scores, MISSED_CUT);
     if (g.today === "E") {
       g.today = 0;
     }

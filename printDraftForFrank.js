@@ -14,7 +14,7 @@ function printScoresForFrank() {
   .then(function (results) {
     const users = results[0];
     const draftPicks = _.groupBy(results[1].picks, 'user');
-    const golfers = _.indexBy(results[2], '_id');
+    const golfers = _.keyBy(results[2], '_id');
 
     _.each(users, function (p) {
       console.log(p.name);

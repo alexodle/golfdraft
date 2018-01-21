@@ -12,7 +12,7 @@ function getGolfersByUser(draftPicks) {
   return _.chain(draftPicks)
     .groupBy('user')
     .transform(function (memo, picks, userId) {
-      memo[userId] = _.pluck(picks, 'golfer');
+      memo[userId] = _.map(picks, 'golfer');
     })
     .value();
 }
@@ -21,10 +21,10 @@ function userScore(userGolfers, scores, user) {
   const scoresByGolfer = _.chain(userGolfers)
     .map(function (g) {
       return _.extend({}, scores[g], {
-        total: _.sum(scores[g].scores)
+        total: _.sumBy(scores[g].scores)
       });
     })
-    .indexBy('golfer')
+    .keyBy('golfer')
     .value();
 
   const scoresByDay = _.times(NDAYS, function (day) {
@@ -42,7 +42,7 @@ function userScore(userGolfers, scores, user) {
       day: day,
       allScores: dayScores,
       usedScores: usedScores,
-      total: _.sum(usedScores, function (s) {
+      total: _.sumBy(usedScores, function (s) {
         return s.scores[day];
       })
     };
@@ -52,14 +52,14 @@ function userScore(userGolfers, scores, user) {
     user: user,
     scoresByDay: scoresByDay,
     scoresByGolfer: scoresByGolfer,
-    total: _.sum(scoresByDay, 'total')
+    total: _.sumBy(scoresByDay, 'total')
   };
 }
 
 function worstScoreForDay(userScores, day) {
   return _.chain(userScores)
-    .pluck('scores')
-    .pluck(day)
+    .map('scores')
+    .map(day)
     .reject(MISSED_CUT)
     .max()
     .value();
@@ -97,7 +97,7 @@ const ScoreLogic = {
           userScore(golfers, golferScores, user),
           { pickNumber: draftPosByUser[user] });
       })
-      .indexBy('user')
+      .keyBy('user')
       .value();
 
     return userScores;

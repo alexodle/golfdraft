@@ -7,15 +7,11 @@ import {ChatMessage} from '../types/Types';
 
 let _messages: ChatMessage[] = null;
 
-const ChatStore =  _.extend({}, Store.prototype, {
-
-  changeEvent: 'ChatStore:change',
-
-  getMessages: function (id) {
-    return _messages;
-  }
-
-});
+class ChatStoreImpl extends Store {
+  changeEvent() { return 'ChatStore:change'; }
+  getMessages() { return _messages; }
+}
+const ChatStore = new ChatStoreImpl();
 
 // Register to handle all updates
 AppDispatcher.register(function (payload) {

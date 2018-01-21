@@ -57,7 +57,7 @@ function getAppState() {
 }
 
 function getGolfersRemaining(golfers, draftPicks) {
-  const pickedGolfers = _.pluck(draftPicks, 'golfer');
+  const pickedGolfers = _.map(draftPicks, 'golfer');
   const golfersRemaining = _.omit(golfers, pickedGolfers);
   return golfersRemaining;
 }
