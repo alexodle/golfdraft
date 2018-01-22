@@ -1,65 +1,62 @@
-'use strict';
-
-import _ from 'lodash';
 import AppDispatcher from '../dispatcher/AppDispatcher';
 import DraftConstants from '../constants/DraftConstants';
 
-const DraftActions = {
+export default class DraftActions {
 
-  makePick: function (golfer) {
+  static makePick(golferId: string) {
     AppDispatcher.handleViewAction({
       actionType: DraftConstants.DRAFT_PICK,
-      golfer: golfer
+      golfer: golferId
     });
-  },
+  }
 
-  makePickListPick: function () {
+  static makePickListPick() {
     AppDispatcher.handleViewAction({
       actionType: DraftConstants.DRAFT_PICK_HIGHEST_PRI
     });
-  },
+  }
 
-  draftUpdate: function (draft) {
+  static draftUpdate(draft) {
     AppDispatcher.handleServerAction({
       actionType: DraftConstants.DRAFT_UPDATE,
       draft: draft
     });
-  },
+  }
 
-  draftForUser: function (user) {
+  static draftForUser(userId: string) {
     AppDispatcher.handleViewAction({
       actionType: DraftConstants.DRAFT_FOR_USER,
-      user: user
+      user: userId
     });
-  },
+  }
 
-  stopDraftingForUser: function (user) {
+  static stopDraftingForUser(userId: string) {
     AppDispatcher.handleViewAction({
       actionType: DraftConstants.STOP_DRAFT_FOR_USER,
-      user: user
+      user: userId
     });
-  },
+  }
 
-  updatePendingPickList: function (pendingPickList) {
+  static updatePendingPickList(pendingPickList: string[]) {
     AppDispatcher.handleViewAction({
       actionType: DraftConstants.UPDATE_PENDING_PICK_LIST,
       pendingPickList: pendingPickList
     });
-  },
+  }
 
-  resetPendingPickList: function () {
+  static resetPendingPickList() {
     AppDispatcher.handleViewAction({
       actionType: DraftConstants.RESET_PENDING_PICK_LIST
     });
-  },
+  }
 
-  savePickList: function () {
+  static savePickList() {
     AppDispatcher.handleViewAction({
       actionType: DraftConstants.SAVE_PICK_LIST
     });
-  },
+  }
 
-  setPickList: function (pickList) {
+  static setPickList(pickList: string[]) {
     AppDispatcher.handleViewAction({
       actionType: DraftConstants.SET_PICK_LIST,
       pickList: pickList
@@ -67,5 +64,3 @@ const DraftActions = {
   }
 
 };
-
-export default DraftActions;

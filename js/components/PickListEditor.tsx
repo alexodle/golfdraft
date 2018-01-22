@@ -5,14 +5,14 @@ import DraftActions from '../actions/DraftActions';
 import FreeTextPickListEditor from './FreeTextPickListEditor';
 import GolferLogic from '../logic/GolferLogic';
 import GolferStore from '../stores/GolferStore';
-import {Golfer} from '../types/Types';
+import {IndexedGolfers} from '../types/Types';
 
 export interface PickListEditorProps {
   syncedPickList: string[];
   pendingPickList: string[];
   preDraftMode?: boolean;
   height?: string;
-  golfersRemaining: {[key: string]: Golfer};
+  golfersRemaining: IndexedGolfers;
 }
 
 interface PickListEditorState {
@@ -33,7 +33,7 @@ export default class PickListEditor extends React.Component<PickListEditorProps,
   }
 
   render() {
-    if (this.props.syncedPickList == AppConstants.PROPERTY_LOADING) {
+    if (!_.isArray(this.props.syncedPickList)) {
       return this._renderLoading();
     }
 

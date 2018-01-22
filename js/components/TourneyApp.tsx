@@ -1,35 +1,40 @@
-'use strict';
-
 import * as _ from 'lodash';
+import * as moment from 'moment';
+import * as React from 'react';
 import ChatRoom from './ChatRoom';
 import constants from '../../common/constants';
 import GolfDraftPanel from './GolfDraftPanel';
 import GolferLogic from '../logic/GolferLogic';
 import GolferStore from '../stores/GolferStore';
-import * as moment from 'moment';
+import ScoreLogic from '../logic/ScoreLogic';
 import UserDetails from './UserDetails';
 import UserStandings from './UserStandings';
-import * as React from 'react';
-import ScoreLogic from '../logic/ScoreLogic';
 import utils from '../../common/utils';
-
-const ReactPropTypes = React.PropTypes;
+import {DraftProps} from '../types/SharedProps';
+import {User, IndexedGolferScores, ChatMessage, Indexed} from '../types/Types';
 
 const NDAYS = constants.NDAYS;
 
-function getState(state, props) {
+export interface TourneyAppProps {
+  draft: DraftProps;
+  currentUser: User;
+  scores: IndexedGolferScores;
+  lastScoresUpdate: Date;
+  chatMessages?: ChatMessage[];
+  activeUsers: Indexed<number>;
+}
+
+interface TourneyAppState {
+  userDetailsUser: string;
+}
+
+function getState(state: TourneyAppState, props: TourneyAppProps) {
   return {
     userDetailsUser: state.userDetailsUser || props.currentUser._id
   };
 }
 
-class TourneyApp extends React.Component {
-  propTypes: {
-    currentUser: ReactPropTypes.object.isRequired,
-    scores: ReactPropTypes.object.isRequired,
-    draft: ReactPropTypes.object.isRequired,
-    chatMessages: ReactPropTypes.array
-  }
+class TourneyApp extends React.Component<TourneyAppProps, TourneyAppState> {
 
   constructor(props) {
     super(props);
@@ -37,7 +42,7 @@ class TourneyApp extends React.Component {
   }
 
   _getInitialState() {
-    return getState({}, this.props);
+    return getState({} as TourneyAppState, this.props);
   }
 
   render() {
@@ -47,23 +52,21 @@ class TourneyApp extends React.Component {
     );
 
     const scores = this.props.scores;
+
     const worstScoresPerDay = _.chain(NDAYS)
-      .times(function (day) {
+      .times((day) => {
         const worstScore = _.chain(scores)
-          .reject(function (s) {
-            return s.missedCuts[day];
-          })
-          .max(function (s) {
-            return s.scores[day];
-          })
+          .reject((s) => s.missedCuts[day])
+          .maxBy((s) => s.scores[day])
           .value();
+
         return {
           day: day,
           golfer: worstScore.golfer,
           score: worstScore.scores[day]
         };
       })
-      .first(function (s) {
+      .takeWhile(function (s) {
         // Assume 0 means they haven't started playing this day yet
         return s.score > 0;
       })
@@ -99,7 +102,7 @@ class TourneyApp extends React.Component {
         {!worstScoresPerDay.length ? null : (
           <GolfDraftPanel heading='Worst Scores of the Day'>
             <ul>
-              {_.map(worstScoresPerDay, function (s) {
+              {_.map(worstScoresPerDay, (s) => {
                 return (
                   <li key={s.day} className='list-unstyled'>
                     <b>Day {s.day + 1}</b>: {utils.toGolferScoreStr(s.score)}
@@ -121,9 +124,9 @@ class TourneyApp extends React.Component {
     );
   }
 
-  _onUserSelect = (user) => {
+  _onUserSelect = (userId: string) => {
     window.location.href = '#UserDetails';
-    this.setState({userDetailsUser: user});
+    this.setState({userDetailsUser: userId});
   }
 
 };

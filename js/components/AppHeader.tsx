@@ -5,7 +5,7 @@ import {User} from '../types/Types';
 export interface AppHeaderProps {
   tourneyName: string;
   currentUser: User;
-  drafting: boolean;
+  drafting?: boolean;
 }
 
 export default class AppHeader extends React.Component<AppHeaderProps, {}> {

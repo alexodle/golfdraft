@@ -8,16 +8,16 @@ import GolfDraftPanel from './GolfDraftPanel';
 import {DraftPick} from '../types/Types';
 
 export interface DraftHistoryProps {
-  selectedUserId: string;
+  selectedUserId?: string;
   draftPicks: DraftPick[];
-  onSelectionChange: (pid?: string) => void;
+  onSelectionChange?: (pid?: string) => void;
 }
 
 export default class DraftHistory extends React.Component<DraftHistoryProps, {}> {
 
   render() {
     const selectedUserId = this.props.selectedUserId;
-    const onPersonClick = this._onPersonClick;
+    const onPersonClick = this.props.onSelectionChange ? this._onPersonClick : null;
     let draftPicks = _.clone(this.props.draftPicks).reverse();
     let heading: JSX.Element | string;
 
@@ -44,14 +44,14 @@ export default class DraftHistory extends React.Component<DraftHistoryProps, {}>
           <table className='table'>
             <thead><tr><th>#</th><th>Pool User</th><th>Golfer</th></tr></thead>
             <tbody>
-              {_.map(draftPicks, function (p) {
+              {_.map(draftPicks, (p) => {
                 const userName = UserStore.getUser(p.user).name;
                 return (
                   <tr key={p.pickNumber}>
                     <td>{p.pickNumber + 1}</td>
                     <td>
                       {selectedUserId ? userName : (
-                        <a href='#DraftHistory' onClick={_.partial(onPersonClick, p.user)}>
+                        <a href='#DraftHistory' onClick={!onPersonClick ? null : _.partial(onPersonClick, p.user)}>
                           {userName}
                         </a>
                       )}

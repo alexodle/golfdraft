@@ -1,11 +1,9 @@
-'use strict';
-
 import AppDispatcher from '../dispatcher/AppDispatcher';
 import AppConstants from '../constants/AppConstants';
 
-const SettingsActions = {
+export default class SettingsActions {
 
-  setAppState: function (appState) {
+  static setAppState(appState) {
     AppDispatcher.handleViewAction({
       actionType: AppConstants.SET_APP_STATE,
       appState: appState
@@ -13,5 +11,3 @@ const SettingsActions = {
   }
 
 };
-
-export default SettingsActions;

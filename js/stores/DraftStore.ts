@@ -13,18 +13,17 @@ let _pickForUsers: string[] = [];
 
 let _pickList: string[] = null;
 let _pendingPickList: string[] = null;
-resetPickList();
 
 function resetPickList() {
-  _pickList = AppConstants.PROPERTY_LOADING;
-  _pendingPickList = _pickList;
+  _pickList = null;
+  _pendingPickList = null;
 }
 
 function getCurrentPickNumber() {
   return _picks.length;
 }
 
-function getCurrentPick() {
+function getCurrentPick(): DraftPickOrder {
   const pickNumber = getCurrentPickNumber();
   if (pickNumber === _pickOrder.length) {
     return null;
@@ -47,7 +46,7 @@ function addPick(golfer) {
 }
 
 function filterPicksFromPickLists() {
-  if (_pickList == AppConstants.PROPERTY_LOADING) return;
+  if (!_.isArray(_pickList)) return;
 
   const pickedGids = _.map(_picks, 'golfer');
   if (_pickList !== _pendingPickList) {

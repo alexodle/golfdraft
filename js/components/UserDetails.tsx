@@ -4,12 +4,12 @@ import * as React from 'react';
 import * as utils from '../../common/utils';
 import GolferStore from '../stores/GolferStore';
 import UserStore from '../stores/UserStore';
-import {User, DraftPick, UserScore} from '../types/Types';
+import {User, DraftPick, UserScore, IndexedUserScores} from '../types/Types';
 
 export interface UserDetailsProps {
   userId: string;
   draftPicks: DraftPick[];
-  userScores: { [key: string]: UserScore };
+  userScores: IndexedUserScores;
 }
 
 export default class UserDetails extends React.Component<UserDetailsProps, {}> {

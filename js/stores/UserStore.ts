@@ -4,12 +4,12 @@ import AppConstants from '../constants/AppConstants';
 import AppDispatcher from '../dispatcher/AppDispatcher';
 import Store from './Store';
 import UserActions from '../actions/UserActions';
-import {User} from '../types/Types';
+import {User, IndexedUsers, Indexed} from '../types/Types';
 
 let _currentUser: string = null;
-let _users: {[userId: string]: User} = null;
+let _users: IndexedUsers = null;
 let _isAdmin: boolean = false;
-let _activeUsers: {[userId: string]: number} = null;
+let _activeUsers: Indexed<number> = null; // active user counts by user id
 
 class UserStoreImpl extends Store {
   changeEvent() { return 'UserStore:change'; }
@@ -17,7 +17,7 @@ class UserStoreImpl extends Store {
   getUser(userId: string) { return _users[userId]; }
   getUserByName(name: string) { return _.find(_users, { name }); }
   isAdmin() { return _isAdmin; }
-  getAll() { return _.values(_users); }
+  getAll() { return _users; }
   getActive() { return _activeUsers; }
 }
 const UserStore = new UserStoreImpl();

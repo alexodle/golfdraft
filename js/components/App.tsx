@@ -1,6 +1,5 @@
-'use strict';
-
 import * as _ from 'lodash';
+import * as React from 'react';
 import AdminApp from './AdminApp';
 import AppHeader from './AppHeader';
 import AppSettingsStore from '../stores/AppSettingsStore';
@@ -8,15 +7,26 @@ import ChatStore from '../stores/ChatStore';
 import DraftApp from './DraftApp';
 import DraftStore from '../stores/DraftStore';
 import GolferStore from '../stores/GolferStore';
-import * as React from 'react';
-import * as Router from 'react-router-dom';
 import ScoreStore from '../stores/ScoreStore';
 import TourneyApp from './TourneyApp';
 import TourneyStore from '../stores/TourneyStore';
 import UserStore from '../stores/UserStore';
 import WhoIsYou from './WhoIsYou';
-
-const {Route, Switch, Redirect} = Router;
+import {DraftProps} from '../types/SharedProps';
+import {Route, Switch, Redirect} from 'react-router-dom';
+import {
+  ChatMessage,
+  DraftPick,
+  DraftPickOrder,
+  Golfer,
+  GolferScore,
+  Indexed,
+  IndexedGolfers,
+  IndexedGolferScores,
+  IndexedUsers,
+  Location,
+  User,
+} from '../types/Types';
 
 const RELEVANT_STORES = [
   AppSettingsStore,
@@ -26,7 +36,29 @@ const RELEVANT_STORES = [
   UserStore
 ];
 
-function getAppState() {
+interface AppState {
+  tourneyName: string;
+  currentUser?: User;
+  activeUsers: Indexed<number>;
+  golfers: IndexedGolfers;
+  users: IndexedUsers;
+  draft: DraftProps;
+  scores: IndexedGolferScores;
+  lastScoresUpdate: Date;
+  chatMessages?: ChatMessage[];
+  isAdmin: boolean;
+  isPaused: boolean;
+  allowClock: boolean;
+  draftHasStarted: boolean;
+  autoPickUsers: Indexed<string>;
+}
+
+interface ComponentProps extends AppState {
+  location: Location;
+  golfersRemaining: IndexedGolfers;
+}
+
+function getAppState(): AppState {
   return {
     tourneyName: TourneyStore.getTourneyName(),
     currentUser: UserStore.getCurrentUser(),
@@ -56,13 +88,13 @@ function getAppState() {
   };
 }
 
-function getGolfersRemaining(golfers, draftPicks) {
+function getGolfersRemaining(golfers: IndexedGolfers, draftPicks: DraftPick[]): IndexedGolfers {
   const pickedGolfers = _.map(draftPicks, 'golfer');
   const golfersRemaining = _.omit(golfers, pickedGolfers);
   return golfersRemaining;
 }
 
-class DraftWrapper extends React.Component {
+class DraftWrapper extends React.Component<ComponentProps, {}> {
 
   render() {
     const props = this.props;
@@ -71,11 +103,9 @@ class DraftWrapper extends React.Component {
         <AppHeader
           tourneyName={props.tourneyName}
           currentUser={props.currentUser}
-          location={props.location}
           drafting
         />
         <DraftApp
-          tourneyName={props.tourneyName}
           currentUser={props.currentUser}
           currentPick={props.draft.currentPick}
           isMyDraftPick={props.draft.isMyDraftPick}
@@ -97,7 +127,7 @@ class DraftWrapper extends React.Component {
 
 };
 
-class TourneyWrapper extends React.Component {
+class TourneyWrapper extends React.Component<ComponentProps, {}> {
 
   render() {
     const props = this.props;
@@ -106,10 +136,8 @@ class TourneyWrapper extends React.Component {
         <AppHeader
           tourneyName={props.tourneyName}
           currentUser={props.currentUser}
-          location={props.location}
         />
         <TourneyApp
-          tourneyName={props.tourneyName}
           currentUser={props.currentUser}
           scores={props.scores}
           draft={props.draft}
@@ -123,7 +151,7 @@ class TourneyWrapper extends React.Component {
 
 };
 
-class AdminWrapper extends React.Component {
+class AdminWrapper extends React.Component<ComponentProps, {}> {
 
   render() {
     const props = this.props;
@@ -132,16 +160,12 @@ class AdminWrapper extends React.Component {
         <AppHeader
           tourneyName={props.tourneyName}
           currentUser={props.currentUser}
-          location={props.location}
         />
         <AdminApp
           isAdmin={props.isAdmin}
-          currentUser={props.currentUser}
           currentPick={props.draft.currentPick}
           draftPicks={props.draft.draftPicks}
           isPaused={props.isPaused}
-          golfersRemaining={props.golfersRemaining}
-          activeUsers={props.activeUsers}
           allowClock={props.allowClock}
           draftHasStarted={props.draftHasStarted}
           users={props.users}
@@ -153,7 +177,9 @@ class AdminWrapper extends React.Component {
 
 };
 
-class AppNode extends React.Component {
+export interface AppNodeProps {}
+
+export default class AppNode extends React.Component<AppNodeProps, AppState> {
 
   constructor(props) {
     super(props);
@@ -165,15 +191,15 @@ class AppNode extends React.Component {
   }
 
   componentDidMount() {
-    _.each(RELEVANT_STORES, function (S) {
-      S.addChangeListener(this._onChange);
-    }, this);
+    _.each(RELEVANT_STORES, (s) => {
+      s.addChangeListener(this._onChange);
+    });
   }
 
   componentWillUnmount() {
-    _.each(RELEVANT_STORES, function (S) {
-      S.removeChangeListener(this._onChange);
-    }, this);
+    _.each(RELEVANT_STORES, (s) => {
+      s.removeChangeListener(this._onChange);
+    });
   }
 
   _requireCurrentUser(from) {
@@ -226,12 +252,4 @@ class AppNode extends React.Component {
     this.setState(getAppState());
   }
 
-};
-
-module.exports = {
-  AdminWrapper: AdminWrapper,
-  AppNode: AppNode,
-  DraftWrapper: DraftWrapper,
-  TourneyWrapper: TourneyWrapper,
-  WhoIsYou: WhoIsYou
 };

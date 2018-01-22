@@ -1,9 +1,7 @@
-'use strict';
-
 import * as _ from 'lodash';
 import AppActions from './actions/AppActions';
 import DraftActions from './actions/DraftActions';
-import DraftParser from './logic/DraftParser';
+import parseDraft from './logic/DraftParser';
 import ScoreActions from './actions/ScoreActions';
 import SettingsActions from './actions/SettingsActions';
 import UserActions from './actions/UserActions';
@@ -11,7 +9,7 @@ import UserActions from './actions/UserActions';
 /** Hydrates the app with data stamped on initial page load
 */
 function hydrate(seedData) {
-  const draft = DraftParser.parseDraft(seedData.draft);
+  const draft = parseDraft(seedData.draft);
 
   AppActions.setUsers(seedData.users);
   AppActions.setGolfers(seedData.golfers);
@@ -29,5 +27,5 @@ function hydrate(seedData) {
 }
 
 export default _.once(() => {
-  hydrate(window.golfDraftSeed);
+  hydrate((<any>window).golfDraftSeed);
 });

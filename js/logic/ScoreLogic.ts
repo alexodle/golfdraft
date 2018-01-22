@@ -1,23 +1,30 @@
-'use strict';
-
 import * as _ from 'lodash';
 import constants from '../../common/constants';
 import utils from '../../common/utils';
+import {
+  DraftPick,
+  DraftPickOrder,
+  Golfer,
+  GolferScore,
+  Indexed,
+  IndexedGolferScores,
+  IndexedUserScores,
+  User,
+  UserScore,
+} from '../types/Types';
 
 const NDAYS = constants.NDAYS;
 const MISSED_CUT = constants.MISSED_CUT;
 const NSCORES_PER_DAY = constants.NSCORES_PER_DAY;
 
-function getGolfersByUser(draftPicks) {
+function getGolfersByUser(draftPicks: DraftPick[]): Indexed<string[]> {
   return _.chain(draftPicks)
     .groupBy('user')
-    .transform(function (memo, picks, userId) {
-      memo[userId] = _.map(picks, 'golfer');
-    })
+    .mapValues((picks) => _.map(picks, 'golfer'))
     .value();
 }
 
-function userScore(userGolfers, scores, user) {
+function userScore(userGolfers: string[], scores: IndexedGolferScores, userId: string): UserScore {
   const scoresByGolfer = _.chain(userGolfers)
     .map(function (g) {
       return _.extend({}, scores[g], {
@@ -37,7 +44,7 @@ function userScore(userGolfers, scores, user) {
       })
       .value();
 
-    const usedScores = _.first(dayScores, NSCORES_PER_DAY);
+    const usedScores = _.take(dayScores, NSCORES_PER_DAY);
     return {
       day: day,
       allScores: dayScores,
@@ -49,23 +56,24 @@ function userScore(userGolfers, scores, user) {
   });
 
   return {
-    user: user,
+    user: userId,
     scoresByDay: scoresByDay,
     scoresByGolfer: scoresByGolfer,
-    total: _.sumBy(scoresByDay, 'total')
+    total: _.sumBy(scoresByDay, 'total'),
+    pickNumber: -1 // set later
   };
 }
 
-function worstScoreForDay(userScores, day) {
-  return _.chain(userScores)
-    .map('scores')
-    .map(day)
+function worstScoreForDay(golferScores: GolferScore[], day: number): number {
+  return _.chain(golferScores)
+    .map((gs) => gs.scores)
+    .map((scores) => scores[day])
     .reject(MISSED_CUT)
     .max()
     .value();
 }
 
-const ScoreLogic = {
+export default class ScoreLogic {
 
   /**
    * Calculates the overall score for each pool user in tournament. Scoring
@@ -79,29 +87,24 @@ const ScoreLogic = {
    * If the either of the top 2 scores contains a MISSED_CUT, then the worst
    * score of all golfers for the particular day will be used instead.
    */
-  calcUserScores: function (draftPicks, golferScores) {
+  static calcUserScores(draftPicks: DraftPick[], golferScores: IndexedGolferScores): IndexedUserScores {
     const golfersByUser = getGolfersByUser(draftPicks);
-    const draftPosByUser = _(draftPicks)
+    const draftPosByUser = _.chain(draftPicks)
       .groupBy('user')
-      .mapValues(function (dps) {
-        return _.min(dps, function (dp) {
-          return dp.pickNumber;
-        })
-        .pickNumber;
-      })
+      .mapValues((dps) => _.minBy(dps, (dp) => dp.pickNumber).pickNumber)
       .value();
 
     const userScores = _.chain(golfersByUser)
-      .map(function (golfers, user) {
-        return _.extend({},
-          userScore(golfers, golferScores, user),
-          { pickNumber: draftPosByUser[user] });
+      .map((golfers, user) => {
+        return _.extend({}, userScore(golfers, golferScores, user), {
+          pickNumber: draftPosByUser[user]
+        });
       })
       .keyBy('user')
       .value();
 
     return userScores;
-  },
+  }
 
   /**
    * Replaces missed cut scores with the worst score of any golfer for that
@@ -113,12 +116,13 @@ const ScoreLogic = {
    * which scores were actually the result of a missed cut instead of the
    * golfer actually shooting that particular score.
    */
-  fillMissedCutScores: function (userScores) {
+  static fillMissedCutScores(golferScores: GolferScore[]): GolferScore[] {
     const worstScores = _.chain(NDAYS)
       .range()
-      .map(_.partial(worstScoreForDay, userScores))
+      .map((day) => worstScoreForDay(golferScores, day))
       .value();
-    _.each(userScores, function (ps) {
+
+    _.each(golferScores, function (ps) {
       ps.missedCuts = _.map(ps.scores, function (s) {
         return s === MISSED_CUT;
       });
@@ -126,10 +130,8 @@ const ScoreLogic = {
         return ps.missedCuts[i] ? worstScores[i] : s;
       });
     });
-    return userScores;
+
+    return golferScores;
   }
 
 };
-
-
-export default ScoreLogic;

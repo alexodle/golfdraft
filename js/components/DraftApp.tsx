@@ -6,12 +6,20 @@ import ChatRoom from './ChatRoom';
 import DraftChooser from './DraftChooser';
 import DraftClock from './DraftClock';
 import DraftHistory from './DraftHistory';
-import DraftPickOrder from './DraftPickOrder';
+import DraftPickOrderView from './DraftPickOrderView';
 import DraftStatus from './DraftStatus';
 import GolfDraftPanel from './GolfDraftPanel';
 import PickListEditor from './PickListEditor';
 import {Link} from 'react-router';
-import {DraftPick, User, ChatMessage, Golfer} from '../types/Types';
+import {
+  ChatMessage,
+  DraftPick,
+  DraftPickOrder,
+  Golfer,
+  Indexed,
+  IndexedGolfers,
+  User,
+} from '../types/Types';
 
 const myTurnSound = new Audio(Assets.MY_TURN_SOUND);
 const pickMadeSound = new Audio(Assets.PICK_MADE_SOUND);
@@ -19,15 +27,15 @@ const pickMadeSound = new Audio(Assets.PICK_MADE_SOUND);
 export interface DraftAppProps {
   draftPicks: DraftPick[];
   isMyDraftPick: boolean;
-  golfersRemaining: {[key: string]: Golfer};
+  golfersRemaining: IndexedGolfers;
   syncedPickList: string[];
   pendingPickList: string[];
   currentUser: User;
   chatMessages: ChatMessage[];
-  activeUsers: {[userId: string]: number};
-  currentPick: DraftPick;
+  activeUsers: Indexed<number>;
+  currentPick?: DraftPickOrder;
   pickingForUsers: string[];
-  autoPickUsers: string[];
+  autoPickUsers: Indexed<string>;
   allowClock: boolean;
   draftHasStarted: boolean;
   isPaused: boolean;
@@ -189,7 +197,7 @@ export default class DraftApp extends React.Component<DraftAppProps, DraftAppSta
           <div className='col-md-4'>
             <GolfDraftPanel heading='Draft Order'>
               <a id='InlineDraftPickListEditor' />
-              <DraftPickOrder
+              <DraftPickOrderView
                 currentUser={this.props.currentUser}
                 currentPick={this.props.currentPick}
                 pickingForUsers={this.props.pickingForUsers}

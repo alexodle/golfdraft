@@ -1,7 +1,5 @@
-'use strict';
-
 // HACKHACK - CDN url is just placed on window for us
-const cdnUrl = window.golfDraftSeed.CDN_URL;
+const cdnUrl = (<any>window).golfDraftSeed.CDN_URL;
 
 export default {
   MY_TURN_SOUND: cdnUrl + '/assets/airplane_chime.wav',

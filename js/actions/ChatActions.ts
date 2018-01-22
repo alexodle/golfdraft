@@ -1,25 +1,23 @@
-'use strict';
-
 import AppDispatcher from '../dispatcher/AppDispatcher';
 import ChatConstants from '../constants/ChatConstants';
 
-const ChatActions = {
+export default class ChatActions {
 
-  setMessages: function (messages) {
+  static setMessages(messages) {
     AppDispatcher.handleServerAction({
       actionType: ChatConstants.SET_MESSAGES,
       messages: messages
     });
-  },
+  }
 
-  newMessage: function (message) {
+  static newMessage(message) {
     AppDispatcher.handleServerAction({
       actionType: ChatConstants.NEW_MESSAGE,
       message: message
     });
-  },
+  }
 
-  createMessage: function (message) {
+  static createMessage(message: string) {
     AppDispatcher.handleViewAction({
       actionType: ChatConstants.CREATE_MESSAGE,
       message: message
@@ -27,5 +25,3 @@ const ChatActions = {
   }
 
 };
-
-export default ChatActions;

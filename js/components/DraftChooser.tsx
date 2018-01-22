@@ -7,11 +7,11 @@ import GolferStore from '../stores/GolferStore';
 import * as React from 'react';
 import UserStore from '../stores/UserStore';
 import GolfDraftPanel from './GolfDraftPanel';
-import {Golfer, DraftPick, User} from '../types/Types';
+import {Golfer, IndexedGolfers, DraftPickOrder, User} from '../types/Types';
 
 export interface DraftChooserProps {
-  golfersRemaining: {[key: string]: Golfer};
-  currentPick: DraftPick;
+  golfersRemaining: IndexedGolfers;
+  currentPick: DraftPickOrder;
   syncedPickList: string[];
   currentUser: User;
 }
@@ -159,14 +159,14 @@ export default class DraftChooser extends React.Component<DraftChooserProps, Dra
   }
 
   _isLoading() {
-    return this.props.syncedPickList === AppConstants.PROPERTY_LOADING;
+    return !_.isArray(this.props.syncedPickList);
   }
 
   _isProxyPick() {
     return isProxyPick(this.props);
   }
 
-  _sortedGolfers(golfers: {[key: string]: Golfer}, sortKey: string): Golfer[]  {
+  _sortedGolfers(golfers: IndexedGolfers, sortKey: string): Golfer[]  {
     const isProxyPick = this._isProxyPick();
     if (sortKey === 'pickList') {
       if (isProxyPick) {

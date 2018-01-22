@@ -4,7 +4,7 @@ import 'font-awesome/css/font-awesome.css';
 import '../less/app.less';
 
 import * as $ from 'jquery';;
-import {AppNode} from './components/App.jsx';
+import AppNode from './components/App';
 import ChatActions from './actions/ChatActions';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';

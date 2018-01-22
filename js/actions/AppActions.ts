@@ -1,25 +1,23 @@
-'use strict';
-
 import AppDispatcher from '../dispatcher/AppDispatcher';
 import AppConstants from '../constants/AppConstants';
 
-const AppActions = {
+export default class AppActions {
 
-  setGolfers: function (golfers) {
+  static setGolfers(golfers) {
     AppDispatcher.handleViewAction({
       actionType: AppConstants.SET_GOLFERS,
       golfers: golfers
     });
-  },
+  }
 
-  setUsers: function (users) {
+  static setUsers(users) {
     AppDispatcher.handleViewAction({
       actionType: AppConstants.SET_USERS,
       users: users
     });
-  },
+  }
 
-  setTourneyName: function (tourneyName) {
+  static setTourneyName(tourneyName: string) {
     AppDispatcher.handleViewAction({
       actionType: AppConstants.SET_TOURNEY_NAME,
       tourneyName: tourneyName
@@ -27,5 +25,3 @@ const AppActions = {
   }
 
 };
-
-export default AppActions;

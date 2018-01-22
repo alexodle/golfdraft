@@ -5,7 +5,7 @@ import * as _ from 'lodash';
 import AppActions from './actions/AppActions';
 import ChatActions from './actions/ChatActions';
 import DraftActions from './actions/DraftActions';
-import DraftParser from './logic/DraftParser';
+import parseDraft from './logic/DraftParser';
 import ScoreActions from './actions/ScoreActions';
 import SettingsActions from './actions/SettingsActions';
 import socketio from 'socket.io-client';
@@ -16,7 +16,7 @@ import UserActions from './actions/UserActions';
 function startSocketUpdates() {
   const io = socketio.connect();
   io.on('change:draft', function (ev) {
-    const draft = DraftParser.parseDraft(ev.data);
+    const draft = parseDraft(ev.data);
     DraftActions.draftUpdate(draft);
   });
   io.on('change:scores', function (ev) {

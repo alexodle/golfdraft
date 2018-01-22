@@ -1,43 +1,42 @@
-'use strict';
-
 import AppDispatcher from '../dispatcher/AppDispatcher';
 import AppConstants from '../constants/AppConstants';
+import {Indexed} from '../types/Types';
 
-const UserActions = {
+export default class UserActions {
 
-  setCurrentUser: function (user) {
+  static setCurrentUser(userId: string) {
     AppDispatcher.handleViewAction({
       actionType: AppConstants.CURRENT_USER_CHANGE,
-      currentUser: user
+      currentUser: userId
     });
-  },
+  }
 
-  setCurrentUserSynced: function () {
+  static setCurrentUserSynced() {
     AppDispatcher.handleServerAction({
       actionType: AppConstants.CURRENT_USER_CHANGE_SYNCED
     });
-  },
+  }
 
   /**
    Same as setting the current user, except that this is specifically
    reserved for app startup
    */
-  hydrateCurrentUser: function (user) {
+  static hydrateCurrentUser(userId: string) {
     AppDispatcher.handleServerAction({
       actionType: AppConstants.CURRENT_USER_CHANGE,
-      currentUser: user,
+      currentUser: userId,
       doNotSync: true
     });
-  },
+  }
 
-  setIsAdmin: function (isAdmin) {
+  static setIsAdmin(isAdmin: boolean) {
     AppDispatcher.handleServerAction({
       actionType: AppConstants.SET_IS_ADMIN,
       isAdmin: isAdmin
     });
-  },
+  }
 
-  setActiveUsers: function (activeUsers) {
+  static setActiveUsers(activeUsers: Indexed<number>) {
     AppDispatcher.handleServerAction({
       actionType: AppConstants.SET_ACTIVE_USERS,
       activeUsers: activeUsers
@@ -45,5 +44,3 @@ const UserActions = {
   }
 
 };
-
-export default UserActions;

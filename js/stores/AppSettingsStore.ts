@@ -2,9 +2,9 @@ import * as _ from 'lodash';
 import AppConstants from '../constants/AppConstants';
 import AppDispatcher from '../dispatcher/AppDispatcher';
 import Store from './Store';
-import {AppState} from '../types/Types';
+import {AppSettings} from '../types/Types';
 
-let _appState: AppState = null;
+let _appState: AppSettings = null;
 
 class AppSettingsStoreImpl extends Store {
   changeEvent() { return 'AppSettingsStore:change'; }

@@ -1,11 +1,9 @@
-'use strict';
-
 import AppDispatcher from '../dispatcher/AppDispatcher';
 import ScoreConstants from '../constants/ScoreConstants';
 
-const ScoreActions = {
+export default class ScoreActions {
 
-  scoreUpdate: function (result) {
+  static scoreUpdate(result) {
     AppDispatcher.handleViewAction({
       actionType: ScoreConstants.SCORE_UPDATE,
       scores: result.scores,
@@ -14,5 +12,3 @@ const ScoreActions = {
   }
 
 };
-
-export default ScoreActions;

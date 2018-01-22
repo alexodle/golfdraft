@@ -1,15 +1,14 @@
-'use strict';
-
 import * as $ from 'jquery';
 import * as _ from 'lodash';
+import * as React from 'react';
 import DraftActions from '../actions/DraftActions';
 import DraftHistory from './DraftHistory';
 import DraftStatus from './DraftStatus';
 import DraftStore from '../stores/DraftStore';
-import * as React from 'react';
 import UserActions from '../actions/UserActions';
+import {IndexedUsers, Indexed, DraftPick, DraftPickOrder} from '../types/Types';
 
-function togglePause(isPaused) {
+function togglePause(isPaused: boolean) {
   $.ajax({
     url: '/admin/pause',
     type: 'PUT',
@@ -18,7 +17,7 @@ function togglePause(isPaused) {
   });
 }
 
-function toggleAllowClock(allowClock) {
+function toggleAllowClock(allowClock: boolean) {
   $.ajax({
     url: '/admin/allowClock',
     type: 'PUT',
@@ -27,7 +26,7 @@ function toggleAllowClock(allowClock) {
   });
 }
 
-function toggleDraftHasStarted(draftHasStarted) {
+function toggleDraftHasStarted(draftHasStarted: boolean) {
   $.ajax({
     url: '/admin/draftHasStarted',
     type: 'PUT',
@@ -36,7 +35,7 @@ function toggleDraftHasStarted(draftHasStarted) {
   });
 }
 
-function toggleAutoPick(userId, autoPick) {
+function toggleAutoPick(userId: string, autoPick: boolean) {
   $.ajax({
     url: '/admin/autoPickUsers',
     type: 'PUT',
@@ -45,15 +44,19 @@ function toggleAutoPick(userId, autoPick) {
   });
 }
 
-class PasswordInput extends React.Component {
+interface PasswordInputProps {
+}
+
+interface PasswordInputState {
+  password: string;
+  busy: boolean;
+}
+
+class PasswordInput extends React.Component<PasswordInputProps, PasswordInputState> {
 
   constructor(props) {
     super(props);
-    this.state = this._getInitialState();
-  }
-
-  _getInitialState() {
-    return {
+    this.state = {
       password: '',
       busy: false
     };
@@ -109,17 +112,26 @@ class PasswordInput extends React.Component {
 
 };
 
-class AdminApp extends React.Component {
+export interface AdminAppProps {
+  isAdmin: boolean;
+  draftHasStarted: boolean;
+  isPaused: boolean;
+  users: IndexedUsers;
+  autoPickUsers: Indexed<string>;
+  allowClock: boolean;
+  currentPick: DraftPickOrder;
+  draftPicks: DraftPick[];
+}
+
+export interface AdminAppState{
+  confirmingUndo: boolean;
+}
+
+class AdminApp extends React.Component<AdminAppProps, AdminAppState> {
 
   constructor(props) {
     super(props);
-    this.state = this._getInitialState();
-  }
-
-  _getInitialState() {
-    return {
-      confirmingUndo: false
-    };
+    this.state = { confirmingUndo: false };
   }
 
   render() {
@@ -180,7 +192,7 @@ class AdminApp extends React.Component {
         <div className='panel'>
           <div className='panel-body'>
             <ul className='list-unstyled'>
-              {_.map(props.users, function (user) {
+              {_.map(props.users, (user) => {
                 const checked = !!props.autoPickUsers[user._id];
                 return (
                   <li key={user._id}>

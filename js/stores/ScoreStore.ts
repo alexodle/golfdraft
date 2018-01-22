@@ -3,9 +3,9 @@ import AppDispatcher from '../dispatcher/AppDispatcher';
 import ScoreConstants from '../constants/ScoreConstants';
 import ScoreLogic from '../logic/ScoreLogic';
 import Store from './Store';
-import {GolferScore} from '../types/Types';
+import {IndexedGolferScores} from '../types/Types';
 
-let _scores: {[golferId: string]: GolferScore} = {};
+let _scores: IndexedGolferScores = {};
 let _lastUpdated: Date = null;
 
 class ScoreStoreImpl extends Store {

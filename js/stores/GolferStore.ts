@@ -2,9 +2,9 @@ import * as _ from 'lodash';
 import AppConstants from '../constants/AppConstants';
 import AppDispatcher from '../dispatcher/AppDispatcher';
 import Store from './Store';
-import {Golfer} from '../types/Types';
+import {Golfer, IndexedGolfers} from '../types/Types';
 
-let _golfers: {[key: string]: Golfer} = null;
+let _golfers: IndexedGolfers = null;
 
 class GolferStoreImpl extends Store {
   changeEvent() { return 'GolferStore:change'; }

@@ -4,17 +4,17 @@ import DraftStore from '../stores/DraftStore';
 import * as React from 'react';
 import UserStore from '../stores/UserStore';
 import GolfDraftPanel from './GolfDraftPanel';
-import {DraftPick, User} from '../types/Types';
+import {DraftPickOrder, User, Indexed} from '../types/Types';
 
 export interface DraftPickOrderProps {
   pickingForUsers: string[];
-  currentPick?: DraftPick;
+  currentPick?: DraftPickOrder;
   currentUser: User;
-  autoPickUsers: string[];
+  autoPickUsers: Indexed<string>;
   onUserSelected: (pid: string) => void;
 }
 
-export default class DraftPickOrder extends React.Component<DraftPickOrderProps, {}> {
+export default class DraftPickOrderView extends React.Component<DraftPickOrderProps, {}> {
 
   render() {
     const {pickingForUsers, currentPick, currentUser, autoPickUsers} = this.props;

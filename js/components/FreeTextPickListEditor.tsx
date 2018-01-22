@@ -4,6 +4,7 @@ import * as React from 'react';
 import DraftActions from '../actions/DraftActions';
 import GolferLogic from '../logic/GolferLogic';
 import GolferStore from '../stores/GolferStore';
+import {Indexed} from '../types/Types';
 
 const MIN_COEFF = 0.5;
 const TEXTAREA_PLACEHOLDER = "Sergio Garcia\nPhil Mickelson\nTiger Woods\nDustin Johnson\nJason Day\n...";
@@ -135,7 +136,7 @@ interface FreeTextPickListEditorState {
   text: string;
   isPosting: boolean;
   suggestions?: Suggestion[];
-  suggestionSelections: { [key: string]: SuggestionOption };
+  suggestionSelections: Indexed<SuggestionOption>;
   errorMessage?: string;
 }
 
@@ -261,7 +262,7 @@ export default class FreeTextPickListEditor extends React.Component<FreeTextPick
     this.setState({ text: ev.target.value });
   }
 
-  _setSuggestions(suggestions) {
+  _setSuggestions(suggestions: Suggestion[]) {
     const suggestionSelections = {};
     _.each(suggestions, function (suggestion) {
       let selection = suggestion.results[0];

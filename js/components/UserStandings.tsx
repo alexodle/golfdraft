@@ -4,10 +4,10 @@ import * as React from 'react';
 import * as utils from '../../common/utils';
 import GolferStore from '../stores/GolferStore';
 import UserStore from '../stores/UserStore';
-import {User, DraftPick, UserScore} from '../types/Types';
+import {User, DraftPick, IndexedUserScores} from '../types/Types';
 
 export interface UserStandingsProps {
-  userScores: { [key: string]: UserScore };
+  userScores: IndexedUserScores;
   onUserSelect: (pid: string) => void;
   currentUser: User;
   selectedUser: string;
@@ -84,7 +84,7 @@ export default class UserStandings extends React.Component<UserStandingsProps, {
     );
   }
 
-  _onUserSelect = (pid) => {
+  _onUserSelect = (pid: string) => {
     this.props.onUserSelect(pid);
   }
 

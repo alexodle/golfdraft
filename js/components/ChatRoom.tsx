@@ -5,7 +5,7 @@ import Assets from '../constants/Assets';
 import ChatActions from '../actions/ChatActions';
 import GolfDraftPanel from './GolfDraftPanel';
 import UserStore from '../stores/UserStore';
-import {User, ChatMessage} from '../types/Types';
+import {User, ChatMessage, Indexed} from '../types/Types';
 
 const BOT_NAME = 'DraftBot';
 
@@ -266,7 +266,7 @@ class Message extends React.PureComponent<MessageProps, {}> {
 
 export interface ChatRoomProps {
   messages: ChatMessage[];
-  activeUsers: {[userId: string]: number};
+  activeUsers: Indexed<number>;
   currentUser: User;
 }
 

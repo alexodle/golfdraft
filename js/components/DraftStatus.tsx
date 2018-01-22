@@ -2,10 +2,10 @@ import * as _ from 'lodash';
 import DraftActions from '../actions/DraftActions';
 import UserStore from '../stores/UserStore';
 import * as React from 'react';
-import {DraftPick} from '../types/Types';
+import {DraftPickOrder} from '../types/Types';
 
 export interface DraftStatusProps {
-  currentPick: DraftPick;
+  currentPick: DraftPickOrder;
 }
 
 export default class DraftStatus extends React.Component<DraftStatusProps, {}> {
