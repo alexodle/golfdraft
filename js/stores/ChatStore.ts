@@ -1,9 +1,9 @@
-import * as $ from 'jquery';
 import * as _ from 'lodash';
 import AppDispatcher from '../dispatcher/AppDispatcher';
 import ChatConstants from '../constants/ChatConstants';
 import Store from './Store';
 import {ChatMessage} from '../types/Types';
+import {postJson} from '../fetch';
 
 let _messages: ChatMessage[] = null;
 
@@ -43,7 +43,7 @@ AppDispatcher.register(function (payload) {
       // For now, fire and forget. If success, we will update the UI via
       // socket.io update.
       //
-      $.post('/chat/messages', { message: action.message });
+      postJson('/chat/messages', { message: action.message });
       break;
   }
 });

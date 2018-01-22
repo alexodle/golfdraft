@@ -1,10 +1,10 @@
-import * as $ from 'jquery';
 import * as _ from 'lodash';
 import * as React from 'react';
 import UserActions from '../actions/UserActions';
 import UserStore from '../stores/UserStore';
 import {Redirect} from 'react-router-dom';
 import {Location} from '../types/Types';
+import {postJson} from '../fetch';
 
 export interface WhoIsYouProps {
   location: Location;
@@ -110,23 +110,21 @@ export default class WhoIsYou extends React.Component<WhoIsYouProps, WhoIsYouSta
 
     this.setState({ isLoading: true, badAuth: false });
 
-    const xhr = $.post('/login', {
-      username: UserStore.getUser(this.state.selectedUser).username,
-      password: this.state.password
-    });
+    postJson('/login', {
+        username: UserStore.getUser(this.state.selectedUser).username,
+        password: this.state.password
+      })
+      .then(() => {
+        UserActions.setCurrentUser(this.state.selectedUser);
 
-    xhr.fail(() => {
-      this.setState({ isLoading: false, badAuth: true, password: '' });
-      (this.refs.passwordInput as HTMLInputElement).focus();
-    });
-
-    xhr.done(() => {
-      UserActions.setCurrentUser(this.state.selectedUser);
-
-      const locationState = this.props.location.state;
-      const redirectTo = (locationState && locationState.from) || '/';
-      this.setState({ redirectTo });
-    });
+        const locationState = this.props.location.state;
+        const redirectTo = (locationState && locationState.from) || '/';
+        this.setState({ redirectTo });
+      })
+      .catch(() => {
+        this.setState({ isLoading: false, badAuth: true, password: '' });
+        (this.refs.passwordInput as HTMLInputElement).focus();
+      });
   }
 
 };

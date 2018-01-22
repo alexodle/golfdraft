@@ -1,10 +1,10 @@
-import * as $ from 'jquery';
 import * as _ from 'lodash';
 import * as React from 'react';
 import DraftActions from '../actions/DraftActions';
 import GolferLogic from '../logic/GolferLogic';
 import GolferStore from '../stores/GolferStore';
 import {Indexed} from '../types/Types';
+import {postJson} from '../fetch';
 
 const MIN_COEFF = 0.5;
 const TEXTAREA_PLACEHOLDER = "Sergio Garcia\nPhil Mickelson\nTiger Woods\nDustin Johnson\nJason Day\n...";
@@ -291,22 +291,25 @@ export default class FreeTextPickListEditor extends React.Component<FreeTextPick
     this.setState({ isPosting: true });
 
     const data = { pickListNames: this._cleanedGolfers() };
-    $.post('/draft/pickList', data)
+    postJson('/draft/pickList', data)
 
-      .done((result) => {
+      .then((result) => {
         DraftActions.setPickList(result.pickList);
         this.props.onComplete();
       })
 
-      .fail((err) => {
-        if (err.status === 300) {
-          this._setSuggestions(err.responseJSON.suggestions);
+      .catch((err) => {
+        const resp = err.response as Response;
+        if (resp.status === 300) {
+          return resp.json()
+            .then((json) => this._setSuggestions(json.suggestions));
         } else {
           this.setState({
             isPosting: false,
             errorMessage: 'Failed to save pickList. Try again in a minute. If that doesn\'t work, contact Odle.'
           });
         }
+
         window.location.href = '#InlinePickListEditor';
       });
   }

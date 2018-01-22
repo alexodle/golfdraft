@@ -1,4 +1,3 @@
-import * as $ from 'jquery';
 import * as _ from 'lodash';
 import AppActions from './actions/AppActions';
 import ChatActions from './actions/ChatActions';

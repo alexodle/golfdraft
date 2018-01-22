@@ -1,4 +1,3 @@
-import * as $ from 'jquery';
 import * as _ from 'lodash';
 import * as React from 'react';
 import DraftActions from '../actions/DraftActions';
@@ -7,41 +6,22 @@ import DraftStatus from './DraftStatus';
 import DraftStore from '../stores/DraftStore';
 import UserActions from '../actions/UserActions';
 import {IndexedUsers, Indexed, DraftPick, DraftPickOrder} from '../types/Types';
+import {putJson, postJson, fetch, del, put} from '../fetch';
 
 function togglePause(isPaused: boolean) {
-  $.ajax({
-    url: '/admin/pause',
-    type: 'PUT',
-    contentType: 'application/json',
-    data: JSON.stringify({ isPaused: isPaused })
-  });
+  return putJson('/admin/pause', { isPaused });
 }
 
 function toggleAllowClock(allowClock: boolean) {
-  $.ajax({
-    url: '/admin/allowClock',
-    type: 'PUT',
-    contentType: 'application/json',
-    data: JSON.stringify({ allowClock: allowClock })
-  });
+  return putJson('/admin/allowClock', { allowClock });
 }
 
 function toggleDraftHasStarted(draftHasStarted: boolean) {
-  $.ajax({
-    url: '/admin/draftHasStarted',
-    type: 'PUT',
-    contentType: 'application/json',
-    data: JSON.stringify({ draftHasStarted: draftHasStarted })
-  });
+  return putJson('/admin/draftHasStarted', { draftHasStarted });
 }
 
 function toggleAutoPick(userId: string, autoPick: boolean) {
-  $.ajax({
-    url: '/admin/autoPickUsers',
-    type: 'PUT',
-    contentType: 'application/json',
-    data: JSON.stringify({ userId: userId, autoPick: autoPick })
-  });
+  return putJson('/admin/autoPickUsers', { userId, autoPick });
 }
 
 interface PasswordInputProps {
@@ -95,19 +75,10 @@ class PasswordInput extends React.Component<PasswordInputProps, PasswordInputSta
   _onSubmit = (ev) => {
     ev.preventDefault();
 
-    const that = this;
     this.setState({ busy: true });
-    $.ajax({
-      url: '/admin/login',
-      type: 'POST',
-      data: { password: this.state.password },
-      success() {
-        UserActions.setIsAdmin(true);
-      },
-      error() {
-        that.setState({ busy: false });
-      }
-    });
+    postJson('/admin/login', { password: this.state.password })
+      .then(() => UserActions.setIsAdmin(true))
+      .catch(() => this.setState({ busy: false }));
   }
 
 };
@@ -304,11 +275,7 @@ class AdminApp extends React.Component<AdminAppProps, AdminAppState> {
   }
 
   _onConfirmUndoLastPick = () => {
-    $.ajax({
-      url: '/admin/lastPick',
-      type: 'DELETE',
-      contentType: 'application/json'
-    });
+    del('/admin/lastPick');
     this._onCancelUndoLastPick();
   }
 
@@ -317,10 +284,7 @@ class AdminApp extends React.Component<AdminAppProps, AdminAppState> {
   }
 
   _forceRefresh() {
-    $.ajax({
-      url: '/admin/forceRefresh',
-      type: 'PUT'
-    });
+    put('/admin/forceRefresh');
   }
 
 };

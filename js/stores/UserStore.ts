@@ -1,10 +1,10 @@
-import * as $ from 'jquery';
 import * as _ from 'lodash';
 import AppConstants from '../constants/AppConstants';
 import AppDispatcher from '../dispatcher/AppDispatcher';
 import Store from './Store';
 import UserActions from '../actions/UserActions';
 import {User, IndexedUsers, Indexed} from '../types/Types';
+import {post} from '../fetch';
 
 let _currentUser: string = null;
 let _users: IndexedUsers = null;
@@ -37,11 +37,11 @@ AppDispatcher.register(function (payload) {
       _currentUser = action.currentUser;
 
       if (!_currentUser && !action.doNotSync) {
-        $.post('/logout')
-          .done(function () {
+        post('/logout')
+          .then(function () {
             UserActions.setCurrentUserSynced();
           })
-          .fail(function () {
+          .catch(function () {
             window.location.reload();
           });
       } else {

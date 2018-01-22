@@ -1,4 +1,3 @@
-import * as $ from 'jquery';
 import * as _ from 'lodash';
 import AppDispatcher from '../dispatcher/AppDispatcher';
 import AppConstants from '../constants/AppConstants';
@@ -6,6 +5,7 @@ import DraftConstants from '../constants/DraftConstants';
 import Store from './Store';
 import UserStore from './UserStore';
 import {DraftPick, DraftPickOrder} from '../types/Types';
+import {postJson, fetchJson, post} from '../fetch';
 
 let _picks: DraftPick[] = [];
 let _pickOrder: DraftPickOrder[] = [];
@@ -90,12 +90,12 @@ AppDispatcher.register(function (payload) {
       filterPicksFromPickLists();
 
       // TODO - Move to separate server sync
-      $.post('/draft/picks', pick)
-      .fail(function () {
-        // No real error handling here, just reload the page to make sure we
-        // don't get people in a weird state.
-        window.location.reload();
-      });
+      postJson('/draft/picks', pick)
+        .catch(function () {
+          // No real error handling here, just reload the page to make sure we
+          // don't get people in a weird state.
+          window.location.reload();
+        });
 
       DraftStore.emitChange();
       break;
@@ -104,9 +104,12 @@ AppDispatcher.register(function (payload) {
       const partialPick = getCurrentPick();
 
       // TODO - Move to separate server sync
-      $.post('/draft/pickPickListGolfer', {
-        fail: () => window.location.reload()
-      });
+      post('/draft/pickPickListGolfer')
+        .catch(function () {
+          // No real error handling here, just reload the page to make sure we
+          // don't get people in a weird state.
+          window.location.reload();
+        });
       break;
 
     case DraftConstants.DRAFT_UPDATE:
@@ -137,15 +140,15 @@ AppDispatcher.register(function (payload) {
       const currentUser = UserStore.getCurrentUser();
       if (currentUser) {
         // TODO - Move to separate server sync
-        $.get('/draft/pickList')
-        .done(function (data) {
-          if (data.userId === currentUser._id) {
-            _pickList = data.pickList;
-            _pendingPickList = _pickList;
-            filterPicksFromPickLists();
-            DraftStore.emitChange();
-          }
-        });
+        fetchJson('/draft/pickList')
+          .then(function (data) {
+            if (data.userId === currentUser._id) {
+              _pickList = data.pickList;
+              _pendingPickList = _pickList;
+              filterPicksFromPickLists();
+              DraftStore.emitChange();
+            }
+          });
       }
       break;
 
@@ -164,8 +167,8 @@ AppDispatcher.register(function (payload) {
 
       // TODO - Move to separate server sync
       const data = { pickList: _pickList };
-      $.post('/draft/pickList', data)
-        .fail(function () {
+      postJson('/draft/pickList', data)
+        .catch(function () {
           window.location.reload();
         });
 
