@@ -1,4 +1,4 @@
-import constants from '../../common/constants';
+import * as constants from '../../common/constants';
 import {Golfer} from '../types/Types';
 
 const UNKNOWN_WGR = constants.UNKNOWN_WGR;

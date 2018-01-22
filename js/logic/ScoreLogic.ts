@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
-import constants from '../../common/constants';
-import utils from '../../common/utils';
+import * as constants from '../../common/constants';
+import * as utils from '../../common/utils';
 import {
   DraftPick,
   DraftPickOrder,

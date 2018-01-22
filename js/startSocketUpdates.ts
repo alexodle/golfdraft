@@ -1,5 +1,3 @@
-'use strict';
-
 import * as $ from 'jquery';
 import * as _ from 'lodash';
 import AppActions from './actions/AppActions';
@@ -8,7 +6,7 @@ import DraftActions from './actions/DraftActions';
 import parseDraft from './logic/DraftParser';
 import ScoreActions from './actions/ScoreActions';
 import SettingsActions from './actions/SettingsActions';
-import socketio from 'socket.io-client';
+import * as socketio from 'socket.io-client';
 import UserActions from './actions/UserActions';
 
 /** Start listening for app-wide socket.io updates
