@@ -1,6 +1,12 @@
 // fetch polyfill
 import 'whatwg-fetch';
 
+import * as _ from 'lodash';
+
+function ensureCredentials(init?: RequestInit): RequestInit {
+  return _.extend({ credentials: "same-origin" }, init);
+}
+
 function ensureSuccess(resp: Response): Response {
   if (resp.ok) return resp;
 
@@ -10,13 +16,16 @@ function ensureSuccess(resp: Response): Response {
 }
 
 function _fetch(url: string, init?: RequestInit) {
-  return window.fetch(url, init)
+  return window.fetch(url, ensureCredentials(init))
     .then(ensureSuccess);
 }
 
 function _fetchJson(url: string, init?: RequestInit) {
   return _fetch(url, init)
-    .then((resp) => resp.json());
+    .then((resp) => {
+      if (resp.json) return resp.json();
+      return null;
+    });
 }
 
 export function fetch(url: string, init?: RequestInit) {
@@ -24,10 +33,7 @@ export function fetch(url: string, init?: RequestInit) {
 }
 
 export function del(url: string) {
-  return _fetch(url, {
-    method: "DELETE",
-    credentials: "same-origin"
-  });
+  return _fetch(url, { method: "DELETE" });
 }
 
 export function fetchJson(url) {
@@ -35,10 +41,7 @@ export function fetchJson(url) {
 }
 
 export function post(url: string) {
-  return _fetchJson(url, {
-    method: "POST",
-    credentials: "same-origin"
-  });
+  return _fetchJson(url, { method: "POST" });
 }
 
 export function postJson(url, data) {
@@ -47,16 +50,12 @@ export function postJson(url, data) {
     body: JSON.stringify(data),
     headers: {
       "Content-Type": "application/json"
-    },
-    credentials: "same-origin"
+    }
   });
 }
 
 export function put(url) {
-  return _fetchJson(url, {
-    method: "PUT",
-    credentials: "same-origin"
-  });
+  return _fetchJson(url, { method: "PUT" });
 }
 
 export function putJson(url, data) {
@@ -65,7 +64,6 @@ export function putJson(url, data) {
     body: JSON.stringify(data),
     headers: {
       "Content-Type": "application/json"
-    },
-    credentials: "same-origin"
+    }
   });
 }
