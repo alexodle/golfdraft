@@ -3,6 +3,7 @@
 const _ = require('lodash');
 const access = require('./access');
 const app = require('./expressApp');
+const requireSession = require('./authMiddleware').requireSession;
 const bodyParser = require('body-parser');
 const chatBot = require('./chatBot');
 const compression = require('compression');
@@ -11,13 +12,13 @@ const exphbs  = require('express-handlebars');
 const express = require('express');
 const io = require('./socketIO');
 const logfmt = require("logfmt");
-const User = require('./models').User;
 const mongooseUtil = require('./mongooseUtil');
 const passport = require('passport');
 const Promise = require('promise');
 const redis = require("./redis");
 const session = require('express-session');
 const tourneyConfigReader = require('./tourneyConfigReader');
+const User = require('./models').User;
 const UserAccess = require('./userAccess');
 const utils = require('../common/utils');
 
@@ -192,7 +193,7 @@ function defineRoutes() {
     res.sendStatus(200);
   });
 
-  app.get('/draft/pickList', passport.authenticate('session'), function (req, res) {
+  app.get('/draft/pickList', requireSession(), function (req, res) {
     const user = req.user;
 
     access.getPickList(user._id)
@@ -208,7 +209,7 @@ function defineRoutes() {
       });
   });
 
-  app.post('/draft/pickList', passport.authenticate('session'), function (req, res) {
+  app.post('/draft/pickList', requireSession(), function (req, res) {
     const body = req.body;
     const user = req.user;
 
@@ -243,7 +244,7 @@ function defineRoutes() {
     return promise;
   });
 
-  app.put('/draft/autoPick', passport.authenticate('session'), function (req, res) {
+  app.put('/draft/autoPick', requireSession(), function (req, res) {
     const body = req.body;
     const user = req.user;
 
@@ -251,7 +252,7 @@ function defineRoutes() {
     return onAppStateUpdate(req, res, access.updateAutoPick(user._id, autoPick));
   });
 
-  app.post('/draft/picks', passport.authenticate('session'), function (req, res) {
+  app.post('/draft/picks', requireSession(), function (req, res) {
     const body = req.body;
     const user = req.user;
 
@@ -273,7 +274,7 @@ function defineRoutes() {
     });
   });
 
-  app.post('/draft/pickPickListGolfer', passport.authenticate('session'), function (req, res) {
+  app.post('/draft/pickPickListGolfer', requireSession(), function (req, res) {
     const body = req.body;
     const user = req.user;
 
@@ -293,7 +294,7 @@ function defineRoutes() {
 
   // ADMIN FUNCTIONALITY
 
-  app.post('/admin/login', passport.authenticate('session'), function (req, res) {
+  app.post('/admin/login', requireSession(), function (req, res) {
     if (req.body.password !== config.admin_password) {
       res.status(401).send('Bad password');
       return;
@@ -310,7 +311,7 @@ function defineRoutes() {
     });
   });
 
-  app.put('/admin/autoPickUsers', passport.authenticate('session'), function (req, res) {
+  app.put('/admin/autoPickUsers', requireSession(), function (req, res) {
     if (!req.session.isAdmin) {
       res.status(401).send('Only can admin can pause the draft');
       return;
@@ -321,7 +322,7 @@ function defineRoutes() {
     return onAppStateUpdate(req, res, access.updateAutoPick(userId, autoPick));
   });
 
-  app.put('/admin/pause', passport.authenticate('session'), function (req, res) {
+  app.put('/admin/pause', requireSession(), function (req, res) {
     if (!req.session.isAdmin) {
       res.status(401).send('Only can admin can pause the draft');
       return;
@@ -331,7 +332,7 @@ function defineRoutes() {
     return onAppStateUpdate(req, res, access.updateAppState({ isDraftPaused: isDraftPaused }));
   });
 
-  app.put('/admin/allowClock', passport.authenticate('session'), function (req, res) {
+  app.put('/admin/allowClock', requireSession(), function (req, res) {
     if (!req.session.isAdmin) {
       res.status(401).send('Only can admin can toggle clock');
       return;
@@ -341,7 +342,7 @@ function defineRoutes() {
     return onAppStateUpdate(req, res, access.updateAppState({ allowClock: allowClock }));
   });
 
-  app.put('/admin/draftHasStarted', passport.authenticate('session'), function (req, res) {
+  app.put('/admin/draftHasStarted', requireSession(), function (req, res) {
     if (!req.session.isAdmin) {
       res.status(401).send('Only can admin can toggle draft status');
       return;
@@ -351,7 +352,7 @@ function defineRoutes() {
     return onAppStateUpdate(req, res, access.updateAppState({ draftHasStarted: draftHasStarted }));
   });
 
-  app.delete('/admin/lastpick', passport.authenticate('session'), function (req, res) {
+  app.delete('/admin/lastpick', requireSession(), function (req, res) {
     if (!req.session.isAdmin) {
       res.status(401).send('Only can admin can undo picks');
       return;
@@ -371,7 +372,7 @@ function defineRoutes() {
     });
   });
 
-  app.put('/admin/forceRefresh', passport.authenticate('session'), function (req, res) {
+  app.put('/admin/forceRefresh', requireSession(), function (req, res) {
     if (!req.session.isAdmin) {
       res.status(401).send('Only can admin can force refreshes');
       return;

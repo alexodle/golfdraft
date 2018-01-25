@@ -3,9 +3,9 @@
 const _ = require('lodash');
 const access = require('./access');
 const app = require('./expressApp');
-const passport = require('passport');
+const requireSession = require('./authMiddleware').requireSession;
 
-app.get('/chat/messages', passport.authenticate('session'), function (req, res) {
+app.get('/chat/messages', requireSession(), function (req, res) {
   access.getChatMessages()
   .then(function (messages) {
     res.status(200).send(messages);
@@ -15,7 +15,7 @@ app.get('/chat/messages', passport.authenticate('session'), function (req, res) 
   });
 });
 
-app.post('/chat/messages', passport.authenticate('session'), function (req, res) {
+app.post('/chat/messages', requireSession(), function (req, res) {
   const body = req.body;
   const user = req.user;
 
