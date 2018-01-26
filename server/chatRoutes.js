@@ -7,12 +7,12 @@ const requireSession = require('./authMiddleware').requireSession;
 
 app.get('/chat/messages', requireSession(), function (req, res) {
   access.getChatMessages()
-  .then(function (messages) {
-    res.status(200).send(messages);
-  })
-  .catch(function (err) {
-    res.status(500).send(err);
-  });
+    .then(function (messages) {
+      res.status(200).send(messages);
+    })
+    .catch(function (err) {
+      res.status(500).send(err);
+    });
 });
 
 app.post('/chat/messages', requireSession(), function (req, res) {
@@ -29,10 +29,10 @@ app.post('/chat/messages', requireSession(), function (req, res) {
     message: body.message
   };
   access.createChatMessage(message)
-  .then(function () {
-    res.sendStatus(201);
-  })
-  .catch(function (err) {
-    res.status(500).send(err);
-  });
+    .then(function () {
+      res.sendStatus(201);
+    })
+    .catch(function (err) {
+      res.status(500).send(err);
+    });
 });

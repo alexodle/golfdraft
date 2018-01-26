@@ -276,7 +276,7 @@ function defineRoutes() {
 
   app.post('/draft/pickPickListGolfer', requireSession(), function (req, res) {
     const body = req.body;
-    const user = req.user;
+    const currentUuser = req.user;
 
     const forUser = body.user;
     const pickNumber = body.pickNumber;
@@ -287,7 +287,7 @@ function defineRoutes() {
         return access.makePickListPick(forUser, pickNumber);
       },
       broadcastPickMessage: function (spec) {
-        return chatBot.broadcastProxyPickListPickMessage(forUser, spec.pick, spec.draft);
+        return chatBot.broadcastProxyPickListPickMessage(currentUuser, spec.pick, spec.draft);
       }
     });
   });
