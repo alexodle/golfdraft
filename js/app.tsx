@@ -4,13 +4,11 @@ import 'font-awesome/css/font-awesome.css';
 import '../less/app.less';
 
 import AppNode from './components/App';
-import ChatActions from './actions/ChatActions';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import {BrowserRouter, Route} from 'react-router-dom';
 import hydrate from './hydrate';
 import startSocketUpdates from './startSocketUpdates';
-import {fetchJson} from './fetch';
 
 function render(rootNode: Element) {
   // hydrate BEFORE rendering
@@ -29,12 +27,6 @@ function render(rootNode: Element) {
 
   // Begin listening for live socket updates
   startSocketUpdates();
-
-  // Lazily get chat messages
-  //
-  // TODO - move to separate server sync
-  fetchJson('/chat/messages')
-    .then(ChatActions.setMessages);
 }
 
 const node = document.getElementById('golfdraftapp');

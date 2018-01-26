@@ -162,7 +162,7 @@ export default class PickListEditor extends React.Component<PickListEditorProps,
 
   _getDisplayPickList() {
     const pendingPickList = this.props.pendingPickList;
-    return !_.isEmpty(pendingPickList) ? [] : _.chain(this.props.golfersRemaining)
+    return !_.isEmpty(pendingPickList) ? pendingPickList : _.chain(this.props.golfersRemaining)
       .sortBy(['wgr', 'name'])
       .map('_id')
       .value();

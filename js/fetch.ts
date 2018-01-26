@@ -23,8 +23,11 @@ function _fetch(url: string, init?: RequestInit) {
 function _fetchJson(url: string, init?: RequestInit) {
   return _fetch(url, init)
     .then((resp) => {
-      if (resp.json) return resp.json();
-      return null;
+      if (!resp.json) return null;
+      return resp.json()
+        .catch((err) => {
+          console.debug(err);
+        });
     });
 }
 

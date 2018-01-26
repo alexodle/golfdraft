@@ -1,9 +1,12 @@
 import * as _ from 'lodash';
+import AppConstants from '../constants/AppConstants';
 import AppDispatcher from '../dispatcher/AppDispatcher';
+import ChatActions from '../actions/ChatActions';
 import ChatConstants from '../constants/ChatConstants';
 import Store from './Store';
+import UserStore from './UserStore';
 import {ChatMessage} from '../types/Types';
-import {postJson} from '../fetch';
+import {postJson, fetchJson} from '../fetch';
 
 let _messages: ChatMessage[] = null;
 
@@ -18,6 +21,14 @@ AppDispatcher.register(function (payload) {
   const action = payload.action;
 
   switch(action.actionType) {
+
+    case AppConstants.CURRENT_USER_CHANGE_SYNCED:
+      const currentUser = UserStore.getCurrentUser();
+      if (currentUser) {
+        fetchJson('/chat/messages')
+          .then(ChatActions.setMessages);
+      }
+      break;
 
     case ChatConstants.SET_MESSAGES:
       _messages = _.sortBy(action.messages, 'date');

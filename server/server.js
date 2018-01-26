@@ -190,7 +190,7 @@ function defineRoutes() {
   app.post('/logout', function (req, res) {
     UserAccess.onUserLogout(req.session.id);
     req.logout();
-    res.sendStatus(200);
+    res.status(200).send({ 'username': null });
   });
 
   app.get('/draft/pickList', requireSession(), function (req, res) {
@@ -307,7 +307,7 @@ function defineRoutes() {
         res.status(500).send(err);
         return;
       }
-      res.sendStatus(200);
+      res.status(200).send({ username: req.user.username, isAdmin: true });
     });
   });
 
@@ -379,7 +379,7 @@ function defineRoutes() {
     }
 
     io.sockets.emit('action:forcerefresh');
-    res.sendStatus(200);
+    res.status(200).send({ forceRefresh: true });
   });
 }
 
@@ -457,7 +457,6 @@ function ensureDraftIsRunning(req, res) {
 
 function handlePick(spec) {
   const {res, makePick, broadcastPickMessage, force} = spec;
-  let pick = null;
 
   const promise = !force ? ensureDraftIsRunning() : Promise.resolve();
   return promise
@@ -475,16 +474,15 @@ function handlePick(spec) {
 
       throw err;
     })
-    .then(function (_pick) {
-      pick = _pick;
+    .then(function (pick) {
       if (res) {
-        res.sendStatus(200);
+        res.status(200).send({ pick });
       }
-      return access.getDraft();
-    })
-    .then(function (draft) {
-      updateClients(draft);
-      return broadcastPickMessage({ pick, draft });
+      return access.getDraft()
+        .then(function (draft) {
+          updateClients(draft);
+          return broadcastPickMessage({ pick, draft });
+        });
     })
     .then(ensureNextAutoPick)
     .catch(function (err) {
@@ -501,8 +499,6 @@ function onAppStateUpdate(req, res, promise) {
       throw NOT_AN_ERROR; // skip next steps
     })
     .then(function () {
-      res.sendStatus(200);
-
       // App state will affect whether or not we should be running auto picks
       // SET AND FORGET
       ensureNextAutoPick();
@@ -510,8 +506,9 @@ function onAppStateUpdate(req, res, promise) {
       return access.getAppState();
     })
     .then(function (appState) {
+      res.status(200).send({ appState });
       io.sockets.emit('change:appstate', {
-        data: { appState: appState }
+        data: { appState }
       });
     })
     .catch(function (err) {
