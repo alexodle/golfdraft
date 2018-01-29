@@ -1,0 +1,29 @@
+import config from './config';
+import * as mongoose from 'mongoose';
+
+(<any>mongoose).Promise = Promise;
+
+if (!config.prod) {
+  mongoose.set('debug', true);
+}
+
+export function connect() {
+  mongoose.connect(config.mongo_url);
+
+  return new Promise(function (fulfill, reject) {
+    mongoose.connection.once('open', function () {
+      fulfill();
+    });
+    mongoose.connection.once('error', function (err) {
+      reject(err);
+    });
+  });
+}
+
+export function close() {
+  mongoose.connection.close();
+}
+
+export const connection = mongoose.connection;
+
+export { mongoose };

@@ -5,7 +5,7 @@ import DraftActions from '../actions/DraftActions';
 import FreeTextPickListEditor from './FreeTextPickListEditor';
 import GolferLogic from '../logic/GolferLogic';
 import GolferStore from '../stores/GolferStore';
-import {IndexedGolfers} from '../types/Types';
+import {IndexedGolfers} from '../types/ClientTypes';
 
 export interface PickListEditorProps {
   syncedPickList: string[];

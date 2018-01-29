@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import * as moment from 'moment';
 import * as React from 'react';
 import ChatRoom from './ChatRoom';
-import * as constants from '../../common/constants';
+import constants from '../../common/constants';
 import GolfDraftPanel from './GolfDraftPanel';
 import GolferLogic from '../logic/GolferLogic';
 import GolferStore from '../stores/GolferStore';
@@ -11,7 +11,7 @@ import UserDetails from './UserDetails';
 import UserStandings from './UserStandings';
 import * as utils from '../../common/utils';
 import {DraftProps} from '../types/SharedProps';
-import {User, IndexedGolferScores, ChatMessage, Indexed} from '../types/Types';
+import {User, IndexedGolferScores, ChatMessage, Indexed} from '../types/ClientTypes';
 
 const NDAYS = constants.NDAYS;
 

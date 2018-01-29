@@ -19,7 +19,7 @@ import {
   Indexed,
   IndexedGolfers,
   User,
-} from '../types/Types';
+} from '../types/ClientTypes';
 
 const myTurnSound = new Audio(Assets.MY_TURN_SOUND);
 const pickMadeSound = new Audio(Assets.PICK_MADE_SOUND);

@@ -5,7 +5,7 @@ import DraftHistory from './DraftHistory';
 import DraftStatus from './DraftStatus';
 import DraftStore from '../stores/DraftStore';
 import UserActions from '../actions/UserActions';
-import {IndexedUsers, Indexed, DraftPick, DraftPickOrder} from '../types/Types';
+import {IndexedUsers, Indexed, DraftPick, DraftPickOrder} from '../types/ClientTypes';
 import {putJson, postJson, fetch, del, put} from '../fetch';
 
 function togglePause(isPaused: boolean) {

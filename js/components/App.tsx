@@ -26,7 +26,7 @@ import {
   IndexedUsers,
   Location,
   User,
-} from '../types/Types';
+} from '../types/ClientTypes';
 
 const RELEVANT_STORES = [
   AppSettingsStore,

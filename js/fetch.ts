@@ -17,18 +17,20 @@ function ensureSuccess(resp: Response): Response {
 
 function _fetch(url: string, init?: RequestInit) {
   return window.fetch(url, ensureCredentials(init))
-    .then(ensureSuccess);
-}
-
-function _fetchJson(url: string, init?: RequestInit) {
-  return _fetch(url, init)
+    .then(ensureSuccess)
     .then((resp) => {
       if (!resp.json) return null;
-      return resp.json()
-        .catch((err) => {
-          console.debug(err);
-        });
-    });
+      try {
+        return resp.json()
+          .catch((err) => {
+            console.debug(err);
+            return null;
+          });
+      } catch (e) {
+        console.debug(e);
+        return null;
+      }
+    })
 }
 
 export function fetch(url: string, init?: RequestInit) {
@@ -36,19 +38,15 @@ export function fetch(url: string, init?: RequestInit) {
 }
 
 export function del(url: string) {
-  return _fetch(url, { method: "DELETE" });
-}
-
-export function fetchJson(url) {
-  return _fetchJson(url);
+  return fetch(url, { method: "DELETE" });
 }
 
 export function post(url: string) {
-  return _fetchJson(url, { method: "POST" });
+  return fetch(url, { method: "POST" });
 }
 
 export function postJson(url, data) {
-  return _fetchJson(url, {
+  return fetch(url, {
     method: "POST",
     body: JSON.stringify(data),
     headers: {
@@ -58,11 +56,11 @@ export function postJson(url, data) {
 }
 
 export function put(url) {
-  return _fetchJson(url, { method: "PUT" });
+  return fetch(url, { method: "PUT" });
 }
 
 export function putJson(url, data) {
-  return _fetchJson(url, {
+  return fetch(url, {
     method: "PUT",
     body: JSON.stringify(data),
     headers: {

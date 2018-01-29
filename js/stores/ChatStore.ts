@@ -5,8 +5,8 @@ import ChatActions from '../actions/ChatActions';
 import ChatConstants from '../constants/ChatConstants';
 import Store from './Store';
 import UserStore from './UserStore';
-import {ChatMessage} from '../types/Types';
-import {postJson, fetchJson} from '../fetch';
+import {ChatMessage} from '../types/ClientTypes';
+import {postJson, fetch} from '../fetch';
 
 let _messages: ChatMessage[] = null;
 
@@ -25,7 +25,7 @@ AppDispatcher.register(function (payload) {
     case AppConstants.CURRENT_USER_CHANGE_SYNCED:
       const currentUser = UserStore.getCurrentUser();
       if (currentUser) {
-        fetchJson('/chat/messages')
+        fetch('/chat/messages')
           .then(ChatActions.setMessages);
       }
       break;
@@ -57,6 +57,8 @@ AppDispatcher.register(function (payload) {
       postJson('/chat/messages', { message: action.message });
       break;
   }
+
+  return true;
 });
 
 export default ChatStore;

@@ -4,8 +4,8 @@ import AppConstants from '../constants/AppConstants';
 import DraftConstants from '../constants/DraftConstants';
 import Store from './Store';
 import UserStore from './UserStore';
-import {DraftPick, DraftPickOrder} from '../types/Types';
-import {postJson, fetchJson, post} from '../fetch';
+import {DraftPick, DraftPickOrder} from '../types/ClientTypes';
+import {postJson, fetch, post} from '../fetch';
 
 let _picks: DraftPick[] = [];
 let _pickOrder: DraftPickOrder[] = [];
@@ -140,7 +140,7 @@ AppDispatcher.register(function (payload) {
       const currentUser = UserStore.getCurrentUser();
       if (currentUser) {
         // TODO - Move to separate server sync
-        fetchJson('/draft/pickList')
+        fetch('/draft/pickList')
           .then(function (data) {
             if (data.userId === currentUser._id) {
               _pickList = data.pickList;

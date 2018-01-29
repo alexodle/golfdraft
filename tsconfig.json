@@ -2,11 +2,18 @@
     "compilerOptions": {
         "alwaysStrict": true,
         "module": "commonjs",
-        "target": "es6",
-        "jsx": "react"
+        "target": "es2015",
+        "jsx": "react",
+        "outDir": "tsDist"
     },
     "include": [
         "./js/**/*",
         "./common/**/*"
+    ],
+    "exclude": [
+        "./node_modules/**/*",
+        "./build/**/*",
+        "./buildd/**/*",
+        "./.git/**/*"
     ]
 }

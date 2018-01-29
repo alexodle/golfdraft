@@ -4,7 +4,7 @@ import * as React from 'react';
 import * as utils from '../../common/utils';
 import GolferStore from '../stores/GolferStore';
 import UserStore from '../stores/UserStore';
-import {User, DraftPick, IndexedUserScores} from '../types/Types';
+import {User, DraftPick, IndexedUserScores} from '../types/ClientTypes';
 
 export interface UserStandingsProps {
   userScores: IndexedUserScores;

@@ -3,7 +3,7 @@ import AppConstants from '../constants/AppConstants';
 import AppDispatcher from '../dispatcher/AppDispatcher';
 import Store from './Store';
 import UserActions from '../actions/UserActions';
-import {User, IndexedUsers, Indexed} from '../types/Types';
+import {User, IndexedUsers, Indexed} from '../types/ClientTypes';
 import {post} from '../fetch';
 
 let _currentUser: string = null;

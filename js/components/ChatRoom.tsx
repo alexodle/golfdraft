@@ -5,7 +5,7 @@ import Assets from '../constants/Assets';
 import ChatActions from '../actions/ChatActions';
 import GolfDraftPanel from './GolfDraftPanel';
 import UserStore from '../stores/UserStore';
-import {User, ChatMessage, Indexed} from '../types/Types';
+import {User, ChatMessage, Indexed} from '../types/ClientTypes';
 
 const BOT_NAME = 'DraftBot';
 
@@ -291,7 +291,7 @@ export default class ChatRoom extends React.PureComponent<ChatRoomProps, {}> {
     if (newMessagesLength > prevMessagesLength) {
       const myTagStr = SPECIFIC_TAG.replace("{{name}}", this.props.currentUser.name);
       const addedMessages = this.props.messages.slice(prevMessagesLength, newMessagesLength);
-      const tagsMe = _.some(addedMessages, function (msg) {
+      const tagsMe = _.some(addedMessages, (msg) => {
         return msg.message.includes(myTagStr);
       });
       if (tagsMe) {

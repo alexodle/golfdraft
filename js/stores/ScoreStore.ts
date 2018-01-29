@@ -3,7 +3,7 @@ import AppDispatcher from '../dispatcher/AppDispatcher';
 import ScoreConstants from '../constants/ScoreConstants';
 import ScoreLogic from '../logic/ScoreLogic';
 import Store from './Store';
-import {IndexedGolferScores} from '../types/Types';
+import {IndexedGolferScores} from '../types/ClientTypes';
 
 let _scores: IndexedGolferScores = {};
 let _lastUpdated: Date = null;

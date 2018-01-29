@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import AppConstants from '../constants/AppConstants';
 import AppDispatcher from '../dispatcher/AppDispatcher';
 import Store from './Store';
-import {AppSettings} from '../types/Types';
+import {AppSettings} from '../types/ClientTypes';
 
 let _appState: AppSettings = null;
 

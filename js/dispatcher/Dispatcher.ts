@@ -20,8 +20,6 @@
  * callbacks for dependent Stores, and to guarantee that no two stores
  * created circular dependencies.
  */
-
-const Promise = require('es6-promise').Promise;
 import * as _ from 'lodash';
 
 const _callbacks = [];

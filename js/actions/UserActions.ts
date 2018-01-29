@@ -1,6 +1,6 @@
 import AppDispatcher from '../dispatcher/AppDispatcher';
 import AppConstants from '../constants/AppConstants';
-import {Indexed} from '../types/Types';
+import {Indexed} from '../types/ClientTypes';
 
 export default class UserActions {
 

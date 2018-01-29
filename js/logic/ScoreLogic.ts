@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import * as constants from '../../common/constants';
+import constants from '../../common/constants';
 import * as utils from '../../common/utils';
 import {
   DraftPick,
@@ -11,7 +11,7 @@ import {
   IndexedUserScores,
   User,
   UserScore,
-} from '../types/Types';
+} from '../types/ClientTypes';
 
 const NDAYS = constants.NDAYS;
 const MISSED_CUT = constants.MISSED_CUT;
@@ -124,7 +124,7 @@ export default class ScoreLogic {
 
     _.each(golferScores, function (ps) {
       ps.missedCuts = _.map(ps.scores, function (s) {
-        return s === MISSED_CUT;
+        return (<any>s) === MISSED_CUT;
       });
       ps.scores = _.map(ps.scores, function (s, i) {
         return ps.missedCuts[i] ? worstScores[i] : s;

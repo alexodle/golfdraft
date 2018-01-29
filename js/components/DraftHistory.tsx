@@ -5,7 +5,7 @@ import * as React from 'react';
 import UserStore from '../stores/UserStore';;
 import * as _ from 'lodash';;
 import GolfDraftPanel from './GolfDraftPanel';
-import {DraftPick} from '../types/Types';
+import {DraftPick} from '../types/ClientTypes';
 
 export interface DraftHistoryProps {
   selectedUserId?: string;

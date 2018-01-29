@@ -3,7 +3,7 @@ import Assets from '../constants/Assets';
 import * as moment from 'moment';
 import * as React from 'react';
 import GolfDraftPanel from './GolfDraftPanel';
-import {DraftPick} from '../types/Types';
+import {DraftPick} from '../types/ClientTypes';
 
 const TIME_INTERVAL = 1000;
 const WARNING_TIME = 1000 * 60 * 2;

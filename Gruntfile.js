@@ -14,7 +14,7 @@ module.exports = function (grunt) {
     express: {
       dev: {
          options: {
-          script: './server/server.js',
+          script: './server/server.ts',
           debug: true,
           output: 'I am fully running now!'
         }

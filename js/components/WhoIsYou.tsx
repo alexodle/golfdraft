@@ -3,7 +3,7 @@ import * as React from 'react';
 import UserActions from '../actions/UserActions';
 import UserStore from '../stores/UserStore';
 import {Redirect} from 'react-router-dom';
-import {Location} from '../types/Types';
+import {Location} from '../types/ClientTypes';
 import {postJson} from '../fetch';
 
 export interface WhoIsYouProps {

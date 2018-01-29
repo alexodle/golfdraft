@@ -1,6 +1,6 @@
 import * as React from 'react';
 import LogoutButton from './LogoutButton';
-import {User} from '../types/Types';
+import {User} from '../types/ClientTypes';
 
 export interface AppHeaderProps {
   tourneyName: string;

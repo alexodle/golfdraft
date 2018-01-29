@@ -3,7 +3,7 @@ import * as React from 'react';
 import DraftActions from '../actions/DraftActions';
 import GolferLogic from '../logic/GolferLogic';
 import GolferStore from '../stores/GolferStore';
-import {Indexed} from '../types/Types';
+import {Indexed} from '../types/ClientTypes';
 import {postJson} from '../fetch';
 
 const MIN_COEFF = 0.5;

@@ -1,9 +1,9 @@
-import * as Types from './Types';
+import * as ClientTypes from './ClientTypes';
 
 export interface DraftProps {
   isMyDraftPick: boolean;
-  currentPick?: Types.DraftPickOrder;
-  draftPicks: Types.DraftPick[];
+  currentPick?: ClientTypes.DraftPickOrder;
+  draftPicks: ClientTypes.DraftPick[];
   pickingForUsers: string[];
   syncedPickList: string[];
   pendingPickList: string[];

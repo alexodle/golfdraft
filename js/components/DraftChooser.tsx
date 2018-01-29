@@ -7,7 +7,7 @@ import GolferStore from '../stores/GolferStore';
 import * as React from 'react';
 import UserStore from '../stores/UserStore';
 import GolfDraftPanel from './GolfDraftPanel';
-import {Golfer, IndexedGolfers, DraftPickOrder, User} from '../types/Types';
+import {Golfer, IndexedGolfers, DraftPickOrder, User} from '../types/ClientTypes';
 
 export interface DraftChooserProps {
   golfersRemaining: IndexedGolfers;

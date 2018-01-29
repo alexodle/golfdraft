@@ -4,7 +4,7 @@ import DraftStore from '../stores/DraftStore';
 import * as React from 'react';
 import UserStore from '../stores/UserStore';
 import GolfDraftPanel from './GolfDraftPanel';
-import {DraftPickOrder, User, Indexed} from '../types/Types';
+import {DraftPickOrder, User, Indexed} from '../types/ClientTypes';
 
 export interface DraftPickOrderProps {
   pickingForUsers: string[];

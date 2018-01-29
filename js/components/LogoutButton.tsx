@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import * as React from 'react';
 import UserActions from '../actions/UserActions';
-import {User} from '../types/Types';
+import {User} from '../types/ClientTypes';
 import {Redirect} from 'react-router';
 
 export interface LogoutButtonProps {

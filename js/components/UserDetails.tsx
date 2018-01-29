@@ -4,7 +4,7 @@ import * as React from 'react';
 import * as utils from '../../common/utils';
 import GolferStore from '../stores/GolferStore';
 import UserStore from '../stores/UserStore';
-import {User, DraftPick, UserScore, IndexedUserScores} from '../types/Types';
+import {User, DraftPick, UserScore, IndexedUserScores} from '../types/ClientTypes';
 
 export interface UserDetailsProps {
   userId: string;

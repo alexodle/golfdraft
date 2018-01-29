@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import AppConstants from '../constants/AppConstants';
 import AppDispatcher from '../dispatcher/AppDispatcher';
 import Store from './Store';
-import {Golfer, IndexedGolfers} from '../types/Types';
+import {Golfer, IndexedGolfers} from '../types/ClientTypes';
 
 let _golfers: IndexedGolfers = null;
 
@@ -25,6 +25,8 @@ AppDispatcher.register(function (payload) {
       GolferStore.emitChange();
       break;
   }
+
+  return true;
 });
 
 export default GolferStore;
