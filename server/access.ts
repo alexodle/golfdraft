@@ -66,25 +66,26 @@ function clearAll(model: Model<Document>) {
   return model.remove(FK_TOURNEY_ID_QUERY).exec();
 };
 
-function mergeWGR(golfer: Golfer, wgrEntry?: WGR): Golfer {
+function mergeWGR(golfer: GolferDoc, wgrEntry: WGR): Golfer {
+  let wgr = null;
   if (!wgrEntry) {
-    console.warn('WGR not found for: ' + golfer.name);
-    golfer.wgr = UNKNOWN_WGR;
+    console.log('WGR not found for: ' + golfer.name);
+    wgr = UNKNOWN_WGR;
   } else {
-    golfer.wgr = wgrEntry.wgr;
+    wgr = wgrEntry.wgr;
   }
-  return golfer;
+  return { wgr, ...golfer.toObject() };
 }
 
 export function getTourney() {
   return models.Tourney.findOne(TOURNEY_ID_QUERY).exec();
 }
 
-export function getPickList(userId: string): Promise<DraftPickListDoc[]> {
-  const query = _.extend({ userId: userId }, FK_TOURNEY_ID_QUERY);
+export function getPickList(userId: string): Promise<string[]> {
+  const query = _.extend({ userId }, FK_TOURNEY_ID_QUERY);
   return models.DraftPickList.findOne(query).exec()
     .then((pickList?: DraftPickList) => {
-      return pickList ? pickList.golferPickList : null;
+      return pickList ? _.map(pickList.golferPickList, (oid) => oid.toString()) : null;
     });
 }
 
@@ -180,23 +181,20 @@ export function getGolfers() {
     ])
     .then(([_wgrs, _golfers]) => {
       const wgrs = _.keyBy(_wgrs as WGRDoc[], 'name');
-      const golfers = _.map(_golfers as GolferDoc[], (g) => {
-        return mergeWGR(g, wgrs[g.name]);
-      });
-      return golfers;
+      return _.map(_golfers as GolferDoc[], (g) => mergeWGR(g, wgrs[g.name]));
     });
 }
 
 export function getUsers(): Promise<UserDoc[]> {
-  return models.User.find({}).exec();
+  return models.User.find({}).exec() as Promise<UserDoc[]>;
 }
 
 export function getScores(): Promise<GolferScoreDoc[]> {
-  return getAll(models.GolferScore);
+  return getAll(models.GolferScore) as Promise<GolferScoreDoc[]>;
 }
 
 export function getPicks(): Promise<DraftPickDoc[]> {
-  return getAll(models.DraftPick);
+  return getAll(models.DraftPick) as Promise<DraftPickDoc[]>;
 }
 
 export function getScoreOverrides() {
@@ -397,7 +395,6 @@ export function createChatMessage(message: ChatMessage) {
   message.date = new Date(); // probably not needed b/c we can use ObjectId
   return chatModels.Message.create(message)
     .then(() => {
-      console.log('hihi.change:chat: ' + message);
       io.sockets.emit('change:chat', {
         data: message,
         evType: 'change:chat',

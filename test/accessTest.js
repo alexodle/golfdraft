@@ -150,10 +150,8 @@ describe('access', function () {
     let golfers = null;
 
     beforeEach(function () {
-      console.log('hihi');
       return access.getGolfers()
         .then(function (golfers) {
-          console.log('hihi.golfersSHouldBeEMpty');
           console.dir(golfers);
         })
 
