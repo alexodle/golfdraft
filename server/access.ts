@@ -389,14 +389,15 @@ export function updateScores(objs: GolferScore[]) {
 // Chat
 
 export function getChatMessages(): Promise<ChatMessageDoc[]> {
-  return chatModels.Message.find(FK_TOURNEY_ID_QUERY).exec();
+  return chatModels.Message.find(FK_TOURNEY_ID_QUERY).exec() as Promise<ChatMessageDoc[]>;
 }
 
 export function createChatMessage(message: ChatMessage) {
   message = extendWithTourneyId(message);
   message.date = new Date(); // probably not needed b/c we can use ObjectId
   return chatModels.Message.create(message)
-    .then(function () {
+    .then(() => {
+      console.log('hihi.change:chat: ' + message);
       io.sockets.emit('change:chat', {
         data: message,
         evType: 'change:chat',

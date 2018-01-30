@@ -396,7 +396,7 @@ function ensureNextAutoPick() {
 
         if (utils.containsObjectId(autoPickUsers, nextPickUser)) {
           console.info('ensureNextAutoPick: making next pick!');
-          autoPick(nextPickUser, nextPickNumber);
+          autoPick(nextPickUser.toString(), nextPickNumber);
         } else {
           console.info('ensureNextAutoPick: not auto-picking; user not in auto-pick list. ' +
             'user: ' + nextPickUser + ', autoPickUsers: ' + autoPickUsers);

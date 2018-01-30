@@ -3,7 +3,7 @@ import 'whatwg-fetch';
 
 import * as _ from 'lodash';
 
-function ensureCredentials(init?: RequestInit): RequestInit {
+function ensureCredentials(init: RequestInit): RequestInit {
   return _.extend({ credentials: "same-origin" }, init);
 }
 
@@ -15,7 +15,7 @@ function ensureSuccess(resp: Response): Response {
   throw error;
 }
 
-function _fetch(url: string, init?: RequestInit) {
+function _fetch(url: string, init: RequestInit) {
   return window.fetch(url, ensureCredentials(init))
     .then(ensureSuccess)
     .then((resp) => {
@@ -34,7 +34,7 @@ function _fetch(url: string, init?: RequestInit) {
 }
 
 export function fetch(url: string, init?: RequestInit) {
-  return _fetch(url);
+  return _fetch(url, init);
 }
 
 export function del(url: string) {
@@ -45,7 +45,7 @@ export function post(url: string) {
   return fetch(url, { method: "POST" });
 }
 
-export function postJson(url, data) {
+export function postJson(url: string, data) {
   return fetch(url, {
     method: "POST",
     body: JSON.stringify(data),
@@ -55,11 +55,11 @@ export function postJson(url, data) {
   });
 }
 
-export function put(url) {
+export function put(url: string) {
   return fetch(url, { method: "PUT" });
 }
 
-export function putJson(url, data) {
+export function putJson(url: string, data) {
   return fetch(url, {
     method: "PUT",
     body: JSON.stringify(data),
