@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import * as access from './access';
 import * as mongooseUtil from './mongooseUtil';
 import config from './config';
-import tourneyConfigReader from './tourneyConfigReader';
+import {loadConfig} from './tourneyConfigReader';
 import {snakeDraftOrder} from './tourneyUtils';
 import {User} from './ServerTypes';
 
@@ -21,7 +21,7 @@ export default function refreshUserState(pickOrderNames) {
     });
     return access.ensureUsers(users);
   })
-  .then(function () {
+  .then(() => {
     return access.getUsers().then((users) => {
       return _.sortBy(users, (u) => {
         return _.indexOf(pickOrderNames, u.name);
@@ -36,14 +36,14 @@ export default function refreshUserState(pickOrderNames) {
 
 if (require.main === module) {
   mongooseUtil.connect()
-    .then(function () {
-      const tourneyCfg = tourneyConfigReader.loadConfig();
+    .then(() => {
+      const tourneyCfg = loadConfig();
       return refreshUserState(tourneyCfg.draftOrder);
     })
-    .then(function () {
+    .then(() => {
       mongooseUtil.close();
     })
-    .catch(function (err) {
+    .catch((err) => {
       console.log(err);
     });
 }

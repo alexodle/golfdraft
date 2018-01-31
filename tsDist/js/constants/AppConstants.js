@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = {
+    CURRENT_USER_CHANGE: 'CURRENT_USER_CHANGE',
+    CURRENT_USER_CHANGE_SYNCED: 'CURRENT_USER_CHANGE_SYNCED',
+    SET_ACTIVE_USERS: 'SET_ACTIVE_USERS',
+    SET_APP_STATE: 'SET_APP_STATE',
+    SET_GOLFERS: 'SET_GOLFERS',
+    SET_IS_ADMIN: 'SET_IS_ADMIN',
+    SET_TOURNEY_NAME: 'SET_TOURNEY_NAME',
+    SET_USERS: 'SET_USERS',
+};

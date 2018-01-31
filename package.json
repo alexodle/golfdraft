@@ -92,7 +92,7 @@
     "webpack-dev-server": "^2.9.7"
   },
   "scripts": {
-    "start": "node server/server.js"
+    "start": "node server/server.jt"
   },
   "engines": {
     "node": "0.12.x",

@@ -181,7 +181,7 @@ function defineRoutes() {
 
   app.post('/register', (req: Request, res: Response, next: NextFunction) => {
     const { username, name, password } = req.body;
-    User.register(new User({ username, name }), password, function (err) {
+    (<any>User).register(new User({ username, name }), password, (err) => {
       if (err) {
         console.log('error while user register!', err);
         res.sendStatus(401);
@@ -192,7 +192,7 @@ function defineRoutes() {
     });
   });
 
-  app.post('/login', passport.authenticate('local'), function (req: Request, res: Response, next: NextFunction) {
+  app.post('/login', passport.authenticate('local'), (req: Request, res: Response, next: NextFunction) => {
     res.status(200).send({ username: req.body.username });
   });
 
@@ -253,10 +253,9 @@ function defineRoutes() {
       pickNumber: body.pickNumber,
       user: body.user,
       golfer: body.golfer
-    };
+    } as DraftPick;
 
     return handlePick({
-      req,
       res,
       makePick: function () {
         return access.makePick(pick);
@@ -321,7 +320,7 @@ function defineRoutes() {
     }
 
     const isDraftPaused = !!req.body.isPaused;
-    return onAppStateUpdate(req, res, access.updateAppState({ isDraftPaused: isDraftPaused }));
+    return onAppStateUpdate(req, res, access.updateAppState({ isDraftPaused } as AppSettings));
   });
 
   app.put('/admin/allowClock', requireSession(), (req: Request, res: Response, next: NextFunction) => {
@@ -331,7 +330,7 @@ function defineRoutes() {
     }
 
     const allowClock = !!req.body.allowClock;
-    return onAppStateUpdate(req, res, access.updateAppState({ allowClock: allowClock }));
+    return onAppStateUpdate(req, res, access.updateAppState({ allowClock } as AppSettings));
   });
 
   app.put('/admin/draftHasStarted', requireSession(), (req: Request, res: Response, next: NextFunction) => {
@@ -341,7 +340,7 @@ function defineRoutes() {
     }
 
     const draftHasStarted = !!req.body.draftHasStarted;
-    return onAppStateUpdate(req, res, access.updateAppState({ draftHasStarted: draftHasStarted }));
+    return onAppStateUpdate(req, res, access.updateAppState({ draftHasStarted } as AppSettings));
   });
 
   app.delete('/admin/lastpick', requireSession(), (req: Request, res: Response, next: NextFunction) => {
@@ -352,13 +351,11 @@ function defineRoutes() {
 
     return handlePick({
       force: true,
-
-      req,
       res,
-      makePick: function () {
+      makePick: () => {
         return access.undoLastPick();
       },
-      broadcastPickMessage: function (spec) {
+      broadcastPickMessage: (spec) => {
         return chatBot.broadcastUndoPickMessage(spec.pick, spec.draft);
       }
     });

@@ -1,14 +1,13 @@
-
-import config from '../config';
-import mongooseUtil from './mongooseUtil';
+import config from '../server/config';
+import * as mongooseUtil from '../server/mongooseUtil';
 import readerConfig from './readerConfig';
-import redis from '../redis';
-import tourneyConfigReader from '../tourneyConfigReader';
-import updateScore from './updateScore';
+import redis from '../server/redis';
+import {loadConfig} from '../server/tourneyConfigReader';
+import * as updateScore from './updateScore';
 
 const TIMEOUT = 30 * 1000; // 30 seconds
 
-const tourneyCfg = tourneyConfigReader.loadConfig();
+const tourneyCfg = loadConfig();
 
 const reader = readerConfig[tourneyCfg.scores.type].reader;
 console.log(tourneyCfg.scores.type);
@@ -32,7 +31,7 @@ function updateScores() {
   updateScore.run(reader, url).then(function (succeeded) {
     console.log("succeeded: " + succeeded);
     if (succeeded) {
-      redis.pubSubClient.publish("scores:update", new Date());
+      redis.pubSubClient.publish("scores:update", (new Date()).toString());
     }
 
     clearTimeout(timeoutId);

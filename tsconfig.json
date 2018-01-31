@@ -8,7 +8,10 @@
     },
     "include": [
         "./js/**/*",
-        "./common/**/*"
+        "./common/**/*",
+        "./server/**/*",
+        "./scores_sync/**/*",
+        "./wgr/**/*"
     ],
     "exclude": [
         "./node_modules/**/*",

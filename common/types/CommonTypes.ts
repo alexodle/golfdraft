@@ -15,7 +15,7 @@ export interface AppSettings {
 }
 
 export interface User {
-  _id: any;
+  _id?: any;
   name: string;
   username: string;
 }
@@ -30,7 +30,7 @@ export interface DraftPickOrder {
 }
 
 export interface Golfer {
-  _id: any;
+  _id?: any;
   name: string;
   wgr: number;
 }

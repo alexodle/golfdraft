@@ -1,7 +1,7 @@
-
 import * as _ from 'lodash';
-import constants from '../common/constants';
 import * as request from 'request';
+import constants from '../common/constants';
+import {Reader, ReaderResult, UpdateGolfer} from './Types';
 
 const MISSED_CUT = constants.MISSED_CUT;
 const NDAYS = constants.NDAYS;
@@ -11,7 +11,25 @@ const PGATOUR_MC_TEXT = 'cut';
 const CUT_ROUND = 3; // cut starts at round 3
 const N_HOLES = 18;
 
-function getRoundScore(par, currentRound, g, round) {
+interface Round {
+  strokes: number;
+  round_number: number;
+}
+
+interface PgaTourGolfer {
+  status: string;
+  today: number;
+  total_strokes: number;
+  current_round: number;
+  thru: number;
+  rounds: Round[];
+  player_bio: {
+    first_name: string;
+    last_name: string;
+  }
+}
+
+function getRoundScore(par: number, currentRound: number, g: PgaTourGolfer, round: Round): number | string {
   const roundNumber = round.round_number;
   const missedCut = g.status === PGATOUR_MC_TEXT;
 
@@ -26,27 +44,27 @@ function getRoundScore(par, currentRound, g, round) {
   return round.strokes;
 }
 
-function adjustWdScores(g, scores) {
+function adjustWdScores(g: PgaTourGolfer, scores: (number | string)[]): (number | string)[] {
   // For WD golfers, "total_strokes" is the only property we can trust
   const total = g.total_strokes;
 
   const newScores = [];
   let strokes = 0;
   for (let i = 0; i < scores.length; i++) {
-    strokes += scores[i];
+    strokes += <number>scores[i];
     newScores.push(strokes <= total ? scores[i] : MISSED_CUT);
   }
 
   return newScores;
 }
 
-function adjustForPar(par, scores) {
-  return _.map(scores, function (s) {
-    return s !== MISSED_CUT ? s - par : MISSED_CUT;
+function adjustForPar(par: number, scores: (number | string)[]): (number | string)[] {
+  return _.map(scores, (s) => {
+    return s !== MISSED_CUT ? (<number>s) - par : MISSED_CUT;
   });
 }
 
-function parseGolfer(par, tourneyRound, g) {
+function parseGolfer(par: number, tourneyRound: number, g: PgaTourGolfer): UpdateGolfer {
   const bio = g.player_bio;
   const golferCurrentRound = g.current_round;
 
@@ -55,10 +73,8 @@ function parseGolfer(par, tourneyRound, g) {
     day: golferCurrentRound || tourneyRound,
     thru: g.thru,
     scores: _.chain(g.rounds)
-      .first(NDAYS)
-      .map(function (round) {
-        return getRoundScore(par, golferCurrentRound, g, round);
-      })
+      .take(NDAYS)
+      .map((round) => getRoundScore(par, golferCurrentRound, g, round))
       .value()
   };
 
@@ -72,11 +88,10 @@ function parseGolfer(par, tourneyRound, g) {
   return parsedGolfer;
 }
 
-const PgaTourReader = {
-
-  run: function (pgatourUrl) {
+class PgaTourReader implements Reader {
+  run(url: string): Promise<ReaderResult> {
     return new Promise(function (fulfill, reject) {
-      request({ url: pgatourUrl, json: true }, function (error, response, body) {
+      request({ url: url, json: true }, function (error, response, body) {
         if (error) {
           reject(error);
           return;
@@ -84,21 +99,17 @@ const PgaTourReader = {
 
         const par = _.parseInt(body.leaderboard.courses[0].par_total);
         const currentRound = body.leaderboard.current_round;
-        const golfers = _.map(body.leaderboard.players, function (g) {
-          return parseGolfer(par, currentRound, g);
-        });
+        const golfers = _.map(body.leaderboard.players, (g: PgaTourGolfer) => parseGolfer(par, currentRound, g));
 
-        fulfill({
-          par: par,
-          golfers: golfers
-        });
+        fulfill({ par, golfers });
       });
     });
-  },
+  }
 
   // Export for testing
-  parseGolfer: parseGolfer
+  parseGolfer(par: number, tourneyRound: number, g: PgaTourGolfer): UpdateGolfer {
+    return parseGolfer(par, tourneyRound, g);
+  }
+}
 
-};
-
-export default PgaTourReader;
+export default new PgaTourReader();

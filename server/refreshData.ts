@@ -1,11 +1,14 @@
 import * as _ from 'lodash';
 import * as access from './access';
 import * as mongooseUtil from './mongooseUtil';
+import * as updateScore from '../scores_sync/updateScore';
 import * as tourneyConfigReader from './tourneyConfigReader';
 import * as tourneyUtils from './tourneyUtils';
 import config from './config';
-import readerConfig from '../readerConfig';
-import updateScore from '../scores_sync/updateScore';
+import readerConfig from '../scores_sync/readerConfig';
+import {
+  User,
+} from './ServerTypes';
 
 function printState() {
   return access.getTourney().then(function (tourney) {
@@ -38,7 +41,7 @@ function refreshData(pickOrderNames, reader, url) {
       console.log("Adding users");
       console.log("");
       const users = _.map(pickOrderNames, function (name) {
-        return {name: name};
+        return {name: name} as User;
       });
       return access.ensureUsers(users);
     })

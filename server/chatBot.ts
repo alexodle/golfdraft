@@ -1,9 +1,14 @@
 import * as _ from 'lodash';
 import * as access from './access';
 import * as utils from '../common/utils';
-import {Draft, DraftPick} from './ServerTypes';
+import {
+  Draft,
+  DraftPick,
+  Golfer,
+  UserDoc,
+} from './ServerTypes';
 
-function loadPick(draft: Draft, draftPick: DraftPick) {
+function loadPick(draft: Draft, draftPick: DraftPick): Promise<{ pickUser: UserDoc, pickGolfer: Golfer, nextUser: UserDoc}> {
   const nextPick = draft.pickOrder[draft.picks.length];
   return Promise.all([
       access.getUser(draftPick.user.toString()),
@@ -33,7 +38,7 @@ function sendMessage(message: string, pickInfo) {
 
 export function broadcastUndoPickMessage(draftPick, draft) {
   return loadPick(draft, draftPick)
-    .then(function (pickInfo) {
+    .then((pickInfo) => {
       const {pickUser, pickGolfer} = pickInfo;
       const message = 'PICK REVERTED: ' + pickUser.name + ' picks ' + pickGolfer.name;
       return sendMessage(message, pickInfo);

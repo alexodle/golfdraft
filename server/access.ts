@@ -24,6 +24,8 @@ import {
   GolferScore,
   GolferScoreDoc,
   ObjectId,
+  ScoreOverride,
+  ScoreOverrideDoc,
   User,
   UserDoc,
   WGR,
@@ -84,7 +86,7 @@ export function getTourney() {
 export function getPickList(userId: string): Promise<string[]> {
   const query = _.extend({ userId }, FK_TOURNEY_ID_QUERY);
   return models.DraftPickList.findOne(query).exec()
-    .then((pickList?: DraftPickList) => {
+    .then((pickList?: DraftPickListDoc) => {
       return pickList ? _.map(pickList.golferPickList, (oid) => oid.toString()) : null;
     });
 }
@@ -159,7 +161,7 @@ export function updatePickListFromNames(userId: string, pickListNames: string[])
     });
 }
 
-export function getGolfer(golferId: string) {
+export function getGolfer(golferId: string): Promise<Golfer> {
   const query = _.extend({ _id: golferId }, FK_TOURNEY_ID_QUERY);
   return models.Golfer.findOne(query).exec()
     .then((golfer: GolferDoc) => {
@@ -170,11 +172,11 @@ export function getGolfer(golferId: string) {
     });
 }
 
-export function getUser(userId: string) {
-  return models.User.findOne({ _id: userId }).exec();
+export function getUser(userId: string): Promise<UserDoc> {
+  return models.User.findOne({ _id: userId }).exec() as Promise<UserDoc>;
 }
 
-export function getGolfers() {
+export function getGolfers(): Promise<Golfer[]> {
   return Promise.all([
       models.WGR.find().exec(),
       models.Golfer.find(FK_TOURNEY_ID_QUERY).exec(),
@@ -197,8 +199,8 @@ export function getPicks(): Promise<DraftPickDoc[]> {
   return getAll(models.DraftPick) as Promise<DraftPickDoc[]>;
 }
 
-export function getScoreOverrides() {
-  return getAll(models.GolferScoreOverrides);
+export function getScoreOverrides(): Promise<ScoreOverrideDoc[]> {
+  return getAll(models.GolferScoreOverrides) as Promise<ScoreOverrideDoc[]>;
 }
 
 export function getAppState(): Promise<AppSettings> {
@@ -318,10 +320,10 @@ export function makePick(pick: DraftPick, ignoreOrder?: boolean) {
     .then(() => pick);
 }
 
-export function undoLastPick() {
+export function undoLastPick(): Promise<DraftPickDoc> {
   return models.DraftPick.count(FK_TOURNEY_ID_QUERY).exec()
     .then((nPicks) => {
-      return models.DraftPick.findOneAndRemove({ pickNumber: nPicks - 1 }).exec();
+      return models.DraftPick.findOneAndRemove({ pickNumber: nPicks - 1 }).exec() as Promise<DraftPickDoc>;
     });
 }
 
@@ -332,7 +334,7 @@ export function getDraft(): Promise<Draft> {
     ])
     .then(([pickOrder, picks]) => {
       return {
-        pickOrder: _.sortBy(pickOrder as DraftPickOrder[], 'pickNumber'),
+        pickOrder: _.sortBy(pickOrder as DraftPickOrderDoc[], 'pickNumber'),
         picks: _.sortBy(picks, 'pickNumber'),
         serverTimestamp: new Date()
       };
@@ -371,7 +373,7 @@ export function ensureGolfers(objs: Golfer[]) {
 
 export function replaceWgrs(wgrEntries: WGR[]) {
   return models.WGR.remove({}).exec()
-    .then(function () {
+    .then(() => {
       return models.WGR.create(wgrEntries);
     });
 }

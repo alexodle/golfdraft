@@ -11,49 +11,55 @@ export interface TourneySpecific {
 export interface AppSettings extends CommonTypes.AppSettings, TourneySpecific {
   autoPickUsers: ObjectId[];
 }
-export interface AppSettingsDoc extends AppSettings, Document {}
+export type AppSettingsDoc = AppSettings & Document;
 
 export interface User extends CommonTypes.User, TourneySpecific {}
-export interface UserDoc extends User, Document {}
+export type UserDoc = User & Document;
 
 export interface DraftPick extends CommonTypes.DraftPick, TourneySpecific {
   user: ObjectId;
   golfer: ObjectId;
 }
-export interface DraftPickDoc extends DraftPick, Document {}
+export type DraftPickDoc = DraftPick & Document;
 
 export interface DraftPickOrder extends CommonTypes.DraftPickOrder, TourneySpecific {
   user: ObjectId;
 }
-export interface DraftPickOrderDoc extends DraftPickOrder, Document {}
+export type DraftPickOrderDoc = DraftPickOrder & Document;
 
 export interface Golfer extends CommonTypes.Golfer, TourneySpecific {}
-export interface GolferDoc extends Golfer, Document {}
+export type GolferDoc = Golfer & Document;
 
 export interface GolferScore extends CommonTypes.GolferScore, TourneySpecific {
   scores: any[];
 }
-export interface GolferScoreDoc extends GolferScore, Document {}
+export type GolferScoreDoc = GolferScore & Document;
 
 export interface ChatMessage extends CommonTypes.ChatMessage, TourneySpecific {
   user?: ObjectId;
 }
-export interface ChatMessageDoc extends ChatMessage, Document {}
+export type ChatMessageDoc = ChatMessage & Document;
 
-export interface DraftPickList extends Document, TourneySpecific {
+export interface DraftPickList extends TourneySpecific {
   userId: ObjectId;
   golferPickList: ObjectId[];
 }
-export interface DraftPickListDoc extends DraftPickList, Document {}
+export type DraftPickListDoc = DraftPickList & Document;
 
 export interface WGR {
   name: string;
   wgr: number;
 }
-export interface WGRDoc extends WGR, Document {}
+export type WGRDoc = WGR & Document;
 
 export interface Draft {
   picks: DraftPick[],
   pickOrder: DraftPickOrder[],
   serverTimestamp: Date
 }
+
+export interface ScoreOverride extends TourneySpecific {
+  golfer: ObjectId;
+}
+export type ScoreOverrideDoc = ScoreOverride & Document;
+
