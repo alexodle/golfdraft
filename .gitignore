@@ -1,6 +1,7 @@
 dev*.sh
 prod*.sh
 distd
+tsDist
 dump.rdb
 node_modules
 npm-*.log
