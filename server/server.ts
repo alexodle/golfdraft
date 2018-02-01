@@ -6,7 +6,6 @@ import * as compression from 'compression';
 import * as connectRedis from 'connect-redis';
 import * as exphbs  from 'express-handlebars';
 import * as express from 'express';
-import expressServer from './expressServer';
 import * as mongooseUtil from './mongooseUtil';
 import * as passport from 'passport';
 import * as session from 'express-session';
@@ -15,11 +14,12 @@ import * as userAccess from './userAccess';
 import * as utils from '../common/utils';
 import app from './expressApp';
 import config from './config';
+import expressServer from './expressServer';
 import io from './socketIO';
 import redis from './redis';
+import {Request, Response, NextFunction} from 'express';
 import {requireSession} from './authMiddleware';
 import {User} from './models';
-import {Request, Response, NextFunction} from 'express';
 import {
   AppSettings,
   Draft,
@@ -40,6 +40,31 @@ const NOT_AN_ERROR = {};
 
 // Temp temp - remove this when we have multiple nodes
 userAccess.refresh();
+
+// Gzip
+app.use(compression());
+
+// Handlebars
+app.engine('handlebars', exphbs({
+  helpers: {
+    or: function (a, b) { return a || b; }
+  }
+}));
+app.set('view engine', 'handlebars');
+
+// Static routes
+if (!config.prod) {
+  app.set('views', './distd/views/');
+  app.use('/dist', express.static(__dirname + '/../../distd'));
+} else {
+  app.set('views', './dist/views/');
+  app.use('/dist', express.static(__dirname + '/../../dist', {
+    maxAge: MAX_AGE
+  }));
+}
+app.use('/assets', express.static(__dirname + '/../../assets', {
+  maxAge: MAX_AGE
+}));
 
 // Session handling
 const sessionMiddleware = session({
@@ -63,31 +88,6 @@ app.use(passport.session());
 passport.serializeUser((<any>User).serializeUser());
 passport.deserializeUser((<any>User).deserializeUser());
 passport.use((<any>User).createStrategy());
-
-// Gzip
-app.use(compression());
-
-// Handlebars
-app.engine('handlebars', exphbs({
-  helpers: {
-    or: function (a, b) { return a || b; }
-  }
-}));
-app.set('view engine', 'handlebars');
-
-// Static routes
-if (!config.prod) {
-  app.set('views', './distd/views/');
-  app.use('/dist', express.static(__dirname + '/../distd'));
-} else {
-  app.set('views', './dist/views/');
-  app.use('/dist', express.static(__dirname + '/../dist', {
-    maxAge: MAX_AGE
-  }));
-}
-app.use('/assets', express.static(__dirname + '/../assets', {
-  maxAge: MAX_AGE
-}));
 
 // Parsing
 app.use(bodyParser());
