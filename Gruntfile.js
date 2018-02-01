@@ -11,16 +11,6 @@ module.exports = function (grunt) {
   const path = require('path');
 
   grunt.initConfig({
-    express: {
-      dev: {
-         options: {
-          script: './server/server.ts',
-          debug: true,
-          output: 'I am fully running now!'
-        }
-      }
-    },
-
     clean: {
       prod: {
         src: 'dist'
@@ -122,7 +112,6 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('rund', [
-    'express:dev',
     'buildd'
   ]);
 
