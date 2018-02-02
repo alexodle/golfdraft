@@ -241,10 +241,7 @@ export function makePickListPick(userId: string, pickNumber: number) {
       .value();
 
     let golferToPick = _.chain(pickList)
-      .invoke('toString')
-      .filter(function (gid) {
-        return !pickedGolfers[gid];
-      })
+      .filter((gid) => !pickedGolfers[gid.toString()])
       .first()
       .value();
 
@@ -253,37 +250,33 @@ export function makePickListPick(userId: string, pickNumber: number) {
     golferToPick = golferToPick || _.chain(golfers)
       .sortBy(['wgr', 'name'])
       .map('_id')
-      .invoke('toString')
-      .filter(function (gid) {
-        return !pickedGolfers[gid];
-      })
+      .filter((gid) => !pickedGolfers[gid.toString()])
       .first()
       .value();
 
-    return makePick({
-        pickNumber: pickNumber,
-        user: new mongoose.Types.ObjectId(userId),
-        golfer: golferToPick,
-        timestamp: null,
-        tourneyId: null,
-      })
-      .then(function (resp) {
-        return _.extend({ isPickListPick }, resp);
+    const pick = {
+      pickNumber,
+      user: new mongoose.Types.ObjectId(userId),
+      golfer: new mongoose.Types.ObjectId(golferToPick),
+    } as DraftPick;
+    return makePick(pick)
+      .then((resp) => {
+        return { isPickListPick, ...resp };
       });
   });
 }
 
 export function makePick(pick: DraftPick, ignoreOrder?: boolean) {
-  const pickOrderQuery = _.extend({}, FK_TOURNEY_ID_QUERY, {
+  const pickOrderQuery = { ...FK_TOURNEY_ID_QUERY,
     pickNumber: pick.pickNumber,
     user: pick.user
-  });
-  const golferDraftedQuery = _.extend({}, FK_TOURNEY_ID_QUERY, {
+  };
+  const golferDraftedQuery = { ...FK_TOURNEY_ID_QUERY,
     golfer: pick.golfer
-  });
-  const golferExistsQuery = _.extend({}, FK_TOURNEY_ID_QUERY, {
+  };
+  const golferExistsQuery = { ...FK_TOURNEY_ID_QUERY,
     _id: pick.golfer
-  });
+  };
   return Promise.all([
       // Ensure correct pick numnber
       models.DraftPick.count(FK_TOURNEY_ID_QUERY).exec(),
