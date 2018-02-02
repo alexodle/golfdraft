@@ -70,7 +70,7 @@ export function broadcastPickMessage(currentUser, draftPick, draft) {
   return loadPick(draft, draftPick)
     .then(function (pickInfo) {
       const {pickUser, pickGolfer} = pickInfo;
-      const isProxyPick = utils.oidsAreEqual(pickUser._id, currentUser._id);
+      const isProxyPick = !utils.oidsAreEqual(pickUser._id, currentUser._id);
 
       let message = pickUser.name + ' picks ' + pickGolfer.name;
       if (isProxyPick) {
