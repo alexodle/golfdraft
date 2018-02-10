@@ -1,8 +1,14 @@
-const _ = require('lodash');
-const constants = require('../common/constants');
-const ScoreLogic = require('../js/logic/ScoreLogic');
+import './initTestConfig';
 
-const MISSED_CUT = constants.MISSED_CUT;
+import * as _ from 'lodash';
+import constants from '../common/constants';
+import ScoreLogic from '../js/logic/ScoreLogic';
+import {
+  DraftPick,
+  GolferScore,
+} from '../js/types/ClientTypes';
+
+const {MISSED_CUT} = constants;
 
 describe('ScoreLogic', function () {
 
@@ -14,12 +20,12 @@ describe('ScoreLogic', function () {
         { pickNumber: 1, user: 'User1', golfer: 'Golfer1_1' },
         { pickNumber: 2, user: 'User1', golfer: 'Golfer1_2' },
         { pickNumber: 3, user: 'User1', golfer: 'Golfer1_3' }
-      ];
+      ] as DraftPick[];
       const scores = {
-        Golfer1_0: { golfer: 'Golfer1_0', day: 1, scores: [-1,  0,  0,  0] },
-        Golfer1_1: { golfer: 'Golfer1_1', day: 1, scores: [-2,  0,  0,  0] },
-        Golfer1_2: { golfer: 'Golfer1_2', day: 1, scores: [0,  -1,  0,  0] },
-        Golfer1_3: { golfer: 'Golfer1_3', day: 1, scores: [0,  -3,  0,  0] },
+        Golfer1_0: { golfer: 'Golfer1_0', day: 1, scores: [-1,  0,  0,  0] } as GolferScore,
+        Golfer1_1: { golfer: 'Golfer1_1', day: 1, scores: [-2,  0,  0,  0] } as GolferScore,
+        Golfer1_2: { golfer: 'Golfer1_2', day: 1, scores: [0,  -1,  0,  0] } as GolferScore,
+        Golfer1_3: { golfer: 'Golfer1_3', day: 1, scores: [0,  -3,  0,  0] } as GolferScore,
       };
       ScoreLogic.calcUserScores(draftPicks, scores).should.eql({
         User1: {
@@ -82,7 +88,7 @@ describe('ScoreLogic', function () {
         { scores: [0, MISSED_CUT, 2, 0] },
         { scores: [0, 0, MISSED_CUT, 3] },
         { scores: [4, 0, 0, MISSED_CUT] }
-      ])
+      ] as GolferScore[])
       .should.eql([
         { scores: [4, 1, 0, 0], missedCuts: [true, false, false, false] },
         { scores: [0, 1, 2, 0], missedCuts: [false, true, false, false] },

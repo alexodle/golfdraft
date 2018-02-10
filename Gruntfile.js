@@ -53,12 +53,6 @@ module.exports = function (grunt) {
       }
     },
 
-    mochaTest: {
-      test: {
-        src: ['./test/*Test.js']
-      }
-    },
-
     copy: {
       prod: {
         src: './views/index.handlebars',
@@ -78,25 +72,10 @@ module.exports = function (grunt) {
         src: ['./dist/*.js', './dist/*.css'],
         dest: './dist/views/index.handlebars'
       }
-    },
-
-    // Experimental at this point
-    mochaSelenium: {
-      options: {
-        reporter: 'spec',
-        useChaining: true
-      },
-      firefox: {
-        src: ['./test/selenium/test*.js']
-      }
     }
 
   });
   grunt.loadNpmTasks('grunt-webpack');
-
-  grunt.registerTask('test', [
-    'mochaTest'
-  ]);
 
   grunt.registerTask('buildd', [
     'clean:dev',

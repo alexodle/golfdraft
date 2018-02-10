@@ -60,6 +60,8 @@ export interface Draft {
 
 export interface ScoreOverride extends TourneySpecific {
   golfer: ObjectId;
+  day: number;
+  scores: any[];
 }
 export type ScoreOverrideDoc = ScoreOverride & Document;
 

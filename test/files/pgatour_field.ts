@@ -1,4 +1,4 @@
-{
+module.exports = JSON.stringify({
   "header": {
     "version": "1.0"
   },
@@ -36,4 +36,4 @@
       }
     ]
   }
-}
+});

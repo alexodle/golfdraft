@@ -1,7 +1,7 @@
-require('../common/utils');
+import './initTestConfig';
 
-const _ = require('lodash');
-const levenshteinDistance = require('../server/levenshteinDistance');
+import * as _ from 'lodash';
+import * as levenshteinDistance from '../server/levenshteinDistance';
 
 describe('levenshteinDistance', function () {
 

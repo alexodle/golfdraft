@@ -1,19 +1,16 @@
+import pgatourReader from './pgatourReader';
+import pgatourFieldReader from './pgatourFieldReader';
+
 export default {
 
-  yahoo: {
-    reader: require('./yahooReader'),
-    nameMap: {
-    }
-  },
-
   pgatour: {
-    reader: require('./pgatourReader'),
+    reader: pgatourReader,
     nameMap: {
     }
   },
 
   pgatour_field: {
-    reader: require('./pgatourFieldReader'),
+    reader: pgatourFieldReader,
     nameMap: {
     }
   }

@@ -6,7 +6,7 @@ import {Reader, ReaderResult, UpdateGolfer} from './Types';
 import {
   Golfer,
   GolferScore,
-  ScoreOverrideDoc,
+  ScoreOverride,
 } from '../server/ServerTypes';
 
 const DAYS = constants.NDAYS;
@@ -46,7 +46,7 @@ export function validate(result: ReaderResult): boolean {
   });
 }
 
-export function mergeOverrides(scores: GolferScore[], scoreOverrides: ScoreOverrideDoc[]): GolferScore[] {
+export function mergeOverrides(scores: GolferScore[], scoreOverrides: ScoreOverride[]): GolferScore[] {
   const overridesByGolfer = _.chain(scoreOverrides)
     .map((o) => {
       return _.chain(o)
@@ -64,8 +64,9 @@ export function mergeOverrides(scores: GolferScore[], scoreOverrides: ScoreOverr
   const newScores = _.map(scores, (s) => {
     const override = overridesByGolfer[s.golfer.toString()];
     if (override) {
-      return _.extend({}, s, override);
+      s = _.extend({}, s, override);
     }
+    s.golfer = s.golfer.toString();
     return s;
   });
 
@@ -100,7 +101,7 @@ export function run(reader: Reader, url: string): Promise<boolean> {
 
       .then((results) => {
         const gs = results[0] as Golfer[];
-        const scoreOverrides = results[1] as ScoreOverrideDoc[];
+        const scoreOverrides = results[1] as ScoreOverride[];
 
         // Build scores with golfer id
         const golfersByName = _.keyBy(gs, "name");

@@ -66,9 +66,8 @@ function userScore(userGolfers: string[], scores: IndexedGolferScores, userId: s
 
 function worstScoreForDay(golferScores: GolferScore[], day: number): number {
   return _.chain(golferScores)
-    .map((gs) => gs.scores)
-    .map((scores) => scores[day])
-    .reject(MISSED_CUT)
+    .map((gs) => gs.scores[day])
+    .reject((s) => (<any>s) === MISSED_CUT)
     .max()
     .value();
 }
@@ -122,13 +121,9 @@ export default class ScoreLogic {
       .map((day) => worstScoreForDay(golferScores, day))
       .value();
 
-    _.each(golferScores, function (ps) {
-      ps.missedCuts = _.map(ps.scores, function (s) {
-        return (<any>s) === MISSED_CUT;
-      });
-      ps.scores = _.map(ps.scores, function (s, i) {
-        return ps.missedCuts[i] ? worstScores[i] : s;
-      });
+    _.each(golferScores, (ps) => {
+      ps.missedCuts = _.map(ps.scores, (s) => (<any>s) === MISSED_CUT);
+      ps.scores = _.map(ps.scores, (s, i) => ps.missedCuts[i] ? worstScores[i] : s);
     });
 
     return golferScores;

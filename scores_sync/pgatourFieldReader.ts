@@ -2,11 +2,10 @@ import * as _ from 'lodash';
 import * as request from 'request';
 import {Reader, ReaderResult, UpdateGolfer} from './Types';
 
-const JQUERY_URL = 'file://' + __dirname + '/../assets/jquery.js';
-
 function parseJson(json: string): UpdateGolfer[] {
-  const golfers = _.map(JSON.parse(json).Tournament.Users, (p) => {
-    const lastFirst = (<any>p).UserName.split(', ');
+  const parsedJson = JSON.parse(json);
+  const golfers = _.map(parsedJson.Tournament.Players, (p) => {
+    const lastFirst = (<any>p).PlayerName.split(', ');
     return {
       golfer: lastFirst[1] + ' ' + lastFirst[0],
       scores: [0, 0, 0, 0],

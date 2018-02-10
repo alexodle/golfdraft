@@ -1,12 +1,16 @@
-const initTestConfig = require('./initTestConfig');
-require('../common/utils');
+import * as _ from 'lodash';
+import * as access from '../server/access';
+import * as should from 'should';
+import * as tourneyUtils from '../server/tourneyUtils';
+import {initTestDb} from './initTestConfig';
+import {mongoose} from '../server/mongooseUtil';
+import {
+  Golfer,
+  DraftPick,
+  User,
+} from '../server/ServerTypes';
 
-const _ = require('lodash');
-const access = require('../server/access');
-const Promise = require('promise');
-const tourneyUtils = require('../server/tourneyUtils');
-const ObjectId = require('../server/mongooseUtil').mongoose.Types.ObjectId;
-const should = require('should');
+const {ObjectId} = mongoose.Types;
 
 function ensureEmptyDraft() {
   return access.getDraft().then(function (draft) {
@@ -23,29 +27,30 @@ function expectSuccess(err) {
 }
 
 function assertPickListResult(userId, expected, promise) {
-  return promise.then(function (result) {
-    result.completed.should.be.true();
-    result.pickList.should.eql(expected);
+  return promise
+    .then(function (result) {
+      result.completed.should.be.true();
+      result.pickList.should.eql(expected);
 
-    return access.getPickList(userId);
-  })
-  .then(function (actualPickList) {
-    _.invoke(actualPickList, 'toString').should.eql(expected);
-  }, expectSuccess);
+      return access.getPickList(userId);
+    })
+    .then(function (actualPickList) {
+      _.map(actualPickList, (pl) => pl.toString()).should.eql(expected);
+    })
+    .catch(expectSuccess);
 }
 
 describe('access', function () {
 
-  before(function () {
-    return initTestConfig.initDb();
-  });
+  before(initTestDb);
 
   describe('getPickList', function () {
     it('returns null for unset pickList', function () {
       return access.getPickList(new ObjectId('5a4d46c9b1a9473036f6a81a').toString())
-      .then(function (actualPickList) {
-        should(actualPickList).be.a.null();
-      }, expectSuccess);
+        .then(function (actualPickList) {
+          should(actualPickList).be.a.null();
+        })
+        .catch(expectSuccess);
     });
   });
 
@@ -80,7 +85,7 @@ describe('access', function () {
         { name: 'Bobby Jones' },
         { name: 'Gary User' },
         { name: 'Jack Nicklaus' }
-      ])
+      ] as Golfer[])
       .then(access.getGolfers)
       .then(_.partialRight(_.keyBy, 'name'))
       .then(function (_golfers) {
@@ -151,38 +156,33 @@ describe('access', function () {
 
     beforeEach(function () {
       return access.getGolfers()
-        .then(function (golfers) {
-          console.dir(golfers);
-        })
+        .then(function () {
+          return Promise.all([
+            access.ensureUsers([{ name: 'User1' }, { name: 'User2' }] as User[])
+              .then(access.getUsers)
+              .then(_.partialRight(_.keyBy, 'name'))
+              .then(function (_users) {
+                users = _users;
+                const pickOrder = tourneyUtils.snakeDraftOrder([
+                  users['User1'],
+                  users['User2']
+                ]);
+                access.setPickOrder(pickOrder);
+              }),
 
-      .then(function () {
+            access.ensureGolfers([{ name: 'Golfer1' }, { name: 'Golfer2' }] as Golfer[])
+              .then(access.getGolfers)
+              .then(_.partialRight(_.keyBy, 'name'))
+              .then(function (_golfers) {
+                golfers = _golfers;
+              }),
 
-      return Promise.all([
-        access.ensureUsers([{ name: 'User1' }, { name: 'User2' }])
-          .then(access.getUsers)
-          .then(_.partialRight(_.keyBy, 'name'))
-          .then(function (_users) {
-            users = _users;
-            const pickOrder = tourneyUtils.snakeDraftOrder([
-              users['User1'],
-              users['User2']
-            ]);
-            access.setPickOrder(pickOrder);
-          }),
-
-        access.ensureGolfers([{ name: 'Golfer1' }, { name: 'Golfer2' }])
-          .then(access.getGolfers)
-          .then(_.partialRight(_.keyBy, 'name'))
-          .then(function (_golfers) {
-            golfers = _golfers;
-          }),
-
-        access.replaceWgrs([
-          { name: 'Golfer2', wgr: 1 },
-          { name: 'Golfer1', wgr: 2 }
-        ])
-      ]);
-    });
+            access.replaceWgrs([
+              { name: 'Golfer2', wgr: 1 },
+              { name: 'Golfer1', wgr: 2 }
+            ])
+          ]);
+        });
     });
 
     afterEach(function () {
@@ -237,7 +237,7 @@ describe('access', function () {
 
     beforeEach(function () {
       return Promise.all([
-        access.ensureUsers([{ name: 'User1' }, { name: 'User2' }])
+        access.ensureUsers([{ name: 'User1' }, { name: 'User2' }] as User[])
           .then(access.getUsers)
           .then(_.partialRight(_.keyBy, 'name'))
           .then(function (_users) {
@@ -249,7 +249,7 @@ describe('access', function () {
             access.setPickOrder(pickOrder);
           }),
 
-        access.ensureGolfers([{ name: 'Golfer1' }, { name: 'Golfer2' }])
+        access.ensureGolfers([{ name: 'Golfer1' }, { name: 'Golfer2' }] as Golfer[])
           .then(access.getGolfers)
           .then(_.partialRight(_.keyBy, 'name'))
           .then(function (_golfers) {
@@ -273,7 +273,7 @@ describe('access', function () {
         user: users['User2']._id,
         golfer: golfers['Golfer2']._id,
         pickNumber: 0
-      })
+      } as DraftPick)
       .then(expectFailure, function (err) {
         err.message.should.equal('invalid pick: user picked out of order');
         return ensureEmptyDraft();
@@ -285,7 +285,7 @@ describe('access', function () {
         user: users['User1']._id,
         golfer: golfers['Golfer1']._id,
         pickNumber: 1
-      })
+      } as DraftPick)
       .then(expectFailure, function (err) {
         err.message.should.equal('invalid pick: pick order out of sync');
         return ensureEmptyDraft();
@@ -297,7 +297,7 @@ describe('access', function () {
         user: users['User1']._id,
         golfer: users['User2']._id,
         pickNumber: 0
-      }).then(expectFailure, function (err) {
+      } as DraftPick).then(expectFailure, function (err) {
         err.message.should.equal('invalid pick: invalid golfer');
         return ensureEmptyDraft();
       });
@@ -308,7 +308,7 @@ describe('access', function () {
         user: users['User1']._id,
         golfer: golfers['Golfer1']._id,
         pickNumber: 0
-      };
+      } as DraftPick;
       return access.makePick(newPick)
       .then(access.getDraft)
       .then(function (draft) {
@@ -328,7 +328,7 @@ describe('access', function () {
           golfer: golfers['Golfer1']._id,
           pickNumber: 1
         }
-      ];
+      ] as DraftPick[];
       return access.makePick(newPicks[0])
       .then(_.partial(access.makePick, newPicks[1]))
       .then(expectFailure, function (err) {

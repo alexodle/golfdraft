@@ -7,6 +7,7 @@
         "outDir": "tsDist"
     },
     "include": [
+        "./test/**/*",
         "./js/**/*",
         "./common/**/*",
         "./server/**/*",
@@ -14,9 +15,6 @@
         "./wgr/**/*"
     ],
     "exclude": [
-        "./node_modules/**/*",
-        "./build/**/*",
-        "./buildd/**/*",
-        "./.git/**/*"
+        "./node_modules/**/*"
     ]
 }
