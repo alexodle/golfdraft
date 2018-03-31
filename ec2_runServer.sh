@@ -11,7 +11,7 @@ git checkout master
 git pull origin master
 npm install
 
-nohup node server/server.js > $BASE_DIR/../serverlog.log 2>&1 &
+nohup npm start > $BASE_DIR/../serverlog.log 2>&1 &
 
 popd
 tail -f $BASE_DIR/../serverlog.log
