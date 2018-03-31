@@ -128,18 +128,21 @@ export function updateAutoPick(userId: string, autoPick: boolean) {
   return update.exec();
 }
 
+
 export function updatePickListFromNames(userId: string, pickListNames: string[]) {
+  const MIN_COEFF = 0.5;
+
   return getGolfers()
     .then((golfers) => {
       const golfersByLcName = _.keyBy(golfers, function (g) {
         return g.name.toLowerCase();
       });
 
-      const notFoundGolferNames = [];
-      const pickList = _.map(pickListNames, function (n) {
+      const notFoundGolferNames = new Set<string>();
+      const pickList = _.map(pickListNames, n => {
         const g = golfersByLcName[n.toLowerCase()];
         if (!g) {
-          notFoundGolferNames.push(n);
+          notFoundGolferNames.add(n);
           return null;
         }
         return g._id.toString();
@@ -152,7 +155,34 @@ export function updatePickListFromNames(userId: string, pickListNames: string[])
 
       // Did not find at at least one golfer by name. Calculate closest matches and provide those
       // suggestions to the client.
-      const suggestions = levenshteinDistance.runAll(notFoundGolferNames, _.map(golfers, 'name'));
+      //
+      // Note: In order to keep this whole process stateless for client and server, return good matches too
+      const golferNames = _.map(golfers, 'name');
+      const suggestions = _.map(pickListNames, n => {
+        if (notFoundGolferNames.has(n)) {
+          const levResult = levenshteinDistance.runAll(n, golferNames);
+
+          let allResults = levResult.results;
+          let bestResult = levResult.results[0];
+          const isGoodSuggestion = bestResult.coeff >= MIN_COEFF;
+
+          if (!isGoodSuggestion) {
+            allResults = _.sortBy(allResults, 'target');
+            bestResult = allResults[0];
+          }
+
+          return {
+            type: 'SUGGESTION',
+            source: levResult.source,
+            suggestion: bestResult.target,
+            allResults,
+            isGoodSuggestion
+          }
+        } else {
+          return { type: "EXACT", source: n };
+        }
+      });
+
       return {
         completed: false,
         suggestions: suggestions,

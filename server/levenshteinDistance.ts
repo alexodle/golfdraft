@@ -16,19 +16,17 @@ function _forEachWordPermutation(words, callback, output) {
   });
 }
 
-export function runAll(sourceList: string[], targetList: string[]) {
-  return _.map(sourceList, (sourceStr) => {
-    const results = _.map(targetList, function (targetStr) {
-      return _.extend({ target: targetStr }, run(sourceStr, targetStr));
-    });
-    results.sort((r1, r2) => {
-      if (r1.coeff !== r2.coeff) {
-        return r2.coeff - r1.coeff; // reverse;
-      }
-      return r1.target.localeCompare(r2.target);
-    });
-    return { source: sourceStr, results: results };
+export function runAll(sourceStr: string, targetList: string[]) {
+  const results = _.map(targetList, function (targetStr) {
+    return _.extend({ target: targetStr }, run(sourceStr, targetStr));
   });
+  results.sort((r1, r2) => {
+    if (r1.coeff !== r2.coeff) {
+      return r2.coeff - r1.coeff; // reverse;
+    }
+    return r1.target.localeCompare(r2.target);
+  });
+  return { source: sourceStr, results: results };
 }
 
 export function run(s1: string, s2: string) {

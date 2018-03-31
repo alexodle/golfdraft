@@ -55,37 +55,30 @@ describe('levenshteinDistance', function () {
 
     it('tries all combos', function () {
       levenshteinDistance.runAll(
-        ['test1', 'alxx2'],
+        'test1',
         ['alxx1', 'test2']
-      ).should.eql([
-        { source: 'test1', results: [
-          { target: 'test2', dist: 1, coeff: (5 - 1) / 5 },
-          { target: 'alxx1', dist: 4, coeff: (5 - 4) / 5 }
-        ]},
-        { source: 'alxx2', results: [
-          { target: 'alxx1', dist: 1, coeff: (5 - 1) / 5 },
-          { target: 'test2', dist: 4, coeff: (5 - 4) / 5 }
-        ]},
-      ]);
+      ).should.eql({ source: 'test1', results: [
+        { target: 'test2', dist: 1, coeff: (5 - 1) / 5 },
+        { target: 'alxx1', dist: 4, coeff: (5 - 4) / 5 }
+      ]});
     });
 
     it('preserves original casing', function () {
-      levenshteinDistance.runAll(['Ac'], ['a', 'B']).should.eql([
-        { source: 'Ac', results: [
+      levenshteinDistance.runAll('Ac', ['a', 'B']).should.eql({ source: 'Ac', results: [
           { target: 'a', dist: 1, coeff: (2 - 1) / 2 },
           { target: 'B', dist: 2, coeff: 0 }
         ]}
-      ]);
+      );
     });
 
     it('sorts by [coeff, target]', function () {
-      levenshteinDistance.runAll(['a'], ['d', 'c', 'b']).should.eql([
-        { source: 'a', results: [
+      levenshteinDistance.runAll('a', ['d', 'c', 'b']).should.eql({
+        source: 'a', results: [
           { target: 'b', dist: 1, coeff: 0 },
           { target: 'c', dist: 1, coeff: 0 },
           { target: 'd', dist: 1, coeff: 0 }
         ]}
-      ]);
+      );
     });
 
   });

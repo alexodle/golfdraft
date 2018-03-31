@@ -6,8 +6,8 @@ import GolferStore from '../stores/GolferStore';
 import {Indexed} from '../types/ClientTypes';
 import {postJson} from '../fetch';
 
-const MIN_COEFF = 0.5;
 const TEXTAREA_PLACEHOLDER = "Sergio Garcia\nPhil Mickelson\nTiger Woods\nDustin Johnson\nJason Day\n...";
+
 
 interface SuggestionOption {
   target: string;
@@ -16,9 +16,20 @@ interface SuggestionOption {
 }
 
 interface Suggestion {
+  type: 'SUGGESTION';
   source: string;
-  results: SuggestionOption[];
+  allResults: SuggestionOption[];
+  isGoodSuggestion: boolean;
+  suggestion: string;
 }
+
+interface Match {
+  type: 'EXACT';
+  source: string;
+}
+
+type SuggestionResponse = Match | Suggestion;
+
 
 interface SuggestionSelectorProps {
   suggestion: Suggestion;
@@ -32,8 +43,28 @@ interface SuggestionSelectorState {
   isViewingAll: boolean;
 }
 
-function calcHasGoodSuggestion(results: SuggestionOption[]) {
-  return results[0].coeff >= MIN_COEFF;
+export interface FreeTextPickListEditorProps {
+  onCancel: () => void;
+  onComplete: () => void;
+}
+
+interface FreeTextPickListEditorState {
+  text: string;
+  isPosting: boolean;
+  suggestions?: SuggestionResponse[];
+  errorMessage?: string;
+}
+
+interface SuggestionSelectorsProps {
+  errorMessage: string;
+  suggestions: SuggestionResponse[];
+  isPosting: boolean;
+  onCancel: () => void;
+  onSave: (pickListNames: string[]) => void;
+}
+
+interface SuggestionSelectorsState {
+  selections: Indexed<string>;
 }
 
 class SuggestionSelector extends React.Component<SuggestionSelectorProps, SuggestionSelectorState> {
@@ -91,7 +122,7 @@ class SuggestionSelector extends React.Component<SuggestionSelectorProps, Sugges
     const selectedValue = this.props.selectedValue;
     const disabled = this.props.disabled;
     const hasGoodSuggestion = this.props.hasGoodSuggestion;
-    const suggestions = _.chain(this.props.suggestion.results)
+    const suggestions = _.chain(this.props.suggestion.allResults)
       .map('target')
       .sortBy()
       .value();
@@ -106,11 +137,9 @@ class SuggestionSelector extends React.Component<SuggestionSelectorProps, Sugges
           value={selectedValue}
           onChange={this._onSelectValueChange}
         >
-          {_.map(suggestions, function (targetName, i) {
-            return (
+          {_.map(suggestions, (targetName, i) => (
               <option key={targetName} value={targetName}>{targetName}</option>
-            );
-          })}
+          ))}
         </select>
       </section>
     );
@@ -127,17 +156,80 @@ class SuggestionSelector extends React.Component<SuggestionSelectorProps, Sugges
 
 };
 
-export interface FreeTextPickListEditorProps {
-  onCancel: () => void;
-  onComplete: () => void;
-}
+class SuggestionSelectors extends React.Component<SuggestionSelectorsProps, SuggestionSelectorsState> {
 
-interface FreeTextPickListEditorState {
-  text: string;
-  isPosting: boolean;
-  suggestions?: Suggestion[];
-  suggestionSelections: Indexed<SuggestionOption>;
-  errorMessage?: string;
+  constructor(props: SuggestionSelectorsProps) {
+    super(props);
+
+    const initialSelections = {};
+    _.each(props.suggestions, s => {
+      if (s.type === "EXACT") {
+        initialSelections[s.source] = s.source;
+      } else {
+        initialSelections[s.source] = s.suggestion;
+      }
+    });
+
+    this.state = {
+      selections: initialSelections
+    }
+  }
+
+  render() {
+    const {suggestions, errorMessage, isPosting, onCancel} = this.props;
+    const {selections} = this.state;
+    return (
+      <div>
+        <div className='text-right' style={{marginBottom: '1em'}}>
+          <button
+            className='btn btn-default'
+            type='button'
+            onClick={onCancel}
+            disabled={isPosting}
+          >Cancel</button>
+        </div>
+        {!errorMessage ? null : (
+          <div className='alert alert-danger'>{errorMessage}</div>
+        )}
+        <div className='alert alert-warning'>Could not find an exact match for all golfers. Please verify the following matches are correct:</div>
+        {_.map(suggestions, s => (s.type === "EXACT" ? null : (
+          <SuggestionSelector
+            key={s.source}
+            hasGoodSuggestion={s.isGoodSuggestion}
+            disabled={isPosting}
+            suggestion={s}
+            selectedValue={selections[s.source]}
+            onSelectionChange={(target: string) => this._onSuggestionSelectionChange(s.source, target)}
+          />
+        )))}
+        <div className='text-right'>
+          <button
+            className='btn btn-default'
+            type='button'
+            onClick={onCancel}
+            disabled={isPosting}
+          >Cancel</button>
+          <span> </span>
+          <button
+            className='btn btn-primary'
+            type='button'
+            onClick={this._onSave}
+            disabled={isPosting}
+          >Save</button>
+        </div>
+      </div>
+    );
+  }
+
+  _onSuggestionSelectionChange(source: string, target: string) {
+    this.setState({ selections: { ...this.state.selections, [source]: target }});
+  }
+
+  _onSave = () => {
+    const newPicks = _.map(this.props.suggestions, s => this.state.selections[s.source]);
+    this.props.onSave(newPicks);
+  }
+
 }
 
 export default class FreeTextPickListEditor extends React.Component<FreeTextPickListEditorProps, FreeTextPickListEditorState> {
@@ -148,7 +240,6 @@ export default class FreeTextPickListEditor extends React.Component<FreeTextPick
       text: '',
       isPosting: false,
       suggestions: null,
-      suggestionSelections: {},
       errorMessage: null
     };
   }
@@ -163,54 +254,23 @@ export default class FreeTextPickListEditor extends React.Component<FreeTextPick
   }
 
   _renderSuggestions() {
-    const suggestions = this.state.suggestions;
-    const suggestionSelections = this.state.suggestionSelections;
-    const isPosting = this.state.isPosting;
-    const errorMessage = this.state.errorMessage;
     return (
-      <div>
-        <div className='text-right' style={{marginBottom: '1em'}}>
-          <button
-            className='btn btn-default'
-            type='button'
-            onClick={this.props.onCancel}
-            disabled={isPosting}
-          >Cancel</button>
-        </div>
-        {!errorMessage ? null : (
-          <div className='alert alert-danger'>{errorMessage}</div>
-        )}
-        <div className='alert alert-warning'>Could not find an exact match for all golfers. Please verify the following matches are correct:</div>
-        {_.map(suggestions, (suggestion: Suggestion) => {
-          const hasGoodSuggestion = calcHasGoodSuggestion(suggestion.results);
-          return (
-            <SuggestionSelector
-              key={suggestion.source}
-              hasGoodSuggestion={hasGoodSuggestion}
-              disabled={isPosting}
-              suggestion={suggestion}
-              selectedValue={suggestionSelections[suggestion.source].target}
-              onSelectionChange={(target: string) => this._onSuggestionSelectionChange(suggestion.source, target)}
-            />
-          );
-        })}
-        <div className='text-right'>
-          <button
-            className='btn btn-default'
-            type='button'
-            onClick={this.props.onCancel}
-            disabled={isPosting}
-          >Cancel</button>
-          <span> </span>
-          <button
-            className='btn btn-primary'
-            type='button'
-            onClick={this._onSave}
-            disabled={isPosting}
-          >Save</button>
-        </div>
-      </div>
+      <SuggestionSelectors
+        errorMessage={this.state.errorMessage}
+        suggestions={this.state.suggestions}
+        isPosting={this.state.isPosting}
+        onCancel={this.props.onCancel}
+        onSave={this._onSaveSuggestions}
+      />
     );
+  }
+
+  _onSaveSuggestions = (pickListNames: string[]) => {
+    this._save(pickListNames);
+  }
+  
+  _onSaveFreeText = () => {
+    this._save(this._cleanedGolfers());
   }
 
   _renderFreeText() {
@@ -229,7 +289,7 @@ export default class FreeTextPickListEditor extends React.Component<FreeTextPick
           <button
             className='btn btn-primary'
             type='button'
-            onClick={this._onSave}
+            onClick={this._onSaveFreeText}
             disabled={isPosting}
           >Save</button>
         </div>
@@ -246,49 +306,21 @@ export default class FreeTextPickListEditor extends React.Component<FreeTextPick
     );
   }
 
-  _cleanedGolfers() {
-    const suggestionSelections = this.state.suggestionSelections;
-    return _.chain(this.state.text.split('\n'))
-      .map(l => l.trim())
-      .reject(_.isEmpty)
-      .map(name => suggestionSelections[name] ? suggestionSelections[name].target : name)
-      .uniq()
-      .value();
-  }
-
   _onChange = (ev) => {
     this.setState({ text: ev.target.value });
   }
 
-  _setSuggestions(suggestions: Suggestion[]) {
-    const suggestionSelections = {};
-    _.each(suggestions, function (suggestion) {
-      let selection = suggestion.results[0];
-      if (!calcHasGoodSuggestion(suggestion.results)) {
-        selection = _.chain(suggestion.results)
-          .sortBy('target')
-          .first()
-          .value();
-      }
-      suggestionSelections[suggestion.source] = selection;
-    });
-
+  _setSuggestions(suggestions: SuggestionResponse[]) {
     this.setState({
       isPosting: false,
-      suggestionSelections: suggestionSelections,
-      suggestions: suggestions
+      suggestions
     });
   }
 
-  _onSuggestionSelectionChange = (source: string, target: string) => {
-    const newSuggestionSelections = _.extend({}, this.state.suggestionSelections, { [source]: target });
-    this.setState({ suggestionSelections: newSuggestionSelections });
-  }
-
-  _onSave = () => {
+  _save(pickListNames: string[]) {
     this.setState({ isPosting: true });
 
-    const data = { pickListNames: this._cleanedGolfers() };
+    const data = { pickListNames };
     postJson('/draft/pickList', data)
 
       .then((result) => {
@@ -300,7 +332,7 @@ export default class FreeTextPickListEditor extends React.Component<FreeTextPick
         const resp = err.response as Response;
         if (resp.status === 300) {
           return resp.json()
-            .then((json) => this._setSuggestions(json.suggestions));
+            .then(json => this._setSuggestions(json.suggestions));
         } else {
           this.setState({
             isPosting: false,
@@ -310,6 +342,14 @@ export default class FreeTextPickListEditor extends React.Component<FreeTextPick
 
         window.location.href = '#InlinePickListEditor';
       });
+  }
+  
+  _cleanedGolfers() {
+    return _.chain(this.state.text.split('\n'))
+      .map(l => l.trim())
+      .reject(_.isEmpty)
+      .uniq()
+      .value();
   }
 
 };

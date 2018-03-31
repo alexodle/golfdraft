@@ -1,11 +1,11 @@
 // ==== Util types ====
 
 export interface Indexed<T> {
-  readonly [id: string]: T;
+  [id: string]: T;
 }
 
 export interface NumberIndexed<T> {
-  readonly [n: number]: T;
+  [n: number]: T;
 }
 
 export interface AppSettings {
