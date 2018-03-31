@@ -14,5 +14,5 @@ pushd $BASE_DIR
 git checkout master
 git pull origin master
 npm install
-node ./server/refreshData.js
+npm run refreshData
 popd
