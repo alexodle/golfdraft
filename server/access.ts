@@ -71,7 +71,6 @@ function clearAll(model: Model<Document>) {
 function mergeWGR(golfer: GolferDoc, wgrEntry: WGR): Golfer {
   let wgr = null;
   if (!wgrEntry) {
-    console.log('WGR not found for: ' + golfer.name);
     wgr = UNKNOWN_WGR;
   } else {
     wgr = wgrEntry.wgr;

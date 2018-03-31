@@ -73,7 +73,7 @@ const sessionMiddleware = session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: !!config.prod,
+    secure: false, // TODO: Get this working when we have real logins
     maxAge: MAX_AGE
   }
 });
