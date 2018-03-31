@@ -10,7 +10,7 @@ import DraftPickOrderView from './DraftPickOrderView';
 import DraftStatus from './DraftStatus';
 import GolfDraftPanel from './GolfDraftPanel';
 import PickListEditor from './PickListEditor';
-import {Link} from 'react-router';
+import {Link} from 'react-router-dom';
 import {
   ChatMessage,
   DraftPick,
