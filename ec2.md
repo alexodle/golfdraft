@@ -13,3 +13,5 @@
 1. `./golfdraft/ec2_provision.sh`
 1. If you hit a mongodb connection issue, just run it again
 1. `./golfdraft/ec2_initNewTourney.sh`
+1. Let's encrypt setup: https://certbot.eff.org/lets-encrypt/ubuntuxenial-nginx
+1. `./golfdraft/ec2_runServer.sh`
