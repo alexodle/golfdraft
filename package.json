@@ -84,8 +84,7 @@
     "webpack": "^3.10.0",
     "whatwg-fetch": "^2.0.3"
   },
-  "devDependencies": {
-  },
+  "devDependencies": {},
   "scripts": {
     "start": "tsc && node tsDist/server/server.js",
     "test": "./node_modules/.bin/mocha --exit --compilers ts:ts-node/register ./test/*Test.ts",
