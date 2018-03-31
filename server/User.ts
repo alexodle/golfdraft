@@ -8,8 +8,7 @@ const User = new Schema({
 });
 
 User.plugin(passportLocalMongoose, {
-  limitAttempts: true,
-  maxAttempts: 10
+  limitAttempts: false
 });
 
 export default mongoose.model('User', User);

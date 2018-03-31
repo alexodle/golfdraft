@@ -249,11 +249,9 @@ export default class FreeTextPickListEditor extends React.Component<FreeTextPick
   _cleanedGolfers() {
     const suggestionSelections = this.state.suggestionSelections;
     return _.chain(this.state.text.split('\n'))
-      .invoke('trim')
+      .map(l => l.trim())
       .reject(_.isEmpty)
-      .map(function (name) {
-        return suggestionSelections[name] ? suggestionSelections[name].target : name;
-      })
+      .map(name => suggestionSelections[name] ? suggestionSelections[name].target : name)
       .uniq()
       .value();
   }

@@ -351,12 +351,18 @@ export function ensureUsers(allUsers: User[]) {
     return { name, username, password };
   });
   return getUsers()
-    .then(function (users) {
+    .then(users => {
       const existingUsersByName = _.keyBy(users, 'name');
-      const usersToAdd = _.filter(userJsons, function (json) {
-        return !existingUsersByName[json.name];
+      const usersToAdd = _.filter(userJsons, json => !existingUsersByName[json.name]);
+      const promises = _.map(usersToAdd, u => {
+        return new Promise((resolve, reject) => {
+          (<any>models.User).register(new models.User({ username: u.username, name: u.name }), u.password, (err) => {
+            if (err) reject(err);
+            resolve();
+          });
+        });
       });
-      return models.User.create(usersToAdd);
+      return Promise.all(promises);
     });
 }
 
@@ -461,6 +467,7 @@ export function resetTourney() {
     clearGolferScoreOverrides(),
     clearChatMessages(),
     clearPickLists(),
-    clearAppState()
+    clearAppState(),
+    clearUsers()
   ]);
 }

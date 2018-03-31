@@ -46,8 +46,6 @@ function addPick(golfer) {
 }
 
 function filterPicksFromPickLists() {
-  if (!_.isArray(_pickList)) return;
-
   const pickedGids = _.map(_picks, 'golfer');
   if (_pickList !== _pendingPickList) {
     _pickList = _.difference(_pickList, pickedGids);
