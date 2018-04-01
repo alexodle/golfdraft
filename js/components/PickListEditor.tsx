@@ -37,18 +37,18 @@ export default class PickListEditor extends React.Component<PickListEditorProps,
       return this._renderLoading();
     }
 
-    if (this.state.isFreeTextMode) {
+    const hasPickList = !_.isEmpty(this.props.pendingPickList);
+    if (this.state.isFreeTextMode || !hasPickList) {
       return (
         <FreeTextPickListEditor
-          onCancel={this._onFreeTextComplete}
+          onCancel={hasPickList ? this._onFreeTextComplete : null}
           onComplete={this._onFreeTextComplete}
         />
       );
     }
 
-    let pickList = this._getDisplayPickList();
+    let pickList = this.props.pendingPickList;
 
-    const hasPickListList = !_.isEmpty(this.props.syncedPickList);
     const draggingIndex = this.state.draggingIndex;
     const draggingHoverIndex = this.state.draggingHoverIndex;
     const unsavedChanges = this.props.syncedPickList !== this.props.pendingPickList;
@@ -91,9 +91,6 @@ export default class PickListEditor extends React.Component<PickListEditorProps,
             </span>
             {!unsavedChanges ? null : (
               <p><small>* Unsaved changes</small></p>
-            )}
-            {hasPickListList ? null : (
-              <p><small><b>Note:</b> You have not set a pick list, so we default to WGR.</small></p>
             )}
           </div>
         </div>
@@ -160,16 +157,8 @@ export default class PickListEditor extends React.Component<PickListEditorProps,
     return (<span>Loading...</span>);
   }
 
-  _getDisplayPickList() {
-    const pendingPickList = this.props.pendingPickList;
-    return !_.isEmpty(pendingPickList) ? pendingPickList : _.chain(this.props.golfersRemaining)
-      .sortBy(['wgr', 'name'])
-      .map('_id')
-      .value();
-  }
-
   _newOrder(fromIndex, toIndex) {
-    const currentOrder = this._getDisplayPickList();
+    const currentOrder = this.props.pendingPickList;
     const movingGolfer = currentOrder[fromIndex];
     const newOrder = currentOrder.slice();
     newOrder.splice(fromIndex, 1);

@@ -44,7 +44,7 @@ interface SuggestionSelectorState {
 }
 
 export interface FreeTextPickListEditorProps {
-  onCancel: () => void;
+  onCancel?: () => void;
   onComplete: () => void;
 }
 
@@ -186,12 +186,12 @@ class SuggestionSelectors extends React.Component<SuggestionSelectorsProps, Sugg
             type='button'
             onClick={onCancel}
             disabled={isPosting}
-          >Cancel</button>
+          >Back</button>
         </div>
         {!errorMessage ? null : (
           <div className='alert alert-danger'>{errorMessage}</div>
         )}
-        <div className='alert alert-warning'>Could not find an exact match for all golfers. Please verify the following matches are correct:</div>
+        <div className='alert alert-warning'>Could not find an exact name match for all golfers. Please verify the following matches are correct:</div>
         {_.map(suggestions, s => (s.type === "EXACT" ? null : (
           <SuggestionSelector
             key={s.source}
@@ -208,7 +208,7 @@ class SuggestionSelectors extends React.Component<SuggestionSelectorsProps, Sugg
             type='button'
             onClick={onCancel}
             disabled={isPosting}
-          >Cancel</button>
+          >Back</button>
           <span> </span>
           <button
             className='btn btn-primary'
@@ -259,10 +259,14 @@ export default class FreeTextPickListEditor extends React.Component<FreeTextPick
         errorMessage={this.state.errorMessage}
         suggestions={this.state.suggestions}
         isPosting={this.state.isPosting}
-        onCancel={this.props.onCancel}
+        onCancel={this._onSuggestionCancel}
         onSave={this._onSaveSuggestions}
       />
     );
+  }
+
+  _onSuggestionCancel = () => {
+    this.setState({ suggestions: null });
   }
 
   _onSaveSuggestions = (pickListNames: string[]) => {
@@ -279,18 +283,21 @@ export default class FreeTextPickListEditor extends React.Component<FreeTextPick
     return (
       <div>
         <div className='text-right'>
-          <button
-            className='btn btn-default'
-            type='button'
-            onClick={this.props.onCancel}
-            disabled={isPosting}
-          >Cancel</button>
-          <span> </span>
+          {!this.props.onCancel ? null : (
+            <span>
+              <button
+                className='btn btn-default'
+                type='button'
+                onClick={this.props.onCancel}
+                disabled={isPosting}
+              >Cancel</button>{" "}
+            </span>
+          )}
           <button
             className='btn btn-primary'
             type='button'
             onClick={this._onSaveFreeText}
-            disabled={isPosting}
+            disabled={isPosting || _.isEmpty(text)}
           >Save</button>
         </div>
         <p>One golfer per line:</p>

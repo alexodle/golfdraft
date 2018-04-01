@@ -1,5 +1,7 @@
 #!/bin/bash
 
+## Idea is to run this on a screen session
+
 BASE_DIR=~/golfdraft
 
 killall node
@@ -11,7 +13,7 @@ git checkout master
 git pull origin master
 npm install
 
-nohup npm start > $BASE_DIR/../serverlog.log 2>&1 &
+npm start > $BASE_DIR/../serverlog.log 2>&1 &
 
 popd
 tail -f $BASE_DIR/../serverlog.log

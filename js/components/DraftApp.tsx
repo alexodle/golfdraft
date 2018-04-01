@@ -196,7 +196,6 @@ export default class DraftApp extends React.Component<DraftAppProps, DraftAppSta
 
           <div className='col-md-4'>
             <GolfDraftPanel heading='Draft Order'>
-              <a id='InlineDraftPickListEditor' />
               <DraftPickOrderView
                 currentUser={this.props.currentUser}
                 currentPick={this.props.currentPick}
@@ -208,8 +207,10 @@ export default class DraftApp extends React.Component<DraftAppProps, DraftAppSta
           </div>
 
           <div className='col-md-8'>
+            <a id='InlineDraftPickListEditor' />
             <GolfDraftPanel heading={this._renderPickListHeader()}>
               <PickListEditor
+                preDraftMode
                 golfersRemaining={this.props.golfersRemaining}
                 syncedPickList={this.props.syncedPickList}
                 pendingPickList={this.props.pendingPickList}
