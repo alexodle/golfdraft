@@ -6,8 +6,6 @@ import {Redirect} from 'react-router-dom';
 import {Location} from '../types/ClientTypes';
 import {postJson} from '../fetch';
 
-const PLACEHOLDER_PASSWORD = 'PLACEHOLDER_PASSWORD';
-
 export interface WhoIsYouProps {
   location: Location;
 }
@@ -15,6 +13,8 @@ export interface WhoIsYouProps {
 interface WhoIsYouState {
   selectedUser: string;
   isLoading: boolean;
+  password: string;
+  badAuth: boolean;
   redirectTo?: string;
 }
 
@@ -26,34 +26,42 @@ export default class WhoIsYou extends React.Component<WhoIsYouProps, WhoIsYouSta
 
   constructor(props) {
     super(props);
-    this.state = this._getInitialState();
-  }
 
-  _getInitialState() {
     const selectedUser = getSortedUsers()[0]._id;
-    return {
+    this.state = {
       selectedUser,
       isLoading: false,
+      password: '',
       badAuth: false,
       redirectTo: null
     };
   }
 
+  componentDidMount() {
+    (this.refs.userSelect as HTMLSelectElement).focus();
+  }
+
   render() {
-    const {isLoading, selectedUser, redirectTo} = this.state;
+    const {badAuth, isLoading, selectedUser, redirectTo, password} = this.state;
     if (redirectTo) {
       return (<Redirect to={redirectTo} />);
     }
 
-    const submitDisabled = isLoading;
+    const submitDisabled = isLoading || _.isEmpty(password);
     return (
       <div>
         <h2>Who is you?</h2>
+        {!badAuth ? null : (
+          <div className='alert alert-danger' role='alert'>
+            Invalid password. Try again.
+          </div>
+        )}
         <div className='panel panel-default'>
           <div className='panel-body'>
             <form role='form'>
               <div className='form-group'>
                 <select
+                  ref='userSelect'
                   id='userSelect'
                   value={this.state.selectedUser}
                   onChange={this._onUserChange}
@@ -64,6 +72,17 @@ export default class WhoIsYou extends React.Component<WhoIsYouProps, WhoIsYouSta
                     return (<option key={u._id} value={u._id}>{u.name}</option>);
                   })}
                 </select>
+              </div>
+              <div className={'form-group' + (badAuth ? ' has-error' : '')}>
+                <input
+                  ref='passwordInput'
+                  type='password'
+                  placeholder='Password'
+                  className='form-control'
+                  onChange={this._onPasswordChange}
+                  disabled={isLoading}
+                  value={password}
+                />
               </div>
               <button
                 className='btn btn-default btn-primary'
@@ -79,6 +98,10 @@ export default class WhoIsYou extends React.Component<WhoIsYouProps, WhoIsYouSta
     );
   }
 
+  _onPasswordChange = (ev) => {
+    this.setState({ password: ev.target.value });
+  }
+
   _onUserChange = (ev) => {
     this.setState({ selectedUser: ev.target.value });
   }
@@ -86,11 +109,11 @@ export default class WhoIsYou extends React.Component<WhoIsYouProps, WhoIsYouSta
   _onSubmit = (ev) => {
     ev.preventDefault();
 
-    this.setState({ isLoading: true });
+    this.setState({ isLoading: true, badAuth: false });
 
     postJson('/login', {
         username: UserStore.getUser(this.state.selectedUser).username,
-        password: PLACEHOLDER_PASSWORD
+        password: this.state.password
       })
       .then(() => {
         UserActions.setCurrentUser(this.state.selectedUser);
@@ -98,6 +121,10 @@ export default class WhoIsYou extends React.Component<WhoIsYouProps, WhoIsYouSta
         const locationState = this.props.location.state;
         const redirectTo = (locationState && locationState.from) || '/';
         this.setState({ redirectTo });
+      })
+      .catch(() => {
+        this.setState({ isLoading: false, badAuth: true, password: '' });
+        (this.refs.passwordInput as HTMLInputElement).focus();
       });
   }
 

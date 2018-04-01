@@ -9,3 +9,4 @@ server/*.sh
 mongolog.txt*
 package-lock.json
 tourney_cfg.json
+init_user_cfg.json

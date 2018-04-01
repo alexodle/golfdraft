@@ -36,7 +36,6 @@ const UNKNOWN_WGR = constants.UNKNOWN_WGR;
 const TOURNEY_ID = new mongoose.Types.ObjectId(config.tourney_id);
 const TOURNEY_ID_QUERY = { _id: TOURNEY_ID };
 const FK_TOURNEY_ID_QUERY = { tourneyId: TOURNEY_ID };
-const PLACEHOLDER_PASSWORD = 'PLACEHOLDER_PASSWORD';
 
 function extendWithTourneyId(obj) {
   return { ...obj, ...FK_TOURNEY_ID_QUERY };
@@ -44,12 +43,6 @@ function extendWithTourneyId(obj) {
 
 function extendAllWithTourneyId(objs) {
   return _.map(objs, extendWithTourneyId);
-}
-
-function nameToUsername(name: string) {
-  return name
-    .toLowerCase()
-    .replace(' ', '_');
 }
 
 function multiUpdate(model: Model<Document>, queryMask: string[], objs: {}[]) {
@@ -373,16 +366,10 @@ export function updateTourney(props) {
 }
 
 export function ensureUsers(allUsers: User[]) {
-  const userJsons = _.map(allUsers, function (user) {
-    const name = user.name;
-    const username = nameToUsername(name);
-    const password = PLACEHOLDER_PASSWORD;
-    return { name, username, password };
-  });
   return getUsers()
     .then(users => {
       const existingUsersByName = _.keyBy(users, 'name');
-      const usersToAdd = _.filter(userJsons, json => !existingUsersByName[json.name]);
+      const usersToAdd = _.filter(allUsers, json => !existingUsersByName[json.name]);
       const promises = _.map(usersToAdd, u => {
         return new Promise((resolve, reject) => {
           (<any>models.User).register(new models.User({ username: u.username, name: u.name }), u.password, (err) => {

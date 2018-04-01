@@ -4,6 +4,7 @@ import * as mongooseUtil from './mongooseUtil';
 import * as updateScore from '../scores_sync/updateScore';
 import * as tourneyConfigReader from './tourneyConfigReader';
 import * as tourneyUtils from './tourneyUtils';
+import * as fs from 'fs';
 import config from './config';
 import readerConfig from '../scores_sync/readerConfig';
 import {
@@ -22,7 +23,13 @@ function printState() {
   });
 }
 
-function refreshData(pickOrderNames, reader, url) {
+function nameToUsername(name: string) {
+  return name
+    .toLowerCase()
+    .replace(' ', '_');
+}
+
+function refreshData(pickOrderNames: string[], reader, url) {
   console.log("BEGIN Refreshing all data...");
   console.log("");
   console.log("Pick order:");
@@ -40,9 +47,12 @@ function refreshData(pickOrderNames, reader, url) {
     .then(function () {
       console.log("Adding users");
       console.log("");
-      const users = _.map(pickOrderNames, function (name) {
-        return {name: name} as User;
-      });
+      const userInitCfg: {[key: string]: { password: string }} = JSON.parse(fs.readFileSync('init_user_cfg.json', 'utf8'));
+      const users: User[] = _.map(pickOrderNames, name => ({
+        name: name,
+        username: nameToUsername(name),
+        password: userInitCfg[name].password,
+      } as User));
       return access.ensureUsers(users);
     })
     .then(function () {
