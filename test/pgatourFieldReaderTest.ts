@@ -22,6 +22,7 @@ describe('PgaTourFieldReader', function () {
         { golfer: 'Gary Woodland', ...baseGolfer },
         { golfer: 'Tiger Woods', ...baseGolfer },
         { golfer: 'Ian Woosnam', ...baseGolfer },
+        { golfer: 'Ted Potter, Jr.', ...baseGolfer }
       ] as UpdateGolfer[]);
     });
 

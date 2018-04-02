@@ -33,6 +33,12 @@ module.exports = JSON.stringify({
         "TournamentPlayerId": "02300",
         "isAlternate": "No",
         "isMember": "N"
+      },
+      {
+        "PlayerName": "Potter, Jr., Ted",
+        "TournamentPlayerId": "04100",
+        "isAlternate": "No",
+        "isMember": "N"
       }
     ]
   }
