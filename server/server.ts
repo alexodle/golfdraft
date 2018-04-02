@@ -272,13 +272,19 @@ function defineRoutes() {
 
     const forUser = body.user;
     const pickNumber = body.pickNumber;
+
+    let isPickListPick = false;
     return handlePick({
       res,
       makePick: () => {
-        return access.makePickListPick(forUser, pickNumber);
+        return access.makePickListPick(forUser, pickNumber)
+          .then(result => {
+            isPickListPick = result.isPickListPick;
+            return result;
+          })
       },
       broadcastPickMessage: (spec) => {
-        return chatBot.broadcastProxyPickListPickMessage(currentUuser, spec.pick, spec.draft);
+        return chatBot.broadcastProxyPickListPickMessage(currentUuser, spec.pick, spec.draft, isPickListPick);
       }
     });
   });
@@ -415,7 +421,7 @@ function autoPick(userId: string, pickNumber: number) {
   return handlePick({
     makePick: () => {
       return access.makePickListPick(userId, pickNumber)
-        .then((result) => {
+        .then(result => {
           isPickListPick = result.isPickListPick;
           return result;
         });
@@ -468,18 +474,18 @@ function handlePick(spec: {
 
       throw err;
     })
-    .then((pick) => {
+    .then(pick => {
       if (res) {
         res.status(200).send({ pick });
       }
       return access.getDraft()
-        .then((draft) => {
+        .then(draft => {
           updateClients(draft);
           return broadcastPickMessage({ pick, draft });
         });
     })
     .then(ensureNextAutoPick)
-    .catch(function (err) {
+    .catch(err => {
       if (err === NOT_AN_ERROR) throw err;
       console.log(err);
     });

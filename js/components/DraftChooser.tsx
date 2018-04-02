@@ -1,13 +1,15 @@
+import {Golfer, IndexedGolfers, DraftPickOrder, User} from '../types/ClientTypes';
 import * as _ from 'lodash';
-import AppConstants from '../constants/AppConstants';
 import * as cx from 'classnames';
+import * as React from 'react';
+import * as utils from '../../common/utils';
+import AppConstants from '../constants/AppConstants';
+import constants from '../../common/constants';
 import DraftActions from '../actions/DraftActions';
+import GolfDraftPanel from './GolfDraftPanel';
 import GolferLogic from '../logic/GolferLogic';
 import GolferStore from '../stores/GolferStore';
-import * as React from 'react';
 import UserStore from '../stores/UserStore';
-import GolfDraftPanel from './GolfDraftPanel';
-import {Golfer, IndexedGolfers, DraftPickOrder, User} from '../types/ClientTypes';
 
 export interface DraftChooserProps {
   golfersRemaining: IndexedGolfers;
@@ -81,14 +83,16 @@ export default class DraftChooser extends React.Component<DraftChooserProps, Dra
         <div className='btn-group' role='group' aria-label='Sorting choices'>
           <label>Sort users by:</label><br />
           {!showPickListOption ? null : (
-            <button
-              type='button'
-              className={cx({
-                'btn btn-default': true,
-                'active': sortKey === 'pickList'
-              })}
-              onClick={() => this._setSortKey('pickList')}
-            >User Pick List</button>
+            <span>
+              <button
+                type='button'
+                className={cx({
+                  'btn btn-default': true,
+                  'active': sortKey === 'pickList'
+                })}
+                onClick={() => this._setSortKey('pickList')}
+              >Pick List</button>
+            </span>
           )}
           <button
             type='button'
@@ -111,16 +115,19 @@ export default class DraftChooser extends React.Component<DraftChooserProps, Dra
         <form role='form'>
         {isProxyPick && sortKey === 'pickList' ? (
           <div style={{marginTop: '1em'}}>
-            <small>* If no pick list is set, uses next WGR</small><br />
+            <small><b>
+              Selects the next player from the pick list. If no pick list is set, 
+              select the {utils.getOrdinal(constants.ABSENT_PICK_NTH_BEST_WGR)} best WGR.
+            </b></small><br />
             <button
               className='btn btn-default btn-primary'
               onClick={this._onProxyPickListPick}
-            >Select next user on pick list</button>
+            >Pick</button>
           </div>
         ) : (
           <div>
             <div className='form-group'>
-              <label htmlFor='golfersRemaining'>Select your user:</label>
+              <label htmlFor='golfersRemaining'>Select your golfer:</label>
               <select
                 id='golfersRemaining'
                 value={this.state.selectedGolfer}

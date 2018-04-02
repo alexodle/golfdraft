@@ -252,7 +252,7 @@ export function makePickListPick(userId: string, pickNumber: number) {
     getGolfers(),
     getPicks()
   ])
-  .then(function (results) {
+  .then(results => {
     const pickList = results[0] || [];
     const golfers = results[1];
     const picks = results[2];
@@ -264,17 +264,18 @@ export function makePickListPick(userId: string, pickNumber: number) {
 
     let golferToPick = _.chain(pickList)
       .filter((gid) => !pickedGolfers[gid.toString()])
-      .first()
+      .nth()
       .value();
 
     // If no golfer from the pickList list is available, use wgr
-    let isPickListPick = !!golferToPick;
-    golferToPick = golferToPick || _.chain(golfers)
-      .sortBy(['wgr', 'name'])
-      .map('_id')
-      .filter((gid) => !pickedGolfers[gid.toString()])
-      .first()
-      .value();
+    const isPickListPick = !!golferToPick;
+    if (!golferToPick) {
+      const remainingGolfers = _.chain(golfers)
+        .filter(g => !pickedGolfers[g._id.toString()])
+        .sortBy(['wgr', 'name'])
+        .value();
+      golferToPick = remainingGolfers[Math.min(constants.ABSENT_PICK_NTH_BEST_WGR, remainingGolfers.length - 1)]._id;
+    }
 
     const pick = {
       pickNumber,
@@ -282,9 +283,7 @@ export function makePickListPick(userId: string, pickNumber: number) {
       golfer: new mongoose.Types.ObjectId(golferToPick),
     } as DraftPick;
     return makePick(pick)
-      .then((resp) => {
-        return { isPickListPick, ...resp };
-      });
+      .then(resp => ({ isPickListPick, ...resp }));
   });
 }
 

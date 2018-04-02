@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import * as access from './access';
 import * as utils from '../common/utils';
+import constants from '../common/constants';
 import {
   Draft,
   DraftPick,
@@ -57,11 +58,15 @@ export function broadcastAutoPickMessage(draftPick, draft, isPickListPick: boole
     });
 }
 
-export function broadcastProxyPickListPickMessage(currentUser, draftPick, draft) {
+export function broadcastProxyPickListPickMessage(currentUser, draftPick, draft, isPickListPick: boolean) {
   return loadPick(draft, draftPick)
-    .then(function (pickInfo) {
+    .then(pickInfo => {
       const {pickUser, pickGolfer} = pickInfo;
-      const message = pickUser.name + ' picks ' + pickGolfer.name + ' (pick list proxy from ' + currentUser.name + ')';
+
+      const message =  `${pickUser.name} picks ${pickGolfer.name}` + (isPickListPick ?
+        ` (from pick list, proxy from ${currentUser.name})` :
+        ` (${utils.getOrdinal(constants.ABSENT_PICK_NTH_BEST_WGR)} best WGR, proxy from ${currentUser.name})`
+      );
       return sendMessage(message, pickInfo);
     });
 }

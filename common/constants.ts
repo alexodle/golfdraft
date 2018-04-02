@@ -11,5 +11,9 @@ export default {
   MISSED_CUT: 'MC',
 
   // Either too high, or non-existent
-  UNKNOWN_WGR: Number.MAX_VALUE
+  UNKNOWN_WGR: Number.MAX_VALUE,
+
+  // If a player is set to auto pick and has no pick list golfer available,
+  // we auto-pick the next nth best WGR player
+  ABSENT_PICK_NTH_BEST_WGR: 7,
 };
