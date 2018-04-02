@@ -52,7 +52,7 @@ export function broadcastAutoPickMessage(draftPick, draft, isPickListPick: boole
       const {pickUser, pickGolfer} = pickInfo;
       const message = pickUser.name + ' picks ' + pickGolfer.name + (isPickListPick ?
           ' (auto-draft from pick list)' :
-          ' (auto-draft wgr)'
+          ` (auto-draft ${utils.getOrdinal(constants.ABSENT_PICK_NTH_BEST_WGR)} best WGR)`
       );
       return sendMessage(message, pickInfo);
     });

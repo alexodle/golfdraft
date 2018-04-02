@@ -274,7 +274,7 @@ export function makePickListPick(userId: string, pickNumber: number) {
         .filter(g => !pickedGolfers[g._id.toString()])
         .sortBy(['wgr', 'name'])
         .value();
-      golferToPick = remainingGolfers[Math.min(constants.ABSENT_PICK_NTH_BEST_WGR, remainingGolfers.length - 1)]._id;
+      golferToPick = remainingGolfers[Math.min(constants.ABSENT_PICK_NTH_BEST_WGR - 1, remainingGolfers.length - 1)]._id;
     }
 
     const pick = {
