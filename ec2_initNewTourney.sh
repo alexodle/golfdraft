@@ -6,6 +6,7 @@ source $BASE_DIR/../config.sh
 
 pushd $BASE_DIR/../golfraft_cfg
 git fetch
+git fetch --tags
 git checkout "$TOURNEY_CFG_TAG"
 git pull origin "$TOURNEY_CFG_TAG"
 popd
