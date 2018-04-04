@@ -71,7 +71,6 @@ function createBasicClearer(model) {
 
 function mergeWGR(golfer, wgrEntry) {
   golfer = _.pick(golfer, '_id', 'name', 'amateur');
-  console.warn(golfer.toString());
   if (!wgrEntry) {
     console.warn('WGR not found for: ' + golfer.name);
     golfer.wgr = UNKNOWN_WGR;

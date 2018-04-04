@@ -71,6 +71,14 @@ var DraftChooser = React.createClass({
             })}
             onClick={_.partial(this._setSortKey, 'wgr')}
           >World Golf Ranking</button>
+          <button
+            type="button"
+            className={cx({
+              "btn btn-default": true,
+              "active": sortKey === 'amateur'
+            })}
+            onClick={_.partial(this._setSortKey, 'amateur')}
+          >Amateur Status (at bottom)</button>
         </div>
 
         <form role="form">
