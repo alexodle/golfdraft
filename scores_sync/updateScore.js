@@ -99,7 +99,7 @@ var UpdateScore = {
       .then(function () {
         // Ensure golfers
         var golfers = _.map(rawTourney.golfers, function (g) {
-          return { name: g.golfer };
+          return { name: g.golfer, amateur:g.is_amateur };
         });
         return access.ensureGolfers(golfers);
       })

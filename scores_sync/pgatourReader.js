@@ -57,6 +57,7 @@ function parseGolfer(par, tourneyRound, g) {
   var parsedGolfer = {
     golfer: bio.first_name + ' ' + bio.last_name,
     player_id: g.player_id,
+    is_amateur: bio.is_amateur,
     day: golferCurrentRound || tourneyRound,
     thru: g.thru,
     scores: _.chain(g.rounds)

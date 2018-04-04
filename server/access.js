@@ -70,7 +70,8 @@ function createBasicClearer(model) {
 }
 
 function mergeWGR(golfer, wgrEntry) {
-  golfer = _.pick(golfer, '_id', 'name');
+  golfer = _.pick(golfer, '_id', 'name', 'amateur');
+  console.warn(golfer.toString());
   if (!wgrEntry) {
     console.warn('WGR not found for: ' + golfer.name);
     golfer.wgr = UNKNOWN_WGR;
@@ -225,7 +226,7 @@ _.extend(access, {
 
   ensurePlayers: createMultiUpdater(models.Player, ['name', 'tourneyId']),
 
-  ensureGolfers: createMultiUpdater(models.Golfer, ['name', 'tourneyId']),
+  ensureGolfers: createMultiUpdater(models.Golfer, ['name', 'tourneyId', 'amateur']),
 
   replaceWgrs: function (wgrEntries) {
     return promiseize(models.WGR.remove().exec()).then(function () {

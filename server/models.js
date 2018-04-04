@@ -4,7 +4,8 @@ var mongoose = require('mongoose');
 
 var golferSchema = mongoose.Schema({
   tourneyId: mongoose.Schema.ObjectId,
-  name: String
+  name: String,
+  amateur: Boolean
 });
 golferSchema.index({ name: 1, tourneyId: 1 });
 
