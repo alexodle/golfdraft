@@ -21,7 +21,7 @@ export interface TourneyAppProps {
   scores: IndexedGolferScores;
   lastScoresUpdate: Date;
   chatMessages?: ChatMessage[];
-  activeUsers: Indexed<number>;
+  activeUsers: string[];
 }
 
 interface TourneyAppState {

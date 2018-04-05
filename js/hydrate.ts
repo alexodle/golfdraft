@@ -20,6 +20,7 @@ function hydrate(seedData) {
   });
   SettingsActions.setAppState(seedData.appState);
   AppActions.setTourneyName(seedData.tourneyName);
+  UserActions.setActiveUsers(seedData.activeUsers);
 
   if (seedData.user) {
     UserActions.hydrateCurrentUser(seedData.user._id);

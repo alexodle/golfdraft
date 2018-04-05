@@ -38,9 +38,6 @@ const AUTO_PICK_STARTUP_DELAY = 1000 * 5;
 
 const NOT_AN_ERROR = {};
 
-// Temp temp - remove this when we have multiple nodes
-userAccess.refresh();
-
 // Gzip
 app.use(compression());
 
@@ -93,7 +90,7 @@ passport.use((<any>User).createStrategy());
 app.use(bodyParser());
 
 // Global error handling
-app.use(function erroHandler(err, req: Request, res: Response, next: NextFunction) {
+app.use((err, req: Request, res: Response, next: NextFunction) => {
   if (err) {
     console.log(err);
     res.status(500).send(err);
@@ -118,9 +115,9 @@ app.use(function logSessionState(req: Request, res: Response, next: NextFunction
   next();
 });
 
-app.use(function updateUserActivity(req: Request, res: Response, next: NextFunction) {
-  if (req.user) {
-    userAccess.onUserActivity(req.session.id, req.user._id.toString());
+app.use((req: Request, res: Response, next: NextFunction) => {
+  if (req.session.passport) {
+    userAccess.onUserActivity(req.session.passport.user);
   }
   next();
 });
@@ -146,7 +143,7 @@ function defineRoutes() {
   // Include chat routes
   require('./chatRoutes');
 
-  // Include socket server
+  // Start listening for connect/disconnect
   require('./socketServer');
 
   // Support legacy urls
@@ -155,15 +152,18 @@ function defineRoutes() {
   });
 
   app.get(['/', '/draft', '/admin', '/whoisyou'], (req: Request, res: Response, next: NextFunction) => {
+    console.log('hihi.passport');
+    console.dir(req.session.passport);
     return Promise.all([
         access.getGolfers(),
         access.getUsers(),
         access.getDraft(),
         access.getScores(),
         access.getTourney(),
-        access.getAppState()
+        access.getAppState(),
+        userAccess.getActiveUsers(),
       ])
-      .then(function (results) {
+      .then(results => {
         res.render('index', {
           golfers: JSON.stringify(results[0]),
           users: JSON.stringify(results[1]),
@@ -171,11 +171,17 @@ function defineRoutes() {
           scores: JSON.stringify(results[3]),
           tourney: JSON.stringify(results[4]),
           appState: JSON.stringify(results[5]),
+          activeUsers: JSON.stringify(results[6]),
           user: JSON.stringify(req.user),
           tourneyName: tourneyCfg.name,
           prod: config.prod,
           cdnUrl: config.cdn_url
         });
+      })
+      .catch(err => {
+        console.log("Fatal error:");
+        console.log(err);
+        res.sendStatus(500);
       });
   });
 
@@ -197,7 +203,7 @@ function defineRoutes() {
   });
 
   app.post('/logout', (req: Request, res: Response, next: NextFunction) => {
-    userAccess.onUserLogout(req.session.id);
+    userAccess.onUserLogout(req.session.passport.user);
     req.logout();
     res.status(200).send({ 'username': null });
   });
@@ -530,6 +536,9 @@ mongooseUtil.connect()
   .then(() => {
     expressServer.listen(port);
     redisPubSubClient.subscribe("scores:update");
+
+    userAccess.startPeriodicClean();
+    userAccess.onUserChange();
 
     // Give some time to settle, and then start ensuring we run auto picks
     setTimeout(ensureNextAutoPick, AUTO_PICK_STARTUP_DELAY);

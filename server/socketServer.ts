@@ -5,14 +5,21 @@ import * as userAccess from './userAccess';
 
 const redisClient = redis.client;
 
-io.on('connection', function (socket) {
+io.on('connection', socket => {
+  console.log(`hihi.connection`);
   const session = socket.request.session;
 
-  if (session.user) {
-    userAccess.onUserActivity(session.id, session.user._id.toString());
+  console.dir(session);
+  if (session.passport) {
+    console.log(`hihi.session.connection: ${session.passport.user}`);
+    userAccess.onUserActivity(session.passport.user);
   }
 
-  socket.on('disconnect', function() {
-    userAccess.onUserLogout(session.id);
+  socket.on('disconnect', () => {
+    console.log(`hihi.session.disconnect`);
+    if (session.passport) {
+      console.log(`hihi.session.disconnect: ${session.passport.user}`);
+      userAccess.onUserLogout(session.passport.user);
+    }
   });
 });

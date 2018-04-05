@@ -9,7 +9,11 @@ const User = new Schema({
 
 User.plugin(passportLocalMongoose, {
   limitAttempts: true,
-  maxAttempts: 100
+  maxAttempts: 100,
+  selectFields: ['_id', 'username', 'name'],
+  findByUsername: (model, queryParameters) => {
+    return model.findOne(queryParameters, ['_id', 'username', 'name']);
+  }
 });
 
 export default mongoose.model('User', User);

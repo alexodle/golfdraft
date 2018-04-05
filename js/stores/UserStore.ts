@@ -9,7 +9,7 @@ import {post} from '../fetch';
 let _currentUser: string = null;
 let _users: IndexedUsers = null;
 let _isAdmin: boolean = false;
-let _activeUsers: Indexed<number> = null; // active user counts by user id
+let _activeUsers: string[] = null;
 
 class UserStoreImpl extends Store {
   changeEvent() { return 'UserStore:change'; }
