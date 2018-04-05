@@ -1,5 +1,10 @@
 #!/bin/bash
 
+## crontab example
+##
+## */10 * * * * ~/golfdraft/ec2_runUpdateScore.sh
+##
+
 cd ~/
 source config.sh
 
@@ -12,6 +17,6 @@ cd golfdraft
 git checkout master
 git pull origin master
 npm install
-/usr/bin/node ./scores_sync/runUpdateScore.js > $logfile 2>&1
+npm run updateScore > $logfile 2>&1
 
 echo "DONE!"
