@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import * as access from './access';
 import * as mongooseUtil from './mongooseUtil';
 import * as updateScore from '../scores_sync/updateScore';
-import * as tourneyConfigReader from './tourneyConfigReader';
+import { loadConfig, TourneyConfig } from './tourneyConfigReader';
 import * as tourneyUtils from './tourneyUtils';
 import * as fs from 'fs';
 import config from './config';
@@ -29,14 +29,14 @@ function nameToUsername(name: string) {
     .replace(' ', '_');
 }
 
-function refreshData(pickOrderNames: string[], reader, url) {
+function refreshData(tourneyCfg: TourneyConfig) {
   console.log("BEGIN Refreshing all data...");
   console.log("");
   console.log("Pick order:");
-  console.log(JSON.stringify(pickOrderNames));
+  console.log(JSON.stringify(tourneyCfg.draftOrder));
   console.log("");
-  console.log("Reader: " + reader);
-  console.log("Reader URL: " + url);
+  console.log("Reader: " + tourneyCfg.scores.type);
+  console.log("Reader URL: " + tourneyCfg.scores.url);
   console.log("");
 
   printState()
@@ -48,7 +48,7 @@ function refreshData(pickOrderNames: string[], reader, url) {
       console.log("Adding users");
       console.log("");
       const userInitCfg: {[key: string]: { password: string }} = JSON.parse(fs.readFileSync('init_user_cfg.json', 'utf8'));
-      const users: User[] = _.map(pickOrderNames, name => ({
+      const users: User[] = _.map(tourneyCfg.draftOrder, name => ({
         name: name,
         username: nameToUsername(name),
         password: userInitCfg[name].password,
@@ -58,7 +58,7 @@ function refreshData(pickOrderNames: string[], reader, url) {
     .then(function () {
       return access.getUsers().then(function (users) {
         return _.sortBy(users, function (p) {
-          return _.indexOf(pickOrderNames, p.name);
+          return _.indexOf(tourneyCfg.draftOrder, p.name);
         });
       });
     })
@@ -73,9 +73,10 @@ function refreshData(pickOrderNames: string[], reader, url) {
     .then(printState)
     .then(function () {
       console.log("BEGIN Updating scores");
-      return updateScore.run(readerConfig[reader].reader, url).then(function () {
-        console.log("END Updating scores");
-      });
+      return updateScore.run(readerConfig[tourneyCfg.scores.type].reader, tourneyCfg.scores.url, tourneyCfg.scores.nameMap, true)
+        .then(() => {
+          console.log("END Updating scores");
+        });
     })
     .catch(function (err) {
       if (err.stack) {
@@ -91,8 +92,9 @@ function refreshData(pickOrderNames: string[], reader, url) {
 
 mongooseUtil.connect()
   .then(function () {
-    const tourneyCfg = tourneyConfigReader.loadConfig();
-    refreshData(tourneyCfg.draftOrder, tourneyCfg.scores.type, tourneyCfg.scores.url);
+    const tourneyCfg = loadConfig();
+    console.log(tourneyCfg);
+    refreshData(tourneyCfg);
   })
   .catch(function (err) {
     console.log(err);

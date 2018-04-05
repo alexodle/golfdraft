@@ -73,7 +73,7 @@ export function mergeOverrides(scores: GolferScore[], scoreOverrides: ScoreOverr
   return newScores;
 }
 
-export function run(reader: Reader, url: string): Promise<boolean> {
+export function run(reader: Reader, url: string, nameMap: { [name: string]: string }, populateGolfers = false): Promise<boolean> {
   return reader.run(url).then(function (rawTourney) {
     // Quick assertion of data
     if (!rawTourney || !validate(rawTourney)) {
@@ -86,27 +86,34 @@ export function run(reader: Reader, url: string): Promise<boolean> {
 
       .then(() => {
         // Ensure golfers
-        const golfers = _.map(rawTourney.golfers, (g) => {
-          return { name: g.golfer } as Golfer;
-        });
-        return access.ensureGolfers(golfers);
+        if (populateGolfers) {
+          const golfers = _.map(rawTourney.golfers, (g) => {
+            return { name: g.golfer } as Golfer;
+          });
+          return access.ensureGolfers(golfers);
+        }
       })
 
-      .then(function () {
+      .then(() => {
         return Promise.all([
           access.getGolfers(),
           access.getScoreOverrides()
         ]);
       })
 
-      .then((results) => {
+      .then(results => {
         const gs = results[0] as Golfer[];
         const scoreOverrides = results[1] as ScoreOverride[];
 
         // Build scores with golfer id
         const golfersByName = _.keyBy(gs, "name");
         const scores = _.map(rawTourney.golfers, (g) => {
-          const golfer = golfersByName[g.golfer]._id;
+          const golferName = nameMap[g.golfer] || g.golfer;
+          if (!golfersByName[golferName]) {
+            throw new Error("ERROR: Could not find golfer: " + golferName);
+          }
+
+          const golfer = golfersByName[golferName]._id;
           return {
             golfer: golfer,
             day: g.day,
@@ -129,12 +136,12 @@ export function run(reader: Reader, url: string): Promise<boolean> {
         return access.updateScores(finalScores);
       })
 
-      .then(function () {
+      .then(() => {
         console.log("HOORAY! - scores updated");
         return true;
       })
 
-      .catch(function (e) {
+      .catch((e) => {
         console.log(e);
         return false;
       });

@@ -90,7 +90,8 @@
     "start": "tsc && node tsDist/server/server.js",
     "test": "./node_modules/.bin/mocha --exit --compilers ts:ts-node/register ./test/*Test.ts",
     "refreshData": "tsc && node tsDist/server/refreshData.js",
-    "updateWgr": "tsc && node tsDist/wgr/runUpdateWGR.js"
+    "updateWgr": "tsc && node tsDist/wgr/runUpdateWGR.js",
+    "updateScore": "tsc && node tsDist/scores_sync/runUpdateScore.js"
   },
   "engines": {
     "node": "0.12.x",

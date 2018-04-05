@@ -10,6 +10,7 @@ const TIMEOUT = 30 * 1000; // 30 seconds
 const tourneyCfg = loadConfig();
 
 const reader = readerConfig[tourneyCfg.scores.type].reader;
+const nameMap = tourneyCfg.scores.nameMap;
 console.log(tourneyCfg.scores.type);
 console.log(reader);
 const url = tourneyCfg.scores.url;
@@ -28,7 +29,7 @@ function updateScores() {
     process.exit(1);
   }, TIMEOUT);
 
-  updateScore.run(reader, url).then(function (succeeded) {
+  updateScore.run(reader, url, nameMap).then(function (succeeded) {
     console.log("succeeded: " + succeeded);
     if (succeeded) {
       redis.pubSubClient.publish("scores:update", (new Date()).toString());

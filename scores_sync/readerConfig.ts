@@ -4,15 +4,11 @@ import pgatourFieldReader from './pgatourFieldReader';
 export default {
 
   pgatour: {
-    reader: pgatourReader,
-    nameMap: {
-    }
+    reader: pgatourReader
   },
 
   pgatour_field: {
-    reader: pgatourFieldReader,
-    nameMap: {
-    }
+    reader: pgatourFieldReader
   }
 
 };
