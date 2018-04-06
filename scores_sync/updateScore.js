@@ -91,7 +91,7 @@ var UpdateScore = {
       .then(function() {
         var stillPlaying = _.filter(rawTourney.golfers, function(g) {
           var strokes = rawTourney.tourney.par * tourneyCfg.scores.startDay;
-          return _.sum(g.scores) <= rawTourney.tourney.cutLineScore;
+          return rawTourney.tourney.currentRound < 3 || _.sum(g.scores) <= rawTourney.tourney.cutLineScore;
           //return !(g.scores[tourneyCfg.scores.startDay] === "MC");
         })
         rawTourney.golfers = stillPlaying;
