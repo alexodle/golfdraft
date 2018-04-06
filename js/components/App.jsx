@@ -56,9 +56,12 @@ function getAppState() {
   };
 }
 
-function getGolfersRemaining(golfers, draftPicks) {
+function getGolfersRemaining(golfers, draftPicks, scores) {
   var pickedGolfers = _.pluck(draftPicks, "golfer");
   var golfersRemaining = _.omit(golfers, pickedGolfers);
+  Object.keys(golfersRemaining).map(function(k) { 
+    golfersRemaining[k].score = scores[k].scores.reduce(function(a,r) { return a+r;},0);
+  })
   return golfersRemaining;
 }
 
@@ -191,7 +194,8 @@ var AppNode = React.createClass({
     // Calculated here since it's used in multiple places
     var golfersRemaining = getGolfersRemaining(
       state.golfers,
-      state.draft.draftPicks
+      state.draft.draftPicks,
+      state.scores
     );
 
     return React.cloneElement(this.props.children, {

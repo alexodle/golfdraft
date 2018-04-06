@@ -75,6 +75,14 @@ var DraftChooser = React.createClass({
             type="button"
             className={cx({
               "btn btn-default": true,
+              "active": sortKey === 'score'
+            })}
+            onClick={_.partial(this._setSortKey, 'score')}
+          >Current Score</button>
+          <button
+            type="button"
+            className={cx({
+              "btn btn-default": true,
               "active": sortKey === 'amateur'
             })}
             onClick={_.partial(this._setSortKey, 'amateur')}

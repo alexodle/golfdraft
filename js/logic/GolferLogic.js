@@ -8,7 +8,9 @@ var GolferLogic = {
 
   renderGolfer: function (g) {
     var wgrDisplay = g.wgr === UNKNOWN_WGR ? '' : ' (WGR: ' + g.wgr + ')';
-    return g.name + (g.amateur ? ' (A)' : '') + wgrDisplay;
+    var amDisplay = g.amateur ? ' (A)' : '';
+    var scDisplay = ' (' + g.score +')'
+    return g.name + scDisplay + amDisplay + wgrDisplay;
   }
 
 };
