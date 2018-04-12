@@ -1,0 +1,39 @@
+# Largely take from https://scotch.io/tutorials/create-a-mean-app-with-angular-2-and-docker-compose
+version: '2' # specify docker-compose version
+
+# Define the services/containers to be run
+services:
+
+  web: #name of the second service
+    #command: tail -f /dev/null #nodemon --inspect=0.0.0.0:5858
+    build: . # specify the directory of the Dockerfile
+    ports:
+      - "4000:4000" #specify ports forwarding
+      - "5858:5858" #debugging
+    links:
+      - mongo
+      - redis
+    volumes:
+      - ./:/usr/src/app
+      - web_node_modules:/usr/src/app/node_modules
+    environment:
+      - PORT=4000
+      - MONGO_URI=mongodb://mongo:27017/gd
+      - DEBUG=true
+      - REDISTOGO_URL=redis://@redis:6379/1
+      - TOURNEY_CFG=config/2018_masters.json
+
+  mongo: # name of the third service
+    image: mongo:latest # specify image to build container from
+    ports:
+      - "27017:27017" # specify port forwarding
+    volumes:
+      - ./data:/data
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+
+volumes:
+  web_node_modules:
