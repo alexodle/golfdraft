@@ -10,7 +10,6 @@ import DraftPickOrderView from './DraftPickOrderView';
 import DraftStatus from './DraftStatus';
 import GolfDraftPanel from './GolfDraftPanel';
 import PickListEditor from './PickListEditor';
-import BestAvailableList from './BestAvailableList';
 import {Link} from 'react-router-dom';
 import {
   ChatMessage,
@@ -152,6 +151,15 @@ export default class DraftApp extends React.Component<DraftAppProps, DraftAppSta
 
     const isMyPick = this.props.isMyDraftPick;
     const isDraftPaused = this.props.isPaused;
+    const syncedPickListForEditor = this.props.syncedPickList === null || !_.isEmpty(this.props.syncedPickList) ?
+      this.props.syncedPickList :
+      _.chain(this.props.golfersRemaining)
+        .sortBy(g => g.wgr, g => g.name)
+        .map(g => g._id)
+        .value();
+    const pendingPickListForEditor = this.props.pendingPickList === null || !_.isEmpty(this.props.pendingPickList) ?
+      this.props.pendingPickList :
+      syncedPickListForEditor;
 
     return (
       <div>
@@ -198,20 +206,14 @@ export default class DraftApp extends React.Component<DraftAppProps, DraftAppSta
           </div>
 
           <div className='col-md-8'>
-            {!_.isEmpty(this.props.syncedPickList) ? (
               <GolfDraftPanel heading='Pick List'>
                 <PickListEditor
                   golfersRemaining={this.props.golfersRemaining}
-                  syncedPickList={this.props.syncedPickList}
-                  pendingPickList={this.props.pendingPickList}
+                  syncedPickList={syncedPickListForEditor}
+                  pendingPickList={pendingPickListForEditor}
                   height='29em'
                 />
               </GolfDraftPanel>
-            ) : (
-              <GolfDraftPanel heading='Players Available'>
-                <BestAvailableList golfersRemaining={this.props.golfersRemaining} maxGolfers={20}  />
-              </GolfDraftPanel>
-            )}
           </div>
 
         </div>
