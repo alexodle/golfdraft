@@ -10,6 +10,7 @@ import DraftPickOrderView from './DraftPickOrderView';
 import DraftStatus from './DraftStatus';
 import GolfDraftPanel from './GolfDraftPanel';
 import PickListEditor from './PickListEditor';
+import BestAvailableList from './BestAvailableList';
 import {Link} from 'react-router-dom';
 import {
   ChatMessage,
@@ -61,15 +62,6 @@ export default class DraftApp extends React.Component<DraftAppProps, DraftAppSta
     }
   }
 
-  _renderPickListHeader() {
-    return (
-      <span>
-        <span>Pick List Editor</span>
-        <span className='pull-right'><em>NEW!</em></span>
-      </span>
-    );
-  }
-
   _renderPreDraft() {
     return (
       <section>
@@ -78,7 +70,6 @@ export default class DraftApp extends React.Component<DraftAppProps, DraftAppSta
           <div className='col-md-12'>
             <div className='jumbotron'>
               <h1>Draft not started.</h1>
-              <em>New feature: <a href='#InlinePickListEditor'>Set up your pick list beforehand</a></em>
             </div>
           </div>
         </div>
@@ -86,7 +77,7 @@ export default class DraftApp extends React.Component<DraftAppProps, DraftAppSta
         <div className='row'>
           <div className='col-md-12'>
             <a id='InlinePickListEditor' />
-            <GolfDraftPanel heading={this._renderPickListHeader()}>
+            <GolfDraftPanel heading='Pick List Editor'>
               <PickListEditor
                 preDraftMode
                 golfersRemaining={this.props.golfersRemaining}
@@ -207,16 +198,20 @@ export default class DraftApp extends React.Component<DraftAppProps, DraftAppSta
           </div>
 
           <div className='col-md-8'>
-            <a id='InlineDraftPickListEditor' />
-            <GolfDraftPanel heading={this._renderPickListHeader()}>
-              <PickListEditor
-                preDraftMode
-                golfersRemaining={this.props.golfersRemaining}
-                syncedPickList={this.props.syncedPickList}
-                pendingPickList={this.props.pendingPickList}
-                height='29em'
-              />
-            </GolfDraftPanel>
+            {!_.isEmpty(this.props.syncedPickList) ? (
+              <GolfDraftPanel heading='Pick List'>
+                <PickListEditor
+                  golfersRemaining={this.props.golfersRemaining}
+                  syncedPickList={this.props.syncedPickList}
+                  pendingPickList={this.props.pendingPickList}
+                  height='29em'
+                />
+              </GolfDraftPanel>
+            ) : (
+              <GolfDraftPanel heading='Players Available'>
+                <BestAvailableList golfersRemaining={this.props.golfersRemaining} maxGolfers={20}  />
+              </GolfDraftPanel>
+            )}
           </div>
 
         </div>
