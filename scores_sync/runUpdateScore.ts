@@ -23,26 +23,21 @@ function end() {
 
 function updateScores() {
   console.log("attempting update...");
-
-  const timeoutId = setTimeout(function () {
-    console.error("TIMEOUT");
-    end();
-    process.exit(1);
-  }, TIMEOUT);
-
-  updateScore.run(reader, url, nameMap)
+  return updateScore.run(reader, url, nameMap)
     .then(() => updatePlayerScores.run())
     .then(() => redis.pubSubClient.publish("scores:update", (new Date()).toString()))
-    .catch(e => console.error("UPDATE FAILED", e))
-    .then(() => {
-      clearTimeout(timeoutId);
-      end();
-    });
 }
+
+const timeoutId = setTimeout(function () {
+  console.error("TIMEOUT");
+  end();
+  process.exit(1);
+}, TIMEOUT);
 
 mongooseUtil.connect()
   .then(updateScores)
-  .catch(function (err) {
-    console.log(err);
+  .catch(e => console.error("Update failed", e))
+  .then(() => {
+    clearTimeout(timeoutId);
     end();
   });

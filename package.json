@@ -91,7 +91,8 @@
     "test": "./node_modules/.bin/mocha --exit --compilers ts:ts-node/register ./test/*Test.ts",
     "refreshData": "tsc && node tsDist/server/refreshData.js",
     "updateWgr": "tsc && node tsDist/wgr/runUpdateWGR.js",
-    "updateScore": "tsc && node tsDist/scores_sync/runUpdateScore.js"
+    "updateScore": "tsc && node tsDist/scores_sync/runUpdateScore.js",
+    "printGolfersWithoutWgr": "tsc && node tsDist/wgr/runPrintGolfersWithoutWgr.js"
   },
   "engines": {
     "node": "0.12.x",
