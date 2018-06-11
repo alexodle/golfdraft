@@ -23,6 +23,7 @@ import {
   GolferDoc,
   GolferScore,
   GolferScoreDoc,
+  PlayerScore,
   ObjectId,
   ScoreOverride,
   ScoreOverrideDoc,
@@ -398,6 +399,10 @@ export function setPickOrder(objs: DraftPickOrder[]) {
 
 export function updateScores(objs: GolferScore[]) {
   return multiUpdate(models.GolferScore, ['golfer', 'tourneyId'], objs);
+}
+
+export function updatePlayerScores(objs: PlayerScore[]) {
+  return multiUpdate(models.PlayerScore, ['player', 'tourneyId'], objs);
 }
 
 // Chat

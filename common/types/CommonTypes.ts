@@ -41,6 +41,21 @@ export interface GolferScore {
   thru: number;
 }
 
+export interface PlayerScore {
+  player: string;
+  totalScore: number;
+  dayScores: [{
+    day: number;
+    totalScore: number;
+    golferScores: [{
+      golfer: string;
+      score: number;
+      missedCut: boolean;
+      scoreUsed: boolean;
+    }];
+  }];
+}
+
 export interface ChatMessage {
   isBot?: boolean;
   message: string;

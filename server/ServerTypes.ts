@@ -37,6 +37,9 @@ export interface GolferScore extends CommonTypes.GolferScore, TourneySpecific {
 }
 export type GolferScoreDoc = GolferScore & Document;
 
+export interface PlayerScore extends CommonTypes.PlayerScore, TourneySpecific {}
+export type PlayerScoreDoc = PlayerScore & Document;
+
 export interface ChatMessage extends CommonTypes.ChatMessage, TourneySpecific {
   user?: ObjectId;
 }

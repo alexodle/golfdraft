@@ -73,11 +73,12 @@ export function mergeOverrides(scores: GolferScore[], scoreOverrides: ScoreOverr
   return newScores;
 }
 
-export function run(reader: Reader, url: string, nameMap: { [name: string]: string }, populateGolfers = false): Promise<boolean> {
-  return reader.run(url).then(function (rawTourney) {
+export function run(reader: Reader, url: string, nameMap: { [name: string]: string }, populateGolfers = false): Promise<void> {
+  return reader.run(url).then(rawTourney => {
     // Quick assertion of data
     if (!rawTourney || !validate(rawTourney)) {
-      return false;
+      console.error("Invalid data for updateScore", rawTourney);
+      throw new Error("Invalid data for updateScore");
     }
 
     // Ensure tourney/par
@@ -138,12 +139,11 @@ export function run(reader: Reader, url: string, nameMap: { [name: string]: stri
 
       .then(() => {
         console.log("HOORAY! - scores updated");
-        return true;
       })
 
-      .catch((e) => {
-        console.log(e);
-        return false;
+      .catch(e => {
+        console.error(e);
+        throw e;
       });
 
     return mainPromise;
