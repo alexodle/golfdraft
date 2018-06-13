@@ -131,10 +131,10 @@ function defineRoutes() {
   redisPubSubClient.on("message", function (channel, message) {
     // Scores updated, alert clients
     console.log("redis message: channel " + channel + ": " + message);
-    access.getScores().then(function (scores) {
+    access.getTourneyStandings().then(tourneyStandings => {
       io.sockets.emit('change:scores', {
         data: {
-          scores: scores,
+          tourneyStandings,
           lastUpdated: new Date()
         },
         evType: 'change:scores',
@@ -159,18 +159,18 @@ function defineRoutes() {
         access.getGolfers(),
         access.getUsers(),
         access.getDraft(),
-        access.getScores(),
+        access.getTourneyStandings(),
         access.getTourney(),
         access.getAppState()
       ])
-      .then(function (results) {
+      .then(([golfers, users, draft, tourneyStandings, tourney, appState]) => {
         res.render('index', {
-          golfers: JSON.stringify(results[0]),
-          users: JSON.stringify(results[1]),
-          draft: JSON.stringify(results[2]),
-          scores: JSON.stringify(results[3]),
-          tourney: JSON.stringify(results[4]),
-          appState: JSON.stringify(results[5]),
+          golfers: JSON.stringify(golfers),
+          users: JSON.stringify(users),
+          draft: JSON.stringify(draft),
+          tourneyStandings: JSON.stringify(tourneyStandings),
+          tourney: JSON.stringify(tourney),
+          appState: JSON.stringify(appState),
           user: JSON.stringify(req.user),
           tourneyName: tourneyCfg.name,
           prod: config.prod,

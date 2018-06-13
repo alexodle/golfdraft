@@ -23,7 +23,8 @@ import {
   GolferDoc,
   GolferScore,
   GolferScoreDoc,
-  PlayerScore,
+  TourneyStandings,
+  TourneyStandingsDoc,
   ObjectId,
   ScoreOverride,
   ScoreOverrideDoc,
@@ -218,6 +219,10 @@ export function getScores(): Promise<GolferScoreDoc[]> {
   return getAll(models.GolferScore) as Promise<GolferScoreDoc[]>;
 }
 
+export function getTourneyStandings(): Promise<TourneyStandingsDoc> {
+  return models.TourneyStandings.findOne(TOURNEY_ID_QUERY).exec() as Promise<TourneyStandingsDoc>;
+}
+
 export function getPicks(): Promise<DraftPickDoc[]> {
   return getAll(models.DraftPick) as Promise<DraftPickDoc[]>;
 }
@@ -388,9 +393,7 @@ export function ensureGolfers(objs: Golfer[]) {
 
 export function replaceWgrs(wgrEntries: WGR[]) {
   return models.WGR.remove({}).exec()
-    .then(() => {
-      return models.WGR.create(wgrEntries);
-    });
+    .then(() => models.WGR.create(wgrEntries));
 }
 
 export function setPickOrder(objs: DraftPickOrder[]) {
@@ -401,8 +404,11 @@ export function updateScores(objs: GolferScore[]) {
   return multiUpdate(models.GolferScore, ['golfer', 'tourneyId'], objs);
 }
 
-export function updatePlayerScores(objs: PlayerScore[]) {
-  return multiUpdate(models.PlayerScore, ['player', 'tourneyId'], objs);
+export function updateTourneyStandings(tourneyStandings: TourneyStandings) {
+  return models.TourneyStandings.update(
+    TOURNEY_ID_QUERY,
+    tourneyStandings,
+    { upsert: true });
 }
 
 // Chat
@@ -454,6 +460,10 @@ export function clearGolferScoreOverrides() {
   return clearAll(models.GolferScoreOverrides);
 }
 
+export function clearTourneyStandings() {
+  return clearAll(models.TourneyStandings);
+}
+
 export function clearPickLists() {
   return clearAll(models.DraftPickList);
 }
@@ -484,6 +494,7 @@ export function resetTourney() {
     clearDraftPicks(),
     clearGolfers(),
     clearGolferScores(),
+    clearTourneyStandings(),
     clearGolferScoreOverrides(),
     clearChatMessages(),
     clearPickLists(),

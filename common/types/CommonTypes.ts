@@ -50,10 +50,17 @@ export interface PlayerScore {
     golferScores: [{
       golfer: string;
       score: number;
+      thru: number;
       missedCut: boolean;
       scoreUsed: boolean;
     }];
   }];
+}
+
+export interface TourneyStandings {
+  currentDay: number;
+  worstScoresForDay: { day: number, golfer: string; score: number; }[],
+  playerScores: PlayerScore[];
 }
 
 export interface ChatMessage {

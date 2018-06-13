@@ -1,29 +1,36 @@
 import * as _ from 'lodash';
 import AppDispatcher from '../dispatcher/AppDispatcher';
 import ScoreConstants from '../constants/ScoreConstants';
-import ScoreLogic from '../logic/ScoreLogic';
 import Store from './Store';
-import {IndexedGolferScores} from '../types/ClientTypes';
+import {TourneyStandings} from '../types/ClientTypes';
 
-let _scores: IndexedGolferScores = {};
+let _tourneyStandings: TourneyStandings = null;
 let _lastUpdated: Date = null;
 
 class ScoreStoreImpl extends Store {
   changeEvent() { return 'ScoreStore:change'; }
-  getScores() { return _scores; }
+  getTourneyStandings() { return _tourneyStandings; }
   getLastUpdated() { return _lastUpdated; }
 }
 const ScoreStore = new ScoreStoreImpl();
 
 // Register to handle all updates
-AppDispatcher.register(function (payload) {
+AppDispatcher.register(payload => {
   const action = payload.action;
 
   switch(action.actionType) {
     case ScoreConstants.SCORE_UPDATE:
-      const scores = ScoreLogic.fillMissedCutScores(action.scores);
-
-      _scores = _.keyBy(scores, "golfer");
+      // Sort the dayScores, that's it
+      const tourneyStandings = action.tourneyStandings as TourneyStandings;
+      const sortedTourneyStandings = { ...tourneyStandings,
+        // Assume a worst score of even means the day hasn't started
+        worstScoresForDay: _.chain(tourneyStandings.worstScoresForDay)
+          .sortBy(ws => ws.day)
+          .takeWhile(ws => ws.score != 0)
+          .value(),
+        playerScores: _.sortBy(tourneyStandings.playerScores, ps => ps.totalScore)
+      };
+      _tourneyStandings = sortedTourneyStandings;
       _lastUpdated = action.lastUpdated;
 
       ScoreStore.emitChange();

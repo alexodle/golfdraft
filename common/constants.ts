@@ -1,4 +1,6 @@
 export default {
+  NHOLES: 18,
+
   // Tournaments are 4 days
   NDAYS: 4,
 
@@ -15,5 +17,5 @@ export default {
 
   // If a player is set to auto pick and has no pick list golfer available,
   // we auto-pick the next nth best WGR player
-  ABSENT_PICK_NTH_BEST_WGR: 7,
+  ABSENT_PICK_NTH_BEST_WGR: 7
 };

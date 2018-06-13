@@ -33,29 +33,7 @@ export interface Golfer extends CommonTypes.Golfer {
 }
 export interface IndexedGolfers extends Indexed<Golfer> {}
 
-export interface GolferScore extends CommonTypes.GolferScore {
-  total: number;
-  missedCuts: boolean[];
-  scores: number[];
-}
-export interface IndexedGolferScores extends Indexed<GolferScore> {}
-
-export interface UserDayScore {
-  day: number;
-  total: number;
-  allScores: GolferScore[];
-  usedScores: GolferScore[];
-}
-export interface IndexedUserDayScores extends NumberIndexed<UserDayScore> {}
-
-export interface UserScore {
-  user: string;
-  total: number;
-  pickNumber: number;
-  scoresByGolfer: IndexedGolferScores;
-  scoresByDay: IndexedUserDayScores;
-}
-export interface IndexedUserScores extends Indexed<UserScore> {}
+export interface TourneyStandings extends CommonTypes.TourneyStandings {}
 
 export interface ChatMessage extends CommonTypes.ChatMessage {
   user?: string;

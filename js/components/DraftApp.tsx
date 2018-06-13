@@ -26,6 +26,7 @@ const pickMadeSound = new Audio(Assets.PICK_MADE_SOUND);
 
 export interface DraftAppProps {
   draftPicks: DraftPick[];
+  pickOrder: DraftPickOrder[];
   isMyDraftPick: boolean;
   golfersRemaining: IndexedGolfers;
   syncedPickList: string[];
@@ -196,6 +197,7 @@ export default class DraftApp extends React.Component<DraftAppProps, DraftAppSta
           <div className='col-md-4'>
             <GolfDraftPanel heading='Draft Order'>
               <DraftPickOrderView
+                pickOrder={this.props.pickOrder}
                 currentUser={this.props.currentUser}
                 currentPick={this.props.currentPick}
                 pickingForUsers={this.props.pickingForUsers}

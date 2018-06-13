@@ -15,7 +15,7 @@ function hydrate(seedData) {
   AppActions.setGolfers(seedData.golfers);
   DraftActions.draftUpdate(draft);
   ScoreActions.scoreUpdate({
-    scores: seedData.scores,
+    tourneyStandings: seedData.tourneyStandings,
     lastUpdated: seedData.tourney.lastUpdated
   });
   SettingsActions.setAppState(seedData.appState);

@@ -6,6 +6,7 @@ import Store from './Store';
 import UserStore from './UserStore';
 import {DraftPick, DraftPickOrder} from '../types/ClientTypes';
 import {postJson, fetch, post} from '../fetch';
+import constants from '../../common/constants';
 
 let _picks: DraftPick[] = [];
 let _pickOrder: DraftPickOrder[] = [];

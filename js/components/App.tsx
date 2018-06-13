@@ -19,10 +19,9 @@ import {
   DraftPick,
   DraftPickOrder,
   Golfer,
-  GolferScore,
   Indexed,
   IndexedGolfers,
-  IndexedGolferScores,
+  TourneyStandings,
   IndexedUsers,
   Location,
   User,
@@ -43,7 +42,7 @@ interface AppState {
   golfers: IndexedGolfers;
   users: IndexedUsers;
   draft: DraftProps;
-  scores: IndexedGolferScores;
+  tourneyStandings: TourneyStandings;
   lastScoresUpdate: Date;
   chatMessages?: ChatMessage[];
   isAdmin: boolean;
@@ -67,6 +66,7 @@ function getAppState(): AppState {
     users: UserStore.getAll(),
 
     draft: {
+      pickOrder: DraftStore.getPickOrder(),
       isMyDraftPick: DraftStore.getIsMyDraftPick(),
       currentPick: DraftStore.getCurrentPick(),
       draftPicks: DraftStore.getDraftPicks(),
@@ -75,7 +75,7 @@ function getAppState(): AppState {
       pendingPickList: DraftStore.getPendingPickList()
     },
 
-    scores: ScoreStore.getScores(),
+    tourneyStandings: ScoreStore.getTourneyStandings(),
     lastScoresUpdate: ScoreStore.getLastUpdated(),
 
     chatMessages: ChatStore.getMessages(),
@@ -114,6 +114,7 @@ class DraftWrapper extends React.Component<ComponentProps, {}> {
           isPaused={props.isPaused}
           golfersRemaining={props.golfersRemaining}
           pickingForUsers={props.draft.pickingForUsers}
+          pickOrder={props.draft.pickOrder}
           activeUsers={props.activeUsers}
           allowClock={props.allowClock}
           syncedPickList={props.draft.syncedPickList}
@@ -139,7 +140,7 @@ class TourneyWrapper extends React.Component<ComponentProps, {}> {
         />
         <TourneyApp
           currentUser={props.currentUser}
-          scores={props.scores}
+          tourneyStandings={props.tourneyStandings}
           draft={props.draft}
           lastScoresUpdate={props.lastScoresUpdate}
           chatMessages={props.chatMessages}

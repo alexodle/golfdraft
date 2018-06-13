@@ -6,7 +6,7 @@ export default class ScoreActions {
   static scoreUpdate(result) {
     AppDispatcher.handleViewAction({
       actionType: ScoreConstants.SCORE_UPDATE,
-      scores: result.scores,
+      tourneyStandings: result.tourneyStandings,
       lastUpdated: result.lastUpdated
     });
   }

@@ -5,8 +5,10 @@ import * as React from 'react';
 import UserStore from '../stores/UserStore';
 import GolfDraftPanel from './GolfDraftPanel';
 import {DraftPickOrder, User, Indexed} from '../types/ClientTypes';
+import constants from '../../common/constants';
 
 export interface DraftPickOrderProps {
+  pickOrder: DraftPickOrder[];
   pickingForUsers: string[];
   currentPick?: DraftPickOrder;
   currentUser: User;
@@ -20,8 +22,7 @@ export default class DraftPickOrderView extends React.Component<DraftPickOrderPr
     const {pickingForUsers, currentPick, currentUser, autoPickUsers} = this.props;
     const myUser = currentUser._id;
 
-    let pickOrder = DraftStore.getPickOrder();
-    pickOrder = _.take(DraftStore.getPickOrder(), pickOrder.length / 4);
+    const pickOrder = _.take(this.props.pickOrder, this.props.pickOrder.length / constants.NGOLFERS);
 
     return (
       <div>

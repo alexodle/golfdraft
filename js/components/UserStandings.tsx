@@ -4,10 +4,11 @@ import * as React from 'react';
 import * as utils from '../../common/utils';
 import GolferStore from '../stores/GolferStore';
 import UserStore from '../stores/UserStore';
-import {User, DraftPick, IndexedUserScores} from '../types/ClientTypes';
+import {User, DraftPick, TourneyStandings, DraftPickOrder} from '../types/ClientTypes';
 
 export interface UserStandingsProps {
-  userScores: IndexedUserScores;
+  tourneyStandings: TourneyStandings;
+  pickOrder: DraftPickOrder[];
   onUserSelect: (pid: string) => void;
   currentUser: User;
   selectedUser: string;
@@ -16,25 +17,31 @@ export interface UserStandingsProps {
 export default class UserStandings extends React.Component<UserStandingsProps, {}> {
 
   render() {
-    const userScores = _.sortBy(this.props.userScores, 'total');
-    const userTotals = _.map(userScores, 'total');
-    const topScore = userTotals[0];
+    const tourneyStandings = this.props.tourneyStandings;
+    const topScore = tourneyStandings.playerScores[0].totalScore;
 
-    const trs = _.map(userScores, (ps) => {
-      const p = UserStore.getUser(ps.user);
+    const trs = _.map(tourneyStandings.playerScores, (ps, i) => {
+      const p = UserStore.getUser(ps.player);
       const userIsMe = this.props.currentUser._id === p._id;
       const userIsSelected = this.props.selectedUser === p._id;
       const viewUser = _.partial(this._onUserSelect, p._id);
-      const holesLeft = _.sumBy(_.values(ps.scoresByGolfer), function (gs) {
-        if (_.some(gs.missedCuts)) {
-          return 0;
-        } else if (gs.thru === null) {
-          return 18;
-        } else {
-          return 18 - gs.thru;
-        }
-      });
 
+      const holesLeft = _.chain(ps.dayScores)
+        .map(ds => {
+          const gs = ds.golferScores[tourneyStandings.currentDay];
+          if (gs.missedCut) {
+            return 0;
+          } else if (gs.thru === null) {
+            return 18;
+          } else {
+            return 18 - gs.thru;
+          }
+        })
+        .sum()
+        .value();
+
+      const pickNumber = _.findIndex(this.props.pickOrder, dpo => dpo.user === ps.player);
+      
       return (
         <tr
           key={p._id}
@@ -43,13 +50,13 @@ export default class UserStandings extends React.Component<UserStandingsProps, {
           })}
           onClick={viewUser}
         >
-          <td>{_.sortedIndex(userTotals, ps.total) + 1}</td>
+          <td>{i + 1}</td>
           <td>{userIsMe ? (<b>{p.name}</b>) : p.name}</td>
-          <td>{utils.toGolferScoreStr(ps.total)}</td>
-          <td>{ps.pickNumber + 1}</td>
+          <td>{utils.toGolferScoreStr(ps.totalScore)}</td>
+          <td>{pickNumber + 1}</td>
           <td className='hidden-xs'>{holesLeft > 0 ? holesLeft : 'F'}</td>
-          {_.map(ps.scoresByDay, function (ds) {
-            return (<td className='hidden-xs' key={ds.day}>{utils.toGolferScoreStr(ds.total)}</td>);
+          {_.map(ps.dayScores, ds => {
+            return (<td className='hidden-xs' key={ds.day}>{utils.toGolferScoreStr(ds.totalScore)}</td>);
           })}
           <td className='visible-xs'><a href='#UserDetails' onClick={viewUser}>Details</a></td>
         </tr>

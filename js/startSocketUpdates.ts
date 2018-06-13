@@ -12,25 +12,25 @@ import UserActions from './actions/UserActions';
 */
 function startSocketUpdates() {
   const io = socketio.connect();
-  io.on('change:draft', function (ev) {
+  io.on('change:draft', ev => {
     const draft = parseDraft(ev.data);
     DraftActions.draftUpdate(draft);
   });
-  io.on('change:scores', function (ev) {
+  io.on('change:scores', ev => {
     ScoreActions.scoreUpdate(ev.data);
   });
-  io.on('change:chat', function (ev) {
+  io.on('change:chat', ev => {
     ChatActions.newMessage(ev.data);
   });
-  io.on('change:appstate', function (ev) {
+  io.on('change:appstate', ev => {
     SettingsActions.setAppState(ev.data.appState);
   });
-  io.on('change:activeusers', function (ev) {
+  io.on('change:activeusers', ev => {
     UserActions.setActiveUsers(ev.data.userCounts);
   });
 
   // ADMIN power
-  io.on('action:forcerefresh', function (ev) {
+  io.on('action:forcerefresh', ev => {
     window.location.reload();
   });
 }

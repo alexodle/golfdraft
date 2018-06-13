@@ -4,56 +4,66 @@ import * as React from 'react';
 import * as utils from '../../common/utils';
 import GolferStore from '../stores/GolferStore';
 import UserStore from '../stores/UserStore';
-import {User, DraftPick, UserScore, IndexedUserScores} from '../types/ClientTypes';
+import {User, DraftPick, TourneyStandings} from '../types/ClientTypes';
 
 export interface UserDetailsProps {
   userId: string;
   draftPicks: DraftPick[];
-  userScores: IndexedUserScores;
+  tourneyStandings: TourneyStandings;
 }
 
 export default class UserDetails extends React.Component<UserDetailsProps, {}> {
 
   render() {
+    const currentDay = this.props.tourneyStandings.currentDay;
+    const userScores = this.props.tourneyStandings.playerScores;
+
     const userId = this.props.userId;
-    const userScore = this.props.userScores[userId];
-    const scoresByDay = userScore.scoresByDay;
-    const draftPicksByGolfer = _.keyBy(this.props.draftPicks, 'golfer');
+    const userScoreIndex = _.findIndex(userScores, us => us.player === userId);
+    const userScore = userScores[userScoreIndex];
 
-    const sortedScores = _.chain(this.props.userScores)
-      .map("total")
-      .sortBy()
+    // User rank is equal to the first instance of the same score (not necessarily the index of the user)
+    let userRank = userScoreIndex;
+    while (userRank > 0 && userScores[userRank - 1].totalScore === userScore.totalScore) {
+      userRank--;
+    }
+
+    const isTied = userScores[userRank + 1] && userScores[userRank + 1].totalScore === userScore.totalScore;
+
+    const golferPickNumbers = _.chain(this.props.draftPicks)
+      .map(dp => dp.golfer)
+      .invert()
+      .mapValues(Number)
       .value();
-    const userRank = _.sortedIndex(sortedScores, userScore.total);
-    const isTied = sortedScores[userRank + 1] === userScore.total;
 
-    const golferScores = _.sortBy(userScore.scoresByGolfer, 'total');
-    const trs = _.map(golferScores, function (gs) {
+    const golferScores = _.chain(userScore.dayScores)
+      .flatMap(ds => ds.golferScores)
+      .groupBy(gs => gs.golfer)
+      .toPairs()
+      .sortBy(([golfer, golferScores]) => golferPickNumbers[golfer])
+      .value();
+
+    const trs = _.map(golferScores, ([golfer, golferScores], i) => {
+      const golferTotal = _.sumBy(golferScores, gs => gs.score);
       return (
-        <tr key={gs.golfer}>
+        <tr key={golfer}>
           <td>
-            {GolferStore.getGolfer(gs.golfer).name}
-            <small> ({utils.getOrdinal(draftPicksByGolfer[gs.golfer].pickNumber + 1)} pick)</small>
+            {GolferStore.getGolfer(golfer).name}
+            <small> ({utils.getOrdinal(golferPickNumbers[golfer] + 1)} pick)</small>
           </td>
-          <td>{utils.toGolferScoreStr(gs.total)}</td>
-          {_.map(gs.scores, function (s, i) {
-            const missedCut = gs.missedCuts[i];
-            const scoreUsed = _.chain(scoresByDay[i].usedScores)
-              .map('golfer')
-              .includes(gs.golfer)
-              .value();
-            const currentDay = gs.day === i + 1;
+          <td>{utils.toGolferScoreStr(golferTotal)}</td>
+          {_.map(golferScores, (gs, i) => {
             return (
               <td
-                className={cx({
-                  'missed-cut': missedCut,
-                  'score-used': scoreUsed
-                })}
                 key={i}
+                className={cx({
+                  'missed-cut': gs.missedCut,
+                  'score-used': gs.scoreUsed
+                })}
               >
-                {utils.toGolferScoreStr(s)}
+                {utils.toGolferScoreStr(gs.score)}
                 <sup className="missed-cut-text"> MC</sup>
-                {!currentDay ? null : (
+                {i !== currentDay ? null : (
                   <sup className="thru-text"> {utils.toThruStr(gs.thru)}</sup>
                 )}
               </td>
@@ -63,13 +73,13 @@ export default class UserDetails extends React.Component<UserDetailsProps, {}> {
       );
     });
 
-    const tieText = isTied ? "(Tie)" : "";
+    const tieText = isTied ? " (Tie)" : "";
     return (
       <section>
         <h2>
           {UserStore.getUser(userId).name}
-          <span> </span>({utils.toGolferScoreStr(userScore.total)})
-          <small> {utils.getOrdinal(userRank + 1)} place {tieText}</small>
+          <span> </span>({utils.toGolferScoreStr(userScore.totalScore)})
+          <small> {utils.getOrdinal(userRank + 1)} place{tieText}</small>
         </h2>
         <table className='table user-details-table'>
           <thead>

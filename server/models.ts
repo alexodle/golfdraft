@@ -50,31 +50,30 @@ const golferScoreSchema = new mongoose.Schema({
 });
 golferScoreSchema.index({ tourneyId: 1, golfer: 1 }, { unique: true });
 
-const playerScoreSchema = new mongoose.Schema({
+const tourneyStandingsSchema = new mongoose.Schema({
   tourneyId: { type: SchemaTypes.ObjectId, required: true },
-  player: { type: SchemaTypes.ObjectId, required: true },
-  totalScore: Number,
-  dayScores: [{
-    day: Number,
+  currentDay: Number,
+  worstScoresForDay: [{
+    golfer: { type: SchemaTypes.ObjectId, required: true },
+    score: Number
+  }],
+  playerScores: [{
+    player: { type: SchemaTypes.ObjectId, required: true },
     totalScore: Number,
-    golferScores: [{
-      golfer: { type: SchemaTypes.ObjectId, required: true },
-      score: Number,
-      missedCut: Boolean,
-      scoreUsed: Boolean
+    dayScores: [{
+      day: Number,
+      totalScore: Number,
+      golferScores: [{
+        golfer: { type: SchemaTypes.ObjectId, required: true },
+        score: Number,
+        thru: Number,
+        missedCut: Boolean,
+        scoreUsed: Boolean
+      }]
     }]
   }]
 });
-playerScoreSchema.index({ tourneyId: 1, player: 1 }, { unique: true });
-
-const tourneyScoreSummarySchema = new mongoose.Schema({
-  tourneyId: { type: SchemaTypes.ObjectId, required: true },
-  worstScoreForDay: [{
-    golfer: { type: SchemaTypes.ObjectId, required: true },
-    score: Number
-  }]
-});
-tourneyScoreSummarySchema.index({ tourneyId: 1 }, { unique: true });
+tourneyStandingsSchema.index({ tourneyId: 1 }, { unique: true });
 
 const appStateSchema = new mongoose.Schema({
   tourneyId: { type: SchemaTypes.ObjectId, required: true, unique: true },
@@ -102,7 +101,6 @@ export const GolferScoreOverrides = mongoose.model(
   'GolferScoreOverrides',
   golferScoreSchema
 );
-export const PlayerScore = mongoose.model('PlayerScore', playerScoreSchema);
-export const TourneyScoreSummary = mongoose.model('TourneyScoreSummary', tourneyScoreSummarySchema);
+export const TourneyStandings = mongoose.model('TourneyStandings', tourneyStandingsSchema);
 export const AppState = mongoose.model('AppState', appStateSchema);
 export const Tourney = mongoose.model('Tourney', tourneySchema);

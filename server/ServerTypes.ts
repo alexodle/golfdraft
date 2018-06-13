@@ -5,7 +5,7 @@ import {Model, Document} from 'mongoose';
 export type ObjectId = mongoose.Types.ObjectId;
 
 export interface TourneySpecific {
-  tourneyId: ObjectId;
+  tourneyId?: ObjectId;
 }
 
 export interface AppSettings extends CommonTypes.AppSettings, TourneySpecific {
@@ -37,8 +37,10 @@ export interface GolferScore extends CommonTypes.GolferScore, TourneySpecific {
 }
 export type GolferScoreDoc = GolferScore & Document;
 
-export interface PlayerScore extends CommonTypes.PlayerScore, TourneySpecific {}
-export type PlayerScoreDoc = PlayerScore & Document;
+export interface PlayerScore extends CommonTypes.PlayerScore {}
+
+export interface TourneyStandings extends CommonTypes.TourneyStandings, TourneySpecific {}
+export type TourneyStandingsDoc = TourneyStandings & Document;
 
 export interface ChatMessage extends CommonTypes.ChatMessage, TourneySpecific {
   user?: ObjectId;

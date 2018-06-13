@@ -3,7 +3,7 @@ import * as mongooseUtil from '../server/mongooseUtil';
 import readerConfig from './readerConfig';
 import redis from '../server/redis';
 import {loadConfig} from '../server/tourneyConfigReader';
-import * as updatePlayerScores from './updatePlayerScores';
+import * as updateTourneyStandings from './updateTourneyStandings';
 import * as updateScore from './updateScore';
 
 const TIMEOUT = 30 * 1000; // 30 seconds
@@ -24,7 +24,7 @@ function end() {
 function updateScores() {
   console.log("attempting update...");
   return updateScore.run(reader, url, nameMap)
-    .then(() => updatePlayerScores.run())
+    .then(() => updateTourneyStandings.run())
     .then(() => redis.pubSubClient.publish("scores:update", (new Date()).toString()))
 }
 

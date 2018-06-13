@@ -1,18 +1,23 @@
 import * as access from '../server/access';
 import * as _ from 'lodash';
 import constants from '../common/constants';
-import {GolferScore, PlayerScore} from '../server/ServerTypes';
+import {GolferScore, PlayerScore, TourneyStandings} from '../server/ServerTypes';
 
-function buildPlayerScore(player: string, rawScores: GolferScore[], worstScoresPerDay: number[]): PlayerScore {
+function buildPlayerScore(
+  player: string,
+  rawScores: GolferScore[],
+  worstScoresForDay: { day: number, golfer: string, score: number }[]
+): PlayerScore {
   const dayScores = _.times(constants.NDAYS, day => {
 
     const golferScores = _.map(rawScores, (golferScores, idx) => {
       const missedCut = golferScores.scores[day] === constants.MISSED_CUT;
-      const dayScore = missedCut ? worstScoresPerDay[day] : golferScores.scores[day];
+      const dayScore = missedCut ? worstScoresForDay[day] : golferScores.scores[day];
       return {
         day,
         idx,
         missedCut,
+        thru: golferScores.thru,
         golfer: golferScores.golfer,
         score: dayScore as number
       }
@@ -29,6 +34,7 @@ function buildPlayerScore(player: string, rawScores: GolferScore[], worstScoresP
         golfer: gs.golfer,
         score: gs.score,
         missedCut: gs.missedCut,
+        thru: gs.thru,
         scoreUsed,
       };
     });
@@ -58,8 +64,16 @@ export function run(): Promise<void> {
       console.log("Running player score update");
 
       // Summary info
-      const worstScoresPerDay = _.times(constants.NDAYS, day => 
-        _.maxBy(scores, s => _.isNumber(s.scores[day]) ? s.scores[day] : Number.MIN_VALUE).scores[day] as number);
+      const worstScoresForDay = _.times(constants.NDAYS, day => {
+        const maxGolferScore = _.maxBy(scores, s => _.isNumber(s.scores[day]) ? 
+          s.scores[day] :
+          Number.MIN_VALUE);
+        return {
+          day,
+          golfer: maxGolferScore.golfer,
+          score: maxGolferScore.scores[day] as number
+        };
+      });
 
       const picksByUser = _.groupBy(draft.picks, p => p.user.toString());
       const scoresByPlayer = _.keyBy(scores, s => s.golfer.toString());
@@ -67,12 +81,19 @@ export function run(): Promise<void> {
         _.map(picks, p => scoresByPlayer[p.golfer.toString()]));
 
       const playerScores = _.map(playerRawScores, (rawScores, pid) => 
-        buildPlayerScore(pid, rawScores, worstScoresPerDay));
+        buildPlayerScore(pid, rawScores, worstScoresForDay));
 
-      console.log(JSON.stringify(playerScores, null, 2));
-      return access.updatePlayerScores(playerScores).then(() => {
-        console.log("DONE Running player score update");
-      })
+      // Estimate current day
+      let currentDay = 0;
+      for (let i = 1; i < worstScoresForDay.length && worstScoresForDay[i].score !== 0; i++) {
+        currentDay++;
+      }
+
+      const tourneyStandings: TourneyStandings = { currentDay, worstScoresForDay, playerScores };
+
+      console.log(JSON.stringify(tourneyStandings, null, 2));
+      return access.updateTourneyStandings(tourneyStandings).then(() => 
+        console.log("DONE Running player score update"));
     })
     .catch(e => {
       console.error("FAILED: Running player score update");

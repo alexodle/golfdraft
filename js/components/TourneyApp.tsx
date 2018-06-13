@@ -6,19 +6,18 @@ import constants from '../../common/constants';
 import GolfDraftPanel from './GolfDraftPanel';
 import GolferLogic from '../logic/GolferLogic';
 import GolferStore from '../stores/GolferStore';
-import ScoreLogic from '../logic/ScoreLogic';
 import UserDetails from './UserDetails';
 import UserStandings from './UserStandings';
 import * as utils from '../../common/utils';
 import {DraftProps} from '../types/SharedProps';
-import {User, IndexedGolferScores, ChatMessage, Indexed} from '../types/ClientTypes';
+import {User, TourneyStandings, ChatMessage, Indexed} from '../types/ClientTypes';
 
 const NDAYS = constants.NDAYS;
 
 export interface TourneyAppProps {
   draft: DraftProps;
   currentUser: User;
-  scores: IndexedGolferScores;
+  tourneyStandings: TourneyStandings;
   lastScoresUpdate: Date;
   chatMessages?: ChatMessage[];
   activeUsers: Indexed<number>;
@@ -46,32 +45,6 @@ class TourneyApp extends React.Component<TourneyAppProps, TourneyAppState> {
   }
 
   render() {
-    const userScores = ScoreLogic.calcUserScores(
-      this.props.draft.draftPicks,
-      this.props.scores
-    );
-
-    const scores = this.props.scores;
-
-    const worstScoresPerDay = _.chain(NDAYS)
-      .times((day) => {
-        const worstScore = _.chain(scores)
-          .reject((s) => s.missedCuts[day])
-          .maxBy((s) => s.scores[day])
-          .value();
-
-        return {
-          day: day,
-          golfer: worstScore.golfer,
-          score: worstScore.scores[day]
-        };
-      })
-      .takeWhile(function (s) {
-        // Assume 0 means they haven't started playing this day yet
-        return s.score > 0;
-      })
-      .value();
-
     return (
       <section>
         <p>
@@ -83,7 +56,8 @@ class TourneyApp extends React.Component<TourneyAppProps, TourneyAppState> {
         <GolfDraftPanel heading='Overall Standings'>
           <UserStandings
             currentUser={this.props.currentUser}
-            userScores={userScores}
+            pickOrder={this.props.draft.pickOrder}
+            tourneyStandings={this.props.tourneyStandings}
             selectedUser={this.state.userDetailsUser}
             onUserSelect={this._onUserSelect}
           />
@@ -91,18 +65,17 @@ class TourneyApp extends React.Component<TourneyAppProps, TourneyAppState> {
 
         <a id='UserDetails' />
         <GolfDraftPanel heading='Score Details'>
-
           <UserDetails
             userId={this.state.userDetailsUser}
-            userScores={userScores}
+            tourneyStandings={this.props.tourneyStandings}
             draftPicks={this.props.draft.draftPicks}
           />
         </GolfDraftPanel>
 
-        {!worstScoresPerDay.length ? null : (
+        {!this.props.tourneyStandings.worstScoresForDay.length ? null : (
           <GolfDraftPanel heading='Worst Scores of the Day'>
             <ul>
-              {_.map(worstScoresPerDay, (s) => {
+              {_.map(this.props.tourneyStandings.worstScoresForDay, s => {
                 return (
                   <li key={s.day} className='list-unstyled'>
                     <b>Day {s.day + 1}</b>: {utils.toGolferScoreStr(s.score)}
