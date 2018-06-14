@@ -22,14 +22,6 @@ export default class UserDetails extends React.Component<UserDetailsProps, {}> {
     const userScoreIndex = _.findIndex(userScores, us => us.player === userId);
     const userScore = userScores[userScoreIndex];
 
-    // User rank is equal to the first instance of the same score (not necessarily the index of the user)
-    let userRank = userScoreIndex;
-    while (userRank > 0 && userScores[userRank - 1].totalScore === userScore.totalScore) {
-      userRank--;
-    }
-
-    const isTied = userScores[userRank + 1] && userScores[userRank + 1].totalScore === userScore.totalScore;
-
     const golferPickNumbers = _.chain(this.props.draftPicks)
       .map(dp => dp.golfer)
       .invert()
@@ -71,15 +63,13 @@ export default class UserDetails extends React.Component<UserDetailsProps, {}> {
           })}
         </tr>
       );
-    });
-
-    const tieText = isTied ? " (Tie)" : "";
+    })
     return (
       <section>
         <h2>
           {UserStore.getUser(userId).name}
           <span> </span>({utils.toGolferScoreStr(userScore.totalScore)})
-          <small> {utils.getOrdinal(userRank + 1)} place{tieText}</small>
+          <small> {utils.getOrdinal(userScore.standing + 1)} place {userScore.isTied ? "(Tie)" : null}</small>
         </h2>
         <table className='table user-details-table'>
           <thead>

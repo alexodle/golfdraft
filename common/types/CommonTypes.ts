@@ -44,6 +44,8 @@ export interface GolferScore {
 export interface PlayerScore {
   player: string;
   totalScore: number;
+  standing: number;
+  isTied: boolean;
   dayScores: [{
     day: number;
     totalScore: number;

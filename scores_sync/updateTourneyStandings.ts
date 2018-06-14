@@ -53,7 +53,29 @@ function buildPlayerScore(
     dayScores,
     player,
     totalScore,
+
+    // Filled in later
+    standing: -1,
+    isTied: false,
   } as PlayerScore;
+}
+
+function isTied(sortedScores: PlayerScore[], i: number) {
+  const totalScore = sortedScores[i].totalScore;
+  return (
+    (i > 0 && sortedScores[i - 1].totalScore === totalScore) ||
+    (i < sortedScores.length - 1 && sortedScores[sortedScores.length - 1].totalScore === totalScore));
+}
+
+function fillInStandings(sortedScores: PlayerScore[]) {
+  let currentStanding = -1;
+  _.each(sortedScores, (ps, i) => {
+    if (i === 0 || ps.totalScore !== sortedScores[i - 1].totalScore) {
+      currentStanding = i;
+    }
+    ps.isTied = isTied(sortedScores, i);
+    ps.standing = currentStanding;
+  });
 }
 
 export function run(): Promise<void> {
@@ -80,8 +102,13 @@ export function run(): Promise<void> {
       const playerRawScores = _.mapValues(picksByUser, picks => 
         _.map(picks, p => scoresByPlayer[p.golfer.toString()]));
 
-      const playerScores = _.map(playerRawScores, (rawScores, pid) => 
-        buildPlayerScore(pid, rawScores, worstScoresForDay));
+      const playerScores = _.chain(playerRawScores)
+        .map((rawScores, pid) => buildPlayerScore(pid, rawScores, worstScoresForDay))
+        .sortBy(ps => ps.totalScore)
+        .value();
+
+      // Fill in standings
+      fillInStandings(playerScores);
 
       // Estimate current day
       let currentDay = 0;

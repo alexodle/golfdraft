@@ -50,7 +50,7 @@ export default class UserStandings extends React.Component<UserStandingsProps, {
           })}
           onClick={viewUser}
         >
-          <td>{i + 1}</td>
+          <td>{ps.standing + 1}</td>
           <td>{userIsMe ? (<b>{p.name}</b>) : p.name}</td>
           <td>{utils.toGolferScoreStr(ps.totalScore)}</td>
           <td>{pickNumber + 1}</td>

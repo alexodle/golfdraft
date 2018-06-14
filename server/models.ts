@@ -60,6 +60,8 @@ const tourneyStandingsSchema = new mongoose.Schema({
   playerScores: [{
     player: { type: SchemaTypes.ObjectId, required: true },
     totalScore: Number,
+    standing: Number,
+    isTied: Boolean,
     dayScores: [{
       day: Number,
       totalScore: Number,
