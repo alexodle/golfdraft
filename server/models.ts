@@ -54,6 +54,7 @@ const tourneyStandingsSchema = new mongoose.Schema({
   tourneyId: { type: SchemaTypes.ObjectId, required: true },
   currentDay: Number,
   worstScoresForDay: [{
+    day: Number,
     golfer: { type: SchemaTypes.ObjectId, required: true },
     score: Number
   }],

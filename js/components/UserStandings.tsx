@@ -26,19 +26,15 @@ export default class UserStandings extends React.Component<UserStandingsProps, {
       const userIsSelected = this.props.selectedUser === p._id;
       const viewUser = _.partial(this._onUserSelect, p._id);
 
-      const holesLeft = _.chain(ps.dayScores)
-        .map(ds => {
-          const gs = ds.golferScores[tourneyStandings.currentDay];
-          if (gs.missedCut) {
-            return 0;
-          } else if (gs.thru === null) {
-            return 18;
-          } else {
-            return 18 - gs.thru;
-          }
-        })
-        .sum()
-        .value();
+      const holesLeft = _.sumBy(ps.dayScores[tourneyStandings.currentDay].golferScores, gs => {
+        if (gs.missedCut) {
+          return 0;
+        } else if (gs.thru === null) {
+          return 18;
+        } else {
+          return 18 - gs.thru;
+        }
+      });
 
       const pickNumber = _.findIndex(this.props.pickOrder, dpo => dpo.user === ps.player);
       
