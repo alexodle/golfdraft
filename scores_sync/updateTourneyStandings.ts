@@ -17,7 +17,7 @@ function buildPlayerScore(
         day,
         idx,
         missedCut,
-        thru: golferScores.thru,
+        thru: day + 1 === golferScores.day ? golferScores.thru : null,
         golfer: golferScores.golfer,
         score: dayScore as number
       }

@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import constants from './constants';
 
 _.mixin({
 
@@ -29,7 +30,7 @@ export function toGolferScoreStr(n: number): string {
 export function toThruStr(thru: number): string {
   if (thru === null) {
     return 'NS';
-  } else if (thru === 18) {
+  } else if (thru === constants.NHOLES) {
     return 'F';
   } else {
     return 'thru ' + thru;

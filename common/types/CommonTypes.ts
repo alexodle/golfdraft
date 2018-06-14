@@ -35,12 +35,6 @@ export interface Golfer {
   wgr: number;
 }
 
-export interface GolferScore {
-  golfer: string;
-  day: number;
-  thru: number;
-}
-
 export interface PlayerScore {
   player: string;
   totalScore: number;
@@ -52,7 +46,7 @@ export interface PlayerScore {
     golferScores: [{
       golfer: string;
       score: number;
-      thru: number;
+      thru: number | null;
       missedCut: boolean;
       scoreUsed: boolean;
     }];

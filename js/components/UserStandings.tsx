@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 import * as cx from 'classnames';
 import * as React from 'react';
 import * as utils from '../../common/utils';
+import constants from '../../common/constants';
 import GolferStore from '../stores/GolferStore';
 import UserStore from '../stores/UserStore';
 import {User, DraftPick, TourneyStandings, DraftPickOrder} from '../types/ClientTypes';
@@ -30,9 +31,9 @@ export default class UserStandings extends React.Component<UserStandingsProps, {
         if (gs.missedCut) {
           return 0;
         } else if (gs.thru === null) {
-          return 18;
+          return constants.NHOLES;
         } else {
-          return 18 - gs.thru;
+          return constants.NHOLES - gs.thru;
         }
       });
 

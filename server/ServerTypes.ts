@@ -32,8 +32,11 @@ export type DraftPickOrderDoc = DraftPickOrder & Document;
 export interface Golfer extends CommonTypes.Golfer, TourneySpecific {}
 export type GolferDoc = Golfer & Document;
 
-export interface GolferScore extends CommonTypes.GolferScore, TourneySpecific {
+export interface GolferScore extends TourneySpecific {
   scores: any[];
+  golfer: string;
+  day: number;
+  thru: number;
 }
 export type GolferScoreDoc = GolferScore & Document;
 

@@ -9,7 +9,6 @@ const NDAYS = constants.NDAYS;
 const PGATOUR_WD_TEXT = 'wd';
 const PGATOUR_MC_TEXT = 'cut';
 const CUT_ROUND = 3; // cut starts at round 3
-const N_HOLES = 18;
 
 interface Round {
   strokes: number;
