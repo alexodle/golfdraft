@@ -38,7 +38,7 @@ const RELEVANT_STORES = [
 interface AppState {
   tourneyName: string;
   currentUser?: User;
-  activeUsers: Indexed<number>;
+  activeUsers: Indexed<string>;
   golfers: IndexedGolfers;
   users: IndexedUsers;
   draft: DraftProps;

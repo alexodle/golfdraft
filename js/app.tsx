@@ -13,6 +13,9 @@ import startSocketUpdates from './startSocketUpdates';
 function render(rootNode: Element) {
   // hydrate BEFORE rendering
   hydrate();
+  
+  // Begin listening for live socket updates
+  startSocketUpdates();
 
   ReactDOM.render(
     (<BrowserRouter>
@@ -24,9 +27,6 @@ function render(rootNode: Element) {
         </div>
       </div>
     </BrowserRouter>), rootNode);
-
-  // Begin listening for live socket updates
-  startSocketUpdates();
 }
 
 const node = document.getElementById('golfdraftapp');

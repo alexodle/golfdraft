@@ -9,7 +9,7 @@ import {post} from '../fetch';
 let _currentUser: string = null;
 let _users: IndexedUsers = null;
 let _isAdmin: boolean = false;
-let _activeUsers: Indexed<number> = null; // active user counts by user id
+let _activeUsers: Indexed<string> = null; // active users indexed by user id
 
 class UserStoreImpl extends Store {
   changeEvent() { return 'UserStore:change'; }
@@ -57,7 +57,7 @@ AppDispatcher.register(function (payload) {
       break;
 
     case AppConstants.SET_ACTIVE_USERS:
-      _activeUsers = action.activeUsers;
+      _activeUsers = _.keyBy(action.activeUsers);
       UserStore.emitChange();
       break;
 

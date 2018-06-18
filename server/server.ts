@@ -118,7 +118,7 @@ app.use(function logSessionState(req: Request, res: Response, next: NextFunction
   next();
 });
 
-app.use(function updateUserActivity(req: Request, res: Response, next: NextFunction) {
+app.use((req: Request, res: Response, next: NextFunction) => {
   if (req.user) {
     userAccess.onUserActivity(req.session.id, req.user._id.toString());
   }

@@ -33,7 +33,7 @@ export interface DraftAppProps {
   pendingPickList: string[];
   currentUser: User;
   chatMessages: ChatMessage[];
-  activeUsers: Indexed<number>;
+  activeUsers: Indexed<string>;
   currentPick?: DraftPickOrder;
   pickingForUsers: string[];
   autoPickUsers: Indexed<string>;

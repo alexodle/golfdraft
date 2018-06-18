@@ -200,6 +200,10 @@ export function getUser(userId: string): Promise<UserDoc> {
   return models.User.findOne({ _id: userId }).exec() as Promise<UserDoc>;
 }
 
+export function getUserByUsername(username: string): Promise<UserDoc> {
+  return models.User.findOne({ username }).exec() as Promise<UserDoc>;
+}
+
 export function getGolfers(): Promise<Golfer[]> {
   return Promise.all([
       models.WGR.find().exec(),

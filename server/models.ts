@@ -1,4 +1,4 @@
-import _User from './User';
+import User from './User';
 import {mongoose} from './mongooseUtil';
 
 const SchemaTypes = mongoose.Schema.Types;
@@ -93,7 +93,7 @@ const tourneySchema = new mongoose.Schema({
   par: Number
 });
 
-export const User = _User;
+export { User };
 export const Golfer = mongoose.model('Golfer', golferSchema);
 export const WGR = mongoose.model('WGR', wgrSchema);
 export const DraftPickOrder = mongoose.model('DraftPickOrder', draftPickOrderSchema);

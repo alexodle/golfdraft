@@ -20,7 +20,7 @@ export interface TourneyAppProps {
   tourneyStandings: TourneyStandings;
   lastScoresUpdate: Date;
   chatMessages?: ChatMessage[];
-  activeUsers: Indexed<number>;
+  activeUsers: Indexed<string>;
 }
 
 interface TourneyAppState {

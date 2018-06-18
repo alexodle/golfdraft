@@ -36,7 +36,7 @@ export default class UserActions {
     });
   }
 
-  static setActiveUsers(activeUsers: Indexed<number>) {
+  static setActiveUsers(activeUsers: string[]) {
     AppDispatcher.handleServerAction({
       actionType: AppConstants.SET_ACTIVE_USERS,
       activeUsers: activeUsers

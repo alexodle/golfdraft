@@ -26,7 +26,7 @@ function startSocketUpdates() {
     SettingsActions.setAppState(ev.data.appState);
   });
   io.on('change:activeusers', ev => {
-    UserActions.setActiveUsers(ev.data.userCounts);
+    UserActions.setActiveUsers(ev.data.users);
   });
 
   // ADMIN power

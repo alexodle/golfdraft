@@ -1,22 +1,31 @@
 import * as _ from 'lodash';
 import io from './socketIO';
 import redis from './redis';
+import * as access from './access';
 
 const redisClient = redis.client;
 
-function onUserChange() {
-  redisClient.hvals('users', function (err, replies) {
-    if (err) {
-      console.error(err);
-      return;
-    }
-
-    io.sockets.emit('change:activeusers', {
-      data: {
-        userCounts: _.countBy(replies)
+function getUserCounts(): Promise<{ [userId: string]: number }> {
+  return new Promise((resolve, reject) => {
+    redisClient.hvals('users', (err, replies) => {
+      if (err) {
+        console.error(err);
+        reject(err);
       }
+  
+      const counts = _.countBy(replies);
+      resolve(counts);
     });
   });
+}
+
+function onUserChange() {
+  return getUserCounts()
+    .then(userCounts => {
+      const data = { data: { users: _.keys(userCounts) } };
+      console.log("hihi.userAccess.ts:26 - data: " + JSON.stringify(data));
+      io.sockets.emit('change:activeusers', data);
+    });
 }
 
 export function refresh() {

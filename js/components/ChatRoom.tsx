@@ -266,7 +266,7 @@ class Message extends React.PureComponent<MessageProps, {}> {
 
 export interface ChatRoomProps {
   messages: ChatMessage[];
-  activeUsers: Indexed<number>;
+  activeUsers: Indexed<string>;
   currentUser: User;
 }
 
