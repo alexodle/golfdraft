@@ -23,7 +23,6 @@ function onUserChange() {
   return getUserCounts()
     .then(userCounts => {
       const data = { data: { users: _.keys(userCounts) } };
-      console.log("hihi.userAccess.ts:26 - data: " + JSON.stringify(data));
       io.sockets.emit('change:activeusers', data);
     });
 }
