@@ -12,14 +12,14 @@ function buildPlayerScore(
 
     const golferScores = _.map(rawScores, (golferScores, idx) => {
       const missedCut = golferScores.scores[day] === constants.MISSED_CUT;
-      const dayScore = missedCut ? worstScoresForDay[day] : golferScores.scores[day];
+      const dayScore = missedCut ? worstScoresForDay[day].score : golferScores.scores[day] as number;
       return {
         day,
         idx,
         missedCut,
         thru: day + 1 === golferScores.day ? golferScores.thru : null,
         golfer: golferScores.golfer,
-        score: dayScore as number
+        score: dayScore
       }
     });
 
@@ -82,7 +82,8 @@ export function run(): Promise<void> {
   return Promise.all([
       access.getScores(),
       access.getDraft()
-    ]).then(([scores, draft]) => {
+    ])
+    .then(([scores, draft]) => {
       console.log("Running player score update");
 
       // Summary info
@@ -118,10 +119,9 @@ export function run(): Promise<void> {
 
       const tourneyStandings: TourneyStandings = { currentDay, worstScoresForDay, playerScores };
 
-      console.log(JSON.stringify(tourneyStandings, null, 2));
-      return access.updateTourneyStandings(tourneyStandings).then(() => 
-        console.log("DONE Running player score update"));
+      return access.updateTourneyStandings(tourneyStandings);
     })
+    .then(() => console.log("DONE Running player score update"))
     .catch(e => {
       console.error("FAILED: Running player score update");
       console.error(e);

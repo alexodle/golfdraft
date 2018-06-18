@@ -407,7 +407,7 @@ export function updateScores(objs: GolferScore[]) {
 export function updateTourneyStandings(tourneyStandings: TourneyStandings) {
   return models.TourneyStandings.update(
     TOURNEY_ID_QUERY,
-    tourneyStandings,
+    { $set: { ...FK_TOURNEY_ID_QUERY, ...tourneyStandings } },
     { upsert: true });
 }
 
