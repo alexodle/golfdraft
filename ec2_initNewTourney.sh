@@ -15,5 +15,6 @@ pushd $BASE_DIR
 git checkout master
 git pull origin master
 npm install
+npm run updateWgr
 npm run refreshData
 popd
