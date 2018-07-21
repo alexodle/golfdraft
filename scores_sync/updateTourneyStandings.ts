@@ -91,10 +91,13 @@ export function run(): Promise<void> {
         const maxGolferScore = _.maxBy(scores, s => _.isNumber(s.scores[day]) ? 
           s.scores[day] :
           Number.MIN_VALUE);
+        const maxScore: number = _.isNumber(maxGolferScore.scores[day]) ?
+          maxGolferScore.scores[day] :
+          0;
         return {
           day,
           golfer: maxGolferScore.golfer,
-          score: maxGolferScore.scores[day] as number
+          score: maxScore
         };
       });
 
