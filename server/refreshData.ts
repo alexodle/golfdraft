@@ -12,7 +12,7 @@ import {
 } from './ServerTypes';
 
 function printState() {
-  return access.getTourney().then(function (tourney) {
+  return access.getCurrentTourney().then(function (tourney) {
     console.log("BEGIN Logging current state...");
     console.log("");
     console.log("Tourney:");

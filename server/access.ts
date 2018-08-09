@@ -23,6 +23,8 @@ import {
   GolferDoc,
   GolferScore,
   GolferScoreDoc,
+  Tourney,  
+  TourneyDoc,
   TourneyStandings,
   TourneyStandingsDoc,
   ObjectId,
@@ -35,32 +37,32 @@ import {
 } from './ServerTypes';
 
 const UNKNOWN_WGR = constants.UNKNOWN_WGR;
-const TOURNEY_ID = new mongoose.Types.ObjectId(config.tourney_id);
-const TOURNEY_ID_QUERY = { _id: TOURNEY_ID };
-const FK_TOURNEY_ID_QUERY = { tourneyId: TOURNEY_ID };
 
-function extendWithTourneyId(obj) {
-  return { ...obj, ...FK_TOURNEY_ID_QUERY };
+async function extendWithTourneyId(obj) {
+  const tourneyId = await getCurrentTourneyId();
+  return { ...obj, tourneyId };
 }
 
 function extendAllWithTourneyId(objs) {
-  return _.map(objs, extendWithTourneyId);
+  return Promise.all(_.map(objs, extendWithTourneyId));
 }
 
-function multiUpdate(model: Model<Document>, queryMask: string[], objs: {}[]) {
-  objs = extendAllWithTourneyId(objs);
+async function multiUpdate(model: Model<Document>, queryMask: string[], objs: {}[]) {
+  objs = await extendAllWithTourneyId(objs);
   return Promise.all(_.map(objs, (o) => {
     const query = _.pick(o, queryMask);
     return model.update(query, o, {upsert: true}).exec();
   }));
 };
 
-function getAll(model: Model<Document>) {
-  return model.find(FK_TOURNEY_ID_QUERY).exec();
+async function getAll(model: Model<Document>) {
+  const tourneyId = await getCurrentTourneyId();
+  return model.find({ tourneyId }).exec();
 };
 
-function clearAll(model: Model<Document>) {
-  return model.remove(FK_TOURNEY_ID_QUERY).exec();
+async function clearAll(model: Model<Document>) {
+  const tourneyId = await getCurrentTourneyId();
+  return model.remove({ tourneyId }).exec();
 };
 
 function mergeWGR(golfer: GolferDoc, wgrEntry: WGR): Golfer {
@@ -73,28 +75,43 @@ function mergeWGR(golfer: GolferDoc, wgrEntry: WGR): Golfer {
   return { wgr, ...golfer.toObject() };
 }
 
-export function getTourney() {
-  return models.Tourney.findOne(TOURNEY_ID_QUERY).exec();
+// Statically cached for lifetime of server
+export const getCurrentTourney = _.once(async function (): Promise<Tourney> {
+  return models.Tourney.find({ isCurrent: true }).exec()
+    .then((tourneys?: TourneyDoc[]) => {
+      if (!tourneys.length) {
+        throw new Error("No current tourney found");
+      } else if (tourneys.length > 1) {
+        throw new Error("Multiple current tourneys found");
+      }
+      return tourneys[0];
+    });
+});
+
+export function getCurrentTourneyId(): Promise<ObjectId> {
+  return getCurrentTourney().then(t => t._id);
 }
 
-export function getPickList(userId: string): Promise<string[]> {
-  const query = _.extend({ userId }, FK_TOURNEY_ID_QUERY);
+export async function getPickList(userId: string): Promise<string[]> {
+  const tourneyId = await getCurrentTourneyId();
+  const query = { tourneyId, userId };
   return models.DraftPickList.findOne(query).exec()
     .then((pickList?: DraftPickListDoc) => {
       return pickList ? _.map(pickList.golferPickList, (oid) => oid.toString()) : null;
     });
 }
 
-export function updatePickList(userId: string, pickList: string[]) {
+export async function updatePickList(userId: string, pickList: string[]) {
+  const tourneyId = await getCurrentTourneyId();
   pickList = _.uniq(pickList);
-  const query = _.extend({ userId: userId }, FK_TOURNEY_ID_QUERY);
+  const query = { tourneyId, userId };
   return models.DraftPickList
     .update(
       query,
       { $set: { golferPickList: pickList } },
       { upsert: true }
     ).exec()
-    .then(function () {
+    .then(() => {
       return {
         completed: true,
         pickList: pickList,
@@ -103,8 +120,9 @@ export function updatePickList(userId: string, pickList: string[]) {
     });
 }
 
-export function updateAutoPick(userId: string, autoPick: boolean) {
-  const query = FK_TOURNEY_ID_QUERY;
+export async function updateAutoPick(userId: string, autoPick: boolean) {
+  const tourneyId = await getCurrentTourneyId();
+  const query = { tourneyId };
 
   let update = null;
   if (!!autoPick) {
@@ -185,8 +203,9 @@ export function updatePickListFromNames(userId: string, pickListNames: string[])
     });
 }
 
-export function getGolfer(golferId: string): Promise<Golfer> {
-  const query = _.extend({ _id: golferId }, FK_TOURNEY_ID_QUERY);
+export async function getGolfer(golferId: string): Promise<Golfer> {
+  const tourneyId = await getCurrentTourneyId();
+  const query = { _id: golferId, tourneyId };
   return models.Golfer.findOne(query).exec()
     .then((golfer: GolferDoc) => {
       return models.WGR.findOne({ name: golfer.name }).exec()
@@ -204,10 +223,11 @@ export function getUserByUsername(username: string): Promise<UserDoc> {
   return models.User.findOne({ username }).exec() as Promise<UserDoc>;
 }
 
-export function getGolfers(): Promise<Golfer[]> {
+export async function getGolfers(): Promise<Golfer[]> {
+  const tourneyId = await getCurrentTourneyId();
   return Promise.all([
       models.WGR.find().exec(),
-      models.Golfer.find(FK_TOURNEY_ID_QUERY).exec(),
+      models.Golfer.find({ tourneyId }).exec(),
     ])
     .then(([_wgrs, _golfers]) => {
       const wgrs = _.keyBy(_wgrs as WGRDoc[], 'name');
@@ -223,8 +243,9 @@ export function getScores(): Promise<GolferScoreDoc[]> {
   return getAll(models.GolferScore) as Promise<GolferScoreDoc[]>;
 }
 
-export function getTourneyStandings(): Promise<TourneyStandingsDoc> {
-  return models.TourneyStandings.findOne(TOURNEY_ID_QUERY).exec() as Promise<TourneyStandingsDoc>;
+export async function getTourneyStandings(): Promise<TourneyStandingsDoc> {
+  const tourneyId = await getCurrentTourneyId();
+  return models.TourneyStandings.findOne({ tourneyId }).exec() as Promise<TourneyStandingsDoc>;
 }
 
 export function getPicks(): Promise<DraftPickDoc[]> {
@@ -235,11 +256,12 @@ export function getScoreOverrides(): Promise<ScoreOverrideDoc[]> {
   return getAll(models.GolferScoreOverrides) as Promise<ScoreOverrideDoc[]>;
 }
 
-export function getAppState(): Promise<AppSettings> {
-  return models.AppState.findOne(FK_TOURNEY_ID_QUERY).exec()
+export async function getAppState(): Promise<AppSettings> {
+  const tourneyId = await getCurrentTourneyId();
+  return models.AppState.findOne({ tourneyId }).exec()
     .then((appState? : AppSettingsDoc) => {
       return appState || {
-        ...FK_TOURNEY_ID_QUERY,
+        tourneyId,
         isDraftPaused: false,
         allowClock: true,
         draftHasStarted: false,
@@ -248,9 +270,10 @@ export function getAppState(): Promise<AppSettings> {
     });
 }
 
-export function updateAppState(props: AppSettings) {
+export async function updateAppState(props: AppSettings) {
+  const tourneyId = await getCurrentTourneyId();
   return models.AppState.update(
-    FK_TOURNEY_ID_QUERY,
+    { tourneyId },
     props,
     { upsert: true }
   ).exec();
@@ -297,63 +320,63 @@ export function makePickListPick(userId: string, pickNumber: number) {
   });
 }
 
-export function makePick(pick: DraftPick, ignoreOrder?: boolean) {
-  const pickOrderQuery = { ...FK_TOURNEY_ID_QUERY,
+export async function makePick(pick: DraftPick, ignoreOrder?: boolean): Promise<DraftPick> {
+  const tourneyId = await getCurrentTourneyId();
+  const pickOrderQuery = {
+    tourneyId,
     pickNumber: pick.pickNumber,
     user: pick.user
   };
-  const golferDraftedQuery = { ...FK_TOURNEY_ID_QUERY,
-    golfer: pick.golfer
-  };
-  const golferExistsQuery = { ...FK_TOURNEY_ID_QUERY,
-    _id: pick.golfer
-  };
-  return Promise.all([
-      // Ensure correct pick numnber
-      models.DraftPick.count(FK_TOURNEY_ID_QUERY).exec(),
+  const golferDraftedQuery = { tourneyId, golfer: pick.golfer };
+  const golferExistsQuery = { tourneyId, _id: pick.golfer };
 
-      // Ensure this user is actually up in the draft
-      models.DraftPickOrder.findOne(pickOrderQuery).exec(),
+  const result = await Promise.all([
+    // Ensure correct pick numnber
+    models.DraftPick.count({ tourneyId }).exec(),
 
-      // Ensure golfer isn't already picked
-      models.DraftPick.findOne(golferDraftedQuery).exec(),
+    // Ensure this user is actually up in the draft
+    models.DraftPickOrder.findOne(pickOrderQuery).exec(),
 
-      // Ensure this golfer actually exists
-      models.Golfer.findOne(golferExistsQuery).exec()
-    ])
-    .then(function (result) {
-      const nPicks = result[0];
-      const userIsUp = !!result[1];
-      const golferAlreadyDrafted = result[2];
-      const golferExists = !!result[3];
+    // Ensure golfer isn't already picked
+    models.DraftPick.findOne(golferDraftedQuery).exec(),
 
-      if (nPicks !==  pick.pickNumber && !ignoreOrder) {
-        throw new Error('invalid pick: pick order out of sync');
-      } else if (!userIsUp && !ignoreOrder) {
-        throw new Error('invalid pick: user picked out of order');
-      } else if (golferAlreadyDrafted) {
-        throw new Error('invalid pick: golfer already drafted');
-      } else if (!golferExists) {
-        throw new Error('invalid pick: invalid golfer');
-      }
+    // Ensure this golfer actually exists
+    models.Golfer.findOne(golferExistsQuery).exec()
+  ]);
+  
+  const nPicks = result[0];
+  const userIsUp = !!result[1];
+  const golferAlreadyDrafted = result[2];
+  const golferExists = !!result[3];
+  if (nPicks !==  pick.pickNumber && !ignoreOrder) {
+    throw new Error('invalid pick: pick order out of sync');
+  } else if (!userIsUp && !ignoreOrder) {
+    throw new Error('invalid pick: user picked out of order');
+  } else if (golferAlreadyDrafted) {
+    throw new Error('invalid pick: golfer already drafted');
+  } else if (!golferExists) {
+    throw new Error('invalid pick: invalid golfer');
+  }
 
-      pick = extendWithTourneyId(pick);
-      pick.timestamp = new Date();
-      return models.DraftPick.create(pick);
-    })
-    .then(() => pick);
+  pick = await extendWithTourneyId(pick);
+  pick.timestamp = new Date();
+
+  await models.DraftPick.create(pick);
+  return pick;
 }
 
-export function undoLastPick(): Promise<DraftPickDoc> {
-  return models.DraftPick.count(FK_TOURNEY_ID_QUERY).exec()
+export async function undoLastPick(): Promise<DraftPickDoc> {
+  const tourneyId = await getCurrentTourneyId();
+  return models.DraftPick.count({ tourneyId }).exec()
     .then((nPicks) => {
       return models.DraftPick.findOneAndRemove({ pickNumber: nPicks - 1 }).exec() as Promise<DraftPickDoc>;
     });
 }
 
-export function getDraft(): Promise<Draft> {
+export async function getDraft(): Promise<Draft> {
+  const tourneyId = await getCurrentTourneyId();
   return Promise.all([
-      models.DraftPickOrder.find(FK_TOURNEY_ID_QUERY).exec(),
+      models.DraftPickOrder.find({ tourneyId }).exec(),
       getPicks()
     ])
     .then(([pickOrder, picks]) => {
@@ -365,12 +388,13 @@ export function getDraft(): Promise<Draft> {
     });
 }
 
-export function updateTourney(props) {
+export async function updateTourney(props) {
+  const tourneyId = await getCurrentTourneyId();
   props = _.extend({}, props, { lastUpdated: new Date() });
   return models.Tourney.update(
-    TOURNEY_ID_QUERY,
+    { tourneyId },
     props,
-    {upsert: true}
+    { upsert: true }
   ).exec();
 }
 
@@ -408,30 +432,31 @@ export function updateScores(objs: GolferScore[]) {
   return multiUpdate(models.GolferScore, ['golfer', 'tourneyId'], objs);
 }
 
-export function updateTourneyStandings(tourneyStandings: TourneyStandings) {
+export async function updateTourneyStandings(tourneyStandings: TourneyStandings) {
+  const tourneyId = await getCurrentTourneyId();
   return models.TourneyStandings.update(
-    TOURNEY_ID_QUERY,
-    { $set: { ...FK_TOURNEY_ID_QUERY, ...tourneyStandings } },
+    { tourneyId },
+    { $set: { tourneyId, ...tourneyStandings } },
     { upsert: true });
 }
 
 // Chat
 
-export function getChatMessages(): Promise<ChatMessageDoc[]> {
-  return chatModels.Message.find(FK_TOURNEY_ID_QUERY).exec() as Promise<ChatMessageDoc[]>;
+export async function getChatMessages(): Promise<ChatMessageDoc[]> {
+  const tourneyId = await getCurrentTourneyId();
+  return chatModels.Message.find({ tourneyId }).exec() as Promise<ChatMessageDoc[]>;
 }
 
-export function createChatMessage(message: ChatMessage) {
-  message = extendWithTourneyId(message);
+export async function createChatMessage(message: ChatMessage) {
+  message = await extendWithTourneyId(message);
   message.date = new Date(); // probably not needed b/c we can use ObjectId
-  return chatModels.Message.create(message)
-    .then(() => {
-      io.sockets.emit('change:chat', {
-        data: message,
-        evType: 'change:chat',
-        action: 'chat:newMessage'
-      });
-    });
+  await chatModels.Message.create(message);
+
+  io.sockets.emit('change:chat', {
+    data: message,
+    evType: 'change:chat',
+    action: 'chat:newMessage'
+  });
 }
 
 export function createChatBotMessage(message: { message: string }) {
@@ -440,8 +465,9 @@ export function createChatBotMessage(message: { message: string }) {
 
   // DEBUGGING/TESTING
 
-export function clearTourney() {
-  return models.Tourney.remove(TOURNEY_ID_QUERY).exec();
+export async function clearTourney() {
+  const tourneyId = await getCurrentTourneyId();
+  return models.Tourney.remove({ tourneyId }).exec();
 }
 
 export function clearPickOrder() {
@@ -488,21 +514,19 @@ export function clearUsers() {
   return models.User.remove({}).exec();
 }
 
-export function resetTourney() {
+export async function resetTourney() {
+  const tourneyId = await getCurrentTourneyId();
   return Promise.all([
-    models.Tourney.update(TOURNEY_ID_QUERY, {
-      name: null,
-      par: -1
-    }).exec(),
-    clearPickOrder(),
-    clearDraftPicks(),
-    clearGolfers(),
-    clearGolferScores(),
-    clearTourneyStandings(),
-    clearGolferScoreOverrides(),
-    clearChatMessages(),
-    clearPickLists(),
-    clearAppState(),
-    clearUsers()
-  ]);
+    models.Tourney.update({ tourneyId }, { name: null, par: -1 }).exec(),
+      clearPickOrder(),
+      clearDraftPicks(),
+      clearGolfers(),
+      clearGolferScores(),
+      clearTourneyStandings(),
+      clearGolferScoreOverrides(),
+      clearChatMessages(),
+      clearPickLists(),
+      clearAppState(),
+      clearUsers()
+    ]);
 }

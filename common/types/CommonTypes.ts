@@ -14,6 +14,14 @@ export interface AppSettings {
   draftHasStarted: boolean;
 }
 
+export interface Tourney {
+  _id?: any;
+  name: string;
+  isCurrent: boolean;
+  lastUpdated: Date;
+  par: Number;
+}
+
 export interface User {
   _id?: any;
   name: string;

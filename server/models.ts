@@ -89,6 +89,7 @@ appStateSchema.index({ tourneyId: 1 }, { unique: true });
 
 const tourneySchema = new mongoose.Schema({
   name: { type: String, required: true },
+  isCurrent: { type: Boolean, required: true },
   lastUpdated: { type: Date, required: true },
   par: Number
 });

@@ -13,6 +13,9 @@ export interface AppSettings extends CommonTypes.AppSettings, TourneySpecific {
 }
 export type AppSettingsDoc = AppSettings & Document;
 
+export type Tourney = CommonTypes.Tourney & TourneySpecific;
+export type TourneyDoc = Tourney & Document;
+
 export interface User extends CommonTypes.User, TourneySpecific {
   password?: string;
 }

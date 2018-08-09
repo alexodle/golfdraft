@@ -160,7 +160,7 @@ function defineRoutes() {
         access.getUsers(),
         access.getDraft(),
         access.getTourneyStandings(),
-        access.getTourney(),
+        access.getCurrentTourney(),
         access.getAppState()
       ])
       .then(([golfers, users, draft, tourneyStandings, tourney, appState]) => {
@@ -257,12 +257,8 @@ function defineRoutes() {
 
     return handlePick({
       res,
-      makePick: function () {
-        return access.makePick(pick);
-      },
-      broadcastPickMessage: function (spec) {
-        return chatBot.broadcastPickMessage(user, spec.pick, spec.draft);
-      }
+      makePick: () => access.makePick(pick),
+      broadcastPickMessage: (spec) => chatBot.broadcastPickMessage(user, spec.pick, spec.draft)
     });
   });
 
