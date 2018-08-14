@@ -16,6 +16,7 @@ export interface AppSettings {
 
 export interface Tourney {
   _id?: any;
+  shortId: string;
   name: string;
   isCurrent: boolean;
   lastUpdated: Date;

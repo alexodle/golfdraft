@@ -241,10 +241,10 @@ export default class AppNode extends React.Component<AppNodeProps, AppState> {
 
     return (
       <Switch>
-        <Route exact path='/' render={renderTourneyWrapper} />
-        <Route exact path='/draft' render={renderDraftWrapper}/>
-        <Route exact path='/whoisyou' render={renderWhoIsYou}/>
-        <Route exact path='/admin' render={renderAdminWrapper}/>
+        <Route exact path='/:tourneyShortId' render={renderTourneyWrapper} />
+        <Route exact path='/draft/:tourneyShortId' render={renderDraftWrapper}/>
+        <Route exact path='/whoisyou/:tourneyShortId' render={renderWhoIsYou}/>
+        <Route exact path='/admin/:tourneyShortId' render={renderAdminWrapper}/>
       </Switch>
     );
   }

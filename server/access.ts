@@ -348,7 +348,7 @@ export async function makePick(pick: DraftPick, ignoreOrder?: boolean): Promise<
   const userIsUp = !!result[1];
   const golferAlreadyDrafted = result[2];
   const golferExists = !!result[3];
-  if (nPicks !==  pick.pickNumber && !ignoreOrder) {
+  if (nPicks !== pick.pickNumber && !ignoreOrder) {
     throw new Error('invalid pick: pick order out of sync');
   } else if (!userIsUp && !ignoreOrder) {
     throw new Error('invalid pick: user picked out of order');

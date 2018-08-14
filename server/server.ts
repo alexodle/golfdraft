@@ -154,7 +154,24 @@ function defineRoutes() {
     res.redirect('/');
   });
 
+  function tmptmpPathJoin(a: string, b: string) {
+    if (a.endsWith('/')) {
+      return a + b;
+    }
+    return a + '/' + b;
+  }
+
   app.get(['/', '/draft', '/admin', '/whoisyou'], (req: Request, res: Response, next: NextFunction) => {
+    access.getCurrentTourney()
+      .then(tourney => res.redirect(tmptmpPathJoin(req.path, tourney.shortId)));
+  });
+
+  app.get([
+    '/draft/:tourneyShortId',
+    '/admin/:tourneyShortId',
+    '/whoisyou/:tourneyShortId',
+    '/:tourneyShortId'
+  ], (req: Request, res: Response, next: NextFunction) => {
     return Promise.all([
         access.getGolfers(),
         access.getUsers(),
