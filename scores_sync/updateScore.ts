@@ -75,79 +75,60 @@ export function mergeOverrides(scores: GolferScore[], scoreOverrides: ScoreOverr
   return newScores;
 }
 
-export function run(reader: Reader, url: string, nameMap: { [name: string]: string }, populateGolfers = false): Promise<void> {
-  return reader.run(url).then(rawTourney => {
-    // Quick assertion of data
-    if (!rawTourney || !validate(rawTourney)) {
-      console.error("Invalid data for updateScore", rawTourney);
-      throw new Error("Invalid data for updateScore");
+export async function run(reader: Reader, url: string, nameMap: { [name: string]: string }, populateGolfers = false) {
+  const rawTourney = await reader.run(url);
+
+  // Quick assertion of data
+  if (!rawTourney || !validate(rawTourney)) {
+    console.error("Invalid data for updateScore", rawTourney);
+    throw new Error("Invalid data for updateScore");
+  }
+
+  // Ensure tourney/par
+  const update = { pgatourUrl: url, par: rawTourney.par };
+  await access.updateTourney(update);
+  
+  // Ensure golfers
+  if (populateGolfers) {
+    const golfers = _.map(rawTourney.golfers, g => ({ name: nameMap[g.golfer] || g.golfer } as Golfer));
+    await access.ensureGolfers(golfers);
+  }
+  
+  const results = await Promise.all([
+    access.getGolfers(),
+    access.getScoreOverrides()
+  ]);
+  const gs = results[0] as Golfer[];
+  const scoreOverrides = results[1] as ScoreOverride[];
+
+  // Build scores with golfer id
+  const golfersByName = _.keyBy(gs, gs => gs.name);
+  const scores = _.map(rawTourney.golfers, g => {
+    const golferName = nameMap[g.golfer] || g.golfer;
+    if (!golfersByName[golferName]) {
+      throw new Error("ERROR: Could not find golfer: " + golferName);
     }
 
-    // Ensure tourney/par
-    const update = { pgatourUrl: url, par: rawTourney.par };
-    const mainPromise = access.updateTourney(update)
-
-      .then(() => {
-        // Ensure golfers
-        if (populateGolfers) {
-          const golfers = _.map(rawTourney.golfers, (g) => {
-            return { name: g.golfer } as Golfer;
-          });
-          return access.ensureGolfers(golfers);
-        }
-      })
-
-      .then(() => {
-        return Promise.all([
-          access.getGolfers(),
-          access.getScoreOverrides()
-        ]);
-      })
-
-      .then(results => {
-        const gs = results[0] as Golfer[];
-        const scoreOverrides = results[1] as ScoreOverride[];
-
-        // Build scores with golfer id
-        const golfersByName = _.keyBy(gs, "name");
-        const scores = _.map(rawTourney.golfers, (g) => {
-          const golferName = nameMap[g.golfer] || g.golfer;
-          if (!golfersByName[golferName]) {
-            throw new Error("ERROR: Could not find golfer: " + golferName);
-          }
-
-          const golfer = golfersByName[golferName]._id;
-          return {
-            golfer: golfer,
-            day: g.day,
-            thru: g.thru,
-            scores: g.scores
-          } as GolferScore;
-        });
-
-        // Merge in overrides
-        console.log("scores BEFORE overrides: " + JSON.stringify(scores));
-        const finalScores = mergeOverrides(scores, scoreOverrides);
-        console.log("");
-        console.log("scores AFTER overrides: " + JSON.stringify(scores));
-        console.log("");
-        if (!finalScores.length) {
-          throw new Error("wtf. no scores.");
-        }
-
-        // Save
-        return access.updateScores(finalScores);
-      })
-
-      .then(() => {
-        console.log("HOORAY! - scores updated");
-      })
-
-      .catch(e => {
-        console.error(e);
-        throw e;
-      });
-
-    return mainPromise;
+    const golfer = golfersByName[golferName]._id;
+    return {
+      golfer: golfer,
+      day: g.day,
+      thru: g.thru,
+      scores: g.scores
+    } as GolferScore;
   });
+
+  // Merge in overrides
+  console.log("scores BEFORE overrides: " + JSON.stringify(scores));
+  const finalScores = mergeOverrides(scores, scoreOverrides);
+  console.log("");
+  console.log("scores AFTER overrides: " + JSON.stringify(scores));
+  console.log("");
+  if (!finalScores.length) {
+    throw new Error("wtf. no scores.");
+  }
+
+  // Save
+  await access.updateScores(finalScores);
+  console.log("HOORAY! - scores updated");
 }
