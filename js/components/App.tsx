@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import {omit} from 'lodash';
 import * as React from 'react';
 import AdminApp from './AdminApp';
 import AppHeader from './AppHeader';
@@ -54,6 +54,9 @@ interface AppState {
 
 interface ComponentProps extends AppState {
   location: Location;
+  match: {
+    params: {[key: string]: string}
+  };
   golfersRemaining: IndexedGolfers;
 }
 
@@ -89,8 +92,8 @@ function getAppState(): AppState {
 }
 
 function getGolfersRemaining(golfers: IndexedGolfers, draftPicks: DraftPick[]): IndexedGolfers {
-  const pickedGolfers = _.map(draftPicks, 'golfer');
-  const golfersRemaining = _.omit(golfers, pickedGolfers);
+  const pickedGolfers = draftPicks.map(dp => dp.golfer);
+  const golfersRemaining = omit(golfers, pickedGolfers);
   return golfersRemaining;
 }
 
@@ -121,6 +124,7 @@ class DraftWrapper extends React.Component<ComponentProps, {}> {
           pendingPickList={props.draft.pendingPickList}
           draftHasStarted={props.draftHasStarted}
           autoPickUsers={props.autoPickUsers}
+          tourneyId={props.match.params.tourneyId}
         />
       </section>
     );
@@ -192,13 +196,13 @@ export default class AppNode extends React.Component<AppNodeProps, AppState> {
   }
 
   componentDidMount() {
-    _.each(RELEVANT_STORES, (s) => {
+    RELEVANT_STORES.forEach(s => {
       s.addChangeListener(this._onChange);
     });
   }
 
   componentWillUnmount() {
-    _.each(RELEVANT_STORES, (s) => {
+    RELEVANT_STORES.forEach(s => {
       s.removeChangeListener(this._onChange);
     });
   }
@@ -241,8 +245,8 @@ export default class AppNode extends React.Component<AppNodeProps, AppState> {
 
     return (
       <Switch>
-        <Route exact path='/' render={renderTourneyWrapper} />
-        <Route exact path='/draft' render={renderDraftWrapper}/>
+        <Route exact path='/:tourneyId' render={renderTourneyWrapper} />
+        <Route exact path='/:tourneyId/draft' render={renderDraftWrapper}/>
         <Route exact path='/whoisyou' render={renderWhoIsYou}/>
         <Route exact path='/admin' render={renderAdminWrapper}/>
       </Switch>

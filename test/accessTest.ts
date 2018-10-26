@@ -1,9 +1,10 @@
 import * as _ from 'lodash';
-import * as access from '../server/access';
+import {getAccess} from '../server/access';
 import * as should from 'should';
 import * as tourneyUtils from '../server/tourneyUtils';
 import {initTestDb} from './initTestConfig';
 import {mongoose} from '../server/mongooseUtil';
+import config from '../server/config'
 import {
   Golfer,
   DraftPick,
@@ -11,6 +12,8 @@ import {
 } from '../server/ServerTypes';
 
 const {ObjectId} = mongoose.Types;
+
+const access = getAccess(config.current_tourney_id);
 
 function ensureEmptyDraft() {
   return access.getDraft().then(function (draft) {

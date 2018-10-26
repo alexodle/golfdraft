@@ -10,14 +10,14 @@ function _forEachWordPermutation(words, callback, output) {
     return callback(output.join(" "));
   }
 
-  _.each(words, function (w, i) {
+  _.each(words, (w, i) => {
     const newWords = words.slice(0, i).concat(words.slice(i + 1, words.length));
     return _forEachWordPermutation(newWords, callback, output.concat([w]));
   });
 }
 
 export function runAll(sourceStr: string, targetList: string[]) {
-  const results = _.map(targetList, function (targetStr) {
+  const results = _.map(targetList, targetStr => {
     return _.extend({ target: targetStr }, run(sourceStr, targetStr));
   });
   results.sort((r1, r2) => {
@@ -34,7 +34,7 @@ export function run(s1: string, s2: string) {
   const norms2 = _normalize(s2);
 
   let bestDist = Number.MAX_VALUE;
-  _forEachWordPermutation(norms1.split(" "), function (s1perm) {
+  _forEachWordPermutation(norms1.split(" "), s1perm => {
     bestDist = Math.min(bestDist, _string.levenshtein(s1perm, norms2));
     return bestDist > 0;
   }, []);

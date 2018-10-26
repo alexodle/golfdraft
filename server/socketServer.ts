@@ -2,9 +2,11 @@ import * as _ from 'lodash';
 import io from './socketIO';
 import redis from './redis';
 import * as userAccess from './userAccess';
-import * as access from './access';
+import config from '../server/config';
+import {getAccess} from '../server/access';
 
 const redisClient = redis.client;
+const access = getAccess(config.current_tourney_id);
 
 io.on('connection', socket => {
   const session = socket.request.session;
@@ -15,7 +17,5 @@ io.on('connection', socket => {
     });
   }
 
-  socket.on('disconnect', () => {
-    userAccess.onUserLogout(session.id);
-  });
+  socket.on('disconnect', () => userAccess.onUserLogout(session.id));
 });

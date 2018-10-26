@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import {sortBy} from 'lodash';
 import AppConstants from '../constants/AppConstants';
 import AppDispatcher from '../dispatcher/AppDispatcher';
 import ChatActions from '../actions/ChatActions';
@@ -25,13 +25,13 @@ AppDispatcher.register(function (payload) {
     case AppConstants.CURRENT_USER_CHANGE_SYNCED:
       const currentUser = UserStore.getCurrentUser();
       if (currentUser) {
-        fetch('/chat/messages')
+        fetch('chat/messages')
           .then(ChatActions.setMessages);
       }
       break;
 
     case ChatConstants.SET_MESSAGES:
-      _messages = _.sortBy(action.messages, 'date');
+      _messages = sortBy(action.messages, 'date');
       ChatStore.emitChange();
       break;
 

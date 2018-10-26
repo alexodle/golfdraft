@@ -1,7 +1,6 @@
 import * as _ from 'lodash';
 import io from './socketIO';
 import redis from './redis';
-import * as access from './access';
 
 const redisClient = redis.client;
 
@@ -19,12 +18,10 @@ function getUserCounts(): Promise<{ [userId: string]: number }> {
   });
 }
 
-function onUserChange() {
-  return getUserCounts()
-    .then(userCounts => {
-      const data = { data: { users: _.keys(userCounts) } };
-      io.sockets.emit('change:activeusers', data);
-    });
+async function onUserChange() {
+  const userCounts = await getUserCounts();
+  const data = { data: { users: _.keys(userCounts) } };
+  io.sockets.emit('change:activeusers', data);
 }
 
 export function refresh() {

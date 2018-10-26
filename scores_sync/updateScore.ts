@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import * as access from '../server/access';
+import {getAccess} from '../server/access';
 import config from '../server/config';
 import constants from '../common/constants';
 import {Reader, ReaderResult, UpdateGolfer} from './Types';
@@ -12,6 +12,8 @@ import {
 const DAYS = constants.NDAYS;
 const MISSED_CUT = constants.MISSED_CUT;
 const OVERRIDE_KEYS = ['golfer', 'day', 'scores'];
+
+const access = getAccess(config.current_tourney_id);
 
 export function validate(result: ReaderResult): boolean {
   if (_.has(result, 'par') && !_.includes([70, 71, 72, 73], result.par)) {

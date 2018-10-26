@@ -1,7 +1,10 @@
 import * as mongooseUtil from '../server/mongooseUtil';
-import * as access from '../server/access';
+import {getAccess} from '../server/access';
+import config from '../server/config';
 import * as _ from 'lodash';
 import constants from '../common/constants';
+
+const access = getAccess(config.current_tourney_id);
 
 function end() {
   mongooseUtil.close();

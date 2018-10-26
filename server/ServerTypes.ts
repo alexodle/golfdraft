@@ -1,6 +1,13 @@
 import * as mongoose from 'mongoose';
 import * as CommonTypes from '../common/types/CommonTypes';
 import {Model, Document} from 'mongoose';
+import {Access} from './access';
+
+declare module "express" {
+  interface Request {
+    access: Access;
+  }
+}
 
 export type ObjectId = mongoose.Types.ObjectId;
 

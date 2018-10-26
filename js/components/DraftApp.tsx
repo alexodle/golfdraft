@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import {isEmpty, sortBy} from 'lodash';
 import * as React from 'react';
 import AppPausedStatus from './AppPausedStatus';
 import Assets from '../constants/Assets';
@@ -40,6 +40,7 @@ export interface DraftAppProps {
   allowClock: boolean;
   draftHasStarted: boolean;
   isPaused: boolean;
+  tourneyId: string;
 }
 
 export interface DraftAppState {
@@ -111,7 +112,7 @@ export default class DraftApp extends React.Component<DraftAppProps, DraftAppSta
           <div className='col-md-12'>
             <div className='jumbotron'>
               <h1>The draft is over!</h1>
-              <p><Link to='/'>Check out the live leaderboard</Link></p>
+              <p><Link to={`/${this.props.tourneyId}`}>Check out the live leaderboard</Link></p>
             </div>
           </div>
         </div>
@@ -152,13 +153,12 @@ export default class DraftApp extends React.Component<DraftAppProps, DraftAppSta
 
     const isMyPick = this.props.isMyDraftPick;
     const isDraftPaused = this.props.isPaused;
-    const syncedPickListForEditor = this.props.syncedPickList === null || !_.isEmpty(this.props.syncedPickList) ?
-      this.props.syncedPickList :
-      _.chain(this.props.golfersRemaining)
-        .sortBy(g => g.wgr, g => g.name)
-        .map(g => g._id)
-        .value();
-    const pendingPickListForEditor = this.props.pendingPickList === null || !_.isEmpty(this.props.pendingPickList) ?
+    let syncedPickListForEditor = this.props.syncedPickList;
+    if (this.props.syncedPickList !== null && isEmpty(this.props.syncedPickList)) {
+      syncedPickListForEditor = sortBy(this.props.golfersRemaining, g => g.wgr, g => g.name).map(g => g._id);
+    }
+    
+    const pendingPickListForEditor = this.props.pendingPickList === null || !isEmpty(this.props.pendingPickList) ?
       this.props.pendingPickList :
       syncedPickListForEditor;
 

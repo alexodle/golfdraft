@@ -1,12 +1,14 @@
 // Refreshes users, pick order, draft picks, and chat
 
 import * as _ from 'lodash';
-import * as access from './access';
+import {getAccess} from './access';
 import * as mongooseUtil from './mongooseUtil';
 import config from './config';
 import {loadConfig} from './tourneyConfigReader';
 import {snakeDraftOrder} from './tourneyUtils';
 import {User} from './ServerTypes';
+
+const access = getAccess(config.current_tourney_id);
 
 export default function refreshUserState(pickOrderNames) {
   return Promise.all([

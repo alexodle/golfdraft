@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
-import * as access from './access';
+import {getAccess} from '../server/access';
+import config from '../server/config';
 import * as utils from '../common/utils';
 import constants from '../common/constants';
 import {
@@ -8,6 +9,8 @@ import {
   Golfer,
   UserDoc,
 } from './ServerTypes';
+
+const access = getAccess(config.current_tourney_id);
 
 function loadPick(draft: Draft, draftPick: DraftPick): Promise<{ pickUser: UserDoc, pickGolfer: Golfer, nextUser: UserDoc}> {
   const nextPick = draft.pickOrder[draft.picks.length];
