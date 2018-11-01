@@ -11,6 +11,7 @@ import * as session from 'express-session';
 import * as tourneyConfigReader from './tourneyConfigReader';
 import * as userAccess from './userAccess';
 import * as utils from '../common/utils';
+import * as updateTourneyStandings from '../scores_sync/updateTourneyStandings';
 import app from './expressApp';
 import config from './config';
 import expressServer from './expressServer';
@@ -79,7 +80,7 @@ const sessionMiddleware = session({
   }
 });
 app.use(sessionMiddleware);
-io.use(function(socket, next) {
+io.use((socket, next) => {
   sessionMiddleware(socket.request, socket.request.res, next);
 });
 
@@ -121,22 +122,34 @@ app.param('tourneyId', (req: Request, res: Response, next: NextFunction, tourney
   next();
 });
 
+async function emitTourneyStandings() {
+  const tourneyStandings = await defaultAccess.getTourneyStandings();
+  io.sockets.emit('change:scores', {
+    data: {
+      tourneyStandings,
+      lastUpdated: new Date()
+    },
+    evType: 'change:scores',
+    action: 'scores:periodic_update'
+  });
+}
+
 function defineRoutes() {
   const tourneyCfg = tourneyConfigReader.loadConfig();
 
   redisPubSubClient.on("message", (channel, message) => {
     // Scores updated, alert clients
     console.log("redis message: channel " + channel + ": " + message);
-    defaultAccess.getTourneyStandings().then(tourneyStandings => {
-      io.sockets.emit('change:scores', {
-        data: {
-          tourneyStandings,
-          lastUpdated: new Date()
-        },
-        evType: 'change:scores',
-        action: 'scores:periodic_update'
-      });
-    });
+    emitTourneyStandings();
+  });
+
+  defaultAccess.on(Access.EVENTS.standingsUpdate, emitTourneyStandings);
+
+  defaultAccess.on(Access.EVENTS.pickMade, async () => {
+    const isDraftOver = await defaultAccess.isDraftComplete();
+    if (isDraftOver) {
+      updateTourneyStandings.run();
+    }
   });
 
   // Include chat routes

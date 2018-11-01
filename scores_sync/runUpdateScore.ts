@@ -6,7 +6,7 @@ import {loadConfig} from '../server/tourneyConfigReader';
 import * as updateTourneyStandings from './updateTourneyStandings';
 import * as updateScore from './updateScore';
 
-const TIMEOUT = 30 * 1000; // 30 seconds
+const TIMEOUT = 2 * 60 * 1000; // 2 minutes
 
 const tourneyCfg = loadConfig();
 
@@ -21,23 +21,26 @@ function end() {
   redis.unref();
 }
 
-function updateScores() {
+async function updateScores() {
   console.log("attempting update...");
-  return updateScore.run(reader, url, nameMap)
-    .then(() => updateTourneyStandings.run())
-    .then(() => redis.pubSubClient.publish("scores:update", (new Date()).toString()))
+  await updateScore.run(reader, url, nameMap)
+  redis.pubSubClient.publish("scores:update", (new Date()).toString());
 }
 
-const timeoutId = setTimeout(function () {
-  console.error("TIMEOUT");
-  end();
-  process.exit(1);
-}, TIMEOUT);
+async function main() {
+  const timeoutId = setTimeout(() => {
+    console.error("TIMEOUT");
+    end();
+    process.exit(1);
+  }, TIMEOUT);
 
-mongooseUtil.connect()
-  .then(updateScores)
-  .catch(e => console.error("Update failed", e))
-  .then(() => {
+  try {
+    await mongooseUtil.connect();
+    await updateScores();
+  } finally {
     clearTimeout(timeoutId);
     end();
-  });
+  }
+}
+
+main();

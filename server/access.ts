@@ -61,10 +61,27 @@ function mergeWGR(golfer: GolferDoc, wgrEntry: WGR): Golfer {
 
 export class Access {
 
+  static readonly EVENTS = {
+    standingsUpdate: 'standingsUpdate',
+    pickMade: 'pickMade'
+  }
+
   private tourneyId: ObjectId;
+  private listeners: { [key: string]: Array<() => void> };
 
   constructor(tourneyId: string) {
     this.tourneyId = new mongoose.Types.ObjectId(tourneyId);
+    this.listeners = {};
+  }
+
+  // TODO: Extract
+  on(key: string, f: () => void) {
+    const l = this.listeners[key] || (this.listeners[key] = []);
+    l.push(f);
+  }
+  fire(key: string) {
+    const l = this.listeners[key] || [];
+    l.forEach(f => setTimeout(f, 0));
   }
 
   private extendWithTourneyId = (obj) => {
@@ -118,17 +135,15 @@ export class Access {
   }
 
   async updateAutoPick(userId: string, autoPick: boolean) {
-    const query = { tourneyId: this.tourneyId };
-
     let update = null;
     if (!!autoPick) {
       update = models.AppState.update(
-        query,
+        {},
         { $addToSet: { autoPickUsers: userId } },
         { upsert: true });
     } else {
       update = models.AppState.update(
-        query,
+        {},
         { $pull: { autoPickUsers: userId } },
         { multi: true });
     }
@@ -240,22 +255,11 @@ export class Access {
   }
 
   async getAppState(): Promise<AppSettings> {
-    const appState = await models.AppState.findOne({ tourneyId: this.tourneyId }).exec() as AppSettingsDoc;
-    return appState || {
-      tourneyId: this.tourneyId,
-      isDraftPaused: false,
-      allowClock: true,
-      draftHasStarted: false,
-      autoPickUsers: [],
-    } as AppSettings;
+    return await models.AppState.findOne().exec() as AppSettingsDoc;
   }
 
   async updateAppState(props: AppSettings) {
-    return models.AppState.update(
-      { tourneyId: this.tourneyId },
-      props,
-      { upsert: true }
-    ).exec();
+    return models.AppState.update({}, props, { upsert: true }).exec();
   }
 
   async makePickListPick(userId: string, pickNumber: number) {
@@ -339,12 +343,22 @@ export class Access {
     pick.timestamp = new Date();
     const pickDoc = await models.DraftPick.create(pick);
 
+    this.fire(Access.EVENTS.pickMade);
+
     return pick;
   }
 
   async undoLastPick(): Promise<DraftPickDoc> {
     const nPicks = await models.DraftPick.count({ tourneyId: this.tourneyId }).exec();
     return models.DraftPick.findOneAndRemove({ pickNumber: nPicks - 1 }).exec() as Promise<DraftPickDoc>;
+  }
+
+  async isDraftComplete(): Promise<boolean> {
+    const [nActualPicks, nExpectedPicks] = await Promise.all([
+      models.DraftPick.count({ tourneyId: this.tourneyId }).exec(),
+      models.DraftPickOrder.count({ tourneyId: this.tourneyId }).exec()
+    ]);
+    return nActualPicks >= nExpectedPicks;
   }
 
   async getDraft(): Promise<Draft> {
@@ -401,10 +415,12 @@ export class Access {
   }
 
   async updateTourneyStandings(tourneyStandings: TourneyStandings) {
-    return models.TourneyStandings.update(
+    const result = await models.TourneyStandings.update(
       { _id: this.tourneyId },
       { $set: { tourneyId: this.tourneyId, ...tourneyStandings } },
       { upsert: true });
+    this.fire(Access.EVENTS.standingsUpdate);
+    return result;
   }
 
   // Chat
@@ -471,7 +487,7 @@ export class Access {
   }
 
   async clearAppState() {
-    return this.clearAll(models.AppState);
+    return models.AppState.remove({}).exec();
   }
 
   async clearUsers() {
@@ -492,8 +508,7 @@ export class Access {
       this.clearGolferScoreOverrides(),
       this.clearChatMessages(),
       this.clearPickLists(),
-      this.clearAppState(),
-      this.clearUsers()
+      this.clearAppState()
     ]);
   }
 

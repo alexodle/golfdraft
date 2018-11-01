@@ -81,56 +81,49 @@ function fillInStandings(sortedScores: PlayerScore[]) {
   });
 }
 
-export function run(): Promise<void> {
-  return Promise.all([
-      access.getScores(),
-      access.getDraft()
-    ])
-    .then(([scores, draft]) => {
-      console.log("Running player score update");
+export async function run() {
+  const [scores, draft] = await Promise.all([
+    access.getScores(),
+    access.getDraft()
+  ]);
+  console.log("Running player score update");
 
-      // Summary info
-      const worstScoresForDay = _.times(constants.NDAYS, day => {
-        const maxGolferScore = _.maxBy(scores, s => _.isNumber(s.scores[day]) ? 
-          s.scores[day] :
-          Number.MIN_VALUE);
-        const maxScore: number = _.isNumber(maxGolferScore.scores[day]) ?
-          maxGolferScore.scores[day] :
-          0;
-        return {
-          day,
-          golfer: maxGolferScore.golfer,
-          score: maxScore
-        };
-      });
+  // Summary info
+  const worstScoresForDay = _.times(constants.NDAYS, day => {
+    const maxGolferScore = _.maxBy(scores, s => _.isNumber(s.scores[day]) ? 
+      s.scores[day] :
+      Number.MIN_VALUE);
+    const maxScore: number = _.isNumber(maxGolferScore.scores[day]) ?
+      maxGolferScore.scores[day] :
+      0;
+    return {
+      day,
+      golfer: maxGolferScore.golfer,
+      score: maxScore
+    };
+  });
 
-      const picksByUser = _.groupBy(draft.picks, p => p.user.toString());
-      const scoresByPlayer = _.keyBy(scores, s => s.golfer.toString());
-      const playerRawScores = _.mapValues(picksByUser, picks => 
-        _.map(picks, p => scoresByPlayer[p.golfer.toString()]));
+  const picksByUser = _.groupBy(draft.picks, p => p.user.toString());
+  const scoresByPlayer = _.keyBy(scores, s => s.golfer.toString());
+  const playerRawScores = _.mapValues(picksByUser, picks => 
+    _.map(picks, p => scoresByPlayer[p.golfer.toString()]));
 
-      const playerScores = _.chain(playerRawScores)
-        .map((rawScores, pid) => buildPlayerScore(pid, rawScores, worstScoresForDay))
-        .sortBy(ps => ps.totalScore)
-        .value();
+  const playerScores = _.chain(playerRawScores)
+    .map((rawScores, pid) => buildPlayerScore(pid, rawScores, worstScoresForDay))
+    .sortBy(ps => ps.totalScore)
+    .value();
 
-      // Fill in standings
-      fillInStandings(playerScores);
+  // Fill in standings
+  fillInStandings(playerScores);
 
-      // Estimate current day
-      let currentDay = 0;
-      for (let i = 1; i < worstScoresForDay.length && worstScoresForDay[i].score !== 0; i++) {
-        currentDay++;
-      }
+  // Estimate current day
+  let currentDay = 0;
+  for (let i = 1; i < worstScoresForDay.length && worstScoresForDay[i].score !== 0; i++) {
+    currentDay++;
+  }
 
-      const tourneyStandings: TourneyStandings = { currentDay, worstScoresForDay, playerScores };
+  const tourneyStandings: TourneyStandings = { currentDay, worstScoresForDay, playerScores };
 
-      return access.updateTourneyStandings(tourneyStandings);
-    })
-    .then(() => console.log("DONE Running player score update"))
-    .catch(e => {
-      console.error("FAILED: Running player score update");
-      console.error(e);
-      throw e;
-    });
+  await access.updateTourneyStandings(tourneyStandings);
+  console.log("DONE Running player score update");
 }

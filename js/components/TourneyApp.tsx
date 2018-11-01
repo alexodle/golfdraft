@@ -40,11 +40,19 @@ class TourneyApp extends React.Component<TourneyAppProps, TourneyAppState> {
     this.state = this._getInitialState();
   }
 
-  _getInitialState() {
+  private _getInitialState() {
     return getState({} as TourneyAppState, this.props);
   }
 
+  private renderCalculatingStandings() {
+    return (<p>Initializing tourney...</p>);
+  }
+
   render() {
+    if (!this.props.tourneyStandings) {
+      return this.renderCalculatingStandings();
+    }
+
     return (
       <section>
         <p>

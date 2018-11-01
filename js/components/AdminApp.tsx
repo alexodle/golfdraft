@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import {every, map, each} from 'lodash';
 import * as React from 'react';
 import DraftActions from '../actions/DraftActions';
 import DraftHistory from './DraftHistory';
@@ -113,6 +113,8 @@ class AdminApp extends React.Component<AdminAppProps, AdminAppState> {
       return (<PasswordInput />);
     }
 
+    const allChecked = every(props.users, u => !!props.autoPickUsers[u._id]);
+
     return (
       <section>
         <h1>Hello admin!</h1>
@@ -162,8 +164,14 @@ class AdminApp extends React.Component<AdminAppProps, AdminAppState> {
         <h2>Auto picks</h2>
         <div className='panel'>
           <div className='panel-body'>
+            <label><input
+              type='checkbox'
+              checked={allChecked}
+              onChange={this._toggleAllAutoPicks.bind(null, !allChecked)}
+            /> Toggle All</label>
+            <br />
             <ul className='list-unstyled'>
-              {_.map(props.users, (user) => {
+              {map(props.users, user => {
                 const checked = !!props.autoPickUsers[user._id];
                 return (
                   <li key={user._id}>
@@ -244,6 +252,12 @@ class AdminApp extends React.Component<AdminAppProps, AdminAppState> {
         <DraftHistory draftPicks={props.draftPicks} />
       </section>
     );
+  }
+
+  _toggleAllAutoPicks = (autoPick: boolean) => {
+    each(this.props.users, user => {
+      toggleAutoPick(user._id, autoPick);
+    });
   }
 
   _onStartDraft = () => {

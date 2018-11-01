@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import * as updateTourneyStandings from './updateTourneyStandings';
 import {getAccess} from '../server/access';
 import config from '../server/config';
 import constants from '../common/constants';
@@ -50,7 +51,7 @@ export function validate(result: ReaderResult): boolean {
 
 export function mergeOverrides(scores: GolferScore[], scoreOverrides: ScoreOverride[]): GolferScore[] {
   const overridesByGolfer = _.chain(scoreOverrides)
-    .map((o) => {
+    .map(o => {
       return _.chain(o)
 
         // Remove all empty values from scoreOverrides
@@ -84,13 +85,16 @@ export async function run(reader: Reader, url: string, nameMap: { [name: string]
     throw new Error("Invalid data for updateScore");
   }
 
+  // Update all names
+  _.each(rawTourney.golfers, g => g.golfer = nameMap[g.golfer] || g.golfer);
+
   // Ensure tourney/par
   const update = { pgatourUrl: url, par: rawTourney.par };
   await access.updateTourney(update);
   
   // Ensure golfers
   if (populateGolfers) {
-    const golfers = _.map(rawTourney.golfers, g => ({ name: nameMap[g.golfer] || g.golfer } as Golfer));
+    const golfers = _.map(rawTourney.golfers, g => ({ name: g.golfer } as Golfer));
     await access.ensureGolfers(golfers);
   }
   
@@ -104,7 +108,7 @@ export async function run(reader: Reader, url: string, nameMap: { [name: string]
   // Build scores with golfer id
   const golfersByName = _.keyBy(gs, gs => gs.name);
   const scores = _.map(rawTourney.golfers, g => {
-    const golferName = nameMap[g.golfer] || g.golfer;
+    const golferName = g.golfer;
     if (!golfersByName[golferName]) {
       throw new Error("ERROR: Could not find golfer: " + golferName);
     }
@@ -119,16 +123,16 @@ export async function run(reader: Reader, url: string, nameMap: { [name: string]
   });
 
   // Merge in overrides
-  console.log("scores BEFORE overrides: " + JSON.stringify(scores));
   const finalScores = mergeOverrides(scores, scoreOverrides);
-  console.log("");
-  console.log("scores AFTER overrides: " + JSON.stringify(scores));
-  console.log("");
   if (!finalScores.length) {
     throw new Error("wtf. no scores.");
   }
 
   // Save
   await access.updateScores(finalScores);
+
+  // Calculate standings
+  await updateTourneyStandings.run();
+
   console.log("HOORAY! - scores updated");
 }

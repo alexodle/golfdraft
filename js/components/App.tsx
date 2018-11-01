@@ -14,6 +14,7 @@ import UserStore from '../stores/UserStore';
 import WhoIsYou from './WhoIsYou';
 import {DraftProps} from '../types/SharedProps';
 import {Route, Switch, Redirect} from 'react-router-dom';
+import constants from '../../common/constants';
 import {
   ChatMessage,
   DraftPick,
@@ -215,7 +216,7 @@ export default class AppNode extends React.Component<AppNodeProps, AppState> {
 
   _requireDraftComplete(from) {
     if (this.state.draft.currentPick) {
-      return (<Redirect to={{ pathname: '/draft', state: { from: from }}} />);
+      return (<Redirect to={{ pathname: 'draft', state: { from: from }}} />);
     }
   }
 
@@ -245,10 +246,10 @@ export default class AppNode extends React.Component<AppNodeProps, AppState> {
 
     return (
       <Switch>
-        <Route exact path='/:tourneyId' render={renderTourneyWrapper} />
-        <Route exact path='/:tourneyId/draft' render={renderDraftWrapper}/>
+        <Route exact path={`/${constants.TOURNEY_ID_PARAM}/draft`} render={renderDraftWrapper}/>
         <Route exact path='/whoisyou' render={renderWhoIsYou}/>
         <Route exact path='/admin' render={renderAdminWrapper}/>
+        <Route exact path={`/${constants.TOURNEY_ID_PARAM}`} render={renderTourneyWrapper} />
       </Switch>
     );
   }
