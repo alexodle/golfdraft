@@ -13,15 +13,22 @@ export default class AppHeader extends React.Component<AppHeaderProps, {}> {
   render() {
     return (
       <div className='page-header draft-page-header'>
-        <h1>
-          Welcome to the {this.props.tourneyName}
-          {!this.props.drafting ? null : ' Draft'}<br />
-          <small>{this.props.currentUser.name}</small>
-          <span> </span>
-          <span className='logout-button'>
-            <LogoutButton currentUser={this.props.currentUser} />
-          </span>
-        </h1>
+        <div className='row'>
+          <div className='col col-md-6'>
+            <h1>
+              Welcome to the Pool Party<br />
+              <small>{this.props.tourneyName}</small>
+            </h1>
+          </div>
+          <div className='col col-md-6'>
+            <h1 style={{ textAlign: 'right' }}>
+              <small>{this.props.currentUser.name}</small><br />
+              <span className='logout-button'>
+                <LogoutButton currentUser={this.props.currentUser} />
+              </span>
+            </h1>
+          </div>
+        </div>
       </div>
     );
   }
