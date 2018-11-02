@@ -5,10 +5,11 @@ import parseDraft from './logic/DraftParser';
 import ScoreActions from './actions/ScoreActions';
 import SettingsActions from './actions/SettingsActions';
 import UserActions from './actions/UserActions';
+import {BootstrapPayload} from './types/ClientTypes';
 
 /** Hydrates the app with data stamped on initial page load
 */
-function hydrate(seedData) {
+function hydrate(seedData: BootstrapPayload) {
   const draft = parseDraft(seedData.draft);
 
   AppActions.setUsers(seedData.users);
@@ -19,7 +20,8 @@ function hydrate(seedData) {
     lastUpdated: seedData.tourney.lastUpdated
   });
   SettingsActions.setAppState(seedData.appState);
-  AppActions.setTourneyName(seedData.tourneyName);
+  AppActions.setTourneyName(seedData.tourney.name);
+  AppActions.setAllTourneys(seedData.allTourneys);
 
   if (seedData.user) {
     UserActions.hydrateCurrentUser(seedData.user._id);

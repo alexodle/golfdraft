@@ -3,6 +3,8 @@ import {Indexed, NumberIndexed} from '../../common/types/CommonTypes';
 
 export {Indexed, NumberIndexed};
 
+export type Tourney = CommonTypes.Tourney;
+
 export interface AppSettings extends CommonTypes.AppSettings {
   autoPickUsers: Indexed<string>;
 }
@@ -37,4 +39,24 @@ export interface TourneyStandings extends CommonTypes.TourneyStandings {}
 
 export interface ChatMessage extends CommonTypes.ChatMessage {
   user?: string;
+}
+
+export interface Draft {
+  picks: DraftPick[],
+  pickOrder: DraftPickOrder[],
+  serverTimestamp: Date
+}
+
+export interface BootstrapPayload {
+  golfers: Golfer[];
+  users: User[];
+  draft: Draft;
+  tourneyStandings: TourneyStandings;
+  tourney: Tourney;
+  appState: AppSettings;
+  user: User;
+  currentTourneyId: string;
+  allTourneys: Tourney[];
+  prod: boolean;
+  cdnUrl: string;
 }

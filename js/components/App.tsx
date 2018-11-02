@@ -157,6 +157,17 @@ class TourneyWrapper extends React.Component<ComponentProps, {}> {
 
 };
 
+class HistoryWrapper extends React.Component<ComponentProps, {}> {
+
+  render() {
+    const props = this.props;
+    return (
+      <h1>HISTORY ROCKS!</h1>
+    );
+  }
+
+}
+
 class AdminWrapper extends React.Component<ComponentProps, {}> {
 
   render() {
@@ -243,12 +254,14 @@ export default class AppNode extends React.Component<AppNodeProps, AppState> {
 
     const renderWhoIsYou = (props) => (<WhoIsYou {...props} {...state} golfersRemaining={golfersRemaining} />);
     const renderAdminWrapper = (props) => (<AdminWrapper {...props} {...state} golfersRemaining={golfersRemaining} />);
+    const renderHistoryWrapper = (props) => (<HistoryWrapper {...props} {...state} />);
 
     return (
       <Switch>
         <Route exact path={`/${constants.TOURNEY_ID_PARAM}/draft`} render={renderDraftWrapper}/>
         <Route exact path='/whoisyou' render={renderWhoIsYou}/>
         <Route exact path='/admin' render={renderAdminWrapper}/>
+        <Route exact path='/history' render={renderHistoryWrapper}/>
         <Route exact path={`/${constants.TOURNEY_ID_PARAM}`} render={renderTourneyWrapper} />
       </Switch>
     );

@@ -82,3 +82,18 @@ export interface ScoreOverride extends TourneySpecific {
 }
 export type ScoreOverrideDoc = ScoreOverride & Document;
 
+export type TourneyDoc = CommonTypes.Tourney & Document;
+
+export interface BootstrapPayload {
+  golfers: string;
+  users: string;
+  draft: string;
+  tourneyStandings: string;
+  tourney: string;
+  appState: string;
+  user: string;
+  currentTourneyId: string;
+  allTourneys: string;
+  prod: boolean;
+  cdnUrl: string;
+}

@@ -65,3 +65,10 @@ export interface ChatMessage {
   message: string;
   date: Date;
 }
+
+export interface Tourney {
+  _id?: any;
+  name: string;
+  startDate: Date;
+  lastUpdated: Date;
+}

@@ -1,4 +1,5 @@
-import {getAccess, Access} from './access';
+import {getAccess, getAllTourneys, Access} from './access';
+import {find} from 'lodash';
 import * as bodyParser from 'body-parser';
 import * as chatBot from './chatBot';
 import * as compression from 'compression';
@@ -25,6 +26,7 @@ import {
   Draft,
   DraftPick,
   DraftPickDoc,
+  BootstrapPayload,
 } from './ServerTypes';
 
 const RedisStore = connectRedis(session);
@@ -167,16 +169,18 @@ function defineRoutes() {
     res.redirect(`/${config.current_tourney_id}${req.path}`);
   });
 
-  app.get(['/whoisyou', '/admin', '/:tourneyId/draft', '/:tourneyId'], async (req: Request, res: Response, next: NextFunction) => {
+  app.get(['/whoisyou', '/admin', '/history', '/:tourneyId/draft', '/:tourneyId'], async (req: Request, res: Response, next: NextFunction) => {
     const access = req.access;
-    const [golfers, users, draft, tourneyStandings, tourney, appState] = await Promise.all([
+    const tourneyId = access.getTourneyId();
+    const [golfers, users, draft, tourneyStandings, appState, allTourneys] = await Promise.all([
       access.getGolfers(),
       access.getUsers(),
       access.getDraft(),
       access.getTourneyStandings(),
-      access.getTourney(),
-      access.getAppState()
+      access.getAppState(),
+      getAllTourneys(),
     ]);
+    const tourney = find(allTourneys, t => utils.oidsAreEqual(tourneyId, t._id));
     if (!tourney) {
       res.sendStatus(404);
       return;
@@ -189,10 +193,20 @@ function defineRoutes() {
       tourney: JSON.stringify(tourney),
       appState: JSON.stringify(appState),
       user: JSON.stringify(req.user),
-      tourneyName: tourneyCfg.name,
+      currentTourneyId: config.current_tourney_id,
+      allTourneys: JSON.stringify(allTourneys),
       prod: config.prod,
       cdnUrl: config.cdn_url
-    });
+    } as BootstrapPayload);
+  });
+
+  app.get('/history', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const tourneys = await getAllTourneys();
+      res.status(200).send({ history: tourneys });
+    } catch (err) {
+      next(err);
+    }
   });
 
   app.post('/register', (req: Request, res: Response, next: NextFunction) => {
@@ -483,9 +497,8 @@ async function onAppStateUpdate(req: Request, res: Response, promise: Promise<an
   try {
     await promise;
   } catch (err) {
-    console.log(err);
     res.status(500).send(err);
-    throw NOT_AN_ERROR; // skip next steps
+    return;
   }
 
   // App state will affect whether or not we should be running auto picks
@@ -497,8 +510,8 @@ async function onAppStateUpdate(req: Request, res: Response, promise: Promise<an
     res.status(200).send({ appState });
     io.sockets.emit('change:appstate', { data: { appState } });
   } catch (err) {
-    if (err === NOT_AN_ERROR) throw err;
     console.log(err);
+    return;
   }
 }
 

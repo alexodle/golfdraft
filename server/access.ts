@@ -32,11 +32,12 @@ import {
   UserDoc,
   WGR,
   WGRDoc,
+  TourneyDoc,
 } from './ServerTypes';
 
 const UNKNOWN_WGR = constants.UNKNOWN_WGR;
 
-const _cache: { [tourneyId: string]: Access } = {};
+const _cache: {[tourneyId: string]: Access} = {};
 export function getAccess(tourneyId: string): Access {
   if (!tourneyId || _.isEmpty(tourneyId)) {
     throw new Error("Empty tourney id");
@@ -47,6 +48,10 @@ export function getAccess(tourneyId: string): Access {
 
   obj = _cache[tourneyId] = new Access(tourneyId);
   return obj;
+}
+
+export async function getAllTourneys(): Promise<TourneyDoc[]> {
+  return models.Tourney.find().exec() as Promise<TourneyDoc[]>;
 }
 
 function mergeWGR(golfer: GolferDoc, wgrEntry: WGR): Golfer {
@@ -72,6 +77,10 @@ export class Access {
   constructor(tourneyId: string) {
     this.tourneyId = new mongoose.Types.ObjectId(tourneyId);
     this.listeners = {};
+  }
+
+  getTourneyId() {
+    return this.tourneyId;
   }
 
   // TODO: Extract
@@ -108,8 +117,8 @@ export class Access {
     return model.remove({ tourneyId: this.tourneyId }).exec();
   };
 
-  async getTourney() {
-    return models.Tourney.findOne({ _id: this.tourneyId }).exec();
+  async getTourney(): Promise<TourneyDoc> {
+    return models.Tourney.findOne({ _id: this.tourneyId }).exec() as Promise<TourneyDoc>;
   }
 
   async getPickList(userId: string): Promise<string[]> {
