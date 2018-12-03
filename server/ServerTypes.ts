@@ -92,7 +92,7 @@ export interface BootstrapPayload {
   tourney: string;
   appState: string;
   user: string;
-  currentTourneyId: string;
+  activeTourneyId: string;
   allTourneys: string;
   prod: boolean;
   cdnUrl: string;

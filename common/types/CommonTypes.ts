@@ -9,7 +9,7 @@ export interface NumberIndexed<T> {
 }
 
 export interface AppSettings {
-  currentTourneyId: string;
+  activeTourneyId: string;
   isDraftPaused: boolean;
   allowClock: boolean;
   draftHasStarted: boolean;

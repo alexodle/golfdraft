@@ -55,7 +55,7 @@ export interface BootstrapPayload {
   tourney: Tourney;
   appState: AppSettings;
   user: User;
-  currentTourneyId: string;
+  activeTourneyId: string;
   allTourneys: Tourney[];
   prod: boolean;
   cdnUrl: string;

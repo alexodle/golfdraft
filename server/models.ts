@@ -79,7 +79,7 @@ const tourneyStandingsSchema = new mongoose.Schema({
 tourneyStandingsSchema.index({ tourneyId: 1 }, { unique: true });
 
 const appStateSchema = new mongoose.Schema({
-  currentTourneyId: SchemaTypes.ObjectId,
+  activeTourneyId: SchemaTypes.ObjectId,
   isDraftPaused: Boolean,
   allowClock: Boolean,
   draftHasStarted: Boolean,
@@ -89,8 +89,7 @@ const appStateSchema = new mongoose.Schema({
 const tourneySchema = new mongoose.Schema({
   name: { type: String, required: true },
   lastUpdated: { type: Date, required: true },
-  startDate: { type: Date, required: true },
-  par: Number
+  startDate: { type: Date, required: true }
 });
 
 export { User };

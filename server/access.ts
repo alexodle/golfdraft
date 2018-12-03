@@ -1,6 +1,4 @@
-import * as _ from 'lodash';
 import * as chatModels from './chatModels';
-import config from './config';
 import constants from '../common/constants';
 import io from './socketIO';
 import * as levenshteinDistance from './levenshteinDistance';
@@ -15,7 +13,6 @@ import {
   Draft,
   DraftPick,
   DraftPickDoc,
-  DraftPickList,
   DraftPickListDoc,
   DraftPickOrder,
   DraftPickOrderDoc,
@@ -26,7 +23,6 @@ import {
   TourneyStandings,
   TourneyStandingsDoc,
   ObjectId,
-  ScoreOverride,
   ScoreOverrideDoc,
   User,
   UserDoc,
@@ -34,12 +30,20 @@ import {
   WGRDoc,
   TourneyDoc,
 } from './ServerTypes';
+import {
+  chain,
+  isEmpty,
+  pick,
+  uniq,
+  keyBy,
+  sortBy,
+} from 'lodash';
 
 const UNKNOWN_WGR = constants.UNKNOWN_WGR;
 
 const _cache: {[tourneyId: string]: Access} = {};
 export function getAccess(tourneyId: string): Access {
-  if (!tourneyId || _.isEmpty(tourneyId)) {
+  if (!tourneyId || isEmpty(tourneyId)) {
     throw new Error("Empty tourney id");
   }
   
@@ -52,6 +56,30 @@ export function getAccess(tourneyId: string): Access {
 
 export async function getAllTourneys(): Promise<TourneyDoc[]> {
   return models.Tourney.find().exec() as Promise<TourneyDoc[]>;
+}
+
+export async function getAppState(): Promise<AppSettings> {
+  return await models.AppState.findOne().exec() as AppSettingsDoc;
+}
+
+export async function updateAppState(props: AppSettings) {
+  return models.AppState.update({}, props, { upsert: true }).exec();
+}
+
+export async function initNewTourney(name: string, startDate: Date): Promise<string> {
+  const lastUpdated = new Date();
+  const tourney = new models.Tourney({ name, startDate, lastUpdated });
+  await tourney.save();
+  return tourney._id.toString();
+}
+
+let _activeTourneyAccess: Access = null;
+export async function getActiveTourneyAccess(): Promise<Access> {
+  if (_activeTourneyAccess) return _activeTourneyAccess;
+  
+  const appState = await getAppState();
+  _activeTourneyAccess = getAccess(appState.activeTourneyId);
+  return _activeTourneyAccess;
 }
 
 function mergeWGR(golfer: GolferDoc, wgrEntry: WGR): Golfer {
@@ -98,13 +126,13 @@ export class Access {
   }
 
   private extendAllWithTourneyId = (objs) => {
-    return _.map(objs, this.extendWithTourneyId);
+    return objs.map(this.extendWithTourneyId);
   }
 
   private multiUpdate = async (model: Model<Document>, queryMask: string[], objs: {}[]) => {
     objs = this.extendAllWithTourneyId(objs);
-    return Promise.all(_.map(objs, o => {
-      const query = _.pick(o, queryMask);
+    return Promise.all(objs.map( o => {
+      const query = pick(o, queryMask);
       return model.update(query, o, { upsert: true }).exec();
     }));
   };
@@ -113,22 +141,18 @@ export class Access {
     return model.find({ tourneyId: this.tourneyId }).exec();
   };
 
-  private clearAll = async (model: Model<Document>) => {
-    return model.remove({ tourneyId: this.tourneyId }).exec();
-  };
-
   async getTourney(): Promise<TourneyDoc> {
     return models.Tourney.findOne({ _id: this.tourneyId }).exec() as Promise<TourneyDoc>;
   }
 
   async getPickList(userId: string): Promise<string[]> {
-    const query = _.extend({ userId }, { tourneyId: this.tourneyId });
+    const query = { tourneyId: this.tourneyId, userId };
     const pickList = await models.DraftPickList.findOne(query).exec() as DraftPickListDoc;
-    return pickList ? _.map(pickList.golferPickList, oid => oid.toString()) : null;
+    return pickList ? pickList.golferPickList.map(oid => oid.toString()) : null;
   }
 
   async updatePickList(userId: string, pickList: string[]) {
-    pickList = _.uniq(pickList);
+    pickList = uniq(pickList);
     const query = { userId: userId, tourneyId: this.tourneyId };
     await models.DraftPickList
       .update(
@@ -165,10 +189,10 @@ export class Access {
     const MIN_COEFF = 0.5;
 
     const golfers = await this.getGolfers();
-    const golfersByLcName = _.keyBy(golfers, g => g.name.toLowerCase());
+    const golfersByLcName = keyBy(golfers, g => g.name.toLowerCase());
 
     const notFoundGolferNames = new Set<string>();
-    const pickList = _.map(pickListNames, n => {
+    const pickList = pickListNames.map(n => {
       const g = golfersByLcName[n.toLowerCase()];
       if (!g) {
         notFoundGolferNames.add(n);
@@ -177,7 +201,7 @@ export class Access {
       return g._id.toString();
     });
 
-    if (_.isEmpty(notFoundGolferNames)) {
+    if (isEmpty(notFoundGolferNames)) {
       // SUCCESS! Found all golfers by name, so go ahead and save them.
       return this.updatePickList(userId, pickList);
     }
@@ -186,8 +210,8 @@ export class Access {
     // suggestions to the client.
     //
     // Note: In order to keep this whole process stateless for client and server, return good matches too
-    const golferNames = _.map(golfers, g => g.name);
-    const suggestions = _.map(pickListNames, n => {
+    const golferNames = golfers.map(g => g.name);
+    const suggestions = pickListNames.map(n => {
       if (notFoundGolferNames.has(n)) {
         const levResult = levenshteinDistance.runAll(n, golferNames);
 
@@ -196,7 +220,7 @@ export class Access {
         const isGoodSuggestion = bestResult.coeff >= MIN_COEFF;
 
         if (!isGoodSuggestion) {
-          allResults = _.sortBy(allResults, 'target');
+          allResults = sortBy(allResults, r => r.target);
           bestResult = allResults[0];
         }
 
@@ -239,8 +263,8 @@ export class Access {
       models.WGR.find().exec(),
       models.Golfer.find({ tourneyId: this.tourneyId }).exec(),
     ]);
-    const wgrs = _.keyBy(_wgrs as WGRDoc[], 'name');
-    return _.map(_golfers as GolferDoc[], g => mergeWGR(g, wgrs[g.name]));
+    const wgrs = keyBy(_wgrs as WGRDoc[], 'name');
+    return (_golfers as GolferDoc[]).map(g => mergeWGR(g, wgrs[g.name]));
   }
 
   async getUsers(): Promise<UserDoc[]> {
@@ -263,14 +287,6 @@ export class Access {
     return this.getAll(models.GolferScoreOverrides) as Promise<ScoreOverrideDoc[]>;
   }
 
-  async getAppState(): Promise<AppSettings> {
-    return await models.AppState.findOne().exec() as AppSettingsDoc;
-  }
-
-  async updateAppState(props: AppSettings) {
-    return models.AppState.update({}, props, { upsert: true }).exec();
-  }
-
   async makePickListPick(userId: string, pickNumber: number) {
     let [pickList, golfers, picks] = await Promise.all([
       this.getPickList(userId),
@@ -279,12 +295,12 @@ export class Access {
     ]);
     pickList = pickList || [];
     
-    const pickedGolfers = _.chain(picks)
+    const pickedGolfers = chain(picks)
       .map(p => p.golfer)
       .keyBy()
       .value();
 
-    let golferToPick = _.chain(pickList)
+    let golferToPick = chain(pickList)
       .filter(gid => !pickedGolfers[gid.toString()])
       .nth()
       .value();
@@ -292,7 +308,7 @@ export class Access {
     // If no golfer from the pickList list is available, use wgr
     const isPickListPick = !!golferToPick;
     if (!golferToPick) {
-      const remainingGolfers = _.chain(golfers)
+      const remainingGolfers = chain(golfers)
         .filter(g => !pickedGolfers[g._id.toString()])
         .sortBy(['wgr', 'name'])
         .value();
@@ -376,14 +392,14 @@ export class Access {
       this.getPicks()
     ]);
     return {
-      pickOrder: _.sortBy(pickOrder as DraftPickOrderDoc[], 'pickNumber'),
-      picks: _.sortBy(picks, 'pickNumber'),
+      pickOrder: sortBy(pickOrder as DraftPickOrderDoc[], p => p.pickNumber),
+      picks: sortBy(picks, p => p.pickNumber),
       serverTimestamp: new Date()
     };
   }
 
   async updateTourney(props) {
-    props = _.extend({}, props, { lastUpdated: new Date() });
+    props = { ...props, lastUpdated: new Date() };
     return models.Tourney.update(
       { _id: this.tourneyId },
       props,
@@ -393,9 +409,9 @@ export class Access {
 
   async ensureUsers(allUsers: User[]) {
     const users = await this.getUsers();
-    const existingUsersByName = _.keyBy(users, 'name');
-    const usersToAdd = _.filter(allUsers, json => !existingUsersByName[json.name]);
-    const promises = _.map(usersToAdd, u => {
+    const existingUsersByName = keyBy(users, 'name');
+    const usersToAdd = allUsers.filter(json => !existingUsersByName[json.name]);
+    const promises = usersToAdd.map(u => {
       return new Promise((resolve, reject) => {
         (<any>models.User).register(new models.User({ username: u.username, name: u.name }), u.password, (err) => {
           if (err) reject(err);
@@ -451,74 +467,6 @@ export class Access {
 
   async createChatBotMessage(message: { message: string }) {
     return this.createChatMessage({ ...message, isBot: true } as ChatMessage);
-  }
-
-    // DEBUGGING/TESTING
-
-  async clearTourney() {
-    return models.Tourney.remove({ _id: this.tourneyId }).exec();
-  }
-
-  async clearPickOrder() {
-    return this.clearAll(models.DraftPickOrder);
-  }
-
-  async clearDraftPicks() {
-    return this.clearAll(models.DraftPick);
-  }
-
-  async clearGolfers() {
-    return this.clearAll(models.Golfer);
-  }
-
-  async clearGolferScores() {
-    return this.clearAll(models.GolferScore);
-  }
-
-  async clearGolferScoreOverrides() {
-    return this.clearAll(models.GolferScoreOverrides);
-  }
-
-  async clearTourneyStandings() {
-    return this.clearAll(models.TourneyStandings);
-  }
-
-  async clearPickLists() {
-    return this.clearAll(models.DraftPickList);
-  }
-
-  async clearChatMessages() {
-    return this.clearAll(chatModels.Message);
-  }
-
-  async clearWgrs() {
-    return this.clearAll(models.WGR);
-  }
-
-  async clearAppState() {
-    return models.AppState.remove({}).exec();
-  }
-
-  async clearUsers() {
-    return models.User.remove({}).exec();
-  }
-
-  async resetTourney() {
-    return Promise.all([
-      models.Tourney.update({ _id: this.tourneyId }, {
-        name: null,
-        par: -1
-      }).exec(),
-      this.clearPickOrder(),
-      this.clearDraftPicks(),
-      this.clearGolfers(),
-      this.clearGolferScores(),
-      this.clearTourneyStandings(),
-      this.clearGolferScoreOverrides(),
-      this.clearChatMessages(),
-      this.clearPickLists(),
-      this.clearAppState()
-    ]);
   }
 
 }

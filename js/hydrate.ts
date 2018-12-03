@@ -20,6 +20,7 @@ function hydrate(seedData: BootstrapPayload) {
     lastUpdated: seedData.tourney.lastUpdated
   });
   SettingsActions.setAppState(seedData.appState);
+  AppActions.setActiveTourneyId(seedData.activeTourneyId);
   AppActions.setTourneyName(seedData.tourney.name);
   AppActions.setAllTourneys(seedData.allTourneys);
 

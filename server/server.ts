@@ -1,4 +1,4 @@
-import {getAccess, getAllTourneys, Access} from './access';
+import {getAccess, getActiveTourneyAccess, getAllTourneys, getAppState, updateAppState, Access} from './access';
 import {find} from 'lodash';
 import * as bodyParser from 'body-parser';
 import * as chatBot from './chatBot';
@@ -25,7 +25,6 @@ import {
   AppSettings,
   Draft,
   DraftPick,
-  DraftPickDoc,
   BootstrapPayload,
 } from './ServerTypes';
 
@@ -40,104 +39,103 @@ const AUTO_PICK_STARTUP_DELAY = 1000 * 5;
 
 const NOT_AN_ERROR = {};
 
-const defaultAccess = getAccess(config.current_tourney_id);
+async function defineRoutes() {
+  const activeTourneyId = (await getAppState()).activeTourneyId;
+  const activeTourneyAccess = await getActiveTourneyAccess();
 
-// Temp temp - remove this when we have multiple nodes
-userAccess.refresh();
+  // Temp temp - remove this when we have multiple nodes
+  userAccess.refresh();
 
-// Gzip
-app.use(compression());
+  // Gzip
+  app.use(compression());
 
-// Handlebars
-app.engine('handlebars', exphbs({
-  helpers: {
-    or: function (a, b) { return a || b; }
+  // Handlebars
+  app.engine('handlebars', exphbs({
+    helpers: {
+      or: function (a, b) { return a || b; }
+    }
+  }));
+  app.set('view engine', 'handlebars');
+
+  // Static routes
+  if (!config.prod) {
+    app.set('views', './distd/views/');
+    app.use('/dist', express.static(__dirname + '/../../distd'));
+  } else {
+    app.set('views', './dist/views/');
+    app.use('/dist', express.static(__dirname + '/../../dist', {
+      maxAge: MAX_AGE
+    }));
   }
-}));
-app.set('view engine', 'handlebars');
-
-// Static routes
-if (!config.prod) {
-  app.set('views', './distd/views/');
-  app.use('/dist', express.static(__dirname + '/../../distd'));
-} else {
-  app.set('views', './dist/views/');
-  app.use('/dist', express.static(__dirname + '/../../dist', {
+  app.use('/assets', express.static(__dirname + '/../../assets', {
     maxAge: MAX_AGE
   }));
-}
-app.use('/assets', express.static(__dirname + '/../../assets', {
-  maxAge: MAX_AGE
-}));
 
-// Session handling
-const sessionMiddleware = session({
-  store: new RedisStore({ url: config.redis_url }),
-  secret: config.session_secret,
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: false, // TODO: Get this working when we have real logins
-    maxAge: MAX_AGE
-  }
-});
-app.use(sessionMiddleware);
-io.use((socket, next) => {
-  sessionMiddleware(socket.request, socket.request.res, next);
-});
-
-// Authentication
-app.use(passport.initialize());
-app.use(passport.session());
-passport.serializeUser((<any>User).serializeUser());
-passport.deserializeUser((<any>User).deserializeUser());
-passport.use((<any>User).createStrategy());
-
-// Parsing
-app.use(bodyParser());
-
-// Global error handling
-app.use((err, req: Request, res: Response, next: NextFunction) => {
-  if (err) {
-    console.log(err);
-    res.status(500).send(err);
-  } else {
-    next();
-  }
-});
-
-// Ensure req is fully populated
-app.use((req: Request, res: Response, next: NextFunction) => {
-  if (req.user) {
-    userAccess.onUserActivity(req.session.id, req.user._id.toString());
-  }
-  req.access = req.access || defaultAccess;
-  next();
-});
-
-app.param('tourneyId', (req: Request, res: Response, next: NextFunction, tourneyId: string) => {
-  try {
-    req.access = getAccess(tourneyId);
-  } catch (err) {
-    return res.sendStatus(404); // Invalid tourneyId
-  }
-  next();
-});
-
-async function emitTourneyStandings() {
-  const tourneyStandings = await defaultAccess.getTourneyStandings();
-  io.sockets.emit('change:scores', {
-    data: {
-      tourneyStandings,
-      lastUpdated: new Date()
-    },
-    evType: 'change:scores',
-    action: 'scores:periodic_update'
+  // Session handling
+  const sessionMiddleware = session({
+    store: new RedisStore({ url: config.redis_url }),
+    secret: config.session_secret,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: false, // TODO: Get this working when we have real logins
+      maxAge: MAX_AGE
+    }
   });
-}
+  app.use(sessionMiddleware);
+  io.use((socket, next) => {
+    sessionMiddleware(socket.request, socket.request.res, next);
+  });
 
-function defineRoutes() {
-  const tourneyCfg = tourneyConfigReader.loadConfig();
+  // Authentication
+  app.use(passport.initialize());
+  app.use(passport.session());
+  passport.serializeUser((<any>User).serializeUser());
+  passport.deserializeUser((<any>User).deserializeUser());
+  passport.use((<any>User).createStrategy());
+
+  // Parsing
+  app.use(bodyParser());
+
+  // Global error handling
+  app.use((err, req: Request, res: Response, next: NextFunction) => {
+    if (err) {
+      console.log(err);
+      res.status(500).send(err);
+    } else {
+      next();
+    }
+  });
+
+  // Ensure req is fully populated
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    if (req.user) {
+      userAccess.onUserActivity(req.session.id, req.user._id.toString());
+    }
+    req.access = req.access || activeTourneyAccess;
+    next();
+  });
+
+  app.param('tourneyId', (req: Request, res: Response, next: NextFunction, tourneyId: string) => {
+    try {
+      req.access = getAccess(tourneyId);
+    } catch (err) {
+      return res.sendStatus(404); // Invalid tourneyId
+    }
+    next();
+  });
+
+  async function emitTourneyStandings() {
+    const tourneyStandings = await activeTourneyAccess.getTourneyStandings();
+    io.sockets.emit('change:scores', {
+      data: {
+        tourneyStandings,
+        lastUpdated: new Date()
+      },
+      evType: 'change:scores',
+      action: 'scores:periodic_update'
+    });
+  }
 
   redisPubSubClient.on("message", (channel, message) => {
     // Scores updated, alert clients
@@ -145,12 +143,12 @@ function defineRoutes() {
     emitTourneyStandings();
   });
 
-  defaultAccess.on(Access.EVENTS.standingsUpdate, emitTourneyStandings);
+  activeTourneyAccess.on(Access.EVENTS.standingsUpdate, emitTourneyStandings);
 
-  defaultAccess.on(Access.EVENTS.pickMade, async () => {
-    const isDraftOver = await defaultAccess.isDraftComplete();
+  activeTourneyAccess.on(Access.EVENTS.pickMade, async () => {
+    const isDraftOver = await activeTourneyAccess.isDraftComplete();
     if (isDraftOver) {
-      updateTourneyStandings.run();
+      updateTourneyStandings.run(activeTourneyAccess);
     }
   });
 
@@ -166,7 +164,7 @@ function defineRoutes() {
   });
 
   app.get(['/', '/draft'], (req: Request, res: Response, next: NextFunction) => {
-    res.redirect(`/${config.current_tourney_id}${req.path}`);
+    res.redirect(`/${activeTourneyId}${req.path}`);
   });
 
   app.get(['/whoisyou', '/admin', '/history', '/:tourneyId/draft', '/:tourneyId'], async (req: Request, res: Response, next: NextFunction) => {
@@ -177,7 +175,7 @@ function defineRoutes() {
       access.getUsers(),
       access.getDraft(),
       access.getTourneyStandings(),
-      access.getAppState(),
+      getAppState(),
       getAllTourneys(),
     ]);
     const tourney = find(allTourneys, t => utils.oidsAreEqual(tourneyId, t._id));
@@ -193,20 +191,11 @@ function defineRoutes() {
       tourney: JSON.stringify(tourney),
       appState: JSON.stringify(appState),
       user: JSON.stringify(req.user),
-      currentTourneyId: config.current_tourney_id,
+      activeTourneyId: activeTourneyId,
       allTourneys: JSON.stringify(allTourneys),
       prod: config.prod,
       cdnUrl: config.cdn_url
     } as BootstrapPayload);
-  });
-
-  app.get('/history', async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const tourneys = await getAllTourneys();
-      res.status(200).send({ history: tourneys });
-    } catch (err) {
-      next(err);
-    }
   });
 
   app.post('/register', (req: Request, res: Response, next: NextFunction) => {
@@ -343,7 +332,7 @@ function defineRoutes() {
     }
 
     const isDraftPaused = !!req.body.isPaused;
-    return onAppStateUpdate(req, res, req.access.updateAppState({ isDraftPaused } as AppSettings));
+    return onAppStateUpdate(req, res, updateAppState({ isDraftPaused } as AppSettings));
   });
 
   app.put('/admin/allowClock', requireSession(), (req: Request, res: Response, next: NextFunction) => {
@@ -353,7 +342,7 @@ function defineRoutes() {
     }
 
     const allowClock = !!req.body.allowClock;
-    return onAppStateUpdate(req, res, req.access.updateAppState({ allowClock } as AppSettings));
+    return onAppStateUpdate(req, res, updateAppState({ allowClock } as AppSettings));
   });
 
   app.put('/admin/draftHasStarted', requireSession(), (req: Request, res: Response, next: NextFunction) => {
@@ -363,7 +352,7 @@ function defineRoutes() {
     }
 
     const draftHasStarted = !!req.body.draftHasStarted;
-    return onAppStateUpdate(req, res, req.access.updateAppState({ draftHasStarted } as AppSettings));
+    return onAppStateUpdate(req, res, updateAppState({ draftHasStarted } as AppSettings));
   });
 
   app.delete('/admin/lastpick', requireSession(), (req: Request, res: Response, next: NextFunction) => {
@@ -391,7 +380,15 @@ function defineRoutes() {
   });
 }
 
-// HELPERS
+function updateClients(draft) {
+  io.sockets.emit('change:draft', {
+    data: draft,
+    evType: 'change:draft',
+    action: 'draft:pick'
+  });
+}
+
+ // HELPERS
 
 function isDraftOver(draft: Draft) {
   const nextPickNumber = draft.picks.length;
@@ -432,7 +429,8 @@ function autoPick(userId: string, pickNumber: number) {
   let isPickListPick = null;
   return handlePick({
     makePick: async () => {
-      const result = await defaultAccess.makePickListPick(userId, pickNumber);
+      const activeTourneyAccess = await getActiveTourneyAccess();
+      const result = await activeTourneyAccess.makePickListPick(userId, pickNumber);
       isPickListPick = result.isPickListPick;
       return result;
     },
@@ -441,9 +439,10 @@ function autoPick(userId: string, pickNumber: number) {
 }
 
 async function ensureDraftIsRunning(): Promise<{ appState: AppSettings, draft: Draft }> {
+  const activeTourneyAccess = await getActiveTourneyAccess();
   const [appState, draft] = await Promise.all([
-    defaultAccess.getAppState(),
-    defaultAccess.getDraft()
+    getAppState(),
+    activeTourneyAccess.getDraft()
   ]);
   if (isDraftOver(draft) || appState.isDraftPaused || !appState.draftHasStarted) {
     throw NOT_AN_ERROR;
@@ -471,7 +470,8 @@ async function handlePick(spec: {
       res.status(200).send({ pick });
     }
 
-    draft = await defaultAccess.getDraft();
+    const activeTourneyAccess = await getActiveTourneyAccess();
+    draft = await activeTourneyAccess.getDraft();
     updateClients(draft);
   } catch (err) {
     if (res) {
@@ -506,7 +506,7 @@ async function onAppStateUpdate(req: Request, res: Response, promise: Promise<an
   ensureNextAutoPick();
 
   try {
-    const appState = await defaultAccess.getAppState();
+    const appState = await getAppState();
     res.status(200).send({ appState });
     io.sockets.emit('change:appstate', { data: { appState } });
   } catch (err) {
@@ -515,17 +515,11 @@ async function onAppStateUpdate(req: Request, res: Response, promise: Promise<an
   }
 }
 
-function updateClients(draft) {
-  io.sockets.emit('change:draft', {
-    data: draft,
-    evType: 'change:draft',
-    action: 'draft:pick'
-  });
-}
+(async () => {
+  try {
+    await mongooseUtil.connect();
+    await defineRoutes();
 
-mongooseUtil.connect()
-  .then(defineRoutes)
-  .then(() => {
     expressServer.listen(port);
     redisPubSubClient.subscribe("scores:update");
 
@@ -533,8 +527,7 @@ mongooseUtil.connect()
     setTimeout(ensureNextAutoPick, AUTO_PICK_STARTUP_DELAY);
 
     console.log('I am fully running now!');
-  })
-  .catch(err => {
-    console.log(err);
+  } finally {
     mongooseUtil.close();
-  });
+  }
+})();

@@ -1,24 +1,30 @@
-import * as _ from 'lodash';
-import {getAccess} from '../server/access';
 import * as should from 'should';
 import * as tourneyUtils from '../server/tourneyUtils';
+import * as models from '../server/models';
+import {Access, getActiveTourneyAccess} from '../server/access';
 import {initTestDb} from './initTestConfig';
 import {mongoose} from '../server/mongooseUtil';
-import config from '../server/config'
-import {
-  Golfer,
-  DraftPick,
-  User,
-} from '../server/ServerTypes';
+import {Golfer, DraftPick, User} from '../server/ServerTypes';
+import {keyBy, pick} from 'lodash';
+import { access } from 'fs';
 
 const {ObjectId} = mongoose.Types;
 
-const access = getAccess(config.current_tourney_id);
+async function ensureEmptyDraft() {
+  const access = await getActiveTourneyAccess();
+  const draft = await access.getDraft();
+  draft.picks.should.be.empty();
+}
 
-function ensureEmptyDraft() {
-  return access.getDraft().then(function (draft) {
-    draft.picks.should.be.empty();
-  });
+function clear() {
+  return Promise.all([
+    models.Golfer.remove({}).exec(),
+    models.DraftPick.remove({}).exec(),
+    models.DraftPickList.remove({}).exec(),
+    models.DraftPickOrder.remove({}).exec(),
+    models.User.remove({}).exec(),
+    models.WGR.remove({}).exec(),
+  ]);
 }
 
 function expectFailure() {
@@ -29,41 +35,37 @@ function expectSuccess(err) {
   ('Should not be here. Expected success, got error: ' + err.message).should.not.be.ok();
 }
 
-function assertPickListResult(userId, expected, promise) {
-  return promise
-    .then(function (result) {
-      result.completed.should.be.true();
-      result.pickList.should.eql(expected);
+async function assertPickListResult(userId, expected, promise) {
+  const access = await getActiveTourneyAccess();
+  
+  const result = await promise;
+  result.completed.should.be.true();
+  result.pickList.should.eql(expected);
 
-      return access.getPickList(userId);
-    })
-    .then(function (actualPickList) {
-      _.map(actualPickList, (pl) => pl.toString()).should.eql(expected);
-    })
-    .catch(expectSuccess);
+  const actualPickList = await access.getPickList(userId);
+  actualPickList.map(pl => pl.toString()).should.eql(expected);
 }
 
-describe('access', function () {
+describe('access', () => {
 
   before(initTestDb);
+  afterEach(clear);
 
-  describe('getPickList', function () {
-    it('returns null for unset pickList', function () {
-      return access.getPickList(new ObjectId('5a4d46c9b1a9473036f6a81a').toString())
-        .then(function (actualPickList) {
-          should(actualPickList).be.a.null();
-        })
-        .catch(expectSuccess);
+  describe('getPickList', () => {
+    it('returns null for unset pickList', async () => {
+      const access = await getActiveTourneyAccess();
+      const actualPickList = access.getPickList(new ObjectId('5a4d46c9b1a9473036f6a81a').toString());
+      should(actualPickList).be.a.null();
     });
   });
 
-  describe('updatePickList', function () {
+  describe('updatePickList', async () => {
 
-    afterEach(function () {
-      return access.clearPickLists();
-    });
+    before(initTestDb);
+    afterEach(clear);
 
-    it('updates pickList for user', function () {
+    it('updates pickList for user', async () => {
+      const access = await getActiveTourneyAccess();
       const userId = new ObjectId('5a4d46c9b1a9473036f6a81a').toString();
       const expected = [
         new ObjectId('5a4d46c9b1a9473036f6a81b').toString(),
@@ -79,31 +81,28 @@ describe('access', function () {
 
   });
 
-  describe('updatePickListFromNames', function () {
+  describe('updatePickListFromNames', () => {
     let golfers = null;
 
-    beforeEach(function () {
-      return access.ensureGolfers([
+    beforeEach(async () => {
+      await initTestDb();
+
+      const access = await getActiveTourneyAccess();
+      await access.ensureGolfers([
         { name: 'Tiger Woods' },
         { name: 'Bobby Jones' },
         { name: 'Gary User' },
         { name: 'Jack Nicklaus' }
-      ] as Golfer[])
-      .then(access.getGolfers)
-      .then(_.partialRight(_.keyBy, 'name'))
-      .then(function (_golfers) {
-        golfers = _golfers;
-      });
+      ] as Golfer[]);
+
+      const _golfers = await access.getGolfers();
+      golfers = keyBy(_golfers, g => g.name);
     });
 
-    afterEach(function () {
-      return Promise.all([
-        access.clearPickLists(),
-        access.clearGolfers()
-      ]);
-    });
+    afterEach(clear);
 
-    it('updates pickList for user by name', function () {
+    it('updates pickList for user by name', async () => {
+      const access = await getActiveTourneyAccess();
       const userId = new ObjectId('5a4d46c9b1a9473036f6a81a').toString();
       const names = [
         'Bobby Jones',
@@ -124,7 +123,8 @@ describe('access', function () {
       );
     });
 
-    it('provides suggestions when mismatches found', function () {
+    it('provides suggestions when mismatches found', async () => {
+      const access = await getActiveTourneyAccess();
       const userId = new ObjectId('5a4d46c9b1a9473036f6a81a').toString();
       const names = [
         'Tiger Woods',
@@ -132,194 +132,179 @@ describe('access', function () {
         'Gary User',
         'JaCk niCklauss' // extra "s" on the end
       ];
-      return access.updatePickListFromNames(userId, names)
-      .then(function (result) {
-        result.completed.should.be.false();
-        result.suggestions.should.containDeepOrdered([
-          { source: 'JaCk niCklauss', results: [
-            { target: 'Jack Nicklaus' },
-            { target: 'Gary User' },
-            { target: 'Bobby Jones' },
-            { target: 'Tiger Woods' }
-          ]}
-        ]);
+      
+      const result = await access.updatePickListFromNames(userId, names);
+      result.completed.should.be.false();
+      result.suggestions.should.containDeepOrdered([
+        { source: 'JaCk niCklauss', results: [
+          { target: 'Jack Nicklaus' },
+          { target: 'Gary User' },
+          { target: 'Bobby Jones' },
+          { target: 'Tiger Woods' }
+        ]}
+      ]);
 
-        return access.getPickList(userId);
-      })
-      .then(function (actualPickList) {
-        should(actualPickList).be.a.null();
-      }, expectSuccess);
+      const actualPickList = await access.getPickList(userId);
+      should(actualPickList).be.a.null();
     });
 
   });
 
-  describe('makePickListPick', function () {
+  describe('makePickListPick', () => {
     let users = null;
     let golfers = null;
 
-    beforeEach(function () {
-      return access.getGolfers()
-        .then(function () {
-          return Promise.all([
-            access.ensureUsers([{ name: 'User1' }, { name: 'User2' }] as User[])
-              .then(access.getUsers)
-              .then(_.partialRight(_.keyBy, 'name'))
-              .then(function (_users) {
-                users = _users;
-                const pickOrder = tourneyUtils.snakeDraftOrder([
-                  users['User1'],
-                  users['User2']
-                ]);
-                access.setPickOrder(pickOrder);
-              }),
-
-            access.ensureGolfers([{ name: 'Golfer1' }, { name: 'Golfer2' }] as Golfer[])
-              .then(access.getGolfers)
-              .then(_.partialRight(_.keyBy, 'name'))
-              .then(function (_golfers) {
-                golfers = _golfers;
-              }),
-
-            access.replaceWgrs([
-              { name: 'Golfer2', wgr: 1 },
-              { name: 'Golfer1', wgr: 2 }
-            ])
-          ]);
-        });
-    });
-
-    afterEach(function () {
-      return Promise.all([
-        access.clearUsers(),
-        access.clearPickOrder(),
-        access.clearDraftPicks(),
-        access.clearGolfers(),
-        access.clearTourney(),
-        access.clearPickLists(),
-        access.clearWgrs()
+    async function fillUsers(access: Access) {
+      await access.ensureUsers([{ name: 'User1' }, { name: 'User2' }] as User[]);
+      const _users = access.getUsers();
+      users = keyBy(_users, g => g.name);
+      
+      const pickOrder = tourneyUtils.snakeDraftOrder([
+        users['User1'],
+        users['User2'],
       ]);
+      await access.setPickOrder(pickOrder);
+    }
+
+    async function fillGolfers(access: Access) {
+      await access.ensureGolfers([{ name: 'Golfer1' }, { name: 'Golfer2' }] as Golfer[]);
+      const _golfers = await access.getGolfers();
+      golfers = keyBy(_golfers, g => g.name);
+
+      await access.replaceWgrs([
+        { name: 'Golfer2', wgr: 1 },
+        { name: 'Golfer1', wgr: 2 }
+      ]);
+    }
+
+    beforeEach(async () => {
+      await initTestDb();
+
+      const access = await getActiveTourneyAccess();
+      await Promise.all([fillUsers(access), fillGolfers(access)]);
     });
 
-    it('uses wgr when pickList not available', function () {
+    afterEach(clear);
+
+    it('uses wgr when pickList not available', async () => {
+      const access = await getActiveTourneyAccess();
+
       const newPick = {
         user: users['User1']._id,
         golfer: golfers['Golfer2']._id,
         pickNumber: 0
       };
-      return access.makePickListPick(users['User1']._id.toString(), 0)
-        .then(access.getDraft)
-        .then(function (draft) {
-          draft.picks.should.containDeepOrdered([newPick]);
-        }, expectSuccess);
+      await access.makePickListPick(users['User1']._id.toString(), 0);
+      const draft = await access.getDraft();
+      draft.picks.should.containDeepOrdered([newPick]);
     });
 
-    it('uses pickList list to pick next golfer', function () {
+    it('uses pickList list to pick next golfer', async () => {
+      const access = await getActiveTourneyAccess();
+
       const newPick = {
         user: users['User1']._id,
         golfer: golfers['Golfer1']._id,
         pickNumber: 0
       };
-      return access.updatePickList(users['User1']._id.toString(), [
-          golfers['Golfer1']._id.toString(),
-          golfers['Golfer2']._id.toString()
-        ])
-        .then(function () {
-          return access.makePickListPick(users['User1']._id.toString(), 0);
-        })
-        .then(access.getDraft)
-        .then(function (draft) {
-          draft.picks.should.containDeepOrdered([newPick]);
-        }, expectSuccess);
+      await access.updatePickList(users['User1']._id.toString(), [
+        golfers['Golfer1']._id.toString(),
+        golfers['Golfer2']._id.toString()
+      ]);
+      await access.makePickListPick(users['User1']._id.toString(), 0);
+      const draft = await access.getDraft();
+      draft.picks.should.containDeepOrdered([newPick]);
     });
 
   });
 
-  describe('makePick', function () {
+  describe('makePick', () => {
     let users = null;
     let golfers = null;
 
-    beforeEach(function () {
-      return Promise.all([
-        access.ensureUsers([{ name: 'User1' }, { name: 'User2' }] as User[])
-          .then(access.getUsers)
-          .then(_.partialRight(_.keyBy, 'name'))
-          .then(function (_users) {
-            users = _users;
-            const pickOrder = tourneyUtils.snakeDraftOrder([
-              users['User1'],
-              users['User2']
-            ]);
-            access.setPickOrder(pickOrder);
-          }),
-
-        access.ensureGolfers([{ name: 'Golfer1' }, { name: 'Golfer2' }] as Golfer[])
-          .then(access.getGolfers)
-          .then(_.partialRight(_.keyBy, 'name'))
-          .then(function (_golfers) {
-            golfers = _golfers;
-          })
+    async function fillUsers(access: Access) {
+      await access.ensureUsers([{ name: 'User1' }, { name: 'User2' }] as User[]);
+      const _users = access.getUsers();
+      users = keyBy(_users, g => g.name);
+      
+      const pickOrder = tourneyUtils.snakeDraftOrder([
+        users['User1'],
+        users['User2'],
       ]);
+      await access.setPickOrder(pickOrder);
+    }
+
+    async function fillGolfers(access: Access) {
+      await access.ensureGolfers([{ name: 'Golfer1' }, { name: 'Golfer2' }] as Golfer[]);
+      const _golfers = await access.getGolfers();
+      golfers = keyBy(_golfers, g => g.name);
+    }
+
+    beforeEach(async () => {
+      await initTestDb();
+
+      const access = await getActiveTourneyAccess();
+      await Promise.all([fillUsers(access), fillGolfers(access)]);
     });
 
-    afterEach(function () {
-      return Promise.all([
-        access.clearUsers(),
-        access.clearPickOrder(),
-        access.clearDraftPicks(),
-        access.clearGolfers(),
-        access.clearTourney()
-      ]);
-    });
+    afterEach(clear);
 
-    it('prevents users from picking out of order', function () {
-      return access.makePick({
-        user: users['User2']._id,
-        golfer: golfers['Golfer2']._id,
-        pickNumber: 0
-      } as DraftPick)
-      .then(expectFailure, function (err) {
+    it('prevents users from picking out of order', async () => {
+      const access = await getActiveTourneyAccess();
+      try {
+        await access.makePick({
+          user: users['User2']._id,
+          golfer: golfers['Golfer2']._id,
+          pickNumber: 0
+        } as DraftPick);
+        'Expected draft pick to fail.'.should.not.be.ok();
+      } catch (err) {
         err.message.should.equal('invalid pick: user picked out of order');
-        return ensureEmptyDraft();
-      });
+      }
     });
 
-    it('prevents pick number from being out of sync', function () {
-      return access.makePick({
-        user: users['User1']._id,
-        golfer: golfers['Golfer1']._id,
-        pickNumber: 1
-      } as DraftPick)
-      .then(expectFailure, function (err) {
+    it('prevents pick number from being out of sync', async () => {
+      const access = await getActiveTourneyAccess();
+      try {
+        await access.makePick({
+          user: users['User1']._id,
+          golfer: golfers['Golfer1']._id,
+          pickNumber: 1
+        } as DraftPick);
+        'Expected draft pick to fail.'.should.not.be.ok();
+      } catch (err) {
         err.message.should.equal('invalid pick: pick order out of sync');
-        return ensureEmptyDraft();
-      });
+      }
     });
 
-    it('requires actual golfers', function () {
-      return access.makePick({
-        user: users['User1']._id,
-        golfer: users['User2']._id,
-        pickNumber: 0
-      } as DraftPick).then(expectFailure, function (err) {
+    it('requires actual golfers', async () => {
+      const access = await getActiveTourneyAccess();
+      try {
+        await access.makePick({
+          user: users['User1']._id,
+          golfer: users['User2']._id,
+          pickNumber: 0
+        } as DraftPick);
+        'Expected draft pick to fail.'.should.not.be.ok();
+      } catch (err) {
         err.message.should.equal('invalid pick: invalid golfer');
-        return ensureEmptyDraft();
-      });
+      }
     });
 
-    it('registers valid pick', function () {
+    it('registers valid pick', async () => {
+      const access = await getActiveTourneyAccess();
       const newPick = {
         user: users['User1']._id,
         golfer: golfers['Golfer1']._id,
         pickNumber: 0
       } as DraftPick;
-      return access.makePick(newPick)
-      .then(access.getDraft)
-      .then(function (draft) {
-        draft.picks.should.containDeepOrdered([newPick]);
-      }, expectSuccess);
+      await access.makePick(newPick);
+      const draft = await access.getDraft();
+      draft.picks.should.containDeepOrdered([newPick]);
     });
 
-    it('does not allow golfers to be picked twice', function () {
+    it('does not allow golfers to be picked twice', async () => {
+      const access = await getActiveTourneyAccess();
       const newPicks = [
         {
           user: users['User1']._id,
@@ -332,17 +317,17 @@ describe('access', function () {
           pickNumber: 1
         }
       ] as DraftPick[];
-      return access.makePick(newPicks[0])
-      .then(_.partial(access.makePick, newPicks[1]))
-      .then(expectFailure, function (err) {
-        err.message.should.equal('invalid pick: golfer already drafted');
-        return access.getDraft().then(function (draft) {
-          _.pick(draft.picks[0], ['user', 'golfer', 'pickNumber'])
-            .should.eql(newPicks[0]);
-        });
-      });
-    });
 
+      await access.makePick(newPicks[0]);
+      try {
+        await access.makePick(newPicks[1]);
+        'Expected draft pick to fail.'.should.not.be.ok();
+      } catch (err) {
+        err.message.should.equal('invalid pick: golfer already drafted');
+        const draft = await access.getDraft();
+        pick(draft.picks[0], ['user', 'golfer', 'pickNumber']).should.eql(newPicks[0]);
+      }
+    });
   });
 
 });

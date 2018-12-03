@@ -4,6 +4,13 @@ import {Tourney} from '../types/ClientTypes';
 
 export default class AppActions {
 
+  static setActiveTourneyId(activeTourneyId) {
+    AppDispatcher.handleViewAction({
+      actionType: AppConstants.SET_ACTIVE_TOURNEY_ID,
+      activeTourneyId
+    });
+  }
+
   static setGolfers(golfers) {
     AppDispatcher.handleViewAction({
       actionType: AppConstants.SET_GOLFERS,

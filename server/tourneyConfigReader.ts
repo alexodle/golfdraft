@@ -1,11 +1,13 @@
 // Refreshes users, pick order, draft picks, and chat
 
-import * as _ from 'lodash';
 import config from './config';
+import {once} from 'lodash';
+import * as moment from 'moment';
 import * as fs from 'fs';
 
 export interface TourneyConfig {
   name: string;
+  startDate: Date;
   scores: {
     type: string;
     url: string;
@@ -20,7 +22,8 @@ export interface TourneyConfig {
 
 function _loadConfig(): TourneyConfig {
   const cfg: TourneyConfig = JSON.parse(fs.readFileSync(config.tourney_cfg, 'utf8'));
+  cfg.startDate = moment(cfg.startDate).toDate();
   return cfg;
 }
 
-export const loadConfig = _.once(_loadConfig);
+export const loadConfig = once(_loadConfig);

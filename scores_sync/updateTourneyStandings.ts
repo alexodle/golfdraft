@@ -1,19 +1,16 @@
-import {getAccess} from '../server/access';
-import config from '../server/config';
-import * as _ from 'lodash';
+import {Access} from '../server/access';
 import constants from '../common/constants';
 import {GolferScore, PlayerScore, TourneyStandings} from '../server/ServerTypes';
-
-const access = getAccess(config.current_tourney_id);
+import {chain, groupBy, keyBy, mapValues, maxBy, isNumber, sumBy, times} from 'lodash';
 
 function buildPlayerScore(
   player: string,
   rawScores: GolferScore[],
   worstScoresForDay: { day: number, golfer: string, score: number }[]
 ): PlayerScore {
-  const dayScores = _.times(constants.NDAYS, day => {
+  const dayScores = times(constants.NDAYS, day => {
 
-    const golferScores = _.map(rawScores, (golferScores, idx) => {
+    const golferScores = rawScores.map((golferScores, idx) => {
       const missedCut = golferScores.scores[day] === constants.MISSED_CUT;
       const dayScore = missedCut ? worstScoresForDay[day].score : golferScores.scores[day] as number;
       return {
@@ -26,12 +23,12 @@ function buildPlayerScore(
       }
     });
 
-    const usedScores = _.chain(golferScores)
+    const usedScores = chain(golferScores)
       .sortBy(ds => ds.score)
       .take(constants.NSCORES_PER_DAY)
       .map(ds => (<any>ds).idx)
       .value();
-    const golferScoresFinal = _.map(golferScores, gs => {
+    const golferScoresFinal = golferScores.map(gs => {
       const scoreUsed = usedScores.indexOf(gs.idx) >= 0;
       return {
         golfer: gs.golfer,
@@ -42,7 +39,7 @@ function buildPlayerScore(
       };
     });
 
-    const totalDayScore = _.sumBy(golferScoresFinal, ds => ds.scoreUsed ? ds.score : 0);
+    const totalDayScore = sumBy(golferScoresFinal, ds => ds.scoreUsed ? ds.score : 0);
     return {
       totalScore: totalDayScore,
       day,
@@ -50,7 +47,7 @@ function buildPlayerScore(
     };
   });
 
-  const totalScore = _.sumBy(dayScores, sbd => sbd.totalScore);
+  const totalScore = sumBy(dayScores, sbd => sbd.totalScore);
 
   return {
     dayScores,
@@ -72,7 +69,7 @@ function isTied(sortedScores: PlayerScore[], i: number) {
 
 function fillInStandings(sortedScores: PlayerScore[]) {
   let currentStanding = -1;
-  _.each(sortedScores, (ps, i) => {
+  sortedScores.forEach((ps, i) => {
     if (i === 0 || ps.totalScore !== sortedScores[i - 1].totalScore) {
       currentStanding = i;
     }
@@ -81,7 +78,7 @@ function fillInStandings(sortedScores: PlayerScore[]) {
   });
 }
 
-export async function run() {
+export async function run(access: Access) {
   const [scores, draft] = await Promise.all([
     access.getScores(),
     access.getDraft()
@@ -89,11 +86,11 @@ export async function run() {
   console.log("Running player score update");
 
   // Summary info
-  const worstScoresForDay = _.times(constants.NDAYS, day => {
-    const maxGolferScore = _.maxBy(scores, s => _.isNumber(s.scores[day]) ? 
+  const worstScoresForDay = times(constants.NDAYS, day => {
+    const maxGolferScore = maxBy(scores, s => isNumber(s.scores[day]) ? 
       s.scores[day] :
       Number.MIN_VALUE);
-    const maxScore: number = _.isNumber(maxGolferScore.scores[day]) ?
+    const maxScore: number = isNumber(maxGolferScore.scores[day]) ?
       maxGolferScore.scores[day] :
       0;
     return {
@@ -103,12 +100,12 @@ export async function run() {
     };
   });
 
-  const picksByUser = _.groupBy(draft.picks, p => p.user.toString());
-  const scoresByPlayer = _.keyBy(scores, s => s.golfer.toString());
-  const playerRawScores = _.mapValues(picksByUser, picks => 
-    _.map(picks, p => scoresByPlayer[p.golfer.toString()]));
+  const picksByUser = groupBy(draft.picks, p => p.user.toString());
+  const scoresByPlayer = keyBy(scores, s => s.golfer.toString());
+  const playerRawScores = mapValues(picksByUser, picks => 
+    picks.map(p => scoresByPlayer[p.golfer.toString()]));
 
-  const playerScores = _.chain(playerRawScores)
+  const playerScores = chain(playerRawScores)
     .map((rawScores, pid) => buildPlayerScore(pid, rawScores, worstScoresForDay))
     .sortBy(ps => ps.totalScore)
     .value();

@@ -15,15 +15,15 @@ import WhoIsYou from './WhoIsYou';
 import {DraftProps} from '../types/SharedProps';
 import {Route, Switch, Redirect} from 'react-router-dom';
 import constants from '../../common/constants';
+import {TourneyHistory} from './TourneyHistory';
 import {
   ChatMessage,
   DraftPick,
-  DraftPickOrder,
-  Golfer,
   Indexed,
   IndexedGolfers,
   TourneyStandings,
   IndexedUsers,
+  Tourney,
   Location,
   User,
 } from '../types/ClientTypes';
@@ -51,6 +51,8 @@ interface AppState {
   allowClock: boolean;
   draftHasStarted: boolean;
   autoPickUsers: Indexed<string>;
+  activeTourneyId: string;
+  allTourneys: Indexed<Tourney>;
 }
 
 interface ComponentProps extends AppState {
@@ -63,6 +65,9 @@ interface ComponentProps extends AppState {
 
 function getAppState(): AppState {
   return {
+    activeTourneyId: TourneyStore.getActiveTourneyId(),
+    allTourneys: TourneyStore.getAllTourneys(),
+
     tourneyName: TourneyStore.getTourneyName(),
     currentUser: UserStore.getCurrentUser(),
     activeUsers: UserStore.getActive(),
@@ -160,10 +165,10 @@ class TourneyWrapper extends React.Component<ComponentProps, {}> {
 class HistoryWrapper extends React.Component<ComponentProps, {}> {
 
   render() {
-    const props = this.props;
-    return (
-      <h1>HISTORY ROCKS!</h1>
-    );
+    return (<TourneyHistory
+      activeTourneyId={this.props.activeTourneyId}
+      allTourneys={this.props.allTourneys} 
+    />);
   }
 
 }

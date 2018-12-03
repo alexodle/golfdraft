@@ -1,9 +1,8 @@
-import * as _ from 'lodash';
 import * as updateTourneyStandings from './updateTourneyStandings';
-import {getAccess} from '../server/access';
-import config from '../server/config';
+import {chain, keyBy, isNull, has, includes, every, isFinite, range} from 'lodash';
+import {Access} from '../server/access';
 import constants from '../common/constants';
-import {Reader, ReaderResult, UpdateGolfer} from './Types';
+import {Reader, ReaderResult} from './Types';
 import {
   Golfer,
   GolferScore,
@@ -14,18 +13,14 @@ const DAYS = constants.NDAYS;
 const MISSED_CUT = constants.MISSED_CUT;
 const OVERRIDE_KEYS = ['golfer', 'day', 'scores'];
 
-const access = getAccess(config.current_tourney_id);
-
 export function validate(result: ReaderResult): boolean {
-  if (_.has(result, 'par') && !_.includes([70, 71, 72, 73], result.par)) {
+  if (has(result, 'par') && !includes([70, 71, 72, 73], result.par)) {
     console.log("ERROR - Par invalid:" + result.par);
     return false;
   }
 
-  return _.every(result.golfers, (g) => {
-    const validScores = _.every(g.scores, (s) => {
-      return _.isFinite(s) || s === MISSED_CUT;
-    });
+  return every(result.golfers, g => {
+    const validScores = every(g.scores, s => isFinite(s) || s === MISSED_CUT);
     let inv = false;
 
     if (g.golfer === "-") {
@@ -37,7 +32,7 @@ export function validate(result: ReaderResult): boolean {
     } else if (!validScores) {
       console.log("ERROR - Invalid golfer scores");
       inv = true;
-    } else if (!_.includes(_.range(DAYS + 1), g.day)) {
+    } else if (!includes(range(DAYS + 1), g.day)) {
       console.log("ERROR - Invalid golfer day");
       inv = true;
     }
@@ -50,24 +45,24 @@ export function validate(result: ReaderResult): boolean {
 }
 
 export function mergeOverrides(scores: GolferScore[], scoreOverrides: ScoreOverride[]): GolferScore[] {
-  const overridesByGolfer = _.chain(scoreOverrides)
+  const overridesByGolfer = chain(scoreOverrides)
     .map(o => {
-      return _.chain(o)
+      return chain(o)
 
         // Remove all empty values from scoreOverrides
-        .omitBy(_.isNull)
+        .omitBy(isNull)
 
         // Whitelist the values we can take
         .pick(OVERRIDE_KEYS)
         .value();
     })
-    .keyBy((o) => o.golfer.toString())
+    .keyBy(o => o.golfer.toString())
     .value();
 
-  const newScores = _.map(scores, (s) => {
+  const newScores = scores.map(s => {
     const override = overridesByGolfer[s.golfer.toString()];
     if (override) {
-      s = _.extend({}, s, override);
+      s = { ...s, ...override } as GolferScore;
     }
     s.golfer = s.golfer.toString();
     return s;
@@ -76,7 +71,7 @@ export function mergeOverrides(scores: GolferScore[], scoreOverrides: ScoreOverr
   return newScores;
 }
 
-export async function run(reader: Reader, url: string, nameMap: { [name: string]: string }, populateGolfers = false) {
+export async function run(access: Access, reader: Reader, url: string, nameMap: { [name: string]: string }, populateGolfers = false) {
   const rawTourney = await reader.run(url);
 
   // Quick assertion of data
@@ -86,7 +81,7 @@ export async function run(reader: Reader, url: string, nameMap: { [name: string]
   }
 
   // Update all names
-  _.each(rawTourney.golfers, g => g.golfer = nameMap[g.golfer] || g.golfer);
+  rawTourney.golfers.forEach(g => g.golfer = nameMap[g.golfer] || g.golfer);
 
   // Ensure tourney/par
   const update = { pgatourUrl: url, par: rawTourney.par };
@@ -94,7 +89,7 @@ export async function run(reader: Reader, url: string, nameMap: { [name: string]
   
   // Ensure golfers
   if (populateGolfers) {
-    const golfers = _.map(rawTourney.golfers, g => ({ name: g.golfer } as Golfer));
+    const golfers = rawTourney.golfers.map(g => ({ name: g.golfer } as Golfer));
     await access.ensureGolfers(golfers);
   }
   
@@ -106,8 +101,8 @@ export async function run(reader: Reader, url: string, nameMap: { [name: string]
   const scoreOverrides = results[1] as ScoreOverride[];
 
   // Build scores with golfer id
-  const golfersByName = _.keyBy(gs, gs => gs.name);
-  const scores = _.map(rawTourney.golfers, g => {
+  const golfersByName = keyBy(gs, gs => gs.name);
+  const scores = rawTourney.golfers.map(g => {
     const golferName = g.golfer;
     if (!golfersByName[golferName]) {
       throw new Error("ERROR: Could not find golfer: " + golferName);
@@ -132,7 +127,7 @@ export async function run(reader: Reader, url: string, nameMap: { [name: string]
   await access.updateScores(finalScores);
 
   // Calculate standings
-  await updateTourneyStandings.run();
+  await updateTourneyStandings.run(access);
 
   console.log("HOORAY! - scores updated");
 }

@@ -11,12 +11,8 @@ export function connect() {
   mongoose.connect(config.mongo_url);
 
   return new Promise(function (fulfill, reject) {
-    mongoose.connection.once('open', function () {
-      fulfill();
-    });
-    mongoose.connection.once('error', function (err) {
-      reject(err);
-    });
+    mongoose.connection.once('open', () => fulfill());
+    mongoose.connection.once('error', err => reject(err));
   });
 }
 

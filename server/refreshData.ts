@@ -1,15 +1,13 @@
 import {sortBy} from 'lodash';
-import {getAccess} from './access';
+import {initNewTourney, getAccess, updateAppState} from './access';
 import * as mongooseUtil from './mongooseUtil';
 import * as updateScore from '../scores_sync/updateScore';
-import { loadConfig, TourneyConfig } from './tourneyConfigReader';
+import {loadConfig, TourneyConfig} from './tourneyConfigReader';
 import * as tourneyUtils from './tourneyUtils';
 import * as fs from 'fs';
-import config from './config';
 import readerConfig from '../scores_sync/readerConfig';
 import {User} from './ServerTypes';
 
-const access = getAccess(config.current_tourney_id);
 
 function nameToUsername(name: string) {
   return name
@@ -22,7 +20,8 @@ async function refreshData(tourneyCfg: TourneyConfig) {
   console.log("Reader: " + tourneyCfg.scores.type);
   console.log("Reader URL: " + tourneyCfg.scores.url);
 
-  await access.resetTourney();
+  const tourneyId = await initNewTourney(tourneyCfg.name, tourneyCfg.startDate);
+  const access = getAccess(tourneyId);
   
   const userInitCfg: {[key: string]: { password: string }} = JSON.parse(fs.readFileSync('init_user_cfg.json', 'utf8'));
   const userSpecs: User[] = tourneyCfg.draftOrder.map(name => ({
@@ -38,10 +37,16 @@ async function refreshData(tourneyCfg: TourneyConfig) {
   const pickOrder = tourneyUtils.snakeDraftOrder(sortedUsers);
   await access.setPickOrder(pickOrder);
   
-  await updateScore.run(readerConfig[tourneyCfg.scores.type].reader, tourneyCfg.scores.url, tourneyCfg.scores.nameMap, true);
+  await updateScore.run(
+    access,
+    readerConfig[tourneyCfg.scores.type].reader,
+    tourneyCfg.scores.url,
+    tourneyCfg.scores.nameMap,
+    true
+  );
 
-  await access.updateAppState({
-    currentTourneyId: config.current_tourney_id,
+  await updateAppState({
+    activeTourneyId: tourneyId,
     isDraftPaused: false,
     allowClock: true,
     draftHasStarted: false,
@@ -50,8 +55,8 @@ async function refreshData(tourneyCfg: TourneyConfig) {
 }
 
 async function run() {
-  await mongooseUtil.connect();
   try {
+    await mongooseUtil.connect();
     const tourneyCfg = loadConfig();
     console.log(tourneyCfg);
     await refreshData(tourneyCfg);

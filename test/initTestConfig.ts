@@ -1,34 +1,41 @@
 import '../common/utils';
 import 'should';
 
-import * as _ from 'lodash';
+import {once, extend} from 'lodash';
+import {initNewTourney} from '../server/access';
 import * as models from '../server/models';
 import * as mongooseUtil from '../server/mongooseUtil';
 import config from '../server/config';
 
-const testTourney = new models.Tourney({
-  name: 'Test Tourney',
-  par: 70,
-  lastUpdate: new Date(),
-  yahooUrl: 'http://golfdrafttest.com/notaurl'
-});
-
-_.extend(config, {
+extend(config, {
   prod: false,
-
   mongo_url: 'mongodb://localhost:27017/golfdraft_testdb',
-  redis_url: 'redis://:@localhost:6379/test',
-
-  tourney_id: testTourney._id
+  redis_url: 'redis://:@localhost:6379/test'
 });
 
-export const initTestDb = _.once(function _initTestDb() {
-  mongooseUtil.connect()
-    .then(function () {
-      return testTourney.save();
-    });
+function clear() {
+  return Promise.all([
+    models.Tourney.remove({}).exec(),
+    models.AppState.remove({}).exec(),
+  ]);
+}
+
+export const initTestDb = once(async () => {
+  await mongooseUtil.connect();
+  await clear();
+
+  const tourneyId = await initNewTourney('Test Tourney', new Date());
+  const appState = new models.AppState({
+    activeTourneyId: tourneyId,
+    isDraftPaused: true,
+    allowClock: true,
+    draftHasStarted: false,
+    autoPickUsers: []
+  });
+  await appState.save();
 });
 
-export const closeTestDb = function _closeTestDb() {
-  mongooseUtil.close();
+export const closeTestDb = async () => {
+  await clear();
+  await mongooseUtil.close();
 }
