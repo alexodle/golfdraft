@@ -39,7 +39,6 @@ const AUTO_PICK_STARTUP_DELAY = 1000 * 5;
 async function defineRoutes() {
   const activeTourneyId = (await getAppState()).activeTourneyId;
   const activeTourneyAccess = await getActiveTourneyAccess();
-  console.log('hihi.activeTourneyId: ' + activeTourneyId);
 
   // Temp temp - remove this when we have multiple nodes
   userAccess.refresh();
@@ -439,11 +438,8 @@ function autoPick(userId: string, pickNumber: number) {
 
 async function isDraftRunning(): Promise<{ appState: AppSettings, draft: Draft } | false> {
   const activeTourneyAccess = await getActiveTourneyAccess();
-  console.log('hihi.isDraftRunning.1');
   const appState = await getAppState();
-  console.log('hihi.isDraftRunning.2');
   const draft = await activeTourneyAccess.getDraft();
-  console.log('hihi.isDraftRunning.3');
   if (isDraftOver(draft) || appState.isDraftPaused || !appState.draftHasStarted) {
     return false;
   }
