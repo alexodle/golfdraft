@@ -55,7 +55,7 @@ async function defineRoutes() {
   app.set('view engine', 'handlebars');
 
   // Static routes
-  if (!config.prod) {
+  if (config.devMode) {
     app.set('views', './distd/');
     app.use('/dist', express.static(__dirname + '/../../distd'));
   } else {
@@ -190,7 +190,7 @@ async function defineRoutes() {
       user: JSON.stringify(req.user),
       activeTourneyId: activeTourneyId,
       allTourneys: JSON.stringify(allTourneys),
-      prod: config.prod,
+      prod: !config.devMode,
       cdnUrl: config.cdn_url
     } as BootstrapPayload);
   });

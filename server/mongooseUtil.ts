@@ -3,10 +3,6 @@ import * as mongoose from 'mongoose';
 
 (<any>mongoose).Promise = Promise;
 
-if (!config.prod) {
-  mongoose.set('debug', true);
-}
-
 export function connect() {
   mongoose.connect(config.mongo_url);
 

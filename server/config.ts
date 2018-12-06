@@ -1,6 +1,5 @@
 const cfg = {
-  prod: !process.env.DEBUG,
-  debug: !!process.env.DEBUG,
+  devMode: process.env.NODE_ENV === 'development',
 
   mongo_url: process.env.MONGO_URI || "mongodb://gd:gd@127.0.0.1:27017/gd",
   redis_url: process.env.REDIS_URL || "redis://:@127.0.0.1:6379/0",
@@ -14,7 +13,7 @@ const cfg = {
   session_secret: process.env.SESSION_SECRET || 'dev_session_secret'
 };
 
-if (cfg.debug) {
+if (cfg.devMode) {
   console.log('CONFIG:');
   console.dir(cfg);
 }

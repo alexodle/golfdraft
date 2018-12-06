@@ -74,7 +74,7 @@
   "scripts": {
     "build": "./node_modules/.bin/webpack --env prod",
     "watch:dev": "./node_modules/.bin/webpack --env dev --watch",
-    "run:dev": "concurrently --kill-others \"npm run watch:dev\" \"npm run start\"",
+    "run:dev": "NODE_ENV=development concurrently --kill-others \"npm run watch:dev\" \"npm run start\"",
     "start": "tsc && node tsDist/server/server.js",
     "test": "./node_modules/.bin/mocha --exit --compilers ts:ts-node/register ./test/*Test.ts",
     "refreshData": "tsc && node tsDist/server/refreshData.js",

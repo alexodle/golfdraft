@@ -1,10 +1,6 @@
 import config from './config';
 import * as redis from 'redis';
 
-if (!config.prod) {
-  (<any>redis).debug_mode = true;
-}
-
 const redisUrl = require("url").parse(config.redis_url);
 
 function createClient() {
