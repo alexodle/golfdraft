@@ -48,7 +48,11 @@ async function defineRoutes() {
   app.use(compression());
 
   // Handlebars
-  app.engine('handlebars', exphbs({}));
+  app.engine('handlebars', exphbs({
+    helpers: {
+      or: (a, b) => a || b
+    }
+  }));
   app.set('view engine', 'handlebars');
 
   // Static routes
@@ -435,10 +439,11 @@ function autoPick(userId: string, pickNumber: number) {
 
 async function isDraftRunning(): Promise<{ appState: AppSettings, draft: Draft } | false> {
   const activeTourneyAccess = await getActiveTourneyAccess();
-  const [appState, draft] = await Promise.all([
-    getAppState(),
-    activeTourneyAccess.getDraft()
-  ]);
+  console.log('hihi.isDraftRunning.1');
+  const appState = await getAppState();
+  console.log('hihi.isDraftRunning.2');
+  const draft = await activeTourneyAccess.getDraft();
+  console.log('hihi.isDraftRunning.3');
   if (isDraftOver(draft) || appState.isDraftPaused || !appState.draftHasStarted) {
     return false;
   }
@@ -501,19 +506,17 @@ async function onAppStateUpdate(req: Request, res: Response, promise: Promise<an
   io.sockets.emit('change:appstate', { data: { appState } });
 }
 
-(async () => {
-  try {
-    await mongooseUtil.connect();
-    await defineRoutes();
+async function run() {
+  await mongooseUtil.connect();
+  await defineRoutes();
 
-    expressServer.listen(port);
-    redisPubSubClient.subscribe("scores:update");
+  expressServer.listen(port);
+  redisPubSubClient.subscribe("scores:update");
 
-    // Give some time to settle, and then start ensuring we run auto picks
-    setTimeout(ensureNextAutoPick, AUTO_PICK_STARTUP_DELAY);
+  // Give some time to settle, and then start ensuring we run auto picks
+  setTimeout(ensureNextAutoPick, AUTO_PICK_STARTUP_DELAY);
 
-    console.log('I am fully running now!');
-  } finally {
-    mongooseUtil.close();
-  }
-})();
+  console.log('I am fully running now!');
+}
+
+run();
