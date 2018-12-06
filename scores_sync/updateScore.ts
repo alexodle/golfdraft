@@ -45,7 +45,7 @@ export function validate(result: ReaderResult): boolean {
 }
 
 export function mergeOverrides(scores: GolferScore[], scoreOverrides: ScoreOverride[]): GolferScore[] {
-  const overridesByGolfer = chain(scoreOverrides)
+  const overridesByGolfer: {[key: string]: {}} = chain(scoreOverrides)
     .map(o => {
       return chain(o)
 

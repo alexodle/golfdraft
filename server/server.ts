@@ -9,7 +9,6 @@ import * as express from 'express';
 import * as mongooseUtil from './mongooseUtil';
 import * as passport from 'passport';
 import * as session from 'express-session';
-import * as tourneyConfigReader from './tourneyConfigReader';
 import * as userAccess from './userAccess';
 import * as utils from '../common/utils';
 import * as updateTourneyStandings from '../scores_sync/updateTourneyStandings';
@@ -37,11 +36,10 @@ const MAX_AGE = 1000 * 60 * 60 * 24 * 365;
 const ENSURE_AUTO_PICK_DELAY_MILLIS = 500;
 const AUTO_PICK_STARTUP_DELAY = 1000 * 5;
 
-const NOT_AN_ERROR = {};
-
 async function defineRoutes() {
   const activeTourneyId = (await getAppState()).activeTourneyId;
   const activeTourneyAccess = await getActiveTourneyAccess();
+  console.log('hihi.activeTourneyId: ' + activeTourneyId);
 
   // Temp temp - remove this when we have multiple nodes
   userAccess.refresh();
@@ -50,19 +48,15 @@ async function defineRoutes() {
   app.use(compression());
 
   // Handlebars
-  app.engine('handlebars', exphbs({
-    helpers: {
-      or: function (a, b) { return a || b; }
-    }
-  }));
+  app.engine('handlebars', exphbs({}));
   app.set('view engine', 'handlebars');
 
   // Static routes
   if (!config.prod) {
-    app.set('views', './distd/views/');
+    app.set('views', './distd/');
     app.use('/dist', express.static(__dirname + '/../../distd'));
   } else {
-    app.set('views', './dist/views/');
+    app.set('views', './dist/');
     app.use('/dist', express.static(__dirname + '/../../dist', {
       maxAge: MAX_AGE
     }));
@@ -400,7 +394,12 @@ function ensureNextAutoPick() {
   setTimeout(async () => {
     try {
       console.info('ensureNextAutoPick: running');
-      const spec = await ensureDraftIsRunning();
+      const spec = await isDraftRunning();
+      if (!spec) {
+        console.info('ensureNextAutoPick: draft is not running, skipping');
+        return;
+      }
+
       const {appState, draft} = spec;
       const {autoPickUsers} = appState;
       const nextPickNumber = draft.picks.length;
@@ -415,10 +414,6 @@ function ensureNextAutoPick() {
           `user: ${nextPickUser}, autoPickUsers: ${autoPickUsers}`);
       }
     } catch (err) {
-      if (err === NOT_AN_ERROR) {
-        console.info('ensureNextAutoPick: not auto-picking; draft is not running.');
-        throw err;
-      }
       console.log(err);
     }
   }, ENSURE_AUTO_PICK_DELAY_MILLIS);
@@ -438,14 +433,14 @@ function autoPick(userId: string, pickNumber: number) {
   });
 }
 
-async function ensureDraftIsRunning(): Promise<{ appState: AppSettings, draft: Draft }> {
+async function isDraftRunning(): Promise<{ appState: AppSettings, draft: Draft } | false> {
   const activeTourneyAccess = await getActiveTourneyAccess();
   const [appState, draft] = await Promise.all([
     getAppState(),
     activeTourneyAccess.getDraft()
   ]);
   if (isDraftOver(draft) || appState.isDraftPaused || !appState.draftHasStarted) {
-    throw NOT_AN_ERROR;
+    return false;
   }
   return { appState, draft };
 }
@@ -462,17 +457,19 @@ async function handlePick(spec: {
   let draft = null;
   try {
     if (!force) {
-      await ensureDraftIsRunning();
+      const isRunning = await isDraftRunning();
+      if (!isRunning) {
+        if (res) {
+          res.send(403).send({ message: 'Draft is not running' });
+        }
+        return;
+      }
     }
 
     pick = await makePick();
     if (res) {
       res.status(200).send({ pick });
     }
-
-    const activeTourneyAccess = await getActiveTourneyAccess();
-    draft = await activeTourneyAccess.getDraft();
-    updateClients(draft);
   } catch (err) {
     if (res) {
       if (err.message.indexOf('invalid pick') !== -1) {
@@ -481,38 +478,27 @@ async function handlePick(spec: {
         res.status(500).send(err);
       }
     }
-    throw err;
+    return;
   }
 
-  try {
-    await broadcastPickMessage({ pick, draft });
-    await ensureNextAutoPick();
-  } catch (err) {
-    if (err === NOT_AN_ERROR) throw err;
-    console.log(err);
-  }
+  const activeTourneyAccess = await getActiveTourneyAccess();
+  draft = await activeTourneyAccess.getDraft();
+  updateClients(draft);
+
+  await broadcastPickMessage({ pick, draft });
+  ensureNextAutoPick();
 }
 
 async function onAppStateUpdate(req: Request, res: Response, promise: Promise<any>) {
-  try {
-    await promise;
-  } catch (err) {
-    res.status(500).send(err);
-    return;
-  }
+  await promise;
 
   // App state will affect whether or not we should be running auto picks
   // SET AND FORGET
   ensureNextAutoPick();
 
-  try {
-    const appState = await getAppState();
-    res.status(200).send({ appState });
-    io.sockets.emit('change:appstate', { data: { appState } });
-  } catch (err) {
-    console.log(err);
-    return;
-  }
+  const appState = await getAppState();
+  res.status(200).send({ appState });
+  io.sockets.emit('change:appstate', { data: { appState } });
 }
 
 (async () => {

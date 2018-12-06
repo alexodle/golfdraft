@@ -54,15 +54,15 @@ export function getAccess(tourneyId: string): Access {
   return obj;
 }
 
-export async function getAllTourneys(): Promise<TourneyDoc[]> {
+export function getAllTourneys(): Promise<TourneyDoc[]> {
   return models.Tourney.find().exec() as Promise<TourneyDoc[]>;
 }
 
-export async function getAppState(): Promise<AppSettings> {
-  return await models.AppState.findOne().exec() as AppSettingsDoc;
+export function getAppState(): Promise<AppSettings> {
+  return models.AppState.findOne().exec() as Promise<AppSettingsDoc>;
 }
 
-export async function updateAppState(props: AppSettings) {
+export function updateAppState(props: AppSettings) {
   return models.AppState.update({}, props, { upsert: true }).exec();
 }
 
