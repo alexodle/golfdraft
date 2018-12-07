@@ -9,13 +9,16 @@ import * as ReactDOM from 'react-dom';
 import {BrowserRouter, Route} from 'react-router-dom';
 import hydrate from './hydrate';
 import startSocketUpdates from './startSocketUpdates';
+import TourneyStore from './stores/TourneyStore';
 
 function render(rootNode: Element) {
   // hydrate BEFORE rendering
   hydrate();
   
-  // Begin listening for live socket updates
-  startSocketUpdates();
+  if (TourneyStore.isViewingActiveTourney()) {
+    // Begin listening for live socket updates
+    startSocketUpdates();
+  }
 
   ReactDOM.render(
     (<BrowserRouter>

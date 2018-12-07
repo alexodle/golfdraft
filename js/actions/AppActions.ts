@@ -25,10 +25,10 @@ export default class AppActions {
     });
   }
 
-  static setTourneyName(tourneyName: string) {
+  static setCurrentTourney(tourney: Tourney) {
     AppDispatcher.handleViewAction({
-      actionType: AppConstants.SET_TOURNEY_NAME,
-      tourneyName
+      actionType: AppConstants.SET_CURRENT_TOURNEY,
+      tourney
     });
   }
 

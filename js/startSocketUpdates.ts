@@ -1,5 +1,4 @@
-import * as _ from 'lodash';
-import AppActions from './actions/AppActions';
+import {once} from 'lodash';
 import ChatActions from './actions/ChatActions';
 import DraftActions from './actions/DraftActions';
 import parseDraft from './logic/DraftParser';
@@ -35,4 +34,4 @@ function startSocketUpdates() {
   });
 }
 
-export default _.once(startSocketUpdates);
+export default once(startSocketUpdates);

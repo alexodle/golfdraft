@@ -21,7 +21,7 @@ function hydrate(seedData: BootstrapPayload) {
   });
   SettingsActions.setAppState(seedData.appState);
   AppActions.setActiveTourneyId(seedData.activeTourneyId);
-  AppActions.setTourneyName(seedData.tourney.name);
+  AppActions.setCurrentTourney(seedData.tourney);
   AppActions.setAllTourneys(seedData.allTourneys);
 
   if (seedData.user) {

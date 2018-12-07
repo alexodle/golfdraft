@@ -5,14 +5,16 @@ import {Indexed, Tourney} from '../types/ClientTypes';
 import {keyBy} from 'lodash';
 
 let _activeTournyId: string = null;
-let _tourneyName: string = null;
+let _currentTourney: Tourney = null;
 let _allTourneys: Indexed<Tourney> = null;
 
 class TourneyStoreImpl extends Store {
   changeEvent() { return 'TourneyStore:change'; }
   getActiveTourneyId() { return _activeTournyId; }
-  getTourneyName() { return _tourneyName; }
+  getCurrentTourney() { return _currentTourney; }
+  getTourneyName() { return _currentTourney.name; }
   getAllTourneys() { return _allTourneys; }
+  isViewingActiveTourney() { return _activeTournyId === _currentTourney._id }
 }
 const TourneyStore = new TourneyStoreImpl();
 
@@ -26,8 +28,8 @@ AppDispatcher.register(function (payload) {
       TourneyStore.emitChange();
       break;
 
-    case AppConstants.SET_TOURNEY_NAME:
-      _tourneyName = action.tourneyName;
+    case AppConstants.SET_CURRENT_TOURNEY:
+      _currentTourney = action.tourney;
       TourneyStore.emitChange();
       break;
       

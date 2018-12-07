@@ -38,6 +38,7 @@ const RELEVANT_STORES = [
 
 interface AppState {
   tourneyName: string;
+  isViewingActiveTourney: boolean;
   currentUser?: User;
   activeUsers: Indexed<string>;
   golfers: IndexedGolfers;
@@ -69,6 +70,7 @@ function getAppState(): AppState {
     allTourneys: TourneyStore.getAllTourneys(),
 
     tourneyName: TourneyStore.getTourneyName(),
+    isViewingActiveTourney: TourneyStore.isViewingActiveTourney(),
     currentUser: UserStore.getCurrentUser(),
     activeUsers: UserStore.getActive(),
     golfers: GolferStore.getAll(),
@@ -226,13 +228,13 @@ export default class AppNode extends React.Component<AppNodeProps, AppState> {
 
   _requireCurrentUser(from) {
     if (!this.state.currentUser) {
-      return (<Redirect to={{ pathname: '/whoisyou', state: { from: from }}} />);
+      return (<Redirect to={{ pathname: '/whoisyou', state: { from }}} />);
     }
   }
 
   _requireDraftComplete(from) {
     if (this.state.draft.currentPick) {
-      return (<Redirect to={{ pathname: 'draft', state: { from: from }}} />);
+      return (<Redirect to={{ pathname: 'draft', state: { from }}} />);
     }
   }
 
