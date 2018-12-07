@@ -136,16 +136,12 @@ class AutoComplete extends React.PureComponent<AutoCompleteProps, AutoCompleteSt
 
 };
 
-interface ChatRoomInputProps {
-  enabled: boolean;
-}
-
 interface ChatRoomInputState {
   text: string;
   taggingText?: string;
 }
 
-class ChatRoomInput extends React.PureComponent<ChatRoomInputProps, ChatRoomInputState> {
+class ChatRoomInput extends React.PureComponent<{}, ChatRoomInputState> {
 
   constructor(props) {
     super(props);
@@ -166,7 +162,6 @@ class ChatRoomInput extends React.PureComponent<ChatRoomInputProps, ChatRoomInpu
               value={text}
               onChange={this._onUpdateText}
               onKeyUp={this._onKeyUp}
-              disabled={!this.props.enabled}
             />
             {!nameTag ? null : (
               <AutoComplete
@@ -175,7 +170,7 @@ class ChatRoomInput extends React.PureComponent<ChatRoomInputProps, ChatRoomInpu
                 text={nameTag[0].substr(1)}
                 onChoose={this._onTag} />
             )}
-            <button type='submit' className='btn btn-default' disabled={!this.props.enabled}>
+            <button type='submit' className='btn btn-default'>
               Send
             </button>
           </div>
@@ -221,8 +216,6 @@ class ChatRoomInput extends React.PureComponent<ChatRoomInputProps, ChatRoomInpu
 
   _onSend = (ev) => {
     ev.preventDefault();
-
-    if (!this.props.enabled) return;
 
     if (this.state.taggingText) {
       this._getNameTagger().forceSelect();
@@ -307,17 +300,68 @@ export default class ChatRoom extends React.PureComponent<ChatRoomProps, {}> {
   }
 
   render() {
-    const messages = this.props.messages;
-
-    let body = null;
-    if (!messages) {
-      body = (<span>Loading...</span>);
-
-    } else if (isEmpty(messages)) {
-      body = (<span>No messages. Be the first! Speak your mind.</span>);
-
+    if (this.props.enabled) {
+      return this.renderEnabledChat();
     } else {
-      body = (
+      return this.renderDisabledChat();
+    }
+  }
+
+  private renderEnabledChat() {
+    const messages = this.props.messages;
+    return (
+      <GolfDraftPanel heading='Chat Room'>
+        <div className='row'>
+          <div className='col-md-9'>
+            <div className='panel panel-default chat-panel' ref='chatPanel'>
+              <div className='panel-body' ref='chatPanelBody'>
+                {this.renderBody()}
+              </div>
+            </div>
+            {!messages ? null : (<ChatRoomInput />)}
+          </div>
+          <div className='col-md-3'>
+            <div className='panel panel-default'>
+              <div className='panel-body'>
+                <b>Online:</b>
+                <ul className='list-unstyled'>
+                  {map(this.props.activeUsers, uid => UserStore.getUser(uid).name)
+                    .sort()
+                    .map(name => (<li key={name}>{name}</li>))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </GolfDraftPanel>
+    );
+  }
+
+  private renderDisabledChat() {
+    const messages = this.props.messages;
+    return (
+      <GolfDraftPanel heading='Chat Room'>
+        <div className='row'>
+          <div className='col-md-12'>
+            <div className='panel panel-default chat-panel' ref='chatPanel'>
+              <div className='panel-body' ref='chatPanelBody'>
+                {this.renderBody()}
+              </div>
+            </div>
+          </div>
+        </div>
+      </GolfDraftPanel>
+    );
+  }
+
+  private renderBody() {
+    const messages = this.props.messages;
+    if (!messages) {
+      return (<span>Loading...</span>);
+    } else if (isEmpty(messages)) {
+      return (<span>No messages. Be the first! Speak your mind.</span>);
+    } else {
+      return (
         <dl className='chat-list dl-horizontal'>
           {messages.map((message, i) => {
             const displayName = message.isBot ?
@@ -341,33 +385,6 @@ export default class ChatRoom extends React.PureComponent<ChatRoomProps, {}> {
         </dl>
       );
     }
-
-    return (
-      <GolfDraftPanel heading='Chat Room'>
-        <div className='row'>
-          <div className='col-md-9'>
-            <div className='panel panel-default chat-panel' ref='chatPanel'>
-              <div className='panel-body' ref='chatPanelBody'>
-                {body}
-              </div>
-            </div>
-            {!messages ? null : (<ChatRoomInput enabled={this.props.enabled} />)}
-          </div>
-          <div className='col-md-3'>
-            <div className='panel panel-default'>
-              <div className='panel-body'>
-                <b>Online:</b>
-                <ul className='list-unstyled'>
-                  {map(this.props.activeUsers, uid => UserStore.getUser(uid).name)
-                    .sort()
-                    .map(name => (<li key={name}>{name}</li>))}
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </GolfDraftPanel>
-    );
   }
 
   _forceScroll() {
