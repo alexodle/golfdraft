@@ -133,6 +133,7 @@ class DraftWrapper extends React.Component<ComponentProps, {}> {
           draftHasStarted={props.draftHasStarted}
           autoPickUsers={props.autoPickUsers}
           tourneyId={props.match.params.tourneyId}
+          isViewingActiveTourney={props.isViewingActiveTourney}
         />
       </section>
     );
@@ -157,6 +158,7 @@ class TourneyWrapper extends React.Component<ComponentProps, {}> {
           lastScoresUpdate={props.lastScoresUpdate}
           chatMessages={props.chatMessages}
           activeUsers={props.activeUsers}
+          isViewingActiveTourney={props.isViewingActiveTourney}
         />
       </section>
     );

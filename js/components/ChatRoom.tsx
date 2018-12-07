@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import {isEmpty, sortBy, escape, some, map} from 'lodash';
 import * as moment from 'moment';
 import * as React from 'react';
 import Assets from '../constants/Assets';
@@ -47,8 +47,8 @@ class AutoComplete extends React.PureComponent<AutoCompleteProps, AutoCompleteSt
     const newChoices = this._getChoices(nextProps);
 
     if (
-        _.isEmpty(oldChoices) ||
-        _.isEmpty(newChoices) ||
+        isEmpty(oldChoices) ||
+        isEmpty(newChoices) ||
         !newChoices[currentIndex] ||
         oldChoices[currentIndex]._id !== newChoices[currentIndex]._id
       ) {
@@ -60,7 +60,7 @@ class AutoComplete extends React.PureComponent<AutoCompleteProps, AutoCompleteSt
   render() {
     const choices = this._getChoices();
 
-    if (_.isEmpty(choices)) {
+    if (isEmpty(choices)) {
       return null;
     }
 
@@ -76,7 +76,7 @@ class AutoComplete extends React.PureComponent<AutoCompleteProps, AutoCompleteSt
           onClick={this._onClick}
           onKeyUp={this._onKeyUp}
         >
-          {_.map(choices, function (u) {
+          {choices.map(u => {
             return (
               <option key={u._id} value={u.name}>{u.name}</option>
             );
@@ -119,11 +119,7 @@ class AutoComplete extends React.PureComponent<AutoCompleteProps, AutoCompleteSt
     props = props || this.props;
 
     const text = props.text.toLowerCase();
-    const choices = _.chain(props.allChoices)
-      .filter(function (u) {
-        return u.name.toLowerCase().startsWith(text);
-      })
-      .value();
+    const choices = props.allChoices.filter(u => u.name.toLowerCase().startsWith(text));
 
     return choices;
   }
@@ -140,12 +136,16 @@ class AutoComplete extends React.PureComponent<AutoCompleteProps, AutoCompleteSt
 
 };
 
+interface ChatRoomInputProps {
+  enabled: boolean;
+}
+
 interface ChatRoomInputState {
   text: string;
   taggingText?: string;
 }
 
-class ChatRoomInput extends React.PureComponent<{}, ChatRoomInputState> {
+class ChatRoomInput extends React.PureComponent<ChatRoomInputProps, ChatRoomInputState> {
 
   constructor(props) {
     super(props);
@@ -166,15 +166,16 @@ class ChatRoomInput extends React.PureComponent<{}, ChatRoomInputState> {
               value={text}
               onChange={this._onUpdateText}
               onKeyUp={this._onKeyUp}
+              disabled={!this.props.enabled}
             />
             {!nameTag ? null : (
               <AutoComplete
                 ref='nameTagger'
-                allChoices={_.sortBy(UserStore.getAll(), 'name')}
+                allChoices={sortBy(UserStore.getAll(), u => u.name)}
                 text={nameTag[0].substr(1)}
                 onChoose={this._onTag} />
             )}
-            <button type='submit' className='btn btn-default'>
+            <button type='submit' className='btn btn-default' disabled={!this.props.enabled}>
               Send
             </button>
           </div>
@@ -221,13 +222,15 @@ class ChatRoomInput extends React.PureComponent<{}, ChatRoomInputState> {
   _onSend = (ev) => {
     ev.preventDefault();
 
+    if (!this.props.enabled) return;
+
     if (this.state.taggingText) {
       this._getNameTagger().forceSelect();
       return;
     }
 
     const text = this.state.text;
-    if (_.isEmpty(text)) return;
+    if (isEmpty(text)) return;
 
     ChatActions.createMessage(text);
     this.setState({ text: '', taggingText: null });
@@ -245,7 +248,7 @@ class Message extends React.PureComponent<MessageProps, {}> {
 
   render() {
     // Escape html BEFORE adding tags
-    const text = _.escape(this.props.text);
+    const text = escape(this.props.text);
 
     // Add tag html
     const htmlStr = text.replace(TAG_TO_NAME_RE, function (match, name) {
@@ -265,6 +268,7 @@ class Message extends React.PureComponent<MessageProps, {}> {
 };
 
 export interface ChatRoomProps {
+  enabled: boolean;
   messages: ChatMessage[];
   activeUsers: Indexed<string>;
   currentUser: User;
@@ -291,7 +295,7 @@ export default class ChatRoom extends React.PureComponent<ChatRoomProps, {}> {
     if (newMessagesLength > prevMessagesLength) {
       const myTagStr = SPECIFIC_TAG.replace("{{name}}", this.props.currentUser.name);
       const addedMessages = this.props.messages.slice(prevMessagesLength, newMessagesLength);
-      const tagsMe = _.some(addedMessages, (msg) => {
+      const tagsMe = some(addedMessages, (msg) => {
         return msg.message.includes(myTagStr);
       });
       if (tagsMe) {
@@ -309,13 +313,13 @@ export default class ChatRoom extends React.PureComponent<ChatRoomProps, {}> {
     if (!messages) {
       body = (<span>Loading...</span>);
 
-    } else if (_.isEmpty(messages)) {
+    } else if (isEmpty(messages)) {
       body = (<span>No messages. Be the first! Speak your mind.</span>);
 
     } else {
       body = (
         <dl className='chat-list dl-horizontal'>
-          {_.map(messages, function (message, i) {
+          {messages.map((message, i) => {
             const displayName = message.isBot ?
               BOT_NAME : UserStore.getUser(message.user).name;
             const className = message.isBot ? 'bot-message' : '';
@@ -347,25 +351,16 @@ export default class ChatRoom extends React.PureComponent<ChatRoomProps, {}> {
                 {body}
               </div>
             </div>
-            {!messages ? null : (<ChatRoomInput />)}
+            {!messages ? null : (<ChatRoomInput enabled={this.props.enabled} />)}
           </div>
           <div className='col-md-3'>
             <div className='panel panel-default'>
               <div className='panel-body'>
                 <b>Online:</b>
                 <ul className='list-unstyled'>
-                  {_.chain(this.props.activeUsers)
-                    .map((count, userId) => {
-                      return UserStore.getUser(userId).name;
-                    })
+                  {map(this.props.activeUsers, uid => UserStore.getUser(uid).name)
                     .sort()
-                    .map((userName) => {
-                      return (
-                        <li key={userName}>{userName}</li>
-                      );
-                    })
-                    .value()
-                  }
+                    .map(name => (<li key={name}>{name}</li>))}
                 </ul>
               </div>
             </div>

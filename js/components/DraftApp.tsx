@@ -15,7 +15,6 @@ import {
   ChatMessage,
   DraftPick,
   DraftPickOrder,
-  Golfer,
   Indexed,
   IndexedGolfers,
   User,
@@ -41,6 +40,7 @@ export interface DraftAppProps {
   draftHasStarted: boolean;
   isPaused: boolean;
   tourneyId: string;
+  isViewingActiveTourney: boolean;
 }
 
 export interface DraftAppState {
@@ -96,6 +96,7 @@ export default class DraftApp extends React.Component<DraftAppProps, DraftAppSta
               currentUser={this.props.currentUser}
               messages={this.props.chatMessages}
               activeUsers={this.props.activeUsers}
+              enabled={this.props.isViewingActiveTourney}
             />
           </div>
         </div>
@@ -123,6 +124,7 @@ export default class DraftApp extends React.Component<DraftAppProps, DraftAppSta
               currentUser={this.props.currentUser}
               messages={this.props.chatMessages}
               activeUsers={this.props.activeUsers}
+              enabled={this.props.isViewingActiveTourney}
             />
           </div>
         </div>
@@ -226,6 +228,7 @@ export default class DraftApp extends React.Component<DraftAppProps, DraftAppSta
               currentUser={this.props.currentUser}
               messages={this.props.chatMessages}
               activeUsers={this.props.activeUsers}
+              enabled={this.props.isViewingActiveTourney}
             />
           </div>
         </div>

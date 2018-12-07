@@ -1,8 +1,6 @@
-import * as _ from 'lodash';
 import * as moment from 'moment';
 import * as React from 'react';
 import ChatRoom from './ChatRoom';
-import constants from '../../common/constants';
 import GolfDraftPanel from './GolfDraftPanel';
 import GolferLogic from '../logic/GolferLogic';
 import GolferStore from '../stores/GolferStore';
@@ -12,8 +10,6 @@ import * as utils from '../../common/utils';
 import {DraftProps} from '../types/SharedProps';
 import {User, TourneyStandings, ChatMessage, Indexed} from '../types/ClientTypes';
 
-const NDAYS = constants.NDAYS;
-
 export interface TourneyAppProps {
   draft: DraftProps;
   currentUser: User;
@@ -21,6 +17,7 @@ export interface TourneyAppProps {
   lastScoresUpdate: Date;
   chatMessages?: ChatMessage[];
   activeUsers: Indexed<string>;
+  isViewingActiveTourney: boolean;
 }
 
 interface TourneyAppState {
@@ -83,15 +80,13 @@ class TourneyApp extends React.Component<TourneyAppProps, TourneyAppState> {
         {!this.props.tourneyStandings.worstScoresForDay.length ? null : (
           <GolfDraftPanel heading='Worst Scores of the Day'>
             <ul>
-              {_.map(this.props.tourneyStandings.worstScoresForDay, s => {
-                return (
-                  <li key={s.day} className='list-unstyled'>
-                    <b>Day {s.day + 1}</b>: {utils.toGolferScoreStr(s.score)}
-                    <span> </span>
-                    {GolferLogic.renderGolfer(GolferStore.getGolfer(s.golfer))}
-                  </li>
-                );
-              })}
+              {this.props.tourneyStandings.worstScoresForDay.map(s => (
+                <li key={s.day} className='list-unstyled'>
+                  <b>Day {s.day + 1}</b>: {utils.toGolferScoreStr(s.score)}
+                  <span> </span>
+                  {GolferLogic.renderGolfer(GolferStore.getGolfer(s.golfer))}
+                </li>
+              ))}
             </ul>
           </GolfDraftPanel>
         )}
@@ -100,6 +95,7 @@ class TourneyApp extends React.Component<TourneyAppProps, TourneyAppState> {
           currentUser={this.props.currentUser}
           messages={this.props.chatMessages}
           activeUsers={this.props.activeUsers}
+          enabled={this.props.isViewingActiveTourney}
         />
       </section>
     );

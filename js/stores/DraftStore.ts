@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import {difference, includes, uniq, without} from 'lodash';
 import AppDispatcher from '../dispatcher/AppDispatcher';
 import AppConstants from '../constants/AppConstants';
 import DraftConstants from '../constants/DraftConstants';
@@ -37,22 +37,22 @@ function getCurrentPick(): DraftPickOrder {
 
 function addPick(golfer) {
   const timestamp = new Date();
-  const pick =  _.extend({}, getCurrentPick(), {
+  const pick =  { ...getCurrentPick(),
     golfer: golfer,
     timestamp: timestamp,
     clientTimestamp: timestamp
-  });
+  };
   _picks.push(pick);
   return pick;
 }
 
 function filterPicksFromPickLists() {
-  const pickedGids = _.map(_picks, 'golfer');
+  const pickedGids = _picks.map(p => p.golfer);
   if (_pickList !== _pendingPickList) {
-    _pickList = _.difference(_pickList, pickedGids);
-    _pendingPickList = _.difference(_pendingPickList, pickedGids);
+    _pickList = difference(_pickList, pickedGids);
+    _pendingPickList = difference(_pendingPickList, pickedGids);
   } else {
-    _pickList = _.difference(_pickList, pickedGids);
+    _pickList = difference(_pickList, pickedGids);
     _pendingPickList = _pickList;
   }
 }
@@ -69,7 +69,7 @@ class DraftStoreImpl extends Store {
 
     return (
       currentPick.user === currentUser._id ||
-      _.includes(_pickForUsers, currentPick.user)
+      includes(_pickForUsers, currentPick.user)
     );
   }
   getPickingForUsers() { return _pickForUsers }
@@ -121,12 +121,12 @@ AppDispatcher.register(function (payload) {
       break;
 
     case DraftConstants.DRAFT_FOR_USER:
-      _pickForUsers = _.uniq(_pickForUsers.concat([action.user]));
+      _pickForUsers = uniq(_pickForUsers.concat([action.user]));
       DraftStore.emitChange();
       break;
 
     case DraftConstants.STOP_DRAFT_FOR_USER:
-      _pickForUsers = _.without(_pickForUsers, action.user);
+      _pickForUsers = without(_pickForUsers, action.user);
       DraftStore.emitChange();
       break;
 
