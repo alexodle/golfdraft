@@ -54,7 +54,7 @@ AppDispatcher.register(function (payload) {
       // For now, fire and forget. If success, we will update the UI via
       // socket.io update.
       //
-      postJson('/chat/messages', { message: action.message });
+      postJson('chat/messages', { message: action.message });
       break;
   }
 
