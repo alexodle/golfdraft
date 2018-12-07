@@ -2,11 +2,11 @@ import {sortBy} from 'lodash';
 import {initNewTourney, getAccess, updateAppState} from './access';
 import * as mongooseUtil from './mongooseUtil';
 import * as updateScore from '../scores_sync/updateScore';
-import {loadConfig, TourneyConfig} from './tourneyConfigReader';
+import {loadConfig} from './tourneyConfigReader';
 import * as tourneyUtils from './tourneyUtils';
 import * as fs from 'fs';
 import readerConfig from '../scores_sync/readerConfig';
-import {User} from './ServerTypes';
+import {User, TourneyConfigSpec} from './ServerTypes';
 
 
 function nameToUsername(name: string) {
@@ -15,12 +15,12 @@ function nameToUsername(name: string) {
     .replace(' ', '_');
 }
 
-async function refreshData(tourneyCfg: TourneyConfig) {
+async function initTourney(tourneyCfg: TourneyConfigSpec) {
   console.log(JSON.stringify(tourneyCfg.draftOrder));
-  console.log("Reader: " + tourneyCfg.scores.type);
-  console.log("Reader URL: " + tourneyCfg.scores.url);
+  console.log("Reader: " + tourneyCfg.scoresSync.syncType);
+  console.log("Reader URL: " + tourneyCfg.scoresSync.url);
 
-  const tourneyId = await initNewTourney(tourneyCfg.name, tourneyCfg.startDate);
+  const tourneyId = await initNewTourney(tourneyCfg);
   const access = getAccess(tourneyId);
   
   const userInitCfg: {[key: string]: { password: string }} = JSON.parse(fs.readFileSync('init_user_cfg.json', 'utf8'));
@@ -39,9 +39,9 @@ async function refreshData(tourneyCfg: TourneyConfig) {
   
   await updateScore.run(
     access,
-    readerConfig[tourneyCfg.scores.type].reader,
-    tourneyCfg.scores.url,
-    tourneyCfg.scores.nameMap,
+    readerConfig[tourneyCfg.scoresSync.syncType].reader,
+    tourneyCfg.scoresSync.url,
+    tourneyCfg.scoresSync.nameMap,
     true
   );
 
@@ -54,12 +54,12 @@ async function refreshData(tourneyCfg: TourneyConfig) {
   });
 }
 
-async function run() {
+async function run(configPath: string) {
   try {
     await mongooseUtil.connect();
-    const tourneyCfg = loadConfig();
+    const tourneyCfg = loadConfig(configPath);
     console.log(tourneyCfg);
-    await refreshData(tourneyCfg);
+    await initTourney(tourneyCfg);
   } catch (err) {
     if (err.stack) {
       console.log(err.stack);
@@ -71,4 +71,9 @@ async function run() {
   }
 }
 
-run();
+if (process.argv.length !== 3) {
+  console.error('Usage: node initTourney.js <tourney_config>');
+  process.exit(1);
+}
+
+run(process.argv[2]);

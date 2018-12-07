@@ -82,7 +82,22 @@ export interface ScoreOverride extends TourneySpecific {
 }
 export type ScoreOverrideDoc = ScoreOverride & Document;
 
-export type TourneyDoc = CommonTypes.Tourney & Document;
+export interface Tourney extends CommonTypes.Tourney {
+  config: {
+    scoresSync: {
+      syncType: string;
+      url: string;
+      nameMap: { src: string, dest: string }[];
+    };
+    draftOrder: string[];
+    wgr: {
+      url: string;
+      nameMap: { src: string, dest: string }[];
+    }
+  };
+}
+
+export type TourneyDoc = Tourney & Document;
 
 export interface BootstrapPayload {
   golfers: string;
@@ -96,4 +111,19 @@ export interface BootstrapPayload {
   allTourneys: string;
   prod: boolean;
   cdnUrl: string;
+} 
+
+export interface TourneyConfigSpec {
+  name: string;
+  startDate: Date;
+  scoresSync: {
+    syncType: string;
+    url: string;
+    nameMap: {[key: string]: string};
+  };
+  draftOrder: string[];
+  wgr: {
+    url: string;
+    nameMap: { [name: string]: string };
+  };
 }

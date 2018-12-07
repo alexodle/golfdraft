@@ -1,29 +1,23 @@
 // Refreshes users, pick order, draft picks, and chat
 
-import config from './config';
-import {once} from 'lodash';
 import * as moment from 'moment';
 import * as fs from 'fs';
+import {TourneyConfigSpec} from '../server/ServerTypes';
 
-export interface TourneyConfig {
-  name: string;
-  startDate: Date;
-  scores: {
-    type: string;
-    url: string;
-    nameMap: { [name: string]: string };
-  };
-  draftOrder: string[];
-  wgr: {
-    url: string;
-    nameMap: { [name: string]: string };
-  };
+function ensureReplaceKey(o, oldKey, newKey) {
+  if (o[oldKey]) {
+    o[newKey] = o[oldKey];
+    delete o[oldKey];
+  }
 }
 
-function _loadConfig(): TourneyConfig {
-  const cfg: TourneyConfig = JSON.parse(fs.readFileSync(config.tourney_cfg, 'utf8'));
+export function loadConfig(tourneyCfgPath: string): TourneyConfigSpec {
+  const cfg: TourneyConfigSpec = JSON.parse(fs.readFileSync(tourneyCfgPath, 'utf8'));
   cfg.startDate = moment(cfg.startDate).toDate();
+
+  // Back-compat
+  ensureReplaceKey(cfg, 'scores', 'scoresSync');
+  ensureReplaceKey(cfg.scoresSync, 'type', 'syncType');
+
   return cfg;
 }
-
-export const loadConfig = once(_loadConfig);

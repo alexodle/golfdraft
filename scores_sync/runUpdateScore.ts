@@ -1,19 +1,10 @@
 import * as mongooseUtil from '../server/mongooseUtil';
 import readerConfig from './readerConfig';
 import redis from '../server/redis';
-import {loadConfig} from '../server/tourneyConfigReader';
-import {getActiveTourneyAccess} from '../server/access';
+import {getActiveTourneyAccess, } from '../server/access';
 import * as updateScore from './updateScore';
 
 const TIMEOUT = 2 * 60 * 1000; // 2 minutes
-
-const tourneyCfg = loadConfig();
-
-const reader = readerConfig[tourneyCfg.scores.type].reader;
-const nameMap = tourneyCfg.scores.nameMap;
-console.log(tourneyCfg.scores.type);
-console.log(reader);
-const url = tourneyCfg.scores.url;
 
 function end() {
   mongooseUtil.close();
@@ -23,7 +14,10 @@ function end() {
 async function updateScores() {
   console.log("attempting update...");
   const access = await getActiveTourneyAccess();
-  await updateScore.run(access, reader, url, nameMap);
+  const tourneyCfg = await access.getTourneyConfig();
+
+  const reader = readerConfig[tourneyCfg.scoresSync.syncType].reader;
+  await updateScore.run(access, reader, tourneyCfg.scoresSync.url, tourneyCfg.scoresSync.nameMap);
   redis.pubSubClient.publish("scores:update", (new Date()).toString());
 }
 

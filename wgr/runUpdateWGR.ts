@@ -1,12 +1,11 @@
 import {getActiveTourneyAccess} from '../server/access';
 import * as mongooseUtil from '../server/mongooseUtil';
 import rawWgrReader from './rawWgrReader';
-import {loadConfig} from '../server/tourneyConfigReader';
 
 async function updateWGR() {
   const access = await getActiveTourneyAccess();
 
-  const tourneyCfg = loadConfig();
+  const tourneyCfg = await access.getTourneyConfig();
   const url = tourneyCfg.wgr.url;
   const nameMap = tourneyCfg.wgr.nameMap;
 

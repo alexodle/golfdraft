@@ -77,7 +77,7 @@
     "run:dev": "NODE_ENV=development concurrently --kill-others \"npm run watch:dev\" \"npm run start\"",
     "start": "tsc && node tsDist/server/server.js",
     "test": "./node_modules/.bin/mocha --exit --compilers ts:ts-node/register ./test/*Test.ts",
-    "refreshData": "tsc && node tsDist/server/refreshData.js",
+    "initTourney": "tsc && node tsDist/server/initTourney.js",
     "updateWgr": "tsc && node tsDist/wgr/runUpdateWGR.js",
     "updateScore": "tsc && node tsDist/scores_sync/runUpdateScore.js",
     "printGolfersWithoutWgr": "tsc && node tsDist/wgr/runPrintGolfersWithoutWgr.js"

@@ -24,7 +24,20 @@ export const initTestDb = once(async () => {
   await mongooseUtil.connect();
   await clear();
 
-  const tourneyId = await initNewTourney('Test Tourney', new Date());
+  const tourneyId = await initNewTourney({
+    name: 'Test Tourney',
+    startDate: new Date(),
+    scoresSync: {
+      syncType: 'test',
+      url: 'test',
+      nameMap: {},
+    },
+    draftOrder: [],
+    wgr: {
+      url: 'test',
+      nameMap: {},
+    }
+  });
   const appState = new models.AppState({
     activeTourneyId: tourneyId,
     isDraftPaused: true,

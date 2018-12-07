@@ -87,9 +87,21 @@ const appStateSchema = new mongoose.Schema({
 });
 
 const tourneySchema = new mongoose.Schema({
-  name: { type: String, required: true },
+  name: { type: String, required: true, unique: true },
   lastUpdated: { type: Date, required: true },
-  startDate: { type: Date, required: true }
+  startDate: { type: Date, required: true },
+  config: {
+    scoresSync: {
+      syncType: String,
+      url: String,
+      nameMap: [{ src: String, dest: String }],
+    },
+    draftOrder: [String],
+    wgr: {
+      url: String,
+      nameMap: [{ src: String, dest: String }],
+    }
+  }
 });
 
 export { User };

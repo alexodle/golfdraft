@@ -29,14 +29,18 @@ import {
   WGR,
   WGRDoc,
   TourneyDoc,
+  TourneyConfigSpec,
+  Tourney,
 } from './ServerTypes';
 import {
   chain,
   isEmpty,
   pick,
+  omit,
   uniq,
   keyBy,
   sortBy,
+  map
 } from 'lodash';
 
 const UNKNOWN_WGR = constants.UNKNOWN_WGR;
@@ -66,10 +70,50 @@ export function updateAppState(props: AppSettings) {
   return models.AppState.update({}, props, { upsert: true }).exec();
 }
 
-export async function initNewTourney(name: string, startDate: Date): Promise<string> {
-  const lastUpdated = new Date();
-  const tourney = new models.Tourney({ name, startDate, lastUpdated });
-  await tourney.save();
+function toNameMap(srcDestPairs: { src: string, dest: string }[]): { [key: string]: string } {
+  const obj = {};
+  srcDestPairs.forEach(p => obj[p.src] = p.dest);
+  return obj;
+}
+
+function configToTourneyObject(spec: TourneyConfigSpec): Tourney  {
+  const tourney = pick(spec, 'name', 'startDate') as Tourney;
+  tourney.lastUpdated = new Date();
+  tourney.config = {
+    scoresSync: {
+      syncType: spec.scoresSync.syncType,
+      url: spec.scoresSync.url,
+      nameMap: map(spec.scoresSync.nameMap, (v, k) => ({ src: k, dest: v })),
+    },
+    draftOrder: spec.draftOrder,
+    wgr: {
+      url: spec.wgr.url,
+      nameMap: map(spec.wgr.nameMap, (v, k) => ({ src: k, dest: v })),
+    }
+  };
+  return tourney;
+}
+
+function tourneyToConfigSpec(tourney: Tourney): TourneyConfigSpec {
+  const spec = pick(tourney, 'name', 'startDate') as TourneyConfigSpec;
+  spec.draftOrder = tourney.config.draftOrder;
+  spec.scoresSync = {
+    ...tourney.config.scoresSync,
+    nameMap: toNameMap(tourney.config.scoresSync.nameMap)
+  };
+  spec.wgr = {
+    ...tourney.config.wgr,
+    nameMap: toNameMap(tourney.config.wgr.nameMap)
+  };
+  return spec;
+}
+
+export async function initNewTourney(spec: TourneyConfigSpec): Promise<string> {
+  const q = { name: spec.name };
+  const tourneyObj = configToTourneyObject(spec);
+  await models.Tourney.update(q, tourneyObj, { upsert: true }).exec();
+
+  const tourney = await models.Tourney.findOne(q).exec();
   return tourney._id.toString();
 }
 
@@ -143,6 +187,11 @@ export class Access {
 
   async getTourney(): Promise<TourneyDoc> {
     return models.Tourney.findOne({ _id: this.tourneyId }).exec() as Promise<TourneyDoc>;
+  }
+
+  async getTourneyConfig(): Promise<TourneyConfigSpec> {
+    const tourney = await this.getTourney();
+    return tourneyToConfigSpec(tourney);
   }
 
   async getPickList(userId: string): Promise<string[]> {
