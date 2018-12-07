@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {Indexed, Tourney} from '../types/ClientTypes';
-import {sortBy} from 'lodash';
+import {orderBy} from 'lodash';
 
 interface TourneyHistoryProps {
   activeTourneyId: string;
@@ -15,7 +15,7 @@ export class TourneyHistory extends React.Component<TourneyHistoryProps, {}> {
   }
 
   render() {
-    const sortedTourneys = sortBy(this.props.allTourneys, t => t.startDate);
+    const sortedTourneys = orderBy(this.props.allTourneys, 'startDate', 'desc');
     const {activeTourneyId} = this.props;
     return (
       <section>
