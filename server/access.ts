@@ -233,7 +233,6 @@ export class Access {
     return update.exec();
   }
 
-
   async updatePickListFromNames(userId: string, pickListNames: string[]) {
     const MIN_COEFF = 0.5;
 

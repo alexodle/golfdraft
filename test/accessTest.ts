@@ -6,7 +6,6 @@ import {initTestDb} from './initTestConfig';
 import {mongoose} from '../server/mongooseUtil';
 import {Golfer, DraftPick, User} from '../server/ServerTypes';
 import {keyBy, pick} from 'lodash';
-import { access } from 'fs';
 
 const {ObjectId} = mongoose.Types;
 
@@ -54,7 +53,7 @@ describe('access', () => {
   describe('getPickList', () => {
     it('returns null for unset pickList', async () => {
       const access = await getActiveTourneyAccess();
-      const actualPickList = access.getPickList(new ObjectId('5a4d46c9b1a9473036f6a81a').toString());
+      const actualPickList = await access.getPickList(new ObjectId('5a4d46c9b1a9473036f6a81a').toString());
       should(actualPickList).be.a.null();
     });
   });
@@ -119,7 +118,7 @@ describe('access', () => {
       return assertPickListResult(
         userId,
         expected,
-        access.updatePickListFromNames(userId, names)
+        await access.updatePickListFromNames(userId, names)
       );
     });
 
@@ -135,13 +134,14 @@ describe('access', () => {
       
       const result = await access.updatePickListFromNames(userId, names);
       result.completed.should.be.false();
+      /*
+          type: 'SUGGESTION',
+          source: levResult.source,
+          suggestion: bestResult.target,
+          allResults,
+          isGoodSuggestion*/
       result.suggestions.should.containDeepOrdered([
-        { source: 'JaCk niCklauss', results: [
-          { target: 'Jack Nicklaus' },
-          { target: 'Gary User' },
-          { target: 'Bobby Jones' },
-          { target: 'Tiger Woods' }
-        ]}
+        { type: 'SUGGESTION', source: 'JaCk niCklauss', suggestion: 'Jack Nicklaus', isGoodSuggestion: true }
       ]);
 
       const actualPickList = await access.getPickList(userId);
@@ -155,8 +155,11 @@ describe('access', () => {
     let golfers = null;
 
     async function fillUsers(access: Access) {
-      await access.ensureUsers([{ name: 'User1' }, { name: 'User2' }] as User[]);
-      const _users = access.getUsers();
+      await access.ensureUsers([
+        { name: 'User1', username: 'user1', password: 'pwd' },
+        { name: 'User2', username: 'user2', password: 'pwd' }] as User[]
+      );
+      const _users = await access.getUsers();
       users = keyBy(_users, g => g.name);
       
       const pickOrder = tourneyUtils.snakeDraftOrder([
@@ -191,7 +194,7 @@ describe('access', () => {
 
       const newPick = {
         user: users['User1']._id,
-        golfer: golfers['Golfer2']._id,
+        golfer: golfers['Golfer1']._id,
         pickNumber: 0
       };
       await access.makePickListPick(users['User1']._id.toString(), 0);
@@ -223,8 +226,11 @@ describe('access', () => {
     let golfers = null;
 
     async function fillUsers(access: Access) {
-      await access.ensureUsers([{ name: 'User1' }, { name: 'User2' }] as User[]);
-      const _users = access.getUsers();
+      await access.ensureUsers([
+        { name: 'User1', username: 'user1', password: 'pwd' },
+        { name: 'User2', username: 'user2', password: 'pwd' }] as User[]
+      );
+      const _users = await access.getUsers();
       users = keyBy(_users, g => g.name);
       
       const pickOrder = tourneyUtils.snakeDraftOrder([
