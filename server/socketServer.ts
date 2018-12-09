@@ -7,7 +7,7 @@ io.on('connection', async socket => {
 
   if (session.passport && session.passport.user) {
     const user = await getUserByUsername(session.passport.user);
-    userAccess.onUserActivity(session.id, user._id.toString());
+    userAccess.onUserActivity(session.id, user._id.toString(), 'socket/login');
   }
 
   socket.on('disconnect', () => userAccess.onUserLogout(session.id));

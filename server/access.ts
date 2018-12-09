@@ -36,7 +36,6 @@ import {
   chain,
   isEmpty,
   pick,
-  omit,
   uniq,
   keyBy,
   sortBy,
@@ -59,7 +58,7 @@ export function getAccess(tourneyId: string): Access {
 }
 
 export async function ensureUsers(allUsers: User[]) {
-  const users = await this.getUsers();
+  const users = await getUsers();
   const existingUsersByName = keyBy(users, 'name');
   const usersToAdd = allUsers.filter(json => !existingUsersByName[json.name]);
   const promises = usersToAdd.map(u => {

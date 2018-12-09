@@ -115,7 +115,7 @@ async function defineRoutes() {
   // Ensure req is fully populated
   app.use((req: Request, res: Response, next: NextFunction) => {
     if (req.user) {
-      userAccess.onUserActivity(req.session.id, req.user._id.toString());
+      userAccess.onUserActivity(req.session.id, req.user._id.toString(), `${req.method}::${req.path}`);
     }
     req.access = req.access || activeTourneyAccess;
     next();
