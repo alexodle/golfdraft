@@ -1,13 +1,10 @@
-import * as _ from 'lodash';
+import {isEmpty, uniq} from 'lodash';
 import * as React from 'react';
 import DraftActions from '../actions/DraftActions';
-import GolferLogic from '../logic/GolferLogic';
-import GolferStore from '../stores/GolferStore';
 import {Indexed} from '../types/ClientTypes';
 import {postJson} from '../fetch';
 
 const TEXTAREA_PLACEHOLDER = "Sergio Garcia\nPhil Mickelson\nTiger Woods\nDustin Johnson\nJason Day\n...";
-
 
 interface SuggestionOption {
   target: string;
@@ -120,12 +117,10 @@ class SuggestionSelector extends React.Component<SuggestionSelectorProps, Sugges
 
   _renderChoices() {
     const selectedValue = this.props.selectedValue;
-    const disabled = this.props.disabled;
     const hasGoodSuggestion = this.props.hasGoodSuggestion;
-    const suggestions = _.chain(this.props.suggestion.allResults)
-      .map('target')
-      .sortBy()
-      .value();
+    const suggestions = this.props.suggestion.allResults
+      .map(r => r.target)
+      .sort();
 
     return (
       <section>
@@ -137,7 +132,7 @@ class SuggestionSelector extends React.Component<SuggestionSelectorProps, Sugges
           value={selectedValue}
           onChange={this._onSelectValueChange}
         >
-          {_.map(suggestions, (targetName, i) => (
+          {suggestions.map(targetName => (
               <option key={targetName} value={targetName}>{targetName}</option>
           ))}
         </select>
@@ -162,7 +157,7 @@ class SuggestionSelectors extends React.Component<SuggestionSelectorsProps, Sugg
     super(props);
 
     const initialSelections = {};
-    _.each(props.suggestions, s => {
+    props.suggestions.forEach(s => {
       if (s.type === "EXACT") {
         initialSelections[s.source] = s.source;
       } else {
@@ -192,7 +187,7 @@ class SuggestionSelectors extends React.Component<SuggestionSelectorsProps, Sugg
           <div className='alert alert-danger'>{errorMessage}</div>
         )}
         <div className='alert alert-warning'>Could not find an exact name match for all golfers. Please verify the following matches are correct:</div>
-        {_.map(suggestions, s => (s.type === "EXACT" ? null : (
+        {suggestions.map(s => (s.type === "EXACT" ? null : (
           <SuggestionSelector
             key={s.source}
             hasGoodSuggestion={s.isGoodSuggestion}
@@ -226,7 +221,7 @@ class SuggestionSelectors extends React.Component<SuggestionSelectorsProps, Sugg
   }
 
   _onSave = () => {
-    const newPicks = _.map(this.props.suggestions, s => this.state.selections[s.source]);
+    const newPicks = this.props.suggestions.map(s => this.state.selections[s.source]);
     this.props.onSave(newPicks);
   }
 
@@ -297,7 +292,7 @@ export default class FreeTextPickListEditor extends React.Component<FreeTextPick
             className='btn btn-primary'
             type='button'
             onClick={this._onSaveFreeText}
-            disabled={isPosting || _.isEmpty(text)}
+            disabled={isPosting || isEmpty(text)}
           >Save</button>
         </div>
         <p>One golfer per line:</p>
@@ -324,39 +319,36 @@ export default class FreeTextPickListEditor extends React.Component<FreeTextPick
     });
   }
 
-  _save(pickListNames: string[]) {
+  async _save(pickListNames: string[]) {
     this.setState({ isPosting: true });
 
     const data = { pickListNames };
-    postJson('/draft/pickList', data)
+    const result = await postJson('/draft/pickList', data);
 
-      .then((result) => {
-        DraftActions.setPickList(result.pickList);
-        this.props.onComplete();
-      })
+    try {
+      DraftActions.setPickList(result.pickList);
+      this.props.onComplete();
+    } catch (err) {
+      const resp = err.response as Response;
+      if (resp.status === 300) {
+        const json = await resp.json();
+        this._setSuggestions(json.suggestions);
+      } else {
+        this.setState({
+          isPosting: false,
+          errorMessage: 'Failed to save pickList. Try again in a minute. If that doesn\'t work, contact Odle.'
+        });
+      }
 
-      .catch((err) => {
-        const resp = err.response as Response;
-        if (resp.status === 300) {
-          return resp.json()
-            .then(json => this._setSuggestions(json.suggestions));
-        } else {
-          this.setState({
-            isPosting: false,
-            errorMessage: 'Failed to save pickList. Try again in a minute. If that doesn\'t work, contact Odle.'
-          });
-        }
-
-        window.location.href = '#InlinePickListEditor';
-      });
+      window.location.href = '#InlinePickListEditor';
+    }
   }
   
   _cleanedGolfers() {
-    return _.chain(this.state.text.split('\n'))
+    return uniq(this.state.text
+      .split('\n')
       .map(l => l.trim())
-      .reject(_.isEmpty)
-      .uniq()
-      .value();
+      .filter(g => !isEmpty(g)));
   }
 
 };

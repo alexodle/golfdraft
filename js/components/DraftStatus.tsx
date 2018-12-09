@@ -1,4 +1,3 @@
-import * as _ from 'lodash';
 import DraftActions from '../actions/DraftActions';
 import UserStore from '../stores/UserStore';
 import * as React from 'react';

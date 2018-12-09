@@ -1,6 +1,5 @@
-import * as _ from 'lodash';
+import {isArray, isEmpty, isNumber} from 'lodash';
 import * as React from 'react';
-import AppConstants from '../constants/AppConstants';
 import DraftActions from '../actions/DraftActions';
 import FreeTextPickListEditor from './FreeTextPickListEditor';
 import GolferLogic from '../logic/GolferLogic';
@@ -33,11 +32,11 @@ export default class PickListEditor extends React.Component<PickListEditorProps,
   }
 
   render() {
-    if (!_.isArray(this.props.syncedPickList)) {
+    if (!isArray(this.props.syncedPickList)) {
       return this._renderLoading();
     }
 
-    const hasPickList = !_.isEmpty(this.props.pendingPickList);
+    const hasPickList = !isEmpty(this.props.pendingPickList);
     if (this.state.isFreeTextMode || !hasPickList) {
       return (
         <FreeTextPickListEditor
@@ -53,9 +52,9 @@ export default class PickListEditor extends React.Component<PickListEditorProps,
     const draggingHoverIndex = this.state.draggingHoverIndex;
     const unsavedChanges = this.props.syncedPickList !== this.props.pendingPickList;
     const preDraftMode = this.props.preDraftMode;
-    const draggingGolferId = _.isNumber(draggingIndex) ? pickList[draggingIndex] : null;
+    const draggingGolferId = isNumber(draggingIndex) ? pickList[draggingIndex] : null;
 
-    if (_.isNumber(draggingHoverIndex)) {
+    if (isNumber(draggingHoverIndex)) {
       pickList = this._newOrder(draggingIndex, draggingHoverIndex);
     }
 
@@ -102,7 +101,7 @@ export default class PickListEditor extends React.Component<PickListEditorProps,
             <table className="table table-condensed table-striped">
               <thead></thead>
               <tbody>
-                {_.map(pickList, (gid, i) => {
+                {pickList.map((gid, i) => {
                   const g = GolferStore.getGolfer(gid);
                   return (
                     <tr

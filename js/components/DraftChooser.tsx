@@ -1,9 +1,8 @@
 import {Golfer, IndexedGolfers, DraftPickOrder, User} from '../types/ClientTypes';
-import * as _ from 'lodash';
+import {isEmpty, isArray, sortBy, first} from 'lodash';
 import * as cx from 'classnames';
 import * as React from 'react';
 import * as utils from '../../common/utils';
-import AppConstants from '../constants/AppConstants';
 import constants from '../../common/constants';
 import DraftActions from '../actions/DraftActions';
 import GolfDraftPanel from './GolfDraftPanel';
@@ -28,7 +27,7 @@ function isProxyPick(props: DraftChooserProps) {
 }
 
 function shouldShowPickListOption(props: DraftChooserProps) {
-  return isProxyPick(props) || !_.isEmpty(props.syncedPickList);
+  return isProxyPick(props) || !isEmpty(props.syncedPickList);
 }
 
 export default class DraftChooser extends React.Component<DraftChooserProps, DraftChooserState> {
@@ -135,7 +134,7 @@ export default class DraftChooser extends React.Component<DraftChooserProps, Dra
                 size={10}
                 className='form-control'
               >
-                {_.map(sortedGolfers, (g) => {
+                {sortedGolfers.map(g => {
                   return (
                     <option key={g._id} value={g._id}>
                       {GolferLogic.renderGolfer(g)}
@@ -166,7 +165,7 @@ export default class DraftChooser extends React.Component<DraftChooserProps, Dra
   }
 
   _isLoading() {
-    return !_.isArray(this.props.syncedPickList);
+    return !isArray(this.props.syncedPickList);
   }
 
   _isProxyPick() {
@@ -180,12 +179,10 @@ export default class DraftChooser extends React.Component<DraftChooserProps, Dra
         // special case, we cannot show the full list if this a proxy pick
         return null;
       } else {
-        return _.chain(this.props.syncedPickList)
-          .map(GolferStore.getGolfer)
-          .value();
+        return this.props.syncedPickList.map(GolferStore.getGolfer);
       }
     }
-    return _.sortBy(golfers, [sortKey, 'name']);
+    return sortBy(golfers, [sortKey, 'name']);
   }
 
   _getSelectionState(props: DraftChooserProps) {
@@ -200,7 +197,7 @@ export default class DraftChooser extends React.Component<DraftChooserProps, Dra
     }
 
     if (!selectedGolfer || !golfersRemaining[selectedGolfer]) {
-      const firstGolfer = _.first(this._sortedGolfers(golfersRemaining, sortKey));
+      const firstGolfer = first(this._sortedGolfers(golfersRemaining, sortKey));
       selectedGolfer = firstGolfer ? firstGolfer._id : null;
     }
     return {
@@ -217,7 +214,7 @@ export default class DraftChooser extends React.Component<DraftChooserProps, Dra
     if (sortKey === this.state.sortKey) return;
 
     const golfersRemaining = this.props.golfersRemaining;
-    const firstGolfer = _.first(this._sortedGolfers(golfersRemaining, sortKey));
+    const firstGolfer = first(this._sortedGolfers(golfersRemaining, sortKey));
     const selectedGolfer = firstGolfer ? firstGolfer._id : null;
     this.setState({
       sortKey: sortKey,

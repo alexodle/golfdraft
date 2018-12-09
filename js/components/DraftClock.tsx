@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import {isEmpty, last} from 'lodash';
 import Assets from '../constants/Assets';
 import * as moment from 'moment';
 import * as React from 'react';
@@ -32,7 +32,7 @@ export default class DraftClock extends React.Component<DraftClockProps, DraftCl
   }
 
   _getInitialState() {
-    return _.extend({ intervalId: null }, this._getTotalMillis());
+    return { intervalId: null, ...this._getTotalMillis() };
   }
 
   componentDidMount() {
@@ -106,11 +106,11 @@ export default class DraftClock extends React.Component<DraftClockProps, DraftCl
   _getTotalMillis(props? : DraftClockProps) {
     props = props || this.props;
 
-    if (_.isEmpty(props.draftPicks) || !this.props.allowClock) {
+    if (isEmpty(props.draftPicks) || !this.props.allowClock) {
       return { totalMillis: null };
     }
 
-    const lastPick = _.last(props.draftPicks);
+    const lastPick = last(props.draftPicks);
     const currentTime = new Date();
     const totalMillis = Math.max(0, currentTime.getTime() - lastPick.clientTimestamp.getTime());
     return {

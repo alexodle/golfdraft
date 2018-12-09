@@ -1,9 +1,8 @@
-import DraftStore from '../stores/DraftStore';;
-import GolferLogic from '../logic/GolferLogic';;
-import GolferStore from '../stores/GolferStore';;
+import GolferLogic from '../logic/GolferLogic';
+import GolferStore from '../stores/GolferStore';
 import * as React from 'react';
-import UserStore from '../stores/UserStore';;
-import * as _ from 'lodash';;
+import UserStore from '../stores/UserStore';
+import {clone, partial} from 'lodash';
 import GolfDraftPanel from './GolfDraftPanel';
 import {DraftPick} from '../types/ClientTypes';
 
@@ -18,12 +17,12 @@ export default class DraftHistory extends React.Component<DraftHistoryProps, {}>
   render() {
     const selectedUserId = this.props.selectedUserId;
     const onPersonClick = this.props.onSelectionChange ? this._onPersonClick : null;
-    let draftPicks = _.clone(this.props.draftPicks).reverse();
+    let draftPicks = clone(this.props.draftPicks).reverse();
     let heading: JSX.Element | string;
 
     heading = 'Draft History';
     if (selectedUserId) {
-      draftPicks = _.filter(draftPicks, { user: selectedUserId });
+      draftPicks = draftPicks.filter(dp => dp.user === selectedUserId);
       heading = (
         <span>
           <a href='#DraftHistory' onClick={this._onDeselectPerson}>Draft History</a>
@@ -44,14 +43,14 @@ export default class DraftHistory extends React.Component<DraftHistoryProps, {}>
           <table className='table'>
             <thead><tr><th>#</th><th>Pool User</th><th>Golfer</th></tr></thead>
             <tbody>
-              {_.map(draftPicks, (p) => {
+              {draftPicks.map(p => {
                 const userName = UserStore.getUser(p.user).name;
                 return (
                   <tr key={p.pickNumber}>
                     <td>{p.pickNumber + 1}</td>
                     <td>
                       {selectedUserId ? userName : (
-                        <a href='#DraftHistory' onClick={!onPersonClick ? null : _.partial(onPersonClick, p.user)}>
+                        <a href='#DraftHistory' onClick={!onPersonClick ? null : partial(onPersonClick, p.user)}>
                           {userName}
                         </a>
                       )}

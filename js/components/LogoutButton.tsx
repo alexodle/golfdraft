@@ -1,4 +1,3 @@
-import * as _ from 'lodash';
 import * as React from 'react';
 import UserActions from '../actions/UserActions';
 import {User} from '../types/ClientTypes';

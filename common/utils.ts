@@ -1,15 +1,5 @@
-import * as _ from 'lodash';
+import {some} from 'lodash';
 import constants from './constants';
-
-_.mixin({
-
-  lock: function (fn) {
-    return function () {
-      return fn();
-    };
-  }
-
-});
 
 export function getOrdinal(n: number): string {
   const s=["th","st","nd","rd"],
@@ -43,5 +33,5 @@ export function oidsAreEqual(a: any, b: any) {
 }
 
 export function containsObjectId(oidList: any[], targetOid: any) {
-  return _.some(oidList, _.partial(oidsAreEqual, targetOid));
+  return some(oidList, oid => oidsAreEqual(oid, targetOid));
 }

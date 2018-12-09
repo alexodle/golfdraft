@@ -1,9 +1,7 @@
-import * as _ from 'lodash';
+import {take, includes, partial} from 'lodash';
 import * as cx from 'classnames';
-import DraftStore from '../stores/DraftStore';
 import * as React from 'react';
 import UserStore from '../stores/UserStore';
-import GolfDraftPanel from './GolfDraftPanel';
 import {DraftPickOrder, User, Indexed} from '../types/ClientTypes';
 import constants from '../../common/constants';
 
@@ -22,7 +20,7 @@ export default class DraftPickOrderView extends React.Component<DraftPickOrderPr
     const {pickingForUsers, currentPick, currentUser, autoPickUsers} = this.props;
     const myUser = currentUser._id;
 
-    const pickOrder = _.take(this.props.pickOrder, this.props.pickOrder.length / constants.NGOLFERS);
+    const pickOrder = take(this.props.pickOrder, this.props.pickOrder.length / constants.NGOLFERS);
 
     return (
       <div>
@@ -33,14 +31,14 @@ export default class DraftPickOrderView extends React.Component<DraftPickOrderPr
           <b>Pro Tip:</b> click on a user to see their picks
         </small></p>
         <ol className='pick-order-list'>
-          {_.map(pickOrder, (pick, i) => {
+          {pickOrder.map(pick => {
             return (
               <li
                 key={pick.user}
                 className={cx({
                   'my-user': (
                     myUser === pick.user ||
-                    _.includes(pickingForUsers, pick.user)
+                    includes(pickingForUsers, pick.user)
                   ),
                   'current-user': currentPick.user === pick.user
                 })}
@@ -48,7 +46,7 @@ export default class DraftPickOrderView extends React.Component<DraftPickOrderPr
                 {!autoPickUsers[pick.user] ? null : (
                   <span><span className='label label-success auto-label'>AUTO</span> </span>
                 )}
-                <a href='#DraftHistory' onClick={_.partial(this._onSelect, pick.user)}>
+                <a href='#DraftHistory' onClick={partial(this._onSelect, pick.user)}>
                   {UserStore.getUser(pick.user).name}
                 </a>
               </li>);
