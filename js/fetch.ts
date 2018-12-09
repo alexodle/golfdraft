@@ -1,10 +1,8 @@
 // fetch polyfill
 import 'whatwg-fetch';
 
-import * as _ from 'lodash';
-
 function ensureCredentials(init: RequestInit): RequestInit {
-  return _.extend({ credentials: "same-origin" }, init);
+  return { credentials: 'same-origin', ...init };
 }
 
 function ensureSuccess(resp: Response): Response {
@@ -15,22 +13,16 @@ function ensureSuccess(resp: Response): Response {
   throw error;
 }
 
-function _fetch(url: string, init: RequestInit) {
-  return window.fetch(url, ensureCredentials(init))
-    .then(ensureSuccess)
-    .then((resp) => {
-      if (!resp.json) return null;
-      try {
-        return resp.json()
-          .catch((err) => {
-            console.debug(err);
-            return null;
-          });
-      } catch (e) {
-        console.debug(e);
-        return null;
-      }
-    })
+async function _fetch(url: string, init: RequestInit) {
+  const resp = ensureSuccess(await window.fetch(url, ensureCredentials(init)));
+  if (!resp.json) return null;
+  
+  try {
+    return await resp.json();
+  } catch (e) {
+    console.debug(e);
+    return null;
+  }
 }
 
 export function fetch(url: string, init?: RequestInit) {

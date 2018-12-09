@@ -36,7 +36,6 @@ import {
   chain,
   isEmpty,
   pick,
-  omit,
   uniq,
   keyBy,
   sortBy,
@@ -56,6 +55,14 @@ export function getAccess(tourneyId: string): Access {
 
   obj = _cache[tourneyId] = new Access(tourneyId);
   return obj;
+}
+
+export async function getUser(userId: string): Promise<UserDoc> {
+  return models.User.findOne({ _id: userId }).exec() as Promise<UserDoc>;
+}
+
+export async function getUserByUsername(username: string): Promise<UserDoc> {
+  return models.User.findOne({ username }).exec() as Promise<UserDoc>;
 }
 
 export function getAllTourneys(): Promise<TourneyDoc[]> {
@@ -297,14 +304,6 @@ export class Access {
     const golfer = await models.Golfer.findOne(query).exec() as GolferDoc;
     const wgr = await models.WGR.findOne({ name: golfer.name }).exec() as WGRDoc;
     return mergeWGR(golfer, wgr);
-  }
-
-  async getUser(userId: string): Promise<UserDoc> {
-    return models.User.findOne({ _id: userId }).exec() as Promise<UserDoc>;
-  }
-
-  async getUserByUsername(username: string): Promise<UserDoc> {
-    return models.User.findOne({ username }).exec() as Promise<UserDoc>;
   }
 
   async getGolfers(): Promise<Golfer[]> {
