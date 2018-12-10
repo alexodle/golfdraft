@@ -1,7 +1,7 @@
 import * as should from 'should';
 import * as tourneyUtils from '../server/tourneyUtils';
 import * as models from '../server/models';
-import {Access, getActiveTourneyAccess} from '../server/access';
+import {Access, getActiveTourneyAccess, getUsers, ensureUsers} from '../server/access';
 import {initTestDb} from './initTestConfig';
 import {mongoose} from '../server/mongooseUtil';
 import {Golfer, DraftPick, User} from '../server/ServerTypes';
@@ -24,14 +24,6 @@ function clear() {
     models.User.remove({}).exec(),
     models.WGR.remove({}).exec(),
   ]);
-}
-
-function expectFailure() {
-  'Should not be here. Expected failure, got success.'.should.not.be.ok();
-}
-
-function expectSuccess(err) {
-  ('Should not be here. Expected success, got error: ' + err.message).should.not.be.ok();
 }
 
 async function assertPickListResult(userId, expected, promise) {
@@ -155,11 +147,11 @@ describe('access', () => {
     let golfers = null;
 
     async function fillUsers(access: Access) {
-      await access.ensureUsers([
+      await ensureUsers([
         { name: 'User1', username: 'user1', password: 'pwd' },
         { name: 'User2', username: 'user2', password: 'pwd' }] as User[]
       );
-      const _users = await access.getUsers();
+      const _users = await getUsers();
       users = keyBy(_users, g => g.name);
       
       const pickOrder = tourneyUtils.snakeDraftOrder([
@@ -226,11 +218,11 @@ describe('access', () => {
     let golfers = null;
 
     async function fillUsers(access: Access) {
-      await access.ensureUsers([
+      await ensureUsers([
         { name: 'User1', username: 'user1', password: 'pwd' },
         { name: 'User2', username: 'user2', password: 'pwd' }] as User[]
       );
-      const _users = await access.getUsers();
+      const _users = await getUsers();
       users = keyBy(_users, g => g.name);
       
       const pickOrder = tourneyUtils.snakeDraftOrder([

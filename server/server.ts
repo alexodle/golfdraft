@@ -1,4 +1,12 @@
-import {getAccess, getActiveTourneyAccess, getAllTourneys, getAppState, updateAppState, Access} from './access';
+import {
+  getAccess,
+  getActiveTourneyAccess,
+  getAllTourneys,
+  getAppState,
+  getUsers,
+  updateAppState,
+  Access
+} from './access';
 import {find} from 'lodash';
 import * as bodyParser from 'body-parser';
 import * as chatBot from './chatBot';
@@ -169,7 +177,7 @@ async function defineRoutes() {
     const tourneyId = access.getTourneyId();
     const [golfers, users, draft, tourneyStandings, appState, allTourneys] = await Promise.all([
       access.getGolfers(),
-      access.getUsers(),
+      getUsers(),
       access.getDraft(),
       access.getTourneyStandings(),
       getAppState(),

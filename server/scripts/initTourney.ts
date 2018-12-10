@@ -1,12 +1,12 @@
 import {sortBy} from 'lodash';
-import {initNewTourney, getAccess, updateAppState} from './access';
-import * as mongooseUtil from './mongooseUtil';
-import * as updateScore from '../scores_sync/updateScore';
-import {loadConfig} from './tourneyConfigReader';
-import * as tourneyUtils from './tourneyUtils';
-import * as fs from 'fs';
-import readerConfig from '../scores_sync/readerConfig';
-import {User, TourneyConfigSpec} from './ServerTypes';
+import {initNewTourney, getAccess, ensureUsers, getUsers, updateAppState} from '../access';
+import * as mongooseUtil from '../mongooseUtil';
+import * as updateScore from '../../scores_sync/updateScore';
+import {loadConfig} from '../tourneyConfigReader';
+import * as tourneyUtils from '../tourneyUtils';
+import { readFileSync } from 'fs';
+import readerConfig from '../../scores_sync/readerConfig';
+import {User, TourneyConfigSpec} from '../ServerTypes';
 
 
 function nameToUsername(name: string) {
@@ -15,23 +15,19 @@ function nameToUsername(name: string) {
     .replace(' ', '_');
 }
 
-async function initTourney(tourneyCfg: TourneyConfigSpec) {
-  console.log(JSON.stringify(tourneyCfg.draftOrder));
-  console.log("Reader: " + tourneyCfg.scoresSync.syncType);
-  console.log("Reader URL: " + tourneyCfg.scoresSync.url);
-
+export async function initTourney(tourneyCfg: TourneyConfigSpec): Promise<string> {
   const tourneyId = await initNewTourney(tourneyCfg);
   const access = getAccess(tourneyId);
   
-  const userInitCfg: {[key: string]: { password: string }} = JSON.parse(fs.readFileSync('init_user_cfg.json', 'utf8'));
+  const userInitCfg: {[key: string]: { password: string }} = JSON.parse(readFileSync('init_user_cfg.json', 'utf8'));
   const userSpecs: User[] = tourneyCfg.draftOrder.map(name => ({
     name: name,
     username: nameToUsername(name),
     password: userInitCfg[name].password,
   } as User));
-  await access.ensureUsers(userSpecs);
+  await ensureUsers(userSpecs);
   
-  const users = await access.getUsers();
+  const users = await getUsers();
   const sortedUsers = sortBy(users, p => tourneyCfg.draftOrder.indexOf(p.name));
   
   const pickOrder = tourneyUtils.snakeDraftOrder(sortedUsers);
@@ -52,28 +48,26 @@ async function initTourney(tourneyCfg: TourneyConfigSpec) {
     draftHasStarted: false,
     autoPickUsers: []
   });
+
+  return tourneyId;
 }
 
 async function run(configPath: string) {
   try {
     await mongooseUtil.connect();
     const tourneyCfg = loadConfig(configPath);
-    console.log(tourneyCfg);
+    console.log(JSON.stringify(tourneyCfg, null, 2));
     await initTourney(tourneyCfg);
-  } catch (err) {
-    if (err.stack) {
-      console.log(err.stack);
-    } else {
-      console.log(err);
-    }
   } finally {
     mongooseUtil.close();
   }
 }
 
-if (process.argv.length !== 3) {
-  console.error('Usage: node initTourney.js <tourney_config>');
-  process.exit(1);
+if (require.main === module) {
+  if (process.argv.length !== 3) {
+    console.error('Usage: node initTourney.js <tourney_config>');
+    process.exit(1);
+  }
+  
+  run(process.argv[2]);
 }
-
-run(process.argv[2]);

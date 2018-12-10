@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import {clone, flatten} from 'lodash';
 import {DraftPick, User} from './ServerTypes';
 
 /**
@@ -6,15 +6,14 @@ import {DraftPick, User} from './ServerTypes';
  in snake draft order.
  */
 export function snakeDraftOrder(userOrder: User[]) : DraftPick[] {
-  const reverseOrder = _.clone(userOrder).reverse();
-  const fullOrder = _.flatten([
+  const reverseOrder = clone(userOrder).reverse();
+  const fullOrder = flatten([
     userOrder,
     reverseOrder,
     userOrder,
     reverseOrder
   ]);
-  const pickOrder = _.map(fullOrder, (user, i) => {
-    return { pickNumber: i, user: user._id } as DraftPick;
-  });
+  const pickOrder = fullOrder.map((user, i) =>
+    ({ pickNumber: i, user: user._id } as DraftPick));
   return pickOrder;
 }

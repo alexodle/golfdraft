@@ -1,4 +1,4 @@
-import {getActiveTourneyAccess} from '../server/access';
+import {getActiveTourneyAccess, getUser} from '../server/access';
 import * as utils from '../common/utils';
 import constants from '../common/constants';
 import {
@@ -12,9 +12,9 @@ async function loadPick(draft: Draft, draftPick: DraftPick): Promise<{ pickUser:
   const nextPick = draft.pickOrder[draft.picks.length];
   const access = await getActiveTourneyAccess();
   const [pickUser, pickGolfer, nextUser] = await Promise.all([
-    access.getUser(draftPick.user.toString()),
+    getUser(draftPick.user.toString()),
     access.getGolfer(draftPick.golfer.toString()),
-    nextPick ? access.getUser(nextPick.user.toString()) : null,
+    nextPick ? getUser(nextPick.user.toString()) : null,
   ]);
   return { pickUser, pickGolfer, nextUser };
 }

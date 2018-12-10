@@ -127,3 +127,7 @@ export interface TourneyConfigSpec {
     nameMap: { [name: string]: string };
   };
 }
+
+export interface DraftExport {
+  draftPicks: { user: string, golfer: string, pickNumber: number }[];
+}

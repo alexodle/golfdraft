@@ -58,6 +58,33 @@ export function getAccess(tourneyId: string): Access {
   return obj;
 }
 
+export async function ensureUsers(allUsers: User[]) {
+  const users = await this.getUsers();
+  const existingUsersByName = keyBy(users, 'name');
+  const usersToAdd = allUsers.filter(json => !existingUsersByName[json.name]);
+  const promises = usersToAdd.map(u => {
+    return new Promise((resolve, reject) => {
+      (<any>models.User).register(new models.User({ username: u.username, name: u.name }), u.password, (err) => {
+        if (err) reject(err);
+        resolve();
+      });
+    });
+  });
+  return Promise.all(promises);
+}
+
+export async function getUsers(): Promise<UserDoc[]> {
+  return models.User.find({}).exec() as Promise<UserDoc[]>;
+}
+
+export async function getUser(userId: string): Promise<UserDoc> {
+  return models.User.findOne({ _id: userId }).exec() as Promise<UserDoc>;
+}
+
+export async function getUserByUsername(username: string): Promise<UserDoc> {
+  return models.User.findOne({ username }).exec() as Promise<UserDoc>;
+}
+
 export function getAllTourneys(): Promise<TourneyDoc[]> {
   return models.Tourney.find().exec() as Promise<TourneyDoc[]>;
 }
@@ -298,14 +325,6 @@ export class Access {
     return mergeWGR(golfer, wgr);
   }
 
-  async getUser(userId: string): Promise<UserDoc> {
-    return models.User.findOne({ _id: userId }).exec() as Promise<UserDoc>;
-  }
-
-  async getUserByUsername(username: string): Promise<UserDoc> {
-    return models.User.findOne({ username }).exec() as Promise<UserDoc>;
-  }
-
   async getGolfers(): Promise<Golfer[]> {
     const [_wgrs, _golfers] = await Promise.all([
       models.WGR.find().exec(),
@@ -313,10 +332,6 @@ export class Access {
     ]);
     const wgrs = keyBy(_wgrs as WGRDoc[], 'name');
     return (_golfers as GolferDoc[]).map(g => mergeWGR(g, wgrs[g.name]));
-  }
-
-  async getUsers(): Promise<UserDoc[]> {
-    return models.User.find({}).exec() as Promise<UserDoc[]>;
   }
 
   async getScores(): Promise<GolferScoreDoc[]> {
@@ -453,21 +468,6 @@ export class Access {
       props,
       { upsert: true }
     ).exec();
-  }
-
-  async ensureUsers(allUsers: User[]) {
-    const users = await this.getUsers();
-    const existingUsersByName = keyBy(users, 'name');
-    const usersToAdd = allUsers.filter(json => !existingUsersByName[json.name]);
-    const promises = usersToAdd.map(u => {
-      return new Promise((resolve, reject) => {
-        (<any>models.User).register(new models.User({ username: u.username, name: u.name }), u.password, (err) => {
-          if (err) reject(err);
-          resolve();
-        });
-      });
-    });
-    return Promise.all(promises);
   }
 
   async ensureGolfers(objs: Golfer[]) {
