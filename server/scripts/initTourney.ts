@@ -29,7 +29,6 @@ export async function initTourney(tourneyCfg: TourneyConfigSpec): Promise<string
   
   const users = await getUsers();
   const sortedUsers = sortBy(users, p => tourneyCfg.draftOrder.indexOf(p.name));
-  
   const pickOrder = tourneyUtils.snakeDraftOrder(sortedUsers);
   await access.setPickOrder(pickOrder);
   
@@ -53,9 +52,9 @@ export async function initTourney(tourneyCfg: TourneyConfigSpec): Promise<string
 }
 
 async function run(configPath: string) {
+  const tourneyCfg = loadConfig(configPath);
   try {
     await mongooseUtil.connect();
-    const tourneyCfg = loadConfig(configPath);
     console.log(JSON.stringify(tourneyCfg, null, 2));
     await initTourney(tourneyCfg);
   } finally {

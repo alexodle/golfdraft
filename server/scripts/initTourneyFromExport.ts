@@ -29,6 +29,7 @@ async function initTourneyFromExport(tourneyCfg: TourneyConfigSpec, draftExport:
   assert(draftPicks.length % NGOLFERS === 0,
     `Expected number of picks to be multiple of ${NGOLFERS}, actual length: ${draftPicks.length}`);
   tourneyCfg.draftOrder = take(draftPicks, draftPicks.length / NGOLFERS).map(dp => ensureTruthy(dp.user, `Empty user found in export`));
+  console.log(JSON.stringify(tourneyCfg, null, 2));
   const tourneyId = await initTourney(tourneyCfg);
 
   // Replay picks
