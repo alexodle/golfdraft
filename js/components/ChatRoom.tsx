@@ -1,4 +1,4 @@
-import {isEmpty, sortBy, escape, some, map} from 'lodash';
+import {isEmpty, sortBy, escape, some, map, findIndex} from 'lodash';
 import * as moment from 'moment';
 import * as React from 'react';
 import Assets from '../constants/Assets';
@@ -260,6 +260,8 @@ class Message extends React.PureComponent<MessageProps, {}> {
 
 };
 
+const DEFAULT_PAGE_SIZE = 25;
+
 export interface ChatRoomProps {
   enabled: boolean;
   messages: ChatMessage[];
@@ -267,17 +269,27 @@ export interface ChatRoomProps {
   currentUser: User;
 }
 
-export default class ChatRoom extends React.PureComponent<ChatRoomProps, {}> {
+export interface ChatRoomState {
+  pageIndex: number;
+}
+
+export default class ChatRoom extends React.PureComponent<ChatRoomProps, ChatRoomState> {
+
+  constructor(props) {
+    super(props);
+    this.state = { pageIndex: null };
+  }
 
   componentDidMount() {
-    this._forceScroll();
+    this.forceScroll();
   }
 
   componentDidUpdate(prevProps) {
     // Don't process these until we have initially loaded messages
     if (!prevProps.messages) {
       if (this.props.messages) {
-        this._forceScroll();
+        this.pageUp();
+        this.forceScroll();
       }
       return;
     }
@@ -288,14 +300,12 @@ export default class ChatRoom extends React.PureComponent<ChatRoomProps, {}> {
     if (newMessagesLength > prevMessagesLength) {
       const myTagStr = SPECIFIC_TAG.replace("{{name}}", this.props.currentUser.name);
       const addedMessages = this.props.messages.slice(prevMessagesLength, newMessagesLength);
-      const tagsMe = some(addedMessages, (msg) => {
-        return msg.message.includes(myTagStr);
-      });
+      const tagsMe = some(addedMessages, msg => msg.message.includes(myTagStr));
       if (tagsMe) {
         newMessageSound.play();
       }
 
-      this._forceScroll();
+      this.forceScroll();
     }
   }
 
@@ -338,7 +348,6 @@ export default class ChatRoom extends React.PureComponent<ChatRoomProps, {}> {
   }
 
   private renderDisabledChat() {
-    const messages = this.props.messages;
     return (
       <GolfDraftPanel heading='Chat Room'>
         <div className='row'>
@@ -354,6 +363,11 @@ export default class ChatRoom extends React.PureComponent<ChatRoomProps, {}> {
     );
   }
 
+  private onLoadMore = (ev) => {
+    ev.preventDefault();
+    this.pageUp();
+  }
+
   private renderBody() {
     const messages = this.props.messages;
     if (!messages) {
@@ -361,33 +375,46 @@ export default class ChatRoom extends React.PureComponent<ChatRoomProps, {}> {
     } else if (isEmpty(messages)) {
       return (<span>No messages. Be the first! Speak your mind.</span>);
     } else {
+      const hasMoreMessages = this.state.pageIndex > 0;
       return (
-        <dl className='chat-list dl-horizontal'>
-          {messages.map((message, i) => {
-            const displayName = message.isBot ?
-              BOT_NAME : UserStore.getUser(message.user).name;
-            const className = message.isBot ? 'bot-message' : '';
-            return [
-              (
-                <dt key={'dt' + i} className={className}>
-                  {displayName} <span className='message-date'>
-                    ({moment(message.date).calendar()})
-                  </span>:
-                </dt>
-              ),
-              (
-                <dd key={'dd' + i} className={className}>
-                  <Message text={message.message} />
-                </dd>
-              )
-            ];
-          })}
-        </dl>
+        <div>
+          {!hasMoreMessages ? null : (
+            <div style={{ textAlign: 'center', paddingBottom: '0.5em' }}>
+              <a href='' onClick={this.onLoadMore}>Load more...</a>
+            </div>
+          )}
+          <dl className='chat-list dl-horizontal'>
+            {messages.slice(this.state.pageIndex).map((message, i) => {
+              const displayName = message.isBot ?
+                BOT_NAME : UserStore.getUser(message.user).name;
+              const className = message.isBot ? 'bot-message' : '';
+              return [
+                (
+                  <dt key={'dt' + i} className={className}>
+                    {displayName} <span className='message-date'>
+                      ({moment(message.date).calendar()})
+                    </span>:
+                  </dt>
+                ),
+                (
+                  <dd key={'dd' + i} className={className}>
+                    <Message text={message.message} />
+                  </dd>
+                )
+              ];
+            })}
+          </dl>
+        </div>
       );
     }
   }
 
-  _forceScroll() {
+  private pageUp() {
+    const currentIndex = this.state.pageIndex !== null ? this.state.pageIndex : this.props.messages.length - 1;
+    this.setState({ pageIndex: Math.max(0, currentIndex - DEFAULT_PAGE_SIZE) });
+  }
+
+  private forceScroll() {
     const refs = this.refs;
     (refs.chatPanel as HTMLDivElement).scrollTop = (refs.chatPanelBody as HTMLDivElement).offsetHeight;
   }
