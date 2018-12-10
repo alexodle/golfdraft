@@ -7,6 +7,8 @@ import { DraftExport, DraftPick, TourneyConfigSpec } from '../ServerTypes';
 import constants from '../../common/constants';
 import { loadConfig } from '../tourneyConfigReader';
 import { initTourney } from './initTourney';
+import * as updateTourneyStandings from '../../scores_sync/updateTourneyStandings';
+import * as models from '../models';
 
 const {NGOLFERS} = constants;
 
@@ -34,6 +36,7 @@ async function initTourneyFromExport(tourneyCfg: TourneyConfigSpec, draftExport:
 
   // Replay picks
 
+  await models.DraftPick.remove({ tourneyId }).exec();
   const access = getAccess(tourneyId);
   const [_users, _golfers] = await Promise.all([getUsers(), access.getGolfers()]);
   const usersByName = keyBy(_users, u => u.name);
@@ -47,6 +50,8 @@ async function initTourneyFromExport(tourneyCfg: TourneyConfigSpec, draftExport:
     };
     await access.makePick(draftPick);
   }
+
+  await updateTourneyStandings.run(access);
 }
 
 async function main(tourneyCfgPath: string, draftExportFile: string) {
