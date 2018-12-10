@@ -129,5 +129,18 @@ export interface TourneyConfigSpec {
 }
 
 export interface DraftExport {
-  draftPicks: { user: string, golfer: string, pickNumber: number }[];
+  draftPicks: {
+    user: string,
+    golfer: string,
+    pickNumber: number 
+  }[];
+  chatMessages: {
+    user: string,
+    isBot: boolean,
+    message: string,
+    date: string
+  }[];
+}
+
+export interface ChatExport {
 }

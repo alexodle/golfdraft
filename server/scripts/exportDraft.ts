@@ -6,19 +6,29 @@ import { DraftExport } from '../ServerTypes';
 import { writeFileSync } from 'fs';
 
 async function exportDraft(access: Access): Promise<DraftExport> {
-  const [_users, _golfers, draft] = await Promise.all([
+  const [_users, _golfers, draft, chatMessages] = await Promise.all([
     getUsers(),
     access.getGolfers(),
-    access.getDraft()
+    access.getDraft(),
+    access.getChatMessages()
   ]);
   const users = keyBy(_users, u => u._id.toString());
   const golfers = keyBy(_golfers, g => g._id.toString());
+
   const draftPicks = sortBy(draft.picks, dp => dp.pickNumber).map(dp => ({
     user: users[dp.user.toString()]['name'],
     golfer: golfers[dp.golfer.toString()]['name'],
     pickNumber: dp.pickNumber
   }));
-  return { draftPicks };
+
+  const chatMessagesExport = sortBy(chatMessages, msg => msg.date).map(msg => ({
+    user: msg.user ? users[msg.user.toString()]['name'] : null,
+    isBot: !!msg.isBot,
+    message: msg.message,
+    date: msg.date.toISOString()
+  }));
+
+  return { draftPicks, chatMessages: chatMessagesExport };
 }
 
 async function main(tourneyId, outputFile) {

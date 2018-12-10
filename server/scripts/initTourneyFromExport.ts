@@ -2,6 +2,7 @@
 import { keyBy, sortBy, take } from 'lodash';
 import { getAccess, getUsers } from '../access';
 import * as mongooseUtil from '../mongooseUtil';
+import {mongoose} from '../mongooseUtil';
 import { readFileSync} from 'fs';
 import { DraftExport, DraftPick, TourneyConfigSpec } from '../ServerTypes';
 import constants from '../../common/constants';
@@ -9,6 +10,8 @@ import { loadConfig } from '../tourneyConfigReader';
 import { initTourney } from './initTourney';
 import * as updateTourneyStandings from '../../scores_sync/updateTourneyStandings';
 import * as models from '../models';
+import * as chatModels from '../chatModels';
+import * as moment from 'moment';
 
 const {NGOLFERS} = constants;
 
@@ -25,6 +28,7 @@ function ensureTruthy(obj, msg) {
 
 async function initTourneyFromExport(tourneyCfg: TourneyConfigSpec, draftExport: DraftExport) {
   const draftPicks = sortBy(draftExport.draftPicks, dp => dp.pickNumber);
+  const chatMessages = sortBy(draftExport.chatMessages, msg => msg.date);
 
   // Init new tourney
 
@@ -36,7 +40,7 @@ async function initTourneyFromExport(tourneyCfg: TourneyConfigSpec, draftExport:
 
   // Replay picks
 
-  await models.DraftPick.remove({ tourneyId }).exec();
+  await models.DraftPick.deleteMany({ tourneyId }).exec();
   const access = getAccess(tourneyId);
   const [_users, _golfers] = await Promise.all([getUsers(), access.getGolfers()]);
   const usersByName = keyBy(_users, u => u.name);
@@ -50,6 +54,16 @@ async function initTourneyFromExport(tourneyCfg: TourneyConfigSpec, draftExport:
     };
     await access.makePick(draftPick);
   }
+
+  // Replay chats
+  await chatModels.Message.deleteMany({ tourneyId }).exec();
+  await chatModels.Message.insertMany(chatMessages.map(msg => ({
+    tourneyId: mongoose.Types.ObjectId(tourneyId),
+    user: msg.user ? ensureTruthy(usersByName[msg.user], `User not found: ${msg.user}`)._id : null,
+    isBot: msg.isBot,
+    message: msg.message,
+    date: moment(msg.date)
+  })));
 
   await updateTourneyStandings.run(access);
 }
