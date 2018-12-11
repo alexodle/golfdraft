@@ -16,20 +16,6 @@ function ensureTruthy(o, msg: string) {
 }
 
 function findPar(doc: Document): number {
-  /*
-  <ul class="ul-inline past-results-cols">
-    <li class="col-left">
-      <h2 class="title">
-        PAST <b>RESULTS</b><span class="pic"></span>
-        <span class="row">The Open Championship</span>
-      </h2>
-      <span class="header-row">
-        <b>Ending: 7/17/2016</b> <span class="pic"></span>
-        <span class="row">Purse: $9,300,000</span>
-        <span class="pic"></span>
-        <span class="row">PAR: 71</span>
-  */
-
   const possibleSpans = doc.querySelectorAll('span.header-row span.row');
   const parRow = ensureTruthy(find(possibleSpans, it => it.textContent.startsWith('PAR: ')), 'Par not found');
   return parseInt(parRow.split(': ')[1]);
@@ -58,18 +44,6 @@ class PgaTourFieldReader implements Reader {
 
     const par: number = findPar(doc);
 
-    /*
-    <td class="cell">
-        Henrik Stenson
-    </td>
-    <td>1</td>
-    <td class="hidden-small">68</td>
-    <td class="hidden-small">65</td>
-    <td class="hidden-small">68</td>
-    <td class="hidden-small">63</td>
-    <td>264</td>
-    <td class="hidden-small">$1,549,590.00</td>
-    <td>600.00</td>*/
     const golfers: UpdateGolfer[] = tail(doc.querySelectorAll('table.table-styled > tr')) // tail() to skip header row
       .map(tr => {
         const tds = tr.querySelectorAll('td');
