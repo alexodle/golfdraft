@@ -2,13 +2,12 @@ import { JSDOM } from 'jsdom';
 import { WGR } from '../server/ServerTypes';
 import * as _ from 'lodash';
 import * as request from 'request';
-import constants from '../common/constants';
 
 const AMATEUR_REGEX = /\(Am\)$/i;
 
 export default function rawWgrReader(url: string): Promise<WGR[]> {
   return new Promise(function (fulfill, reject) {
-    request({ url: url }, function (error, response, body) {
+    request({ url }, function (error, response, body) {
       if (error) {
         reject(error);
         return;
