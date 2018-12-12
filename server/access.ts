@@ -474,7 +474,7 @@ export class Access {
   }
 
   async replaceWgrs(wgrEntries: WGR[]) {
-    await models.WGR.remove({}).exec()
+    await models.WGR.deleteMany({}).exec()
     return models.WGR.create(wgrEntries);
   }
 
@@ -483,6 +483,7 @@ export class Access {
   }
 
   async updateScores(objs: GolferScore[]) {
+    await models.GolferScore.deleteMany({ tourneyId: this.tourneyId });
     return this.multiUpdate(models.GolferScore, ['golfer', 'tourneyId'], objs);
   }
 
