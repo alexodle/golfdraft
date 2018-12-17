@@ -1,4 +1,4 @@
-import {sortBy} from 'lodash';
+import {keyBy} from 'lodash';
 import {initNewTourney, getAccess, ensureUsers, getUsers, updateAppState} from '../access';
 import * as mongooseUtil from '../mongooseUtil';
 import * as updateScore from '../../scores_sync/updateScore';
@@ -8,6 +8,16 @@ import { readFileSync } from 'fs';
 import readerConfig from '../../scores_sync/readerConfig';
 import {User, TourneyConfigSpec} from '../ServerTypes';
 
+function assert(cond, msg) {
+  if (!cond) {
+    throw new Error('Assert: ' + msg);
+  }
+}
+
+function ensureTruthy(obj, msg) {
+  assert(!!obj, msg);
+  return obj;
+}
 
 function nameToUsername(name: string) {
   return name
@@ -28,7 +38,9 @@ export async function initTourney(tourneyCfg: TourneyConfigSpec): Promise<string
   await ensureUsers(userSpecs);
   
   const users = await getUsers();
-  const sortedUsers = sortBy(users, p => tourneyCfg.draftOrder.indexOf(p.name));
+  const usersByName = keyBy(users, u => u.name);
+
+  const sortedUsers = tourneyCfg.draftOrder.map(name => ensureTruthy(usersByName[name], `User not found: ${name}`));
   const pickOrder = tourneyUtils.snakeDraftOrder(sortedUsers);
   await access.setPickOrder(pickOrder);
   

@@ -1,5 +1,5 @@
 
-import { keyBy, sortBy, take } from 'lodash';
+import { keyBy, sortBy, take, mapValues } from 'lodash';
 import { getAccess, getUsers } from '../access';
 import * as mongooseUtil from '../mongooseUtil';
 import {mongoose} from '../mongooseUtil';
@@ -52,6 +52,7 @@ async function initTourneyFromExport(tourneyCfg: TourneyConfigSpec, draftExport:
       pickNumber: dp.pickNumber,
       timestamp: null
     };
+    console.log(`Simulating pick - pick:${dp.pickNumber}, user:${dp.user}, golfer:${dp.golfer}`);
     await access.makePick(draftPick);
   }
 

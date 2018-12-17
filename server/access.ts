@@ -417,13 +417,13 @@ export class Access {
     ]);
 
     if (nPicks !==  pick.pickNumber && !ignoreOrder) {
-      throw new Error('invalid pick: pick order out of sync');
+      throw new Error(`invalid pick: pick order out of sync (user: ${pick.user}, pickNumber: ${pick.pickNumber})`);
     } else if (!userIsUp && !ignoreOrder) {
-      throw new Error('invalid pick: user picked out of order');
+      throw new Error(`invalid pick: user picked out of order (user: ${pick.user}, pickNumber: ${pick.pickNumber})`);
     } else if (golferAlreadyDrafted) {
-      throw new Error('invalid pick: golfer already drafted');
+      throw new Error(`invalid pick: golfer already drafted (user: ${pick.user}, pickNumber: ${pick.pickNumber}, golfer: ${pick.golfer})`);
     } else if (!golferExists) {
-      throw new Error('invalid pick: invalid golfer');
+      throw new Error(`invalid pick: invalid golfer (user: ${pick.user}, pickNumber: ${pick.pickNumber}, golfer: ${pick.golfer})`);
     }
 
     pick = this.extendWithTourneyId(pick);
@@ -474,16 +474,17 @@ export class Access {
   }
 
   async replaceWgrs(wgrEntries: WGR[]) {
-    await models.WGR.deleteMany({}).exec()
+    await models.WGR.deleteMany({}).exec();
     return models.WGR.create(wgrEntries);
   }
 
   async setPickOrder(objs: DraftPickOrder[]) {
+    await models.DraftPickOrder.deleteMany({ tourneyId: this.tourneyId }).exec();
     return this.multiUpdate(models.DraftPickOrder, ['tourneyId', 'user', 'pickNumber'], objs);
   }
 
   async updateScores(objs: GolferScore[]) {
-    await models.GolferScore.deleteMany({ tourneyId: this.tourneyId });
+    await models.GolferScore.deleteMany({ tourneyId: this.tourneyId }).exec();
     return this.multiUpdate(models.GolferScore, ['golfer', 'tourneyId'], objs);
   }
 
