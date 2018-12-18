@@ -5,9 +5,10 @@ import {
   getAppState,
   getUsers,
   updateAppState,
+  exportTourneyResults,
   Access
 } from './access';
-import {find} from 'lodash';
+import {find, chain} from 'lodash';
 import * as bodyParser from 'body-parser';
 import * as chatBot from './chatBot';
 import * as compression from 'compression';
@@ -162,6 +163,36 @@ async function defineRoutes() {
 
   // Include socket server
   require('./socketServer');
+
+  app.get('/export', async (req: Request, res: Response, next: NextFunction) => {
+    const tourneyResults = await exportTourneyResults();
+
+    // CSV
+    const HEADER = ['user_name', 'tourney_name', 'tourney_start_date', 'pick_number', 'standing', 'isTied'];
+    const flatResults = chain(tourneyResults)
+      .sortBy(tr => tr.tourney.startDate)
+      .reverse()
+      .map(tr => chain(tr.userScores)
+        .sortBy(us => us.standing)
+        .map(us => [
+          us.user.name,
+          tr.tourney.name,
+          tr.tourney.startDate.toDateString(),
+          us.pickNumber,
+          us.standing,
+          us.isTied
+        ].join(','))
+        .value())
+      .flatten()
+      .value();
+    flatResults.unshift(HEADER.join(','));
+
+    const csvContents = flatResults.join('\n');
+    res
+      .attachment('past_results.csv')
+      .send(new Buffer(csvContents))
+      .status(200);
+  });
 
   // Support legacy urls
   app.get(/\/tourney\/?/, (req: Request, res: Response, next: NextFunction) => {

@@ -39,7 +39,10 @@ import {
   uniq,
   keyBy,
   sortBy,
-  map
+  map,
+  keys,
+  groupBy,
+  minBy,
 } from 'lodash';
 
 const UNKNOWN_WGR = constants.UNKNOWN_WGR;
@@ -94,6 +97,41 @@ export function getAppState(): Promise<AppSettings> {
 
 export function updateAppState(props: AppSettings) {
   return models.AppState.update({}, props, { upsert: true }).exec();
+}
+
+export async function exportTourneyResults() {
+  const tourneys = await getAllTourneys();
+  const tourneysById = keyBy(tourneys, t => t._id.toString() as string);
+
+  const tourneyIdsQuery = { tourneyId: { $in: keys(tourneysById) } };
+  const [users, tourneyStandings, pickOrders] = await Promise.all([
+    getUsers(),
+    models.TourneyStandings.find(tourneyIdsQuery).exec() as Promise<TourneyStandingsDoc[]>,
+    models.DraftPickOrder.find(tourneyIdsQuery).exec() as Promise<DraftPickOrderDoc[]>
+  ]);
+  const usersById = keyBy(users, u => u._id.toString() as string);
+  const pickOrdersByTourneyId = groupBy(pickOrders, o => o.tourneyId.toString());
+
+  const tourneyStandingsOut = tourneyStandings.map(st => {
+    const tourney = tourneysById[st.tourneyId.toString()];
+    const draftOrderByUser = chain(pickOrdersByTourneyId[tourney._id.toString()])
+      .groupBy(po => po.user.toString())
+      .mapValues(pos => minBy(pos, po => po.pickNumber).pickNumber)
+      .value();
+
+    return {
+      tourney: pick(tourneysById[st.tourneyId.toString()], ['_id', 'name', 'startDate']),
+      userScores: st.playerScores.map(ps => ({
+        user: pick(usersById[ps.player], ['_id', 'name']),
+        totalScore: ps.totalScore,
+        standing: ps.standing,
+        isTied: ps.isTied,
+        pickNumber: draftOrderByUser[ps.player]
+      }))
+    };
+  });
+
+  return tourneyStandingsOut;
 }
 
 function toNameMap(srcDestPairs: { src: string, dest: string }[]): { [key: string]: string } {
