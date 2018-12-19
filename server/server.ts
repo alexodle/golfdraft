@@ -170,8 +170,7 @@ async function defineRoutes() {
     // CSV
     const HEADER = ['user_name', 'tourney_name', 'tourney_start_date', 'pick_number', 'standing', 'isTied'];
     const flatResults = chain(tourneyResults)
-      .sortBy(tr => tr.tourney.startDate)
-      .reverse()
+      .orderBy(tr => tr.tourney.startDate, 'desc')
       .map(tr => chain(tr.userScores)
         .sortBy(us => us.standing)
         .map(us => [
@@ -179,7 +178,7 @@ async function defineRoutes() {
           tr.tourney.name,
           tr.tourney.startDate.toDateString(),
           us.pickNumber,
-          us.standing,
+          us.standing + 1,
           us.isTied
         ].join(','))
         .value())

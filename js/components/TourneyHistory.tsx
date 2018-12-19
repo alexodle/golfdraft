@@ -20,6 +20,7 @@ export class TourneyHistory extends React.Component<TourneyHistoryProps, {}> {
     return (
       <section>
         <h1>Tourney history</h1>
+        <p><a href='/export'>Export all results</a></p>
         <ol>
           {sortedTourneys.map(t => {
             if (t._id === activeTourneyId) {
