@@ -177,7 +177,7 @@ async function defineRoutes() {
           us.user.name,
           tr.tourney.name,
           tr.tourney.startDate.toDateString(),
-          us.pickNumber,
+          us.pickNumber + 1,
           us.standing + 1
         ].join(','))
         .value())
