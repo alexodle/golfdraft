@@ -23,12 +23,23 @@ describe('PgaTourLbReader', () => {
       result.par.should.equal(71);
     });
 
+    it('parses pre-tourney golfer', async () => {
+      const result = await reader.run(readPreStartJson());
+      const g = result.golfers.find(g => g.golfer === 'Francesco Molinari');
+      g.should.eql({
+        golfer: 'Francesco Molinari',
+        scores: [0, 0, 0, 0],
+        day: 1,
+        thru: 0,
+      });
+    });
+
     it('parses post-tourney json', async () => {
       const result = await reader.run(readPostStartJson());
       result.par.should.equal(72);
     });
 
-    it('parses golfer', async () => {
+    it('parses finished golfer', async () => {
       const result = await reader.run(readPostStartJson());
       const g = result.golfers.find(g => g.golfer === 'Francesco Molinari');
       g.should.eql({
@@ -38,6 +49,18 @@ describe('PgaTourLbReader', () => {
         thru: 18,
       });
     });
+
+    it('parses mid-round golfer', async () => {
+      const result = await reader.run(readPostStartJson());
+      const g = result.golfers.find(g => g.golfer === 'Francesco MolinariMidwayThruExample');
+      g.should.eql({
+        golfer: 'Francesco MolinariMidwayThruExample',
+        scores: [-3, -2, 1, -6],
+        day: 4,
+        thru: 16,
+      });
+    });
+    
 
     it('parses mc golfer correctly', async () => {
       const result = await reader.run(readPostStartJson());

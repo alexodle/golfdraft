@@ -11,5 +11,5 @@ export interface ReaderResult {
 }
 
 export interface Reader {
-  run: (url: string) => Promise<ReaderResult>;
+  run: (data: any) => Promise<ReaderResult>;
 }

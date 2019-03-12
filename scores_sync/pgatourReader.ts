@@ -1,5 +1,4 @@
 import * as _ from 'lodash';
-import * as request from 'request';
 import constants from '../common/constants';
 import {Reader, ReaderResult, UpdateGolfer} from './Types';
 
@@ -88,21 +87,12 @@ function parseGolfer(par: number, tourneyRound: number, g: PgaTourGolfer): Updat
 }
 
 class PgaTourReader implements Reader {
-  run(url: string): Promise<ReaderResult> {
-    return new Promise(function (fulfill, reject) {
-      request({ url: url, json: true }, function (error, response, body) {
-        if (error) {
-          reject(error);
-          return;
-        }
-
-        const par = _.parseInt(body.leaderboard.courses[0].par_total);
-        const currentRound = body.leaderboard.current_round;
-        const golfers = _.map(body.leaderboard.players, (g: PgaTourGolfer) => parseGolfer(par, currentRound, g));
-
-        fulfill({ par, golfers });
-      });
-    });
+  async run(data: any): Promise<ReaderResult> {
+    const body = JSON.parse(data);
+    const par = _.parseInt(body.leaderboard.courses[0].par_total);
+    const currentRound = body.leaderboard.current_round;
+    const golfers = _.map(body.leaderboard.players, (g: PgaTourGolfer) => parseGolfer(par, currentRound, g));
+    return { par, golfers };
   }
 
   // Export for testing

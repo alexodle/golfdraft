@@ -1,4 +1,5 @@
 import * as updateTourneyStandings from './updateTourneyStandings';
+import * as request from 'request';
 import {chain, keyBy, isNull, has, includes, every, isFinite, range} from 'lodash';
 import {Access} from '../server/access';
 import constants from '../common/constants';
@@ -71,8 +72,21 @@ export function mergeOverrides(scores: GolferScore[], scoreOverrides: ScoreOverr
   return newScores;
 }
 
+function fetchData(url: string): Promise<any> {
+  return new Promise((fulfill, reject) => {
+    request({ url }, (error, _response, body) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+      fulfill(body);
+    });
+  });
+}
+
 export async function run(access: Access, reader: Reader, url: string, nameMap: { [name: string]: string }, populateGolfers = false) {
-  const rawTourney = await reader.run(url);
+  const jsonStr = await fetchData(url);
+  const rawTourney = await reader.run(jsonStr);
 
   // Quick assertion of data
   if (!rawTourney || !validate(rawTourney)) {

@@ -2,6 +2,7 @@ import {keyBy} from 'lodash';
 import {initNewTourney, getAccess, ensureUsers, getUsers, updateAppState} from '../access';
 import * as mongooseUtil from '../mongooseUtil';
 import * as updateScore from '../../scores_sync/updateScore';
+import * as updateTourneyStandings from '../../scores_sync/updateTourneyStandings';
 import {loadConfig} from '../tourneyConfigReader';
 import * as tourneyUtils from '../tourneyUtils';
 import { readFileSync } from 'fs';
@@ -51,6 +52,7 @@ export async function initTourney(tourneyCfg: TourneyConfigSpec): Promise<string
     tourneyCfg.scoresSync.nameMap,
     true
   );
+  await updateTourneyStandings.run(access);
 
   await updateAppState({
     activeTourneyId: tourneyId,

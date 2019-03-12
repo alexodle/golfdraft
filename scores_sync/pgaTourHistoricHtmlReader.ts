@@ -1,7 +1,6 @@
 import { parseInt, find, tail, slice, isEmpty } from 'lodash';
 import { Reader, ReaderResult, UpdateGolfer } from './Types';
 import { JSDOM } from 'jsdom';
-import * as request from 'request';
 import constants from '../common/constants';
 
 function assert(cond, msg: string) {
@@ -32,14 +31,8 @@ function parseDayScore(td: Element, par: number): number | 'MC' {
 
 class PgaTourFieldReader implements Reader {
 
-  async run(url: string): Promise<ReaderResult> {
-    const htmlBodyStr = await new Promise<string>((fulfill, reject) => {
-      request({ url }, (error, response, body: string) => {
-        error ? reject(error) : fulfill(body);
-      });
-    });
-
-    const dom = new JSDOM(htmlBodyStr);
+  async run(data: any): Promise<ReaderResult> {
+    const dom = new JSDOM(data);
     const doc = dom.window.document;
 
     const par: number = findPar(doc);
