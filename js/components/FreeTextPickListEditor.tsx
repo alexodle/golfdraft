@@ -322,10 +322,9 @@ export default class FreeTextPickListEditor extends React.Component<FreeTextPick
   async _save(pickListNames: string[]) {
     this.setState({ isPosting: true });
 
-    const data = { pickListNames };
-    const result = await postJson('/draft/pickList', data);
-
     try {
+      const data = { pickListNames };
+      const result = await postJson('/draft/pickList', data);
       DraftActions.setPickList(result.pickList);
       this.props.onComplete();
     } catch (err) {
