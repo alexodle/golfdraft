@@ -321,7 +321,7 @@ describe('access', () => {
         await access.makePick(newPicks[1]);
         'Expected draft pick to fail.'.should.not.be.ok();
       } catch (err) {
-        err.message.should.startWith('invalid pick: golfer already drafted');
+        err.message.should.startWith('tinvalid pick: golfer already drafted');
         const draft = await access.getDraft();
         pick(draft.picks[0], ['user', 'golfer', 'pickNumber']).should.eql(newPicks[0]);
       }
