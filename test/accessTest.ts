@@ -257,7 +257,7 @@ describe('access', () => {
         } as DraftPick);
         'Expected draft pick to fail.'.should.not.be.ok();
       } catch (err) {
-        err.message.should.equal('invalid pick: user picked out of order');
+        err.message.should.startWith('invalid pick: user picked out of order');
       }
     });
 
@@ -271,7 +271,7 @@ describe('access', () => {
         } as DraftPick);
         'Expected draft pick to fail.'.should.not.be.ok();
       } catch (err) {
-        err.message.should.equal('invalid pick: pick order out of sync');
+        err.message.should.startWith('invalid pick: pick order out of sync');
       }
     });
 
@@ -285,7 +285,7 @@ describe('access', () => {
         } as DraftPick);
         'Expected draft pick to fail.'.should.not.be.ok();
       } catch (err) {
-        err.message.should.equal('invalid pick: invalid golfer');
+        err.message.should.startWith('invalid pick: invalid golfer');
       }
     });
 
@@ -321,7 +321,7 @@ describe('access', () => {
         await access.makePick(newPicks[1]);
         'Expected draft pick to fail.'.should.not.be.ok();
       } catch (err) {
-        err.message.should.equal('invalid pick: golfer already drafted');
+        err.message.should.startWith('invalid pick: golfer already drafted');
         const draft = await access.getDraft();
         pick(draft.picks[0], ['user', 'golfer', 'pickNumber']).should.eql(newPicks[0]);
       }
