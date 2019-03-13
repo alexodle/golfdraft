@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pool Party</title>
+
+    <script>
+      // BOOTSTRAP DATA
+      //
+      var sd = window.golfDraftSeed = {};
+      sd.CDN_URL = '{{cdnUrl}}';
+
+      sd.golfers = {{{golfers}}};
+      sd.users = {{{users}}};
+      sd.draft = {{{draft}}};
+      sd.tourneyStandings = {{{tourneyStandings}}};
+      sd.tourney = {{{tourney}}};
+      sd.appState = {{{appState}}};
+      sd.user = {{{or user "null"}}};
+      sd.allTourneys = {{{allTourneys}}};
+      sd.activeTourneyId = '{{activeTourneyId}}';
+    </script>
+  <link href="/dist/vendors.27e94a51b96125a34fc8.css" rel="stylesheet"><link href="/dist/main.50fd4b5c310f42cd2f14.css" rel="stylesheet"></head>
+  <body>
+    <section id="golfdraftapp" />
+  <script type="text/javascript" src="/dist/runtime.3a608f0ae98a9a1420d2.js"></script><script type="text/javascript" src="/dist/vendors.a1fd8c8af043280414b4.js"></script><script type="text/javascript" src="/dist/main.b3505fdb2eaa834ba98f.js"></script></body>
+</html>
