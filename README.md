@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/odetown/golfdraft/tree/master.svg?style=svg)](https://circleci.com/gh/odetown/golfdraft/tree/master)
+
 # README #
 
 App for handling my yearly 18-person PGA tournament pool. Has two main modes, Draft (js/components/DraftApp.jsx) and Tournament (js/components/TourneyApp.jsx).
