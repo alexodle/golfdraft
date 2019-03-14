@@ -98,7 +98,6 @@ function parseGolferScores(par: number, g: LbDataGolfer): (number | string)[] {
 
   const currentRound = parseRoundDay(g);
   const currentRoundScore = parseRoundScore(g);
-  console.log(`Round score: ${g.playerNames.firstName} ${g.playerNames.lastName} - ${currentRound} - ${currentRoundScore}`);
 
   // Logic for getting the current round score is different than earlier rounds
   const scores = g.rounds
