@@ -59,7 +59,8 @@ function parseRoundDay(g: LbDataGolfer) {
 }
 
 function interpretParFromGolferScores(golfers: LbDataGolfer[]) {
-  const g = find(golfers, (g: LbDataGolfer) => g.isActive && !isNullStr(g.round));
+  // Full round scores are only available after completing round 1..
+  const g = find(golfers, (g: LbDataGolfer) => g.isActive && parseRoundDay(g) > 1);
   if (!g) return DEFAULT_PAR;
 
   const relativeRoundScore = parseRoundScore(g);
@@ -92,18 +93,23 @@ function parseGolferScores(par: number, g: LbDataGolfer): (number | string)[] {
   const missedCut = !g.isActive;
   if (missedCut) return parseMissedCutGolferScores(par, g);
 
-  const hasStarted = !isNullStr(g.strokes);
+  const hasStarted = !isNullStr(g.round);
   if (!hasStarted) return times(NDAYS, () => 0);
 
-  const latestRound = parseRoundDay(g);
-  const finishedRound = g.roundComplete;
-  return g.rounds.map((r, i) => {
-    if (!finishedRound && i === latestRound - 1) {
-      return parseRoundScore(g);
-    } else {
-      return safeParseInt(r.strokes) - par;
-    }
-  });
+  const currentRound = parseRoundDay(g);
+  const currentRoundScore = parseRoundScore(g);
+  console.log(`Round score: ${g.playerNames.firstName} ${g.playerNames.lastName} - ${currentRound} - ${currentRoundScore}`);
+
+  // Logic for getting the current round score is different than earlier rounds
+  const scores = g.rounds
+      .slice(0, currentRound - 1)
+      .map(r => safeParseInt(r.strokes) - par);
+  scores.push(currentRoundScore);
+  for (let i=scores.length; i<NDAYS; i++) {
+    scores.push(0);
+  }
+  
+  return scores;
 }
 
 function parseGolfer(par: number, g: LbDataGolfer): UpdateGolfer {
