@@ -73,7 +73,7 @@ function interpretParFromGolferScores(golfers: LbDataGolfer[]) {
 
 function parseThru(g: LbDataGolfer) {
   const thruStr = g.thru;
-  if (isNullStr(thruStr)) return 0;
+  if (isNullStr(thruStr)) return null;
   if (thruStr === 'F') return NHOLES;
   return parseRequiredInt(thruStr, `Invalid thru value: ${thruStr}`);
 }

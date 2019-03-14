@@ -34,7 +34,7 @@ describe('PgaTourLbReader', () => {
         golfer: 'Francesco Molinari',
         scores: [0, 0, 0, 0],
         day: 1,
-        thru: 0,
+        thru: null,
       });
     });
 
