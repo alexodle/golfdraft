@@ -1,7 +1,6 @@
 import {parseInt, find, times} from 'lodash';
 import constants from '../common/constants';
 import {Reader, ReaderResult, UpdateGolfer} from './Types';
-import { Timestamp } from 'bson';
 
 const {MISSED_CUT, NHOLES, NDAYS} = constants;
 const DEFAULT_PAR = 71; // Dumb, but we sometimes cannot determine par

@@ -13,8 +13,19 @@ function ensureSuccess(resp: Response): Response {
   throw error;
 }
 
+function pathJoin(a: string, b: string) {
+  if (a.endsWith('/')) return a + b;
+  return `${a}/${b}`;
+}
+
+function normalizeUrl(url: string): string {
+  if (url.startsWith('/')) return url;
+  return pathJoin(window.location.pathname, url);
+}
+
 async function _fetch(url: string, init: RequestInit) {
-  const resp = ensureSuccess(await window.fetch(url, ensureCredentials(init)));
+  const normalizedUrl = normalizeUrl(url);
+  const resp = ensureSuccess(await window.fetch(normalizedUrl, ensureCredentials(init)));
   if (!resp.json) return null;
   
   try {
