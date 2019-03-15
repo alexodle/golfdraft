@@ -58,16 +58,8 @@ function parseRoundDay(g: LbDataGolfer) {
 }
 
 function interpretParFromGolferScores(golfers: LbDataGolfer[]) {
-  // Full round scores are only available after completing round 1..
-  const g = find(golfers, (g: LbDataGolfer) => g.isActive && parseRoundDay(g) > 1);
-  if (!g) return DEFAULT_PAR;
-
-  const relativeRoundScore = parseRoundScore(g);
-  const golferRound = parseRoundDay(g);
-  const roundFullScore = parseRequiredInt(g.rounds[golferRound - 1].strokes, 'Invalid round score');
-  const par = roundFullScore - relativeRoundScore;
-
-  return par;
+  // TEMP HACK 
+  return 72;
 }
 
 function parseThru(g: LbDataGolfer) {
