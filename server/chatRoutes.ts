@@ -4,12 +4,12 @@ import {requireSession} from './authMiddleware';
 import {Request, Response, NextFunction} from 'express';
 import {ChatMessage} from './ServerTypes';
 
-app.get('/:tourneyId/chat/messages', requireSession(), async (req: Request, res: Response) => {
+app.get(['/:tourneyId/chat/messages', '/:tourneyId/draft/chat/messages'], requireSession(), async (req: Request, res: Response) => {
   const messages = await req.access.getChatMessages();
   res.status(200).send(messages);
 });
 
-app.post('/:tourneyId/chat/messages', requireSession(), async (req: Request, res: Response) => {
+app.post(['/:tourneyId/chat/messages', '/:tourneyId/draft/chat/messages'], requireSession(), async (req: Request, res: Response) => {
   const body = req.body;
   const user = req.user;
 
