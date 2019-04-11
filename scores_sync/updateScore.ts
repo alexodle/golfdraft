@@ -113,6 +113,7 @@ async function safeWriteGzippedTmpFile(data: any) {
       discardDescriptor: true,
     });
     fs.writeFileSync(tmpOjb.name, compressed);
+    console.log("Wrote raw data to temp file:", tmpOjb.name);
   } catch (e) {
     console.warn("Failed to write data to tmp file:", e);
   }
