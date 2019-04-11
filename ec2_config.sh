@@ -16,3 +16,5 @@ unset DEBUG
 export NODE_ENV=production
 export PORT=8000
 export MONGO_URI="mongodb://gd:${MONGO_PW}@127.0.0.1:27017/gd"
+
+export TZ="America/Los_Angeles"

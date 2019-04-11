@@ -78,7 +78,7 @@ function fillInStandings(sortedScores: PlayerScore[]) {
   });
 }
 
-export async function run(access: Access) {
+export async function run(access: Access): Promise<TourneyStandings> {
   const [scores, draft] = await Promise.all([
     access.getScores(),
     access.getDraft()
@@ -123,4 +123,6 @@ export async function run(access: Access) {
 
   await access.updateTourneyStandings(tourneyStandings);
   console.log("DONE Running player score update");
+
+  return tourneyStandings;
 }

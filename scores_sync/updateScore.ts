@@ -1,6 +1,6 @@
 import * as updateTourneyStandings from './updateTourneyStandings';
 import * as request from 'request';
-import * as tmp from 'tmp';
+import * as moment from 'moment';
 import * as fs from 'fs';
 import {gzip} from 'node-gzip';
 import {chain, keyBy, isNull, has, includes, every, isFinite, range} from 'lodash';
@@ -102,28 +102,24 @@ function ensureDirectory(path: string) {
   }
 }
 
-async function safeWriteGzippedTmpFile(data: any) {
-  const compressed = await gzip(data);
+async function safeWriteGzippedTmpFile(filename: string, data: any) {
+  const filePath = `${DATA_TMP_DIR}/${filename}.gz`;
   try {
+    const compressed = await gzip(data);
     ensureDirectory(DATA_TMP_DIR);
-    const tmpOjb = tmp.fileSync({
-      prefix: 'data-',
-      postfix: '.gz',
-      dir: DATA_TMP_DIR,
-      discardDescriptor: true,
-    });
-    fs.writeFileSync(tmpOjb.name, compressed);
-    console.log("Wrote raw data to temp file:", tmpOjb.name);
+    fs.writeFileSync(filePath, compressed);
+    console.log("Wrote data to temp file:", filePath);
   } catch (e) {
-    console.warn("Failed to write data to tmp file:", e);
+    console.warn("Failed to write data to tmp file:", filePath, e);
   }
 }
 
 export async function run(access: Access, reader: Reader, config: TourneyConfigSpec, populateGolfers = false) {
   const url = config.scoresSync.url;
+  const ts = moment().format('YMMDD_HHmmss');
 
   const data = await fetchData(url);
-  safeWriteGzippedTmpFile(data);
+  safeWriteGzippedTmpFile(`${ts}-rawdata`, data);
 
   const rawTourney = await reader.run(config, data);
 
@@ -136,10 +132,6 @@ export async function run(access: Access, reader: Reader, config: TourneyConfigS
   // Update all names
   const nameMap = config.scoresSync.nameMap;
   rawTourney.golfers.forEach(g => g.golfer = nameMap[g.golfer] || g.golfer);
-
-  // Ensure tourney/par
-  const update = { pgatourUrl: url, par: rawTourney.par };
-  await access.updateTourney(update);
   
   // Ensure golfers
   if (populateGolfers) {
@@ -179,9 +171,11 @@ export async function run(access: Access, reader: Reader, config: TourneyConfigS
 
   // Save
   await access.updateScores(finalScores);
+  safeWriteGzippedTmpFile(`${ts}-scores`, JSON.stringify(finalScores));
 
   // Calculate standings
-  await updateTourneyStandings.run(access);
+  const tourneyStanding = await updateTourneyStandings.run(access);
+  safeWriteGzippedTmpFile(`${ts}-standings`, JSON.stringify(tourneyStanding));
 
   console.log("HOORAY! - scores updated");
 }
