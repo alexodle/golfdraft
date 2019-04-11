@@ -1,5 +1,5 @@
-import { parseInt, find, tail, slice, isEmpty } from 'lodash';
-import { Reader, ReaderResult, UpdateGolfer } from './Types';
+import { parseInt, find, slice, isEmpty } from 'lodash';
+import { Reader, ReaderResult, UpdateGolfer, TourneyConfigSpec } from './Types';
 import { JSDOM } from 'jsdom';
 import constants from '../common/constants';
 
@@ -31,7 +31,7 @@ function parseDayScore(td: Element, par: number): number | 'MC' {
 
 class PgaTourFieldReader implements Reader {
 
-  async run(data: any): Promise<ReaderResult> {
+  async run(_config: TourneyConfigSpec, data: any): Promise<ReaderResult> {
     const dom = new JSDOM(data);
     const doc = dom.window.document;
 

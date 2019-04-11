@@ -91,6 +91,7 @@ const tourneySchema = new mongoose.Schema({
   lastUpdated: { type: Date, required: true },
   startDate: { type: Date, required: true },
   config: {
+    par: { type: Number, default: -1 },
     scoresSync: {
       syncType: String,
       url: String,

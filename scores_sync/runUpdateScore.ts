@@ -17,7 +17,7 @@ async function updateScores() {
   const tourneyCfg = await access.getTourneyConfig();
 
   const reader = readerConfig[tourneyCfg.scoresSync.syncType].reader;
-  await updateScore.run(access, reader, tourneyCfg.scoresSync.url, tourneyCfg.scoresSync.nameMap);
+  await updateScore.run(access, reader, tourneyCfg);
   redis.pubSubClient.publish("scores:update", (new Date()).toString());
 }
 

@@ -1,9 +1,8 @@
-import {parseInt, find, times} from 'lodash';
+import { parseInt, times } from 'lodash';
 import constants from '../common/constants';
-import {Reader, ReaderResult, UpdateGolfer} from './Types';
+import { Reader, ReaderResult, UpdateGolfer, TourneyConfigSpec } from './Types';
 
 const {MISSED_CUT, NHOLES, NDAYS} = constants;
-const DEFAULT_PAR = 71; // Dumb, but we sometimes cannot determine par
 
 interface LbDataGolfer {
   currentHoleId: string; // "<number>" || null
@@ -55,11 +54,6 @@ function parseRoundScore(g: LbDataGolfer): number | null {
 function parseRoundDay(g: LbDataGolfer) {
   const golferRoundId = parseRequiredInt(g.playerRoundId, 'Invalid player round id');
   return golferRoundId;
-}
-
-function interpretParFromGolferScores(golfers: LbDataGolfer[]) {
-  // TEMP HACK 
-  return 72;
 }
 
 function parseThru(g: LbDataGolfer) {
@@ -116,10 +110,10 @@ function parseGolfer(par: number, g: LbDataGolfer): UpdateGolfer {
 }
 
 class PgaTourLbDataReader implements Reader {
-  async run(data: any): Promise<ReaderResult> {
+  async run(config: TourneyConfigSpec, data: any): Promise<ReaderResult> {
     const json = JSON.parse(data);
 
-    const par = interpretParFromGolferScores(json.rows as LbDataGolfer[]);
+    const par = config.par;
     const golfers = json.rows.map((g: LbDataGolfer) => parseGolfer(par, g));
     return { par, golfers };
   }

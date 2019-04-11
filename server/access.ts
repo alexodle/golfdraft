@@ -144,6 +144,7 @@ function configToTourneyObject(spec: TourneyConfigSpec): Tourney  {
   const tourney = pick(spec, 'name', 'startDate') as Tourney;
   tourney.lastUpdated = new Date();
   tourney.config = {
+    par: spec.par || -1,
     scoresSync: {
       syncType: spec.scoresSync.syncType,
       url: spec.scoresSync.url,

@@ -2,7 +2,6 @@ import './initTestConfig';
 
 import constants from '../common/constants';
 import reader from '../scores_sync/pgatourReader';
-import * as should from 'should';
 
 const {MISSED_CUT} = constants;
 

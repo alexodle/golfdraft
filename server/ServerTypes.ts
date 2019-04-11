@@ -1,7 +1,7 @@
 import * as mongoose from 'mongoose';
 import * as CommonTypes from '../common/types/CommonTypes';
-import {Model, Document} from 'mongoose';
-import {Access} from './access';
+import { Document } from 'mongoose';
+import { Access } from './access';
 
 declare module "express" {
   interface Request {
@@ -84,6 +84,7 @@ export type ScoreOverrideDoc = ScoreOverride & Document;
 
 export interface Tourney extends CommonTypes.Tourney {
   config: {
+    par: number;
     scoresSync: {
       syncType: string;
       url: string;
@@ -116,6 +117,7 @@ export interface BootstrapPayload {
 export interface TourneyConfigSpec {
   name: string;
   startDate: Date;
+  par: number;
   scoresSync: {
     syncType: string;
     url: string;

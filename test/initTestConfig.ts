@@ -27,6 +27,7 @@ export const initTestDb = once(async () => {
   const tourneyId = await initNewTourney({
     name: 'Test Tourney',
     startDate: new Date(),
+    par: -1,
     scoresSync: {
       syncType: 'test',
       url: 'test',

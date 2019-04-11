@@ -8,6 +8,7 @@ import {
   Golfer,
   GolferScore,
   ScoreOverride,
+  TourneyConfigSpec
 } from '../server/ServerTypes';
 
 const DAYS = constants.NDAYS;
@@ -15,7 +16,7 @@ const MISSED_CUT = constants.MISSED_CUT;
 const OVERRIDE_KEYS = ['golfer', 'day', 'scores'];
 
 export function validate(result: ReaderResult): boolean {
-  if (has(result, 'par') && !includes([70, 71, 72, 73], result.par)) {
+  if (has(result, 'par') && !includes([70, 71, 72], result.par)) {
     console.log("ERROR - Par invalid:" + result.par);
     return false;
   }
@@ -84,9 +85,11 @@ function fetchData(url: string): Promise<any> {
   });
 }
 
-export async function run(access: Access, reader: Reader, url: string, nameMap: { [name: string]: string }, populateGolfers = false) {
+export async function run(access: Access, reader: Reader, config: TourneyConfigSpec, populateGolfers = false) {
+  const url = config.scoresSync.url;
+
   const jsonStr = await fetchData(url);
-  const rawTourney = await reader.run(jsonStr);
+  const rawTourney = await reader.run(config, jsonStr);
 
   // Quick assertion of data
   if (!rawTourney || !validate(rawTourney)) {
@@ -95,6 +98,7 @@ export async function run(access: Access, reader: Reader, url: string, nameMap: 
   }
 
   // Update all names
+  const nameMap = config.scoresSync.nameMap;
   rawTourney.golfers.forEach(g => g.golfer = nameMap[g.golfer] || g.golfer);
 
   // Ensure tourney/par

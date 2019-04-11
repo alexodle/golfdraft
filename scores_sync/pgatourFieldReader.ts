@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import {Reader, ReaderResult, UpdateGolfer} from './Types';
+import { Reader, ReaderResult, UpdateGolfer, TourneyConfigSpec } from './Types';
 
 function parseName(name: string): string {
   const parts = name.split(', ');
@@ -21,16 +21,12 @@ function parseJson(json: string): UpdateGolfer[] {
 }
 
 class PgaTourFieldReader implements Reader {
-  async run(data: any): Promise<ReaderResult> {
+  async run(config: TourneyConfigSpec, data: any): Promise<ReaderResult> {
     const golfers = parseJson(data);
     return {
-      par: 72, // hack for now
+      par: config.par,
       golfers
     };
-  }
-
-  parseJson(json: string): UpdateGolfer[]  {
-    return parseJson(json);
   }
 }
 
