@@ -101,7 +101,7 @@ function ensureDirectory(path: string) {
   }
 }
 
-async function safeWriteTmpFile(data: any) : Promise<void> {
+function safeWriteTmpFile(data: any) {
   try {
     ensureDirectory(DATA_TMP_DIR);
     const tmpOjb = tmp.fileSync({
@@ -119,7 +119,7 @@ export async function run(access: Access, reader: Reader, config: TourneyConfigS
   const url = config.scoresSync.url;
 
   const data = await fetchData(url);
-  await safeWriteTmpFile(data);
+  safeWriteTmpFile(data);
 
   const rawTourney = await reader.run(config, data);
 
