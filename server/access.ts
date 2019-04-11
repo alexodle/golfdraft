@@ -161,6 +161,7 @@ function configToTourneyObject(spec: TourneyConfigSpec): Tourney  {
 
 function tourneyToConfigSpec(tourney: Tourney): TourneyConfigSpec {
   const spec = pick(tourney, 'name', 'startDate') as TourneyConfigSpec;
+  spec.par = tourney.config.par;
   spec.draftOrder = tourney.config.draftOrder;
   spec.scoresSync = {
     ...tourney.config.scoresSync,

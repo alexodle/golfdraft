@@ -48,8 +48,7 @@ export async function initTourney(tourneyCfg: TourneyConfigSpec): Promise<string
   await updateScore.run(
     access,
     readerConfig[tourneyCfg.scoresSync.syncType].reader,
-    tourneyCfg.scoresSync.url,
-    tourneyCfg.scoresSync.nameMap,
+    tourneyCfg,
     true
   );
   await updateTourneyStandings.run(access);
