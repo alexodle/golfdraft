@@ -15,3 +15,10 @@
 1. `./golfdraft/ec2_initNewTourney.sh`
 1. Let's encrypt setup: https://certbot.eff.org/lets-encrypt/ubuntuxenial-nginx
 1. `./golfdraft/ec2_runServer.sh`
+
+## crontab -e
+
+```
+*/10 * * * * ~/golfdraft/ec2_runUpdateScore.sh
+0 * * * * [[ -d /tmp/golfdraft_data ]] && find /tmp/golfdraft_data/ -type f -mtime +2 -exec rm {} \;
+```
