@@ -2,6 +2,7 @@ import * as updateTourneyStandings from './updateTourneyStandings';
 import * as request from 'request';
 import * as tmp from 'tmp';
 import * as fs from 'fs';
+import {gzip} from 'node-gzip';
 import {chain, keyBy, isNull, has, includes, every, isFinite, range} from 'lodash';
 import {Access} from '../server/access';
 import constants from '../common/constants';
@@ -101,15 +102,17 @@ function ensureDirectory(path: string) {
   }
 }
 
-function safeWriteTmpFile(data: any) {
+async function safeWriteGzippedTmpFile(data: any) {
+  const compressed = await gzip(data);
   try {
     ensureDirectory(DATA_TMP_DIR);
     const tmpOjb = tmp.fileSync({
       prefix: 'data-',
+      postfix: '.gz',
       dir: DATA_TMP_DIR,
       discardDescriptor: true,
     });
-    fs.writeFileSync(tmpOjb.name, data);
+    fs.writeFileSync(tmpOjb.name, compressed);
   } catch (e) {
     console.warn("Failed to write data to tmp file:", e);
   }
@@ -119,7 +122,7 @@ export async function run(access: Access, reader: Reader, config: TourneyConfigS
   const url = config.scoresSync.url;
 
   const data = await fetchData(url);
-  safeWriteTmpFile(data);
+  safeWriteGzippedTmpFile(data);
 
   const rawTourney = await reader.run(config, data);
 
