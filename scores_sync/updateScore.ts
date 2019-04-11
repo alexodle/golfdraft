@@ -1,5 +1,7 @@
 import * as updateTourneyStandings from './updateTourneyStandings';
 import * as request from 'request';
+import * as tmp from 'tmp';
+import * as fs from 'fs';
 import {chain, keyBy, isNull, has, includes, every, isFinite, range} from 'lodash';
 import {Access} from '../server/access';
 import constants from '../common/constants';
@@ -10,6 +12,10 @@ import {
   ScoreOverride,
   TourneyConfigSpec
 } from '../server/ServerTypes';
+
+const TMP_DIR_MASK = '0777';
+const FS_EXISTS_ERR = 'EEXIST';
+const DATA_TMP_DIR = '/tmp/golfdraft_data'
 
 const DAYS = constants.NDAYS;
 const MISSED_CUT = constants.MISSED_CUT;
@@ -85,11 +91,37 @@ function fetchData(url: string): Promise<any> {
   });
 }
 
+function ensureDirectory(path: string) {
+  try {
+    fs.mkdirSync(path, TMP_DIR_MASK);
+  } catch (e) {
+    if (e.code !== FS_EXISTS_ERR) {
+      throw e;
+    }
+  }
+}
+
+async function safeWriteTmpFile(data: any) : Promise<void> {
+  try {
+    ensureDirectory(DATA_TMP_DIR);
+    const tmpOjb = tmp.fileSync({
+      prefix: 'data-',
+      dir: DATA_TMP_DIR,
+      discardDescriptor: true,
+    });
+    fs.writeFileSync(tmpOjb.name, data);
+  } catch (e) {
+    console.warn("Failed to write data to tmp file:", e);
+  }
+}
+
 export async function run(access: Access, reader: Reader, config: TourneyConfigSpec, populateGolfers = false) {
   const url = config.scoresSync.url;
 
-  const jsonStr = await fetchData(url);
-  const rawTourney = await reader.run(config, jsonStr);
+  const data = await fetchData(url);
+  await safeWriteTmpFile(data);
+
+  const rawTourney = await reader.run(config, data);
 
   // Quick assertion of data
   if (!rawTourney || !validate(rawTourney)) {
