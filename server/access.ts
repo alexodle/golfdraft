@@ -500,7 +500,11 @@ export class Access {
     };
   }
 
-  async updateTourney(props) {
+  touchLastUpdated() {
+    return this.updateTourney({});
+  }
+
+  updateTourney(props) {
     props = { ...props, lastUpdated: new Date() };
     return models.Tourney.update(
       { _id: this.tourneyId },

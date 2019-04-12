@@ -177,5 +177,8 @@ export async function run(access: Access, reader: Reader, config: TourneyConfigS
   const tourneyStanding = await updateTourneyStandings.run(access);
   safeWriteGzippedTmpFile(`${ts}-standings`, JSON.stringify(tourneyStanding));
 
+  // Mark as updated
+  await access.touchLastUpdated();
+
   console.log("HOORAY! - scores updated");
 }
