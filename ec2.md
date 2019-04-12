@@ -21,4 +21,5 @@
 ```
 */10 * * * * ~/golfdraft/ec2_runUpdateScore.sh
 0 * * * * [[ -d /tmp/golfdraft_data ]] && find /tmp/golfdraft_data/ -type f -mtime +2 -exec rm {} \;
+0 * * * * [[ -d /var/log/golfdraft/ ]] && find /var/log/golfdraft/ -type f -mtime +2 -exec rm {} \;
 ```
