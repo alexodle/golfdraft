@@ -42,9 +42,9 @@ function parseRequiredInt(str: string, msg: string): number {
   return n;
 }
 
-function parseRoundScore(g: LbDataGolfer): number | null {
+function parseRoundScore(g: LbDataGolfer): number {
   const str = g.round;
-  if (isNullStr(str)) return null;
+  if (isNullStr(str)) return 0;
   if (str === 'E') return 0;
   if (str.startsWith('+')) return parseInt(str.substr(1));
   if (str.startsWith('-')) return parseInt(str);
@@ -77,9 +77,6 @@ function parseMissedCutGolferScores(par: number, g: LbDataGolfer): (number | str
 function parseGolferScores(par: number, g: LbDataGolfer): (number | string)[] {
   const missedCut = !g.isActive;
   if (missedCut) return parseMissedCutGolferScores(par, g);
-
-  const hasStarted = !isNullStr(g.round);
-  if (!hasStarted) return times(NDAYS, () => 0);
 
   const currentRound = parseRoundDay(g);
   const currentRoundScore = parseRoundScore(g);

@@ -35,6 +35,10 @@ function readMidRoundJson2() {
   return fs.readFileSync('test/files/pgatour_lbdata.midround2.json');
 }
 
+function readMidRoundJsonDay2() {
+  return fs.readFileSync('test/files/pgatour_lbdata.midround.day2.json');
+}
+
 function readPostStartJson() {
   return fs.readFileSync('test/files/pgatour_lbdata.finished.json');
 }
@@ -107,6 +111,17 @@ describe('PgaTourLbReader', () => {
       const result = await reader.run(config, readPostStartJson());
       const wdGolfer = result.golfers.find(g => g.golfer === 'Jason Day');
       wdGolfer.scores.should.eql([MISSED_CUT, MISSED_CUT, MISSED_CUT, MISSED_CUT]);
+    });
+
+    it('parses day 2 scores correctly', async () => {
+      const result = await reader.run(config, readMidRoundJsonDay2());
+      const g = result.golfers.find(g => g.golfer === 'Cameron Smith');
+      g.should.eql({
+        golfer: 'Cameron Smith',
+        scores: [-2, 0, 0, 0],
+        day: 2,
+        thru: null,
+      });
     });
 
   });
