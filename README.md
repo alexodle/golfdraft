@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/odetown/golfdraft/tree/master.svg?style=svg)](https://circleci.com/gh/odetown/golfdraft/tree/master)
+[![CircleCI](https://circleci.com/gh/alexodle/golfdraft.svg?style=svg)](https://circleci.com/gh/alexodle/golfdraft)
 
 # README #
 
