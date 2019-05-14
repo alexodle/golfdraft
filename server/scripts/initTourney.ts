@@ -8,6 +8,7 @@ import * as tourneyUtils from '../tourneyUtils';
 import { readFileSync } from 'fs';
 import readerConfig from '../../scores_sync/readerConfig';
 import {User, TourneyConfigSpec} from '../ServerTypes';
+import {updateWgr} from '../../wgr/updateWgr';
 
 function assert(cond, msg) {
   if (!cond) {
@@ -60,6 +61,9 @@ export async function initTourney(tourneyCfg: TourneyConfigSpec): Promise<string
     draftHasStarted: false,
     autoPickUsers: []
   });
+
+  console.log("Updating WGR");
+  await updateWgr(access);
 
   return tourneyId;
 }

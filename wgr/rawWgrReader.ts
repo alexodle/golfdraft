@@ -5,7 +5,7 @@ import * as request from 'request';
 
 const AMATEUR_REGEX = /\(Am\)$/i;
 
-export default function rawWgrReader(url: string): Promise<WGR[]> {
+export function rawWgrReader(url: string): Promise<WGR[]> {
   return new Promise(function (fulfill, reject) {
     request({ url }, function (error, response, body) {
       if (error) {

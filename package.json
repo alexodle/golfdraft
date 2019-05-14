@@ -81,7 +81,7 @@
     "start": "tsc && node tsDist/server/server.js",
     "test": "./node_modules/.bin/mocha --exit --compilers ts:ts-node/register ./test/*Test.ts",
     "initTourney": "node tsDist/server/scripts/initTourney.js",
-    "updateWgr": "node tsDist/wgr/runUpdateWGR.js",
+    "updateWgr": "node tsDist/wgr/runUpdateWgr.js",
     "updateScore": "node tsDist/scores_sync/runUpdateScore.js",
     "printGolfersWithoutWgr": "node tsDist/wgr/runPrintGolfersWithoutWgr.js",
     "exportDraft": "node tsDist/server/scripts/exportDraft.js",
