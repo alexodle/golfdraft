@@ -39,8 +39,8 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
 
-      - run: npm build
-      - run: npm buildServer
+      - run: npm run build
+      - run: npm run buildServer
   test:
     docker:
       # specify the version you desire here
