@@ -9,12 +9,6 @@ import {keyBy, pick} from 'lodash';
 
 const {ObjectId} = mongoose.Types;
 
-async function ensureEmptyDraft() {
-  const access = await getActiveTourneyAccess();
-  const draft = await access.getDraft();
-  draft.picks.should.be.empty();
-}
-
 function clear() {
   return Promise.all([
     models.Golfer.remove({}).exec(),
@@ -31,10 +25,10 @@ async function assertPickListResult(userId, expected, promise) {
   
   const result = await promise;
   result.completed.should.be.true();
-  result.pickList.should.eql(expected);
+  Array.from(result.pickList).should.eql(expected);
 
   const actualPickList = await access.getPickList(userId);
-  actualPickList.map(pl => pl.toString()).should.eql(expected);
+  Array.from(actualPickList.map(pl => pl.toString())).should.eql(expected);
 }
 
 describe('access', () => {
