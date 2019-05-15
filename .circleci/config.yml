@@ -70,6 +70,5 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
 
-      - run: echo "tsc --version"; tsc --version; echo ""; echo "node --version"; node --version
-      - run: tsc --version && npm test
+      - run: npm test
       
