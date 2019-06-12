@@ -52,6 +52,7 @@ interface AppState {
   allowClock: boolean;
   draftHasStarted: boolean;
   autoPickUsers: Indexed<string>;
+  pickListUsers: Indexed<string>;
   activeTourneyId: string;
   allTourneys: Indexed<Tourney>;
 }
@@ -95,7 +96,8 @@ function getAppState(): AppState {
     isPaused: AppSettingsStore.getIsPaused(),
     allowClock: AppSettingsStore.getAllowClock(),
     draftHasStarted: AppSettingsStore.getDraftHasStarted(),
-    autoPickUsers: AppSettingsStore.getAutoPickUsers()
+    autoPickUsers: AppSettingsStore.getAutoPickUsers(),
+    pickListUsers: UserStore.getPickListUsers()
   };
 }
 
@@ -132,6 +134,7 @@ class DraftWrapper extends React.Component<ComponentProps, {}> {
           pendingPickList={props.draft.pendingPickList}
           draftHasStarted={props.draftHasStarted}
           autoPickUsers={props.autoPickUsers}
+          pickListUsers={props.pickListUsers}
           tourneyId={props.match.params.tourneyId}
           isViewingActiveTourney={props.isViewingActiveTourney}
         />

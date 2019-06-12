@@ -32,14 +32,21 @@ export default class UserActions {
   static setIsAdmin(isAdmin: boolean) {
     AppDispatcher.handleServerAction({
       actionType: AppConstants.SET_IS_ADMIN,
-      isAdmin: isAdmin
+      isAdmin,
     });
   }
 
   static setActiveUsers(activeUsers: string[]) {
     AppDispatcher.handleServerAction({
       actionType: AppConstants.SET_ACTIVE_USERS,
-      activeUsers: activeUsers
+      activeUsers,
+    });
+  }
+
+  static setPickListUsers(pickListUsers: string[]) {
+    AppDispatcher.handleServerAction({
+      actionType: AppConstants.SET_PICKLIST_USERS,
+      pickListUsers,
     });
   }
 

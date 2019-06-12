@@ -36,6 +36,7 @@ export interface DraftAppProps {
   currentPick?: DraftPickOrder;
   pickingForUsers: string[];
   autoPickUsers: Indexed<string>;
+  pickListUsers: Indexed<string>;
   allowClock: boolean;
   draftHasStarted: boolean;
   isPaused: boolean;
@@ -180,6 +181,7 @@ export default class DraftApp extends React.Component<DraftAppProps, DraftAppSta
                   golfersRemaining={this.props.golfersRemaining}
                   currentPick={this.props.currentPick}
                   syncedPickList={this.props.syncedPickList}
+                  pickListUsers={this.props.pickListUsers}
                 />
               )}
             </div>
@@ -204,6 +206,7 @@ export default class DraftApp extends React.Component<DraftAppProps, DraftAppSta
                 currentPick={this.props.currentPick}
                 pickingForUsers={this.props.pickingForUsers}
                 autoPickUsers={this.props.autoPickUsers}
+                pickListUsers={this.props.pickListUsers}
                 onUserSelected={this._onDraftHistorySelectionChange}
               />
             </GolfDraftPanel>

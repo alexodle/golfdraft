@@ -10,6 +10,7 @@ let _currentUser: string = null;
 let _users: IndexedUsers = null;
 let _isAdmin: boolean = false;
 let _activeUsers: Indexed<string> = null; // active users indexed by user id
+let _pickListUsers: Indexed<string> = null; // picklist users indexed by user id
 
 class UserStoreImpl extends Store {
   changeEvent() { return 'UserStore:change'; }
@@ -19,11 +20,12 @@ class UserStoreImpl extends Store {
   isAdmin() { return _isAdmin; }
   getAll() { return _users; }
   getActive() { return _activeUsers; }
+  getPickListUsers() { return _pickListUsers; }
 }
 const UserStore = new UserStoreImpl();
 
 // Register to handle all updates
-AppDispatcher.register(function (payload) {
+AppDispatcher.register(async (payload) => {
   const action = payload.action;
 
   switch(action.actionType) {
@@ -37,13 +39,12 @@ AppDispatcher.register(function (payload) {
       _currentUser = action.currentUser;
 
       if (!_currentUser && !action.doNotSync) {
-        post('/logout')
-          .then(function () {
-            UserActions.setCurrentUserSynced();
-          })
-          .catch(function () {
-            window.location.reload();
-          });
+        try {
+          await post('/logout')
+          UserActions.setCurrentUserSynced();
+        } catch (e) {
+          window.location.reload();
+        }
       } else {
         UserActions.setCurrentUserSynced();
       }
@@ -58,6 +59,11 @@ AppDispatcher.register(function (payload) {
 
     case AppConstants.SET_ACTIVE_USERS:
       _activeUsers = _.keyBy(action.activeUsers);
+      UserStore.emitChange();
+      break;
+    
+    case AppConstants.SET_PICKLIST_USERS:
+      _pickListUsers = _.keyBy(action.pickListUsers);
       UserStore.emitChange();
       break;
 

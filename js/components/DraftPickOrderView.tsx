@@ -11,13 +11,14 @@ export interface DraftPickOrderProps {
   currentPick?: DraftPickOrder;
   currentUser: User;
   autoPickUsers: Indexed<string>;
+  pickListUsers: Indexed<string>;
   onUserSelected: (pid: string) => void;
 }
 
 export default class DraftPickOrderView extends React.Component<DraftPickOrderProps, {}> {
 
   render() {
-    const {pickingForUsers, currentPick, currentUser, autoPickUsers} = this.props;
+    const {pickingForUsers, currentPick, currentUser, autoPickUsers, pickListUsers} = this.props;
     const myUser = currentUser._id;
 
     const pickOrder = take(this.props.pickOrder, this.props.pickOrder.length / constants.NGOLFERS);
@@ -45,6 +46,9 @@ export default class DraftPickOrderView extends React.Component<DraftPickOrderPr
               >
                 {!autoPickUsers[pick.user] ? null : (
                   <span><span className='label label-success auto-label'>AUTO</span> </span>
+                )}
+                {!pickListUsers[pick.user] ? null : (
+                  <span><span className='label label-success auto-label'>PL</span> </span>
                 )}
                 <a href='#DraftHistory' onClick={partial(this._onSelect, pick.user)}>
                   {UserStore.getUser(pick.user).name}

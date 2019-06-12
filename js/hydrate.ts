@@ -23,6 +23,7 @@ function hydrate(seedData: BootstrapPayload) {
   AppActions.setActiveTourneyId(seedData.activeTourneyId);
   AppActions.setCurrentTourney(seedData.tourney);
   AppActions.setAllTourneys(seedData.allTourneys);
+  UserActions.setPickListUsers(seedData.pickListUsers);
 
   if (seedData.user) {
     UserActions.hydrateCurrentUser(seedData.user._id);

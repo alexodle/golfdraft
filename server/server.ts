@@ -204,13 +204,14 @@ async function defineRoutes() {
   app.get(['/whoisyou', '/admin', '/history', '/:tourneyId/draft', '/:tourneyId'], async (req: Request, res: Response, next: NextFunction) => {
     const access = req.access;
     const tourneyId = access.getTourneyId();
-    const [golfers, users, draft, tourneyStandings, appState, allTourneys] = await Promise.all([
+    const [golfers, users, draft, tourneyStandings, appState, allTourneys, pickListUsers] = await Promise.all([
       access.getGolfers(),
       getUsers(),
       access.getDraft(),
       access.getTourneyStandings(),
       getAppState(),
       getAllTourneys(),
+      access.getPickListUsers(),
     ]);
     const tourney = find(allTourneys, t => utils.oidsAreEqual(tourneyId, t._id));
     if (!tourney) {
@@ -223,6 +224,7 @@ async function defineRoutes() {
       draft: JSON.stringify(draft),
       tourneyStandings: JSON.stringify(tourneyStandings),
       tourney: JSON.stringify(tourney),
+      pickListUsers: JSON.stringify(pickListUsers),
       appState: JSON.stringify(appState),
       user: JSON.stringify(req.user),
       activeTourneyId: activeTourneyId,

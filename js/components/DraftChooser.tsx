@@ -1,4 +1,4 @@
-import {Golfer, IndexedGolfers, DraftPickOrder, User} from '../types/ClientTypes';
+import {Golfer, IndexedGolfers, DraftPickOrder, User, Indexed} from '../types/ClientTypes';
 import {isEmpty, isArray, sortBy, first} from 'lodash';
 import * as cx from 'classnames';
 import * as React from 'react';
@@ -15,6 +15,7 @@ export interface DraftChooserProps {
   currentPick: DraftPickOrder;
   syncedPickList: string[];
   currentUser: User;
+  pickListUsers: Indexed<string>;
 }
 
 interface DraftChooserState {
@@ -52,6 +53,7 @@ export default class DraftChooser extends React.Component<DraftChooserProps, Dra
     }
 
     const golfersRemaining = this.props.golfersRemaining;
+    const pickListUsers = this.props.pickListUsers;
     const currentPick = this.props.currentPick;
     const sortKey = this.state.sortKey;
     const isProxyPick = this._isProxyPick();
@@ -80,7 +82,7 @@ export default class DraftChooser extends React.Component<DraftChooserProps, Dra
         {header}
 
         <div className='btn-group' role='group' aria-label='Sorting choices'>
-          <label>Sort users by:</label><br />
+          <label>Make pick by:</label><br />
           {!showPickListOption ? null : (
             <span>
               <button
@@ -90,7 +92,9 @@ export default class DraftChooser extends React.Component<DraftChooserProps, Dra
                   'active': sortKey === 'pickList'
                 })}
                 onClick={() => this._setSortKey('pickList')}
-              >Pick List</button>
+              >
+                {pickListUsers[currentPick.user] ? "Pick List" : "7th Best WGR"}
+              </button>
             </span>
           )}
           <button

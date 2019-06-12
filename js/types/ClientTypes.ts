@@ -53,6 +53,7 @@ export interface BootstrapPayload {
   draft: Draft;
   tourneyStandings: TourneyStandings;
   tourney: Tourney;
+  pickListUsers: string[];
   appState: AppSettings;
   user: User;
   activeTourneyId: string;
