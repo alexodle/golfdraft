@@ -92,7 +92,7 @@ export function getAllTourneys(): Promise<TourneyDoc[]> {
 }
 
 export function getAppState(): Promise<AppSettings> {
-  return models.AppState.findOne().exec() as Promise<AppSettings>;
+  return models.AppState.findOne().exec() as Promise<AppSettingsDoc>;
 }
 
 export function updateAppState(props: AppSettings) {
