@@ -57,6 +57,12 @@ function filterPicksFromPickLists() {
   }
 }
 
+function setPickList(pickList: string[]) {
+  _pickList = pickList;
+  _pendingPickList = _pickList;
+  filterPicksFromPickLists();
+}
+
 class DraftStoreImpl extends Store {
   changeEvent() { return 'DraftStore:change'; }
   getCurrentPick() { return getCurrentPick(); }
@@ -139,9 +145,7 @@ AppDispatcher.register(async payload => {
         // TODO - Move to separate server sync
         const data = await fetch('/draft/pickList');
         if (data.userId === currentUser._id) {
-          _pickList = data.pickList;
-          _pendingPickList = _pickList;
-          filterPicksFromPickLists();
+          setPickList(data.pickList);
           DraftStore.emitChange();
         }
       }
@@ -172,9 +176,7 @@ AppDispatcher.register(async payload => {
       break;
 
     case DraftConstants.SET_PICK_LIST:
-      _pickList = action.pickList;
-      _pendingPickList = _pickList;
-
+      setPickList(action.pickList);
       DraftStore.emitChange();
       break;
 
