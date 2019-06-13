@@ -92,7 +92,7 @@ export function getAllTourneys(): Promise<TourneyDoc[]> {
 }
 
 export function getAppState(): Promise<AppSettings> {
-  return models.AppState.findOne().exec();
+  return models.AppState.findOne().exec() as Promise<AppSettings>;
 }
 
 export function updateAppState(props: AppSettings) {
@@ -268,7 +268,7 @@ export class Access {
 
   async getPickListUsers(): Promise<ObjectId[]> {
     const query = { tourneyId: this.tourneyId }
-    const picksLists: DraftPickListDoc[] = await models.DraftPickList.find(query, { userId: true }).exec();
+    const picksLists = await models.DraftPickList.find(query, { userId: true }).exec() as DraftPickListDoc[];
     const users = picksLists.map(dpl => dpl.userId);
     return users;
   }
