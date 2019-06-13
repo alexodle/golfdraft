@@ -25,12 +25,6 @@ export default class DraftPickOrderView extends React.Component<DraftPickOrderPr
 
     return (
       <div>
-        <p><small>
-          <b>Tip:</b> your are picking for all users in bold
-        </small></p>
-        <p><small>
-          <b>Pro Tip:</b> click on a user to see their picks
-        </small></p>
         <ol className='pick-order-list'>
           {pickOrder.map(pick => {
             return (
@@ -44,15 +38,15 @@ export default class DraftPickOrderView extends React.Component<DraftPickOrderPr
                   'current-user': currentPick.user === pick.user
                 })}
               >
-                {!autoPickUsers[pick.user] ? null : (
-                  <span><span className='label label-success auto-label'>AUTO</span> </span>
-                )}
-                {!pickListUsers[pick.user] ? null : (
-                  <span><span className='label label-success auto-label'>PL</span> </span>
-                )}
                 <a href='#DraftHistory' onClick={partial(this._onSelect, pick.user)}>
                   {UserStore.getUser(pick.user).name}
                 </a>
+                {!autoPickUsers[pick.user] ? null : (
+                  <span> <span className='label label-success info-label'>AUTO</span></span>
+                )}
+                {!pickListUsers[pick.user] ? null : (
+                  <span> <span className='label label-info info-label'>PL</span></span>
+                )}
               </li>);
           })}
         </ol>

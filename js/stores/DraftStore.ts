@@ -79,7 +79,7 @@ class DraftStoreImpl extends Store {
 const DraftStore = new DraftStoreImpl();
 
 // Register to handle all updates
-AppDispatcher.register(function (payload) {
+AppDispatcher.register(async payload => {
   const action = payload.action;
 
   switch(action.actionType) {
@@ -89,12 +89,11 @@ AppDispatcher.register(function (payload) {
       filterPicksFromPickLists();
 
       // TODO - Move to separate server sync
-      postJson('/draft/picks', pick)
-        .catch(function () {
-          // No real error handling here, just reload the page to make sure we
-          // don't get people in a weird state.
-          window.location.reload();
-        });
+      try {
+        await postJson('/draft/picks', pick)
+      } catch {
+        window.location.reload();
+      }
 
       DraftStore.emitChange();
       break;
@@ -103,12 +102,11 @@ AppDispatcher.register(function (payload) {
       const partialPick = getCurrentPick();
 
       // TODO - Move to separate server sync
-      postJson('/draft/pickPickListGolfer', partialPick)
-        .catch(function () {
-          // No real error handling here, just reload the page to make sure we
-          // don't get people in a weird state.
-          window.location.reload();
-        });
+      try {
+        await postJson('/draft/pickPickListGolfer', partialPick);
+      } catch  {
+        window.location.reload();
+      }
       break;
 
     case DraftConstants.DRAFT_UPDATE:
@@ -137,17 +135,15 @@ AppDispatcher.register(function (payload) {
 
     case AppConstants.CURRENT_USER_CHANGE_SYNCED:
       const currentUser = UserStore.getCurrentUser();
-      if (currentUser) {
+      if (currentUser && !action.isHydration) {
         // TODO - Move to separate server sync
-        fetch('/draft/pickList')
-          .then(function (data) {
-            if (data.userId === currentUser._id) {
-              _pickList = data.pickList;
-              _pendingPickList = _pickList;
-              filterPicksFromPickLists();
-              DraftStore.emitChange();
-            }
-          });
+        const data = await fetch('/draft/pickList');
+        if (data.userId === currentUser._id) {
+          _pickList = data.pickList;
+          _pendingPickList = _pickList;
+          filterPicksFromPickLists();
+          DraftStore.emitChange();
+        }
       }
       break;
 
@@ -166,10 +162,11 @@ AppDispatcher.register(function (payload) {
 
       // TODO - Move to separate server sync
       const data = { pickList: _pickList };
-      postJson('/draft/pickList', data)
-        .catch(function () {
+      try {
+        await postJson('/draft/pickList', data);
+      } catch {
           window.location.reload();
-        });
+      }
 
       DraftStore.emitChange();
       break;

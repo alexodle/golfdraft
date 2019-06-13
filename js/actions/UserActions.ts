@@ -1,6 +1,5 @@
 import AppDispatcher from '../dispatcher/AppDispatcher';
 import AppConstants from '../constants/AppConstants';
-import {Indexed} from '../types/ClientTypes';
 
 export default class UserActions {
 
@@ -11,9 +10,10 @@ export default class UserActions {
     });
   }
 
-  static setCurrentUserSynced() {
+  static setCurrentUserSynced(isHydration: boolean = false) {
     AppDispatcher.handleServerAction({
-      actionType: AppConstants.CURRENT_USER_CHANGE_SYNCED
+      actionType: AppConstants.CURRENT_USER_CHANGE_SYNCED,
+      isHydration
     });
   }
 
@@ -25,7 +25,7 @@ export default class UserActions {
     AppDispatcher.handleServerAction({
       actionType: AppConstants.CURRENT_USER_CHANGE,
       currentUser: userId,
-      doNotSync: true
+      isHydration: true
     });
   }
 

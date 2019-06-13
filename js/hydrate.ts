@@ -27,6 +27,7 @@ function hydrate(seedData: BootstrapPayload) {
 
   if (seedData.user) {
     UserActions.hydrateCurrentUser(seedData.user._id);
+    DraftActions.setPickList(seedData.userPickList);
   }
 }
 

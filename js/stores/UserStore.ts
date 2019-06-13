@@ -38,15 +38,15 @@ AppDispatcher.register(async (payload) => {
     case AppConstants.CURRENT_USER_CHANGE:
       _currentUser = action.currentUser;
 
-      if (!_currentUser && !action.doNotSync) {
+      if (!_currentUser && !action.isHydration) {
         try {
           await post('/logout')
           UserActions.setCurrentUserSynced();
-        } catch (e) {
+        } catch {
           window.location.reload();
         }
       } else {
-        UserActions.setCurrentUserSynced();
+        UserActions.setCurrentUserSynced(action.isHydration);
       }
 
       UserStore.emitChange();

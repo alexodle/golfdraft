@@ -84,18 +84,16 @@ export default class DraftChooser extends React.Component<DraftChooserProps, Dra
         <div className='btn-group' role='group' aria-label='Sorting choices'>
           <label>Make pick by:</label><br />
           {!showPickListOption ? null : (
-            <span>
-              <button
-                type='button'
-                className={cx({
-                  'btn btn-default': true,
-                  'active': sortKey === 'pickList'
-                })}
-                onClick={() => this._setSortKey('pickList')}
-              >
-                {pickListUsers[currentPick.user] ? "Pick List" : "7th Best WGR"}
-              </button>
-            </span>
+            <button
+              type='button'
+              className={cx({
+                'btn btn-default': true,
+                'active': sortKey === 'pickList'
+              })}
+              onClick={() => this._setSortKey('pickList')}
+            >
+              {pickListUsers[currentPick.user] ? "Pick List" : `${utils.getOrdinal(constants.ABSENT_PICK_NTH_BEST_WGR)} Best WGR`}
+            </button>
           )}
           <button
             type='button'
@@ -118,10 +116,6 @@ export default class DraftChooser extends React.Component<DraftChooserProps, Dra
         <form role='form'>
         {isProxyPick && sortKey === 'pickList' ? (
           <div style={{marginTop: '1em'}}>
-            <small><b>
-              Selects the next player from the pick list. If no pick list is set, 
-              select the {utils.getOrdinal(constants.ABSENT_PICK_NTH_BEST_WGR)} best WGR.
-            </b></small><br />
             <button
               className='btn btn-default btn-primary'
               onClick={this._onProxyPickListPick}
