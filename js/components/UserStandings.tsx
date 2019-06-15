@@ -65,14 +65,14 @@ export default class UserStandings extends React.Component<UserStandingsProps, {
       <section>
         <p>
           <small>
-            <b>Tip:</b> Click on a user row to view score details
+            <b>Tip:</b> Click on a player row to view details
           </small>
         </p>
         <table className='table standings-table table-hover'>
           <thead>
             <tr>
               <th>#</th>
-              <th>Pool User</th>
+              <th>Pool Player</th>
               <th>Total</th>
               <th>Pick Number</th>
               <th className='hidden-xs'>Holes Left Today</th>

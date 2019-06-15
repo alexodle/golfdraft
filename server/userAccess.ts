@@ -32,7 +32,8 @@ export function refresh() {
 export async function onUserActivity(sessionId: string, userId: string, activity: string) {
   redisClient.hset('users', sessionId, userId, onUserChange);
   const user = await getUser(userId);
-  console.log(`onUserActivity: ${sessionId}, user: ${user.username}, activity: ${activity}`);
+  const currentTime = new Date();
+  console.log(`${currentTime.toISOString()} - onUserActivity: ${sessionId}, user: ${user.username}, activity: ${activity}`);
 }
 
 export function onUserLogout(sessionId: string) {
