@@ -15,7 +15,7 @@ export interface UserDetailsProps {
 export default class UserDetails extends React.Component<UserDetailsProps, {}> {
 
   render() {
-    const currentDay = this.props.tourneyStandings.currentDay;
+    const currentDayIndex = this.props.tourneyStandings.currentDay - 1;
     const userScores = this.props.tourneyStandings.playerScores;
 
     const userId = this.props.userId;
@@ -55,7 +55,7 @@ export default class UserDetails extends React.Component<UserDetailsProps, {}> {
               >
                 {utils.toGolferScoreStr(gs.score)}
                 <sup className="missed-cut-text"> MC</sup>
-                {i !== currentDay ? null : (
+                {i !== currentDayIndex ? null : (
                   <sup className="thru-text"> {utils.toThruStr(gs.thru)}</sup>
                 )}
               </td>

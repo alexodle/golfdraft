@@ -78,6 +78,10 @@ function fillInStandings(sortedScores: PlayerScore[]) {
   });
 }
 
+function estimateCurrentDay(scores: GolferScore[]) {
+  return scores[0].day;
+}
+
 export async function run(access: Access): Promise<TourneyStandings> {
   const [scores, draft] = await Promise.all([
     access.getScores(),
@@ -110,15 +114,9 @@ export async function run(access: Access): Promise<TourneyStandings> {
     .sortBy(ps => ps.totalScore)
     .value();
 
-  // Fill in standings
   fillInStandings(playerScores);
 
-  // Estimate current day
-  let currentDay = 0;
-  for (let i = 1; i < worstScoresForDay.length && worstScoresForDay[i].score !== 0; i++) {
-    currentDay++;
-  }
-
+  let currentDay = estimateCurrentDay(scores);
   const tourneyStandings: TourneyStandings = { currentDay, worstScoresForDay, playerScores };
 
   await access.updateTourneyStandings(tourneyStandings);

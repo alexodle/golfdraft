@@ -19,6 +19,7 @@ export default class UserStandings extends React.Component<UserStandingsProps, {
 
   render() {
     const tourneyStandings = this.props.tourneyStandings;
+    const currentDayIndex = tourneyStandings.currentDay - 1;
     const topScore = tourneyStandings.playerScores[0].totalScore;
 
     const trs = _.map(tourneyStandings.playerScores, (ps, i) => {
@@ -27,7 +28,7 @@ export default class UserStandings extends React.Component<UserStandingsProps, {
       const userIsSelected = this.props.selectedUser === p._id;
       const viewUser = _.partial(this._onUserSelect, p._id);
 
-      const holesLeft = _.sumBy(ps.dayScores[tourneyStandings.currentDay].golferScores, gs => {
+      const holesLeft = _.sumBy(ps.dayScores[currentDayIndex].golferScores, gs => {
         if (gs.missedCut) {
           return 0;
         } else if (gs.thru === null) {
