@@ -26,7 +26,7 @@ interface LbDataGolfer {
 }
 
 function isNullStr(str: string) {
-  return str.startsWith('--');
+  return str === null || str.startsWith('--') || str === 'null';
 }
 
 function safeParseInt(str: string): number | null {
@@ -64,8 +64,7 @@ function parseThru(g: LbDataGolfer) {
 }
 
 function parseMissedCutGolferScores(par: number, g: LbDataGolfer): (number | string)[] {
-    // This logic for "finished round" is only valid for missed cut golfers
-  const finishedRound = g.currentHoleId === null;
+  const finishedRound = isNullStr(g.currentHoleId);
 
   let latestRound = parseRoundDay(g);
   if (!finishedRound) {
