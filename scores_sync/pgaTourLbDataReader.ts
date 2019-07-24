@@ -51,9 +51,18 @@ function parseRoundScore(g: LbDataGolfer): number {
   throw new Error(`Unexpected round score: ${str}`);
 }
 
-function parseRoundDay(g: LbDataGolfer) {
-  const golferRoundId = parseRequiredInt(g.playerRoundId, 'Invalid player round id');
-  return golferRoundId;
+function parseRoundDayMissedCut(g: LbDataGolfer): number {
+  return parseRequiredInt(g.playerRoundId, 'Invalid player round id');
+}
+
+function parseRoundDay(g: LbDataGolfer): number {
+  let day=0;
+  for (day=0; day<constants.NDAYS; day++) {
+    if (isNullStr(g.rounds[day].strokes)) {
+      break;
+    }
+  }
+  return Math.min(day+1, constants.NDAYS);
 }
 
 function parseThru(g: LbDataGolfer) {
@@ -66,7 +75,7 @@ function parseThru(g: LbDataGolfer) {
 function parseMissedCutGolferScores(par: number, g: LbDataGolfer): (number | string)[] {
   const finishedRound = isNullStr(g.currentHoleId);
 
-  let latestRound = parseRoundDay(g);
+  let latestRound = parseRoundDayMissedCut(g);
   if (!finishedRound) {
     latestRound--;
   }

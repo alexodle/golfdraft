@@ -105,7 +105,7 @@ describe('PgaTourLbReader', () => {
       g.should.eql({
         golfer: 'Billy Horschel',
         scores: [4, -1, MISSED_CUT, MISSED_CUT],
-        day: 2,
+        day: 3,
         thru: null
       })
     })
