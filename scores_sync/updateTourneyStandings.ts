@@ -2,6 +2,7 @@ import {Access} from '../server/access';
 import constants from '../common/constants';
 import {GolferScore, PlayerScore, TourneyStandings} from '../server/ServerTypes';
 import {chain, groupBy, keyBy, mapValues, maxBy, isNumber, sumBy, times} from 'lodash';
+import { SSL_OP_ALL } from 'constants';
 
 function buildPlayerScore(
   player: string,
@@ -79,7 +80,8 @@ function fillInStandings(sortedScores: PlayerScore[]) {
 }
 
 function estimateCurrentDay(scores: GolferScore[]) {
-  return scores[0].day;
+  const nonMissedCutScore = scores.find(gs => !gs.scores.some(s => s === constants.MISSED_CUT))
+  return nonMissedCutScore.day;
 }
 
 export async function run(access: Access): Promise<TourneyStandings> {
