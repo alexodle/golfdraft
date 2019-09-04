@@ -1,25 +1,29 @@
-import * as _ from 'lodash';
 import * as React from 'react';
-import UserActions from '../actions/UserActions';
-import UserStore from '../stores/UserStore';
-import {Redirect} from 'react-router-dom';
-import {Location} from '../types/ClientTypes';
-import {postJson} from '../fetch';
 
 export interface WhoIsYouProps {
-  location: Location;
+  usernames: string[];
 }
 
 interface WhoIsYouState {
   selectedUser: string;
-  isLoading: boolean;
   password: string;
   badAuth: boolean;
+  isSubmitted: boolean;
   redirectTo?: string;
 }
 
-function getSortedUsers() {
-  return _.sortBy(UserStore.getAll(), 'name');
+function isEmpty(v): boolean {
+  return !v || !(v.length && v.length > 0);
+}
+
+function getBadAuthParam(): boolean {
+  const urlParams = new URLSearchParams(window.location.search);
+  return !!urlParams.get('invalidAuth');
+}
+
+function getRedirectToParam(): string {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get('redirect');
 }
 
 export default class WhoIsYou extends React.Component<WhoIsYouProps, WhoIsYouState> {
@@ -27,13 +31,13 @@ export default class WhoIsYou extends React.Component<WhoIsYouProps, WhoIsYouSta
   constructor(props) {
     super(props);
 
-    const selectedUser = getSortedUsers()[0]._id;
+    const selectedUser = props.usernames.sort()[0];
     this.state = {
       selectedUser,
-      isLoading: false,
       password: '',
-      badAuth: false,
-      redirectTo: null
+      isSubmitted: false,
+      badAuth: getBadAuthParam(),
+      redirectTo: getRedirectToParam(),
     };
   }
 
@@ -42,12 +46,9 @@ export default class WhoIsYou extends React.Component<WhoIsYouProps, WhoIsYouSta
   }
 
   render() {
-    const {badAuth, isLoading, selectedUser, redirectTo, password} = this.state;
-    if (redirectTo) {
-      return (<Redirect to={redirectTo} />);
-    }
+    const {badAuth, isSubmitted, selectedUser, redirectTo, password} = this.state;
 
-    const submitDisabled = isLoading || _.isEmpty(password);
+    const submitDisabled = isSubmitted || isEmpty(password);
     return (
       <div>
         <h2>Who is you?</h2>
@@ -58,39 +59,42 @@ export default class WhoIsYou extends React.Component<WhoIsYouProps, WhoIsYouSta
         )}
         <div className='panel panel-default'>
           <div className='panel-body'>
-            <form role='form'>
+            <form role='form' action='/login' method='post'>
               <div className='form-group'>
                 <select
                   ref='userSelect'
                   id='userSelect'
-                  value={this.state.selectedUser}
+                  name='username'
+                  value={selectedUser}
                   onChange={this._onUserChange}
                   size={15}
                   className='form-control'
                 >
-                  {_.map(getSortedUsers(), u => {
-                    return (<option key={u._id} value={u._id}>{u.name}</option>);
-                  })}
+                  {this.props.usernames.sort().map(u => <option key={u} value={u}>{u}</option>)}
                 </select>
               </div>
               <div className={'form-group' + (badAuth ? ' has-error' : '')}>
                 <input
                   ref='passwordInput'
+                  name='password'
                   type='password'
                   placeholder='Password'
                   className='form-control'
                   onChange={this._onPasswordChange}
-                  disabled={isLoading}
+                  disabled={isSubmitted}
                   value={password}
                 />
               </div>
-              <button
+              {isEmpty(redirectTo) ? null : (
+                <input type='hidden' name='redirect' value={redirectTo} />
+              )}
+              <input
+                type='submit'
                 className='btn btn-default btn-primary'
-                onClick={this._onSubmit}
+                onSubmit={this._onSubmit}
                 disabled={submitDisabled}
-              >
-                Sign in
-              </button>
+                value='Sign in'
+              />
             </form>
           </div>
         </div>
@@ -106,26 +110,8 @@ export default class WhoIsYou extends React.Component<WhoIsYouProps, WhoIsYouSta
     this.setState({ selectedUser: ev.target.value });
   }
 
-  _onSubmit = (ev) => {
-    ev.preventDefault();
-
-    this.setState({ isLoading: true, badAuth: false });
-
-    postJson('/login', {
-        username: UserStore.getUser(this.state.selectedUser).username,
-        password: this.state.password
-      })
-      .then(() => {
-        UserActions.setCurrentUser(this.state.selectedUser);
-
-        const locationState = this.props.location.state;
-        const redirectTo = (locationState && locationState.from) || '/';
-        this.setState({ redirectTo });
-      })
-      .catch(() => {
-        this.setState({ isLoading: false, badAuth: true, password: '' });
-        (this.refs.passwordInput as HTMLInputElement).focus();
-      });
+  _onSubmit = () => {
+    this.setState({ isSubmitted: true, badAuth: false });
   }
 
 };

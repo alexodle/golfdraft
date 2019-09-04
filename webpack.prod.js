@@ -6,7 +6,10 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   mode: 'production',
-  entry: './js/app.tsx',
+  entry: {
+    main: './js/app.tsx',
+    login: './js/login.tsx',
+  },
   resolve: {
     // Add '.ts' and '.tsx' as resolvable extensions.
     extensions: ['.ts', '.tsx', '.js', '.jsx', '.json']

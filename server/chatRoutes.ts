@@ -1,15 +1,15 @@
 import {isEmpty} from 'lodash';
 import app from './expressApp';
-import {requireSession} from './authMiddleware';
+import {requireSessionApi} from './authMiddleware';
 import {Request, Response, NextFunction} from 'express';
 import {ChatMessage} from './ServerTypes';
 
-app.get(['/:tourneyId/chat/messages', '/:tourneyId/draft/chat/messages'], requireSession(), async (req: Request, res: Response) => {
+app.get(['/:tourneyId/chat/messages', '/:tourneyId/draft/chat/messages'], requireSessionApi(), async (req: Request, res: Response) => {
   const messages = await req.access.getChatMessages();
   res.status(200).send(messages);
 });
 
-app.post(['/:tourneyId/chat/messages', '/:tourneyId/draft/chat/messages'], requireSession(), async (req: Request, res: Response) => {
+app.post(['/:tourneyId/chat/messages', '/:tourneyId/draft/chat/messages'], requireSessionApi(), async (req: Request, res: Response) => {
   const body = req.body;
   const user = req.user;
 

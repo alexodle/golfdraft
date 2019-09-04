@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import {once} from 'lodash';
 import AppActions from './actions/AppActions';
 import DraftActions from './actions/DraftActions';
 import parseDraft from './logic/DraftParser';
@@ -31,6 +31,6 @@ function hydrate(seedData: BootstrapPayload) {
   }
 }
 
-export default _.once(() => {
+export default once(() => {
   hydrate((<any>window).golfDraftSeed);
 });

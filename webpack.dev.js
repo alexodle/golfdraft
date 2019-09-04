@@ -6,13 +6,14 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
   mode: 'development',
   devtool: 'inline-source-map',
-
-  entry: './js/app.tsx',
+  entry: {
+    main: './js/app.tsx',
+    login: './js/login.tsx',
+  },
   resolve: {
     // Add '.ts' and '.tsx' as resolvable extensions.
     extensions: ['.ts', '.tsx', '.js', '.jsx', '.json']
   },
-
   output: {
     filename: '[name].js',
     path: path.resolve(__dirname, 'distd'),
@@ -22,9 +23,15 @@ module.exports = {
     new CleanWebpackPlugin(['distd']),
     new MiniCssExtractPlugin({ filename: '[name].css' }),
     new HtmlWebpackPlugin({
+      chunks: ['main'],
       filename: 'index.handlebars',
       template: 'views/index.handlebars'
-    })
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['login'],
+      filename: 'login.handlebars',
+      template: 'views/login.handlebars',
+    }),
   ],
   module: {
     rules: [

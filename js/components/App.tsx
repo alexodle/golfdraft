@@ -11,7 +11,6 @@ import ScoreStore from '../stores/ScoreStore';
 import TourneyApp from './TourneyApp';
 import TourneyStore from '../stores/TourneyStore';
 import UserStore from '../stores/UserStore';
-import WhoIsYou from './WhoIsYou';
 import {DraftProps} from '../types/SharedProps';
 import {Route, Switch, Redirect} from 'react-router-dom';
 import constants from '../../common/constants';
@@ -231,12 +230,6 @@ export default class AppNode extends React.Component<AppNodeProps, AppState> {
     });
   }
 
-  _requireCurrentUser(from) {
-    if (!this.state.currentUser) {
-      return (<Redirect to={{ pathname: '/whoisyou', state: { from }}} />);
-    }
-  }
-
   _requireDraftComplete(from) {
     if (this.state.draft.currentPick) {
       return (<Redirect to={{ pathname: 'draft', state: { from }}} />);
@@ -253,25 +246,18 @@ export default class AppNode extends React.Component<AppNodeProps, AppState> {
     );
 
     const renderTourneyWrapper = (props) => {
-      return this._requireCurrentUser(props.location.pathname) || this._requireDraftComplete(props.location) || (
+      return this._requireDraftComplete(props.location) || (
         <TourneyWrapper {...props} {...state} golfersRemaining={golfersRemaining} />
       );
     }
 
-    const renderDraftWrapper = (props) => {
-      return this._requireCurrentUser(props.location.pathname) || (
-        <DraftWrapper {...props} {...state} golfersRemaining={golfersRemaining} />
-      );
-    }
-
-    const renderWhoIsYou = (props) => (<WhoIsYou {...props} {...state} golfersRemaining={golfersRemaining} />);
+    const renderDraftWrapper = (props) => (<DraftWrapper {...props} {...state} golfersRemaining={golfersRemaining} />);
     const renderAdminWrapper = (props) => (<AdminWrapper {...props} {...state} golfersRemaining={golfersRemaining} />);
     const renderHistoryWrapper = (props) => (<HistoryWrapper {...props} {...state} />);
 
     return (
       <Switch>
         <Route exact path={`/${constants.TOURNEY_ID_PARAM}/draft`} render={renderDraftWrapper}/>
-        <Route exact path='/whoisyou' render={renderWhoIsYou}/>
         <Route exact path='/admin' render={renderAdminWrapper}/>
         <Route exact path='/history' render={renderHistoryWrapper}/>
         <Route exact path={`/${constants.TOURNEY_ID_PARAM}`} render={renderTourneyWrapper} />

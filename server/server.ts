@@ -27,7 +27,7 @@ import expressServer from './expressServer';
 import io from './socketIO';
 import redis from './redis';
 import {Request, Response, NextFunction} from 'express';
-import {requireSession} from './authMiddleware';
+import {requireSessionApi, requireSessionHtml, requireAdminApi} from './authMiddleware';
 import {User} from './models';
 import {
   AppSettings,
@@ -35,6 +35,7 @@ import {
   DraftPick,
   BootstrapPayload,
 } from './ServerTypes';
+import { access } from 'fs';
 
 const RedisStore = connectRedis(session);
 const redisPubSubClient = redis.pubSubClient;
@@ -194,14 +195,25 @@ async function defineRoutes() {
 
   // Support legacy urls
   app.get(/\/tourney\/?/, (req: Request, res: Response, next: NextFunction) => {
-    res.redirect('/');
+    res.redirect(`/${activeTourneyId}`);
   });
-
   app.get(['/', '/draft'], (req: Request, res: Response, next: NextFunction) => {
     res.redirect(`/${activeTourneyId}${req.path}`);
   });
 
-  app.get(['/whoisyou', '/admin', '/history', '/:tourneyId/draft', '/:tourneyId'], async (req: Request, res: Response, next: NextFunction) => {
+  app.get('/login', async (req: Request, res: Response, next: NextFunction) => {
+    if (req.user) {
+      res.redirect(`/${activeTourneyId}`);
+      return;
+    }
+
+    const users = await getUsers();
+    res.render('login', {
+      usernames: JSON.stringify(users.map(u => u.username))
+    });
+  });
+
+  app.get(['/admin', '/history', '/:tourneyId/draft', '/:tourneyId'], requireSessionHtml(), async (req: Request, res: Response, next: NextFunction) => {
     const access = req.access;
     const tourneyId = access.getTourneyId();
     const [golfers, users, draft, tourneyStandings, appState, allTourneys, pickListUsers, userPickList] = await Promise.all([
@@ -250,22 +262,23 @@ async function defineRoutes() {
   });
 
   app.post('/login', passport.authenticate('local'), (req: Request, res: Response, next: NextFunction) => {
-    res.status(200).send({ username: req.body.username });
+    const redirect = req.query.redirect || `/${activeTourneyId}`;
+    res.redirect(redirect);
   });
 
-  app.post('/logout', (req: Request, res: Response, next: NextFunction) => {
+  app.post('/logout', requireSessionApi(), (req: Request, res: Response, next: NextFunction) => {
     userAccess.onUserLogout(req.session.id);
     req.logout();
-    res.status(200).send({ 'username': null });
+    res.redirect('/login');
   });
 
-  app.get(['/draft/pickList', '/:tourneyId/draft/pickList'], requireSession(), async (req: Request, res: Response, next: NextFunction) => {
+  app.get(['/draft/pickList', '/:tourneyId/draft/pickList'], requireSessionApi(), async (req: Request, res: Response, next: NextFunction) => {
     const user = req.user;
     const pickList = await req.access.getPickList(user._id);
     res.status(200).send({ userId: user._id, pickList: pickList });
   });
 
-  app.post('/draft/pickList', requireSession(), async (req: Request, res: Response, next: NextFunction) => {
+  app.post('/draft/pickList', requireSessionApi(), async (req: Request, res: Response, next: NextFunction) => {
     const access = req.access;
     const body = req.body;
     const user = req.user;
@@ -287,7 +300,7 @@ async function defineRoutes() {
     }
   });
 
-  app.put('/draft/autoPick', requireSession(), (req: Request, res: Response, next: NextFunction) => {
+  app.put('/draft/autoPick', requireSessionApi(), (req: Request, res: Response, next: NextFunction) => {
     const body = req.body;
     const user = req.user;
 
@@ -295,7 +308,7 @@ async function defineRoutes() {
     onAppStateUpdate(req, res, req.access.updateAutoPick(user._id, autoPick));
   });
 
-  app.post('/draft/picks', requireSession(), (req: Request, res: Response, next: NextFunction) => {
+  app.post('/draft/picks', requireSessionApi(), (req: Request, res: Response, next: NextFunction) => {
     const body = req.body;
     const user = req.user;
 
@@ -312,7 +325,7 @@ async function defineRoutes() {
     });
   });
 
-  app.post('/draft/pickPickListGolfer', requireSession(), (req: Request, res: Response, next: NextFunction) => {
+  app.post('/draft/pickPickListGolfer', requireSessionApi(), (req: Request, res: Response, next: NextFunction) => {
     const body = req.body;
     const currentUuser = req.user;
 
@@ -335,7 +348,7 @@ async function defineRoutes() {
 
   // ADMIN FUNCTIONALITY
 
-  app.post('/admin/login', requireSession(), (req: Request, res: Response, next: NextFunction) => {
+  app.post('/admin/login', requireSessionApi(), (req: Request, res: Response, next: NextFunction) => {
     if (req.body.password !== config.admin_password) {
       res.status(401).send('Bad password');
       return;
@@ -352,53 +365,28 @@ async function defineRoutes() {
     });
   });
 
-  app.put('/admin/autoPickUsers', requireSession(), (req: Request, res: Response, next: NextFunction) => {
-    if (!req.session.isAdmin) {
-      res.status(401).send('Only can admin can pause the draft');
-      return;
-    }
-
+  app.put('/admin/autoPickUsers', requireAdminApi(), (req: Request, res: Response, next: NextFunction) => {
     const userId = req.body.userId;
     const autoPick = !!req.body.autoPick;
     return onAppStateUpdate(req, res, req.access.updateAutoPick(userId, autoPick));
   });
 
-  app.put('/admin/pause', requireSession(), (req: Request, res: Response, next: NextFunction) => {
-    if (!req.session.isAdmin) {
-      res.status(401).send('Only can admin can pause the draft');
-      return;
-    }
-
+  app.put('/admin/pause', requireAdminApi(), (req: Request, res: Response, next: NextFunction) => {
     const isDraftPaused = !!req.body.isPaused;
     return onAppStateUpdate(req, res, updateAppState({ isDraftPaused } as AppSettings));
   });
 
-  app.put('/admin/allowClock', requireSession(), (req: Request, res: Response, next: NextFunction) => {
-    if (!req.session.isAdmin) {
-      res.status(401).send('Only can admin can toggle clock');
-      return;
-    }
-
+  app.put('/admin/allowClock', requireAdminApi(), (req: Request, res: Response, next: NextFunction) => {
     const allowClock = !!req.body.allowClock;
     return onAppStateUpdate(req, res, updateAppState({ allowClock } as AppSettings));
   });
 
-  app.put('/admin/draftHasStarted', requireSession(), (req: Request, res: Response, next: NextFunction) => {
-    if (!req.session.isAdmin) {
-      res.status(401).send('Only can admin can toggle draft status');
-      return;
-    }
-
+  app.put('/admin/draftHasStarted', requireAdminApi(), (req: Request, res: Response, next: NextFunction) => {
     const draftHasStarted = !!req.body.draftHasStarted;
     return onAppStateUpdate(req, res, updateAppState({ draftHasStarted } as AppSettings));
   });
 
-  app.delete('/admin/lastpick', requireSession(), (req: Request, res: Response, next: NextFunction) => {
-    if (!req.session.isAdmin) {
-      res.status(401).send('Only can admin can undo picks');
-      return;
-    }
-
+  app.delete('/admin/lastpick', requireAdminApi(), (req: Request, res: Response, next: NextFunction) => {
     return handlePick({
       force: true,
       res,
@@ -407,12 +395,7 @@ async function defineRoutes() {
     });
   });
 
-  app.put('/admin/forceRefresh', requireSession(), (req: Request, res: Response, next: NextFunction) => {
-    if (!req.session.isAdmin) {
-      res.status(401).send('Only can admin can force refreshes');
-      return;
-    }
-
+  app.put('/admin/forceRefresh', requireAdminApi(), (req: Request, res: Response, next: NextFunction) => {
     io.sockets.emit('action:forcerefresh');
     res.status(200).send({ forceRefresh: true });
   });
