@@ -23,8 +23,14 @@ module.exports = {
     new CleanWebpackPlugin(['dist']),
     new MiniCssExtractPlugin({ filename: '[name].[contenthash].css' }),
     new HtmlWebpackPlugin({
+      chunks: ['main'],
       filename: 'index.handlebars',
       template: 'views/index.handlebars'
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['login'],
+      filename: 'login.handlebars',
+      template: 'views/login.handlebars',
     }),
     new webpack.HashedModuleIdsPlugin()
   ],
