@@ -1,41 +1,26 @@
-import {
-  getAccess,
-  getActiveTourneyAccess,
-  getAllTourneys,
-  getAppState,
-  getUsers,
-  updateAppState,
-  exportTourneyResults,
-  Access
-} from './access';
-import {find, chain} from 'lodash';
 import * as bodyParser from 'body-parser';
-import * as chatBot from './chatBot';
 import * as compression from 'compression';
 import * as connectRedis from 'connect-redis';
-import * as exphbs  from 'express-handlebars';
 import * as express from 'express';
-import * as mongooseUtil from './mongooseUtil';
-import * as passport from 'passport';
+import { NextFunction, Request, Response } from 'express';
+import * as exphbs from 'express-handlebars';
 import * as session from 'express-session';
-import * as userAccess from './userAccess';
+import { chain, find } from 'lodash';
+import * as passport from 'passport';
 import * as utils from '../common/utils';
 import * as updateTourneyStandings from '../scores_sync/updateTourneyStandings';
-import app from './expressApp';
+import { Access, exportTourneyResults, getAccess, getActiveTourneyAccess, getAllTourneys, getAppState, getUsers, updateAppState } from './access';
+import { requireAdminApi, requireSessionApi, requireSessionHtml } from './authMiddleware';
+import * as chatBot from './chatBot';
 import config from './config';
+import app from './expressApp';
 import expressServer from './expressServer';
-import io from './socketIO';
+import { User } from './models';
+import * as mongooseUtil from './mongooseUtil';
 import redis from './redis';
-import {Request, Response, NextFunction} from 'express';
-import {requireSessionApi, requireSessionHtml, requireAdminApi} from './authMiddleware';
-import {User} from './models';
-import {
-  AppSettings,
-  Draft,
-  DraftPick,
-  BootstrapPayload,
-} from './ServerTypes';
-import { access } from 'fs';
+import { AppSettings, BootstrapPayload, Draft, DraftPick } from './ServerTypes';
+import io from './socketIO';
+import * as userAccess from './userAccess';
 
 const RedisStore = connectRedis(session);
 const redisPubSubClient = redis.pubSubClient;
@@ -399,6 +384,12 @@ async function defineRoutes() {
     io.sockets.emit('action:forcerefresh');
     res.status(200).send({ forceRefresh: true });
   });
+
+  // Health
+
+  app.get('/health', (_req: Request, res: Response) => {
+    return { 'hello': 'world' }
+  })
 }
 
 function updateClients(draft) {
@@ -409,7 +400,7 @@ function updateClients(draft) {
   });
 }
 
- // HELPERS
+// HELPERS
 
 function isDraftOver(draft: Draft) {
   const nextPickNumber = draft.picks.length;
@@ -427,8 +418,8 @@ function ensureNextAutoPick() {
         return;
       }
 
-      const {appState, draft} = spec;
-      const {autoPickUsers} = appState;
+      const { appState, draft } = spec;
+      const { autoPickUsers } = appState;
       const nextPickNumber = draft.picks.length;
       const nextPick = draft.pickOrder[nextPickNumber];
       const nextPickUser = nextPick.user;
@@ -476,7 +467,7 @@ async function handlePick(spec: {
   broadcastPickMessage: ({ pick: DraftPick, draft: Draft }) => Promise<any>,
   force?: boolean
 }) {
-  const {res, makePick, broadcastPickMessage, force} = spec;
+  const { res, makePick, broadcastPickMessage, force } = spec;
 
   let pick = null;
   let draft = null;
