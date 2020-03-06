@@ -388,7 +388,7 @@ async function defineRoutes() {
   // Health
 
   app.get('/health', (_req: Request, res: Response) => {
-    return { 'hello': 'world' }
+    res.status(200).send({ 'hello': 'world' })
   })
 }
 
