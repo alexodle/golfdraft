@@ -194,6 +194,7 @@ async function defineRoutes() {
 
     const users = await getUsers();
     res.render('login', {
+      layout: false,
       usernames: JSON.stringify(users.map(u => u.username))
     });
   });
@@ -217,6 +218,7 @@ async function defineRoutes() {
       return;
     }
     res.render('index', {
+      layout: false,
       golfers: JSON.stringify(golfers),
       users: JSON.stringify(users),
       draft: JSON.stringify(draft),

@@ -1,5 +1,5 @@
+import { NextFunction, Request, RequestHandler, Response } from 'express';
 import * as passport from 'passport';
-import {Request, Response, NextFunction, RequestHandler} from 'express';
 import * as url from 'url';
 
 function ensureUserApi(req: Request, res: Response, next: NextFunction) {
@@ -14,10 +14,9 @@ function ensureUserHtml(req: Request, res: Response, next: NextFunction) {
   if (req.user) {
     next();
   } else {
-    console.log('hihi.referrer: ' + req.get('Referrer'));
     res.redirect(url.format({
-      pathname:"/login",
-      query: {redirect: req.get('Referrer')}
+      pathname: "/login",
+      query: { redirect: req.get('Referrer') }
     }));
   }
 }
