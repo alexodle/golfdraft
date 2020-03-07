@@ -22,17 +22,17 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin(['dist']),
     new MiniCssExtractPlugin({ filename: '[name].[contenthash].css' }),
+    new webpack.HashedModuleIdsPlugin(),
     new HtmlWebpackPlugin({
-      chunks: ['main'],
+      chunks: ['main', 'runtime', 'vendors'],
       filename: 'index.handlebars',
       template: 'views/index.handlebars'
     }),
     new HtmlWebpackPlugin({
-      chunks: ['login'],
+      chunks: ['login', 'runtime', 'vendors'],
       filename: 'login.handlebars',
       template: 'views/login.handlebars',
     }),
-    new webpack.HashedModuleIdsPlugin()
   ],
   optimization: {
     runtimeChunk: 'single',

@@ -1,30 +1,33 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Pool Party</title>
 
-    <script>
-      // BOOTSTRAP DATA
-      //
-      var sd = window.golfDraftSeed = {};
-      sd.CDN_URL = '{{cdnUrl}}';
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pool Party</title>
 
-      sd.golfers = {{{golfers}}};
-      sd.users = {{{users}}};
-      sd.draft = {{{draft}}};
-      sd.tourneyStandings = {{{tourneyStandings}}};
-      sd.tourney = {{{tourney}}};
-      sd.userPickList = {{{userPickList}}};
-      sd.pickListUsers = {{{pickListUsers}}};
-      sd.appState = {{{appState}}};
-      sd.user = {{{or user "null"}}};
-      sd.allTourneys = {{{allTourneys}}};
-      sd.activeTourneyId = '{{activeTourneyId}}';
-    </script>
-  <link href="/dist/main.16052ee401808295a4fb.css" rel="stylesheet"></head>
-  <body>
-    <section id="golfdraftapp" />
-  <script type="text/javascript" src="/dist/main.907c7a830c1fe263c4ef.js"></script></body>
+  <script>
+    // BOOTSTRAP DATA
+    //
+    var sd = window.golfDraftSeed = {};
+    sd.CDN_URL = '{{cdnUrl}}';
+
+    sd.golfers = {{ { golfers } }};
+    sd.users = {{ { users } }};
+    sd.draft = {{ { draft } }};
+    sd.tourneyStandings = {{ { tourneyStandings } }};
+    sd.tourney = {{ { tourney } }};
+    sd.userPickList = {{ { userPickList } }};
+    sd.pickListUsers = {{ { pickListUsers } }};
+    sd.appState = {{ { appState } }};
+    sd.user = {{ { or user "null" } }};
+    sd.allTourneys = {{ { allTourneys } }};
+    sd.activeTourneyId = '{{activeTourneyId}}';
+  </script>
+<link href="/dist/vendors.1a0fea6d95d4476fa861.css" rel="stylesheet"><link href="/dist/main.16052ee401808295a4fb.css" rel="stylesheet"></head>
+
+<body>
+  <section id="golfdraftapp" />
+<script type="text/javascript" src="/dist/runtime.ba82c719ece8e66557e1.js"></script><script type="text/javascript" src="/dist/vendors.c881c7900ec717833fc9.js"></script><script type="text/javascript" src="/dist/main.907c7a830c1fe263c4ef.js"></script></body>
+
 </html>
