@@ -248,7 +248,7 @@ async function defineRoutes() {
     });
   });
 
-  app.post('/login', passport.authenticate('local'), (req: Request, res: Response, next: NextFunction) => {
+  app.post('/login', passport.authenticate('local', { failureRedirect: '/login?invalidAuth=true' }), (req: Request, res: Response, next: NextFunction) => {
     const redirect = req.query.redirect || `/${activeTourneyId}`;
     res.redirect(redirect);
   });
