@@ -80,7 +80,7 @@
     "buildServer": "./node_modules/typescript/bin/tsc",
     "watch:dev": "./node_modules/.bin/webpack --env dev --watch",
     "run:dev": "NODE_ENV=development concurrently --kill-others \"npm run watch:dev\" \"npm run start\"",
-    "start": "./node_modules/typescript/bin/tsc && node tsDist/server/server.js",
+    "start": "node tsDist/server/server.js",
     "test": "./node_modules/.bin/mocha --exit --require ts-node/register ./test/*Test.ts",
     "initTourney": "node tsDist/server/scripts/initTourney.js",
     "updateWgr": "node tsDist/wgr/runUpdateWgr.js",
