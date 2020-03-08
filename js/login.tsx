@@ -1,9 +1,11 @@
 // load css right away
-import 'bootstrap/dist/css/bootstrap.css';
-import 'font-awesome/css/font-awesome.css';
+//import 'bootstrap/dist/css/bootstrap.css';
+//import 'font-awesome/css/font-awesome.css';
+import '../less/app.less';
+import '../less/bootstrap_repl.less'
+
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import '../less/app.less';
 import WhoIsYou from './components/WhoIsYou';
 
 

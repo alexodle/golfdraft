@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {User} from '../types/ClientTypes';
+import { User } from '../types/ClientTypes';
 
 export interface LogoutButtonProps {
   currentUser: User;
@@ -18,15 +18,15 @@ export default class LogoutButton extends React.Component<LogoutButtonProps, Log
 
   render() {
     return (
-        <form action='/logout' method='post'>
-          <input
-            type='submit'
-            className="logout-button"
-            value={`I'm not ${this.props.currentUser.name}`}
-            onSubmit={this._onSubmit}
-            disabled={!this.state.enabled}
-          />
-        </form>
+      <form action='/logout' method='post'>
+        <input
+          type='submit'
+          className="logout-button"
+          value={`I'm not ${this.props.currentUser.name}`}
+          onSubmit={this._onSubmit}
+          disabled={!this.state.enabled}
+        />
+      </form>
     );
   }
 

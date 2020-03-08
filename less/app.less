@@ -76,53 +76,6 @@
   text-align: center;
 }
 
-.draft-page-header {
-  position: relative;
-}
-
-@dtWidth: 220px;
-.chat-panel {
-  height: 200px;
-  min-height: 200px;
-  overflow-y: scroll;
-
-  @media (min-width: 768px) {
-    resize: vertical;
-    height: 350px;
-    min-height: 350px;
-    dt {
-      width: @dtWidth;
-    }
-
-    dd {
-      margin-left: @dtWidth + 20;
-    }
-  }
-
-  .message-date {
-    font-size: x-small;
-  }
-
-  .chat-list {
-    margin-bottom: 0;
-  }
-
-  .bot-message {
-    font-weight: bold;
-  }
-}
-
-input.logout-button {
-  font-size: small;
-  color: #337ab7;
-  background: none!important;
-  border: none;
-  padding: 0!important;
-  text-decoration: underline;
-  cursor: pointer;
-
-}
-
 .draft-status {
   font-size: larger;
 }

@@ -173,7 +173,7 @@ class HistoryWrapper extends React.Component<ComponentProps, {}> {
   render() {
     return (<TourneyHistory
       activeTourneyId={this.props.activeTourneyId}
-      allTourneys={this.props.allTourneys} 
+      allTourneys={this.props.allTourneys}
     />);
   }
 

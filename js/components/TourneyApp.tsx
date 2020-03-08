@@ -7,8 +7,8 @@ import GolferStore from '../stores/GolferStore';
 import UserDetails from './UserDetails';
 import UserStandings from './UserStandings';
 import * as utils from '../../common/utils';
-import {DraftProps} from '../types/SharedProps';
-import {User, TourneyStandings, ChatMessage, Indexed} from '../types/ClientTypes';
+import { DraftProps } from '../types/SharedProps';
+import { User, TourneyStandings, ChatMessage, Indexed } from '../types/ClientTypes';
 
 export interface TourneyAppProps {
   draft: DraftProps;
@@ -79,9 +79,9 @@ class TourneyApp extends React.Component<TourneyAppProps, TourneyAppState> {
 
         {!this.props.tourneyStandings.worstScoresForDay.length ? null : (
           <GolfDraftPanel heading='Worst Scores of the Day'>
-            <ul>
+            <ul className='list-unstyled'>
               {this.props.tourneyStandings.worstScoresForDay.map(s => (
-                <li key={s.day} className='list-unstyled'>
+                <li key={s.day}>
                   <b>Day {s.day + 1}</b>: {utils.toGolferScoreStr(s.score)}
                   <span> </span>
                   {GolferLogic.renderGolfer(GolferStore.getGolfer(s.golfer))}
@@ -103,7 +103,7 @@ class TourneyApp extends React.Component<TourneyAppProps, TourneyAppState> {
 
   _onUserSelect = (userId: string) => {
     window.location.href = '#UserDetails';
-    this.setState({userDetailsUser: userId});
+    this.setState({ userDetailsUser: userId });
   }
 
 };

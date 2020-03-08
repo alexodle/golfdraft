@@ -1,0 +1,29 @@
+.chat-room-container {
+  display: grid;
+  grid-template-columns: 1fr 130px;
+  column-gap: 10px;
+}
+
+.chat-panel {
+  height: 200px;
+  min-height: 200px;
+  overflow-y: scroll;
+
+  @media only screen and (max-width: 812px) {
+    resize: vertical;
+    height: 350px;
+    min-height: 350px;
+  }
+
+  .message-date {
+    font-size: x-small;
+  }
+
+  .chat-list {
+    margin-bottom: 0;
+  }
+
+  .bot-message {
+    font-weight: bold;
+  }
+}

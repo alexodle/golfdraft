@@ -1,12 +1,12 @@
 // load css right away
-import 'bootstrap/dist/css/bootstrap.css';
-import 'font-awesome/css/font-awesome.css';
+//import 'bootstrap/dist/css/bootstrap.css';
 import '../less/app.less';
+import '../less/bootstrap_repl.less';
 
 import AppNode from './components/App';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import {BrowserRouter, Route} from 'react-router-dom';
+import { BrowserRouter, Route } from 'react-router-dom';
 import hydrate from './hydrate';
 import startSocketUpdates from './startSocketUpdates';
 import TourneyStore from './stores/TourneyStore';
@@ -14,7 +14,7 @@ import TourneyStore from './stores/TourneyStore';
 function render(rootNode: Element) {
   // hydrate BEFORE rendering
   hydrate();
-  
+
   if (TourneyStore.isViewingActiveTourney()) {
     // Begin listening for live socket updates
     startSocketUpdates();
