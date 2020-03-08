@@ -3,13 +3,18 @@
   grid-template-columns: 1fr 130px;
   column-gap: 10px;
 }
+@media only screen and (max-width: 920px) {
+  .chat-room-container {
+    grid-template-columns: 1fr;
+  }
+}
 
 .chat-panel {
   height: 200px;
   min-height: 200px;
   overflow-y: scroll;
 
-  @media only screen and (max-width: 812px) {
+  @media only screen and (max-width: 920px) {
     resize: vertical;
     height: 350px;
     min-height: 350px;

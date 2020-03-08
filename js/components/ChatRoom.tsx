@@ -394,7 +394,7 @@ export default class ChatRoom extends React.PureComponent<ChatRoomProps, ChatRoo
                 (
                   <dt key={'dt' + i} className={className}>
                     {displayName} <span className='message-date'>
-                      ({moment(message.date).calendar()})
+                      ({moment(message.date).format('l LT')})
                     </span>:
                   </dt>
                 ),

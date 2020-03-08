@@ -10,6 +10,13 @@ body {
   margin: 0 auto;
   width: 900px;
 }
+@media only screen and (max-width: 920px) {
+  .container {
+    width: 100%;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
 
 ul, ol {
   margin-top: 0;
@@ -55,7 +62,7 @@ button[disabled], input[type=submit][disabled].btn {
   cursor: inherit;
 }
 
-button.btn-primary, input[type=submit].btn {
+button.btn-primary, input[type=submit].btn, button.btn-default {
   background-color: #1976d2;
   color: #fff;
   cursor: pointer;
@@ -107,19 +114,7 @@ table {
     display: none;
   }
 }
-
-.dl-horizontal {
-  display: grid;
-  grid-template-columns: 230px 1fr;
-  column-gap: 10px;
-}
-
-@media only screen and (max-width: 812px) {
-  .container {
-    margin: 0 20px;
-    width: 100%;
-  }
-
+@media only screen and (max-width: 920px) {
   table {
     .hidden-xs {
       display: none !important;
@@ -127,5 +122,16 @@ table {
     .visible-xs {
       display: inherit !important;
     }
+  }
+}
+
+.dl-horizontal {
+  display: grid;
+  grid-template-columns: 230px 1fr;
+  column-gap: 10px;
+
+  dd {
+    padding-left: 0;
+    margin-left: 0;
   }
 }

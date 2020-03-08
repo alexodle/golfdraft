@@ -23,11 +23,7 @@ function render(rootNode: Element) {
   ReactDOM.render(
     (<BrowserRouter>
       <div className="container">
-        <div className="row">
-          <div className="col-md-offset-1 col-md-10">
-            <Route component={AppNode} path="/" />
-          </div>
-        </div>
+        <Route component={AppNode} path="/" />
       </div>
     </BrowserRouter>), rootNode);
 }
