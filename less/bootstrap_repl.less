@@ -1,6 +1,7 @@
 body {
   font-family: Helvetica Neue,Helvetica,Arial,sans-serif;
   font-size: 14px;
+  line-height: 1.42857143;
   * {
     box-sizing: border-box;
   }
@@ -23,6 +24,10 @@ ul, ol {
   margin-bottom: 10px;
 }
 
+p {
+  margin: 0 0 10px;
+}
+
 .list-unstyled {
   list-style-type: none;
   list-style: none;
@@ -30,42 +35,65 @@ ul, ol {
 }
 
 h1, h2, h3, h4 {
+  font-weight: 500;
+  line-height: 1.1;
+  margin-top: 20px;
+  margin-bottom: 10px;
   small {
     color: #777;
     font-size: 65%;
     font-weight: 400;
   }
 }
-
 h1 {
-  font-size: 45px;
-  margin-bottom: 10px;
+  font-size: 36px;
 }
 
-h2 {
-  font-size: 35px;
-}
-
-select, input, button {
-  width: 100%;
-  border: 1px #eee solid;
+select, input {
+  border: 1px solid #eee;
   border-radius: 10px;
   margin: 10px 0;
   font-size: 15px;
   line-height: 1.5em;
   padding: 5px;
+  width: 100%;
 }
 
-button[disabled], input[type=submit][disabled].btn {
-  background-color: rgba(0, 0, 0, 0.12);
-  color: rgba(0, 0, 0, 0.26);
-  cursor: inherit;
+.btn {
+  touch-action: manipulation;
+  border: 1px solid transparent;
+  padding: 6px 12px;
+  font-size: 14px;
+  border-radius: 4px;
+}
+.btn-default {
+  background-color: #fff;
+  border-color: #ccc;
+}
+.btn-primary {
+  color: #fff;
+  background-color: #337ab7;
+  border-color: #2e6da4;
+}
+.btn.disabled, .btn[disabled] {
+  cursor: not-allowed;
+  opacity: .65;
 }
 
-button.btn-primary, input[type=submit].btn, button.btn-default {
+button.btn-primary, input[type=submit].btn {
   background-color: #1976d2;
   color: #fff;
   cursor: pointer;
+}
+
+a {
+  color: #337ab7;
+  text-decoration: none;
+  cursor: pointer;
+
+  :hover {
+    text-decoration: underline;
+  }
 }
 
 .panel {
@@ -108,7 +136,6 @@ table {
   }
   th, td {
     padding: 8px;
-    line-height: 1.429;
   }
   .visible-xs {
     display: none;
@@ -134,4 +161,40 @@ table {
     padding-left: 0;
     margin-left: 0;
   }
+}
+
+.jumbotron {
+  padding: 48px 60px;
+  margin-bottom: 30px;
+  border-radius: 6px;
+  background-color: #eee;
+
+  h1 {
+    font-size: 63px;
+  }
+
+  p {
+    margin-bottom: 15px;
+    font-size: 21px;
+    font-weight: 200;
+  }
+}
+
+.label {
+  display: inline;
+  padding: .2em .6em .3em;
+  font-size: 75%;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: .25em;
+}
+.label-info {
+  background-color: #5bc0de;
+}
+.label-success {
+  background-color: #5cb85c;
 }
