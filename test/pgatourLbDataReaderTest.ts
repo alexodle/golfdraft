@@ -5,7 +5,7 @@ import reader from '../scores_sync/pgaTourLbDataReader';
 import { TourneyConfigSpec } from '../scores_sync/Types';
 import * as fs from 'fs';
 
-const {MISSED_CUT} = constants;
+const { MISSED_CUT } = constants;
 
 const config: TourneyConfigSpec = {
   name: "test tourney",
@@ -24,27 +24,27 @@ const config: TourneyConfigSpec = {
 };
 
 function readPreStartJson() {
-  return fs.readFileSync('test/files/pgatour_lbdata.pre_start.json');
+  return 'test/files/pgatour_lbdata.pre_start.json'
 }
 
 function readMidRoundJson() {
-  return fs.readFileSync('test/files/pgatour_lbdata.midround.json');
+  return 'test/files/pgatour_lbdata.midround.json'
 }
 
 function readMidRoundJson2() {
-  return fs.readFileSync('test/files/pgatour_lbdata.midround2.json');
+  return 'test/files/pgatour_lbdata.midround2.json'
 }
 
 function readMidRoundJsonDay2() {
-  return fs.readFileSync('test/files/pgatour_lbdata.midround.day2.json');
+  return 'test/files/pgatour_lbdata.midround.day2.json'
 }
 
 function readPostRound3Json() {
-  return fs.readFileSync('test/files/pgatour_lbdata.postround.day3.json');
+  return 'test/files/pgatour_lbdata.postround.day3.json'
 }
 
 function readPostStartJson() {
-  return fs.readFileSync('test/files/pgatour_lbdata.finished.json');
+  return 'test/files/pgatour_lbdata.finished.json'
 }
 
 describe('PgaTourLbReader', () => {

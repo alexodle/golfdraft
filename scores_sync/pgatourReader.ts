@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import constants from '../common/constants';
-import {Reader, ReaderResult, UpdateGolfer, TourneyConfigSpec} from './Types';
+import { Reader, ReaderResult, UpdateGolfer, TourneyConfigSpec } from './Types';
+import { fetchData } from './util';
 
 const MISSED_CUT = constants.MISSED_CUT;
 const NDAYS = constants.NDAYS;
@@ -87,7 +88,8 @@ function parseGolfer(par: number, tourneyRound: number, g: PgaTourGolfer): Updat
 }
 
 class PgaTourReader implements Reader {
-  async run(_config: TourneyConfigSpec, data: any): Promise<ReaderResult> {
+  async run(_config: TourneyConfigSpec, url: string): Promise<ReaderResult> {
+    const data = await fetchData(url);
     const body = JSON.parse(data);
     const par = _.parseInt(body.leaderboard.courses[0].par_total);
     const currentRound = body.leaderboard.current_round;

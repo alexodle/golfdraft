@@ -1,4 +1,4 @@
-import { TourneyConfigSpec } from '../server/ServerTypes' 
+import { TourneyConfigSpec } from '../server/ServerTypes'
 
 export interface UpdateGolfer {
   scores: (number | string)[];
@@ -13,7 +13,7 @@ export interface ReaderResult {
 }
 
 export interface Reader {
-  run: (config: TourneyConfigSpec, data: any) => Promise<ReaderResult>;
+  run: (config: TourneyConfigSpec, url: string) => Promise<ReaderResult>;
 }
 
-export {TourneyConfigSpec}
+export { TourneyConfigSpec }

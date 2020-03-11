@@ -1,8 +1,9 @@
 import { parseInt, times } from 'lodash';
 import constants from '../common/constants';
 import { Reader, ReaderResult, UpdateGolfer, TourneyConfigSpec } from './Types';
+import { fetchData } from './util';
 
-const {MISSED_CUT, NHOLES, NDAYS} = constants;
+const { MISSED_CUT, NHOLES, NDAYS } = constants;
 
 interface LbDataGolfer {
   currentHoleId: string; // "<number>" || null
@@ -38,7 +39,7 @@ function parseRequiredInt(str: string, msg: string): number {
 
   const n = safeParseInt(str);
   if (n === null) throw new Error(`${msg}: ${str}`);
-  
+
   return n;
 }
 
@@ -56,13 +57,13 @@ function parseRoundDayMissedCut(g: LbDataGolfer): number {
 }
 
 function parseRoundDay(g: LbDataGolfer): number {
-  let day=0;
-  for (day=0; day<constants.NDAYS; day++) {
+  let day = 0;
+  for (day = 0; day < constants.NDAYS; day++) {
     if (isNullStr(g.rounds[day].strokes)) {
       break;
     }
   }
-  return Math.min(day+1, constants.NDAYS);
+  return Math.min(day + 1, constants.NDAYS);
 }
 
 function parseThru(g: LbDataGolfer) {
@@ -91,13 +92,13 @@ function parseGolferScores(par: number, g: LbDataGolfer): (number | string)[] {
 
   // Logic for getting the current round score is different than earlier rounds
   const scores = g.rounds
-      .slice(0, currentRound - 1)
-      .map(r => safeParseInt(r.strokes) - par);
+    .slice(0, currentRound - 1)
+    .map(r => safeParseInt(r.strokes) - par);
   scores.push(currentRoundScore);
-  for (let i=scores.length; i<NDAYS; i++) {
+  for (let i = scores.length; i < NDAYS; i++) {
     scores.push(0);
   }
-  
+
   return scores;
 }
 
@@ -115,7 +116,8 @@ function parseGolfer(par: number, g: LbDataGolfer): UpdateGolfer {
 }
 
 class PgaTourLbDataReader implements Reader {
-  async run(config: TourneyConfigSpec, data: any): Promise<ReaderResult> {
+  async run(config: TourneyConfigSpec, url: string): Promise<ReaderResult> {
+    const data = await fetchData(url);
     const json = JSON.parse(data);
 
     const par = config.par;

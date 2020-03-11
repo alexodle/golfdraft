@@ -1,7 +1,7 @@
+import { getActiveTourneyAccess } from '../server/access';
 import * as mongooseUtil from '../server/mongooseUtil';
-import readerConfig from './readerConfig';
 import redis from '../server/redis';
-import {getActiveTourneyAccess, } from '../server/access';
+import readerConfig from './readerConfig';
 import * as updateScore from './updateScore';
 
 const TIMEOUT = 2 * 60 * 1000; // 2 minutes
@@ -30,6 +30,10 @@ async function main() {
   try {
     await mongooseUtil.connect();
     await updateScores();
+  } catch (e) {
+    console.error('Error while running score')
+    console.error(e.stack)
+    process.exit(1)
   } finally {
     clearTimeout(timeoutId);
     end();

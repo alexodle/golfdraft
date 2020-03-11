@@ -1,22 +1,11 @@
-import * as updateTourneyStandings from './updateTourneyStandings';
-import * as request from 'request';
+import { chain, every, has, includes, isFinite, isNull, keyBy, range } from 'lodash';
 import * as moment from 'moment';
-import * as fs from 'fs';
-import {gzip} from 'node-gzip';
-import {chain, keyBy, isNull, has, includes, every, isFinite, range} from 'lodash';
-import {Access} from '../server/access';
 import constants from '../common/constants';
-import {Reader, ReaderResult} from './Types';
-import {
-  Golfer,
-  GolferScore,
-  ScoreOverride,
-  TourneyConfigSpec
-} from '../server/ServerTypes';
-
-const TMP_DIR_MASK = '0777';
-const FS_EXISTS_ERR = 'EEXIST';
-const DATA_TMP_DIR = '/tmp/golfdraft_data'
+import { Access } from '../server/access';
+import { Golfer, GolferScore, ScoreOverride, TourneyConfigSpec } from '../server/ServerTypes';
+import { Reader, ReaderResult } from './Types';
+import * as updateTourneyStandings from './updateTourneyStandings';
+import { safeWriteGzippedTmpFile } from './util';
 
 const DAYS = constants.NDAYS;
 const MISSED_CUT = constants.MISSED_CUT;
@@ -54,7 +43,7 @@ export function validate(result: ReaderResult): boolean {
 }
 
 export function mergeOverrides(scores: GolferScore[], scoreOverrides: ScoreOverride[]): GolferScore[] {
-  const overridesByGolfer: {[key: string]: {}} = chain(scoreOverrides)
+  const overridesByGolfer: { [key: string]: {} } = chain(scoreOverrides)
     .map(o => {
       return chain(o)
 
@@ -80,48 +69,11 @@ export function mergeOverrides(scores: GolferScore[], scoreOverrides: ScoreOverr
   return newScores;
 }
 
-function fetchData(url: string): Promise<any> {
-  return new Promise((fulfill, reject) => {
-    request({ url }, (error, _response, body) => {
-      if (error) {
-        reject(error);
-        return;
-      }
-      fulfill(body);
-    });
-  });
-}
-
-function ensureDirectory(path: string) {
-  try {
-    fs.mkdirSync(path, TMP_DIR_MASK);
-  } catch (e) {
-    if (e.code !== FS_EXISTS_ERR) {
-      throw e;
-    }
-  }
-}
-
-async function safeWriteGzippedTmpFile(filename: string, data: any) {
-  const filePath = `${DATA_TMP_DIR}/${filename}.gz`;
-  try {
-    const compressed = await gzip(data);
-    ensureDirectory(DATA_TMP_DIR);
-    fs.writeFileSync(filePath, compressed);
-    console.log("Wrote data to temp file:", filePath);
-  } catch (e) {
-    console.warn("Failed to write data to tmp file:", filePath, e);
-  }
-}
-
 export async function run(access: Access, reader: Reader, config: TourneyConfigSpec, populateGolfers = false) {
   const url = config.scoresSync.url;
   const ts = moment().format('YMMDD_HHmmss');
 
-  const data = await fetchData(url);
-  safeWriteGzippedTmpFile(`${ts}-rawdata`, data);
-
-  const rawTourney = await reader.run(config, data);
+  const rawTourney = await reader.run(config, url);
 
   // Quick assertion of data
   if (!rawTourney || !validate(rawTourney)) {
@@ -132,13 +84,13 @@ export async function run(access: Access, reader: Reader, config: TourneyConfigS
   // Update all names
   const nameMap = config.scoresSync.nameMap;
   rawTourney.golfers.forEach(g => g.golfer = nameMap[g.golfer] || g.golfer);
-  
+
   // Ensure golfers
   if (populateGolfers) {
     const golfers = rawTourney.golfers.map(g => ({ name: g.golfer } as Golfer));
     await access.ensureGolfers(golfers);
   }
-  
+
   const results = await Promise.all([
     access.getGolfers(),
     access.getScoreOverrides()

@@ -2,6 +2,7 @@ import { parseInt, find, slice, isEmpty } from 'lodash';
 import { Reader, ReaderResult, UpdateGolfer, TourneyConfigSpec } from './Types';
 import { JSDOM } from 'jsdom';
 import constants from '../common/constants';
+import { fetchData } from './util';
 
 function assert(cond, msg: string) {
   if (!cond) {
@@ -31,7 +32,8 @@ function parseDayScore(td: Element, par: number): number | 'MC' {
 
 class PgaTourFieldReader implements Reader {
 
-  async run(_config: TourneyConfigSpec, data: any): Promise<ReaderResult> {
+  async run(_config: TourneyConfigSpec, url: string): Promise<ReaderResult> {
+    const data = await fetchData(url);
     const dom = new JSDOM(data);
     const doc = dom.window.document;
 
