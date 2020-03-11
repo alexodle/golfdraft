@@ -14,10 +14,6 @@ logdir=/var/log/golfdraft
 logfile="${logdir}/log.${date}.log"
 
 cd golfdraft
-git checkout master
-git pull origin master
-npm install
-npm run buildServer
 npm run updateScore > $logfile 2>&1
 
 echo "DONE!"
