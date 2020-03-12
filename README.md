@@ -28,6 +28,7 @@ Requires mongodb and redis instances. See server/config.js default values for se
 
 ```
 npm install
+npm run buildServer
 npm run run:dev
 ```
 
@@ -37,7 +38,7 @@ Navigate to http://localhost:3000
 
 ```npm test```
 
-## Build prod files (checked in) ##
+## Build frontend assets for prod (checked in) ##
 
 If building, keep in a separate commit in master.
 
