@@ -10,7 +10,7 @@ export default class GolfDraftPanel extends React.Component<GolfDraftPanelProps,
     return (
       <div
         className='panel panel-default golfdraft-panel'
-        style={{height: this.props.height || "100%"}}
+        style={{ height: this.props.height }}
       >
         {!this.props.heading ? null : (
           <div className='panel-heading'>

@@ -143,7 +143,7 @@ export default class DraftApp extends React.Component<DraftAppProps, DraftAppSta
       syncedPickListForEditor;
 
     return (
-      <section className='active-draft'>
+      <section className={'draft ' + (isDraftPaused ? 'draft-paused' : 'draft-active')}>
         {isDraftPaused ? <section className='app-paused-section'><AppPausedStatus /></section> : (
           <React.Fragment>
             <section className='chooser-section'>
