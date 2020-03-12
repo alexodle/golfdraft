@@ -1,10 +1,13 @@
 import { TourneyConfigSpec } from '../server/ServerTypes'
 
+export type Thru = number | null
+export type Score = number | 'MC'
+
 export interface UpdateGolfer {
-  scores: (number | string)[];
+  scores: Score[];
   golfer: string;
   day: number;
-  thru: number;
+  thru: Thru;
 }
 
 export interface ReaderResult {

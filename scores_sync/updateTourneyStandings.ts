@@ -1,8 +1,7 @@
-import {Access} from '../server/access';
+import { chain, groupBy, isNumber, keyBy, mapValues, maxBy, sumBy, times } from 'lodash';
 import constants from '../common/constants';
-import {GolferScore, PlayerScore, TourneyStandings} from '../server/ServerTypes';
-import {chain, groupBy, keyBy, mapValues, maxBy, isNumber, sumBy, times} from 'lodash';
-import { SSL_OP_ALL } from 'constants';
+import { Access } from '../server/access';
+import { GolferScore, PlayerScore, TourneyStandings } from '../server/ServerTypes';
 
 function buildPlayerScore(
   player: string,
@@ -93,7 +92,7 @@ export async function run(access: Access): Promise<TourneyStandings> {
 
   // Summary info
   const worstScoresForDay = times(constants.NDAYS, day => {
-    const maxGolferScore = maxBy(scores, s => isNumber(s.scores[day]) ? 
+    const maxGolferScore = maxBy(scores, s => isNumber(s.scores[day]) ?
       s.scores[day] :
       Number.MIN_VALUE);
     const maxScore: number = isNumber(maxGolferScore.scores[day]) ?
@@ -108,7 +107,7 @@ export async function run(access: Access): Promise<TourneyStandings> {
 
   const picksByUser = groupBy(draft.picks, p => p.user.toString());
   const scoresByPlayer = keyBy(scores, s => s.golfer.toString());
-  const playerRawScores = mapValues(picksByUser, picks => 
+  const playerRawScores = mapValues(picksByUser, picks =>
     picks.map(p => scoresByPlayer[p.golfer.toString()]));
 
   const playerScores = chain(playerRawScores)

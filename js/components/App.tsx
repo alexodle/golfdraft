@@ -1,4 +1,4 @@
-import {omit} from 'lodash';
+import { omit } from 'lodash';
 import * as React from 'react';
 import AdminApp from './AdminApp';
 import AppHeader from './AppHeader';
@@ -11,10 +11,10 @@ import ScoreStore from '../stores/ScoreStore';
 import TourneyApp from './TourneyApp';
 import TourneyStore from '../stores/TourneyStore';
 import UserStore from '../stores/UserStore';
-import {DraftProps} from '../types/SharedProps';
-import {Route, Switch, Redirect} from 'react-router-dom';
+import { DraftProps } from '../types/SharedProps';
+import { Route, Switch, Redirect } from 'react-router-dom';
 import constants from '../../common/constants';
-import {TourneyHistory} from './TourneyHistory';
+import { TourneyHistory } from './TourneyHistory';
 import {
   ChatMessage,
   DraftPick,
@@ -59,7 +59,7 @@ interface AppState {
 interface ComponentProps extends AppState {
   location: Location;
   match: {
-    params: {[key: string]: string}
+    params: { [key: string]: string }
   };
   golfersRemaining: IndexedGolfers;
 }
@@ -173,7 +173,7 @@ class HistoryWrapper extends React.Component<ComponentProps, {}> {
   render() {
     return (<TourneyHistory
       activeTourneyId={this.props.activeTourneyId}
-      allTourneys={this.props.allTourneys} 
+      allTourneys={this.props.allTourneys}
     />);
   }
 
@@ -205,7 +205,7 @@ class AdminWrapper extends React.Component<ComponentProps, {}> {
 
 };
 
-export interface AppNodeProps {}
+export interface AppNodeProps { }
 
 export default class AppNode extends React.Component<AppNodeProps, AppState> {
 
@@ -232,7 +232,7 @@ export default class AppNode extends React.Component<AppNodeProps, AppState> {
 
   _requireDraftComplete(from) {
     if (this.state.draft.currentPick) {
-      return (<Redirect to={{ pathname: 'draft', state: { from }}} />);
+      return (<Redirect to={{ pathname: `/${this.state.activeTourneyId}/draft`, state: { from } }} />);
     }
   }
 
@@ -257,9 +257,9 @@ export default class AppNode extends React.Component<AppNodeProps, AppState> {
 
     return (
       <Switch>
-        <Route exact path={`/${constants.TOURNEY_ID_PARAM}/draft`} render={renderDraftWrapper}/>
-        <Route exact path='/admin' render={renderAdminWrapper}/>
-        <Route exact path='/history' render={renderHistoryWrapper}/>
+        <Route exact path={`/${constants.TOURNEY_ID_PARAM}/draft`} render={renderDraftWrapper} />
+        <Route exact path='/admin' render={renderAdminWrapper} />
+        <Route exact path='/history' render={renderHistoryWrapper} />
         <Route exact path={`/${constants.TOURNEY_ID_PARAM}`} render={renderTourneyWrapper} />
       </Switch>
     );

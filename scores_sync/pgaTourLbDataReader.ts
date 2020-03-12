@@ -1,6 +1,6 @@
-import { parseInt, times } from 'lodash';
+import { parseInt } from 'lodash';
 import constants from '../common/constants';
-import { Reader, ReaderResult, UpdateGolfer, TourneyConfigSpec } from './Types';
+import { Reader, ReaderResult, UpdateGolfer, TourneyConfigSpec, Score } from './Types';
 import { fetchData } from './util';
 
 const { MISSED_CUT, NHOLES, NDAYS } = constants;
@@ -73,7 +73,7 @@ function parseThru(g: LbDataGolfer) {
   return parseRequiredInt(thruStr, `Invalid thru value: ${thruStr}`);
 }
 
-function parseMissedCutGolferScores(par: number, g: LbDataGolfer): (number | string)[] {
+function parseMissedCutGolferScores(par: number, g: LbDataGolfer): Score[] {
   const finishedRound = isNullStr(g.currentHoleId);
 
   let latestRound = parseRoundDayMissedCut(g);
@@ -83,7 +83,7 @@ function parseMissedCutGolferScores(par: number, g: LbDataGolfer): (number | str
   return g.rounds.map((r, i) => i < latestRound ? safeParseInt(r.strokes) - par : MISSED_CUT);
 }
 
-function parseGolferScores(par: number, g: LbDataGolfer): (number | string)[] {
+function parseGolferScores(par: number, g: LbDataGolfer): Score[] {
   const missedCut = !g.isActive;
   if (missedCut) return parseMissedCutGolferScores(par, g);
 

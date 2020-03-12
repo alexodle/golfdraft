@@ -2,6 +2,7 @@
   "name": "golfdraft-react-flux",
   "main": "js/app.js",
   "dependencies": {
+    "@types/cheerio": "^0.22.16",
     "@types/connect-redis": "0.0.8",
     "@types/events": "^1.2.0",
     "@types/express": "^4.16.0",
@@ -24,7 +25,7 @@
     "bootstrap": "^3.3.7",
     "bufferutil": "^4.0.1",
     "canvas": "^2.6.1",
-    "cheerio": "^1.0.0-rc.2",
+    "cheerio": "^1.0.0-rc.3",
     "classnames": "^2.2.6",
     "clean-webpack-plugin": "^1.0.0",
     "compression": "^1.7.3",
