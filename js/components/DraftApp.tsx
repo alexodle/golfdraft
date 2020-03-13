@@ -1,7 +1,10 @@
-import {isEmpty, sortBy} from 'lodash';
+import { isEmpty, sortBy } from 'lodash';
 import * as React from 'react';
-import AppPausedStatus from './AppPausedStatus';
+import { Link } from 'react-router-dom';
+import '../../less/tourney_app.less';
 import Assets from '../constants/Assets';
+import { ChatMessage, DraftPick, DraftPickOrder, Indexed, IndexedGolfers, User } from '../types/ClientTypes';
+import AppPausedStatus from './AppPausedStatus';
 import ChatRoom from './ChatRoom';
 import DraftChooser from './DraftChooser';
 import DraftClock from './DraftClock';
@@ -10,15 +13,6 @@ import DraftPickOrderView from './DraftPickOrderView';
 import DraftStatus from './DraftStatus';
 import GolfDraftPanel from './GolfDraftPanel';
 import PickListEditor from './PickListEditor';
-import {Link} from 'react-router-dom';
-import {
-  ChatMessage,
-  DraftPick,
-  DraftPickOrder,
-  Indexed,
-  IndexedGolfers,
-  User,
-} from '../types/ClientTypes';
 
 const myTurnSound = new Audio(Assets.MY_TURN_SOUND);
 const pickMadeSound = new Audio(Assets.PICK_MADE_SOUND);
@@ -68,77 +62,60 @@ export default class DraftApp extends React.Component<DraftAppProps, DraftAppSta
     return (
       <section>
 
-        <div className='row'>
-          <div className='col-md-12'>
-            <div className='jumbotron'>
-              <h1>Draft not started.</h1>
-            </div>
-          </div>
+        <div className='jumbotron'>
+          <h1>Draft not started.</h1>
         </div>
 
-        <div className='row'>
-          <div className='col-md-12'>
-            <a id='InlinePickListEditor' />
-            <GolfDraftPanel heading='Pick List Editor'>
-              <PickListEditor
-                preDraftMode
-                golfersRemaining={this.props.golfersRemaining}
-                syncedPickList={this.props.syncedPickList}
-                pendingPickList={this.props.pendingPickList}
-                height='30em'
-              />
-            </GolfDraftPanel>
-          </div>
-        </div>
-
-        <div className='row'>
-          <div className='col-md-12'>
-            <ChatRoom
-              currentUser={this.props.currentUser}
-              messages={this.props.chatMessages}
-              activeUsers={this.props.activeUsers}
-              enabled={this.props.isViewingActiveTourney}
+        <section>
+          <a id='InlinePickListEditor' />
+          <GolfDraftPanel heading='Pick List Editor'>
+            <PickListEditor
+              preDraftMode
+              golfersRemaining={this.props.golfersRemaining}
+              syncedPickList={this.props.syncedPickList}
+              pendingPickList={this.props.pendingPickList}
+              height='30em'
             />
-          </div>
-        </div>
+          </GolfDraftPanel>
+        </section>
 
-      </section>
+        <section>
+          <ChatRoom
+            currentUser={this.props.currentUser}
+            messages={this.props.chatMessages}
+            activeUsers={this.props.activeUsers}
+            enabled={this.props.isViewingActiveTourney}
+          />
+        </section>
+
+      </section >
     );
   }
 
   _renderDraftComplete() {
     return (
       <section>
-
-        <div className="row">
-          <div className='col-md-12'>
-            <div className='jumbotron'>
-              <h1>The draft is over!</h1>
-              <p><Link to={`/${this.props.tourneyId}`}>Check out the live leaderboard</Link></p>
-            </div>
-          </div>
+        <div className='jumbotron'>
+          <h1>The draft is over!</h1>
+          <p><Link to={`/${this.props.tourneyId}`}>Check out the live leaderboard</Link></p>
         </div>
 
-        <div className='row'>
-          <div className='col-md-12'>
-            <ChatRoom
-              currentUser={this.props.currentUser}
-              messages={this.props.chatMessages}
-              activeUsers={this.props.activeUsers}
-              enabled={this.props.isViewingActiveTourney}
-            />
-          </div>
-        </div>
+        <section>
+          <ChatRoom
+            currentUser={this.props.currentUser}
+            messages={this.props.chatMessages}
+            activeUsers={this.props.activeUsers}
+            enabled={this.props.isViewingActiveTourney}
+          />
+        </section>
 
-        <div className='row'>
-          <div className='col-md-12'>
-            <DraftHistory
-              draftPicks={this.props.draftPicks}
-              selectedUserId={this.state.draftHistoryUserId}
-              onSelectionChange={this._onDraftHistorySelectionChange}
-            />
-          </div>
-        </div>
+        <section>
+          <DraftHistory
+            draftPicks={this.props.draftPicks}
+            selectedUserId={this.state.draftHistoryUserId}
+            onSelectionChange={this._onDraftHistorySelectionChange}
+          />
+        </section>
 
       </section>
     );
@@ -160,93 +137,86 @@ export default class DraftApp extends React.Component<DraftAppProps, DraftAppSta
     if (this.props.syncedPickList !== null && isEmpty(this.props.syncedPickList)) {
       syncedPickListForEditor = sortBy(this.props.golfersRemaining, g => g.wgr, g => g.name).map(g => g._id);
     }
-    
+
     const pendingPickListForEditor = this.props.pendingPickList === null || !isEmpty(this.props.pendingPickList) ?
       this.props.pendingPickList :
       syncedPickListForEditor;
 
     return (
-      <div>
-        {isDraftPaused ? (<AppPausedStatus />) : (
-          <div className='row'>
-
-            <div className='col-md-9'>
+      <section className={'draft ' + (isDraftPaused ? 'draft-paused' : 'draft-active')}>
+        {isDraftPaused ? <section className='app-paused-section'><AppPausedStatus /></section> : (
+          <React.Fragment>
+            <section className='chooser-section'>
               {!isMyPick ? (
                 <GolfDraftPanel heading='Draft Status'>
                   <DraftStatus currentPick={this.props.currentPick} />
                 </GolfDraftPanel>
               ) : (
-                <DraftChooser
-                  currentUser={this.props.currentUser}
-                  golfersRemaining={this.props.golfersRemaining}
-                  currentPick={this.props.currentPick}
-                  syncedPickList={this.props.syncedPickList}
-                  pickListUsers={this.props.pickListUsers}
-                />
-              )}
-            </div>
+                  <DraftChooser
+                    currentUser={this.props.currentUser}
+                    golfersRemaining={this.props.golfersRemaining}
+                    currentPick={this.props.currentPick}
+                    syncedPickList={this.props.syncedPickList}
+                    pickListUsers={this.props.pickListUsers}
+                  />
+                )}
+            </section>
 
-            <div className='col-md-3'>
+            <section className='draft-clock-section'>
               <DraftClock
                 draftPicks={this.props.draftPicks}
                 isMyPick={this.props.isMyDraftPick}
                 allowClock={this.props.allowClock}
               />
-            </div>
-          </div>
+            </section>
+
+          </React.Fragment>
         )}
 
-        <div className='row'>
-
-          <div className='col-md-4'>
-            <GolfDraftPanel heading='Draft Order'>
-              <DraftPickOrderView
-                pickOrder={this.props.pickOrder}
-                currentUser={this.props.currentUser}
-                currentPick={this.props.currentPick}
-                pickingForUsers={this.props.pickingForUsers}
-                autoPickUsers={this.props.autoPickUsers}
-                pickListUsers={this.props.pickListUsers}
-                onUserSelected={this._onDraftHistorySelectionChange}
-              />
-            </GolfDraftPanel>
-          </div>
-
-          <div className='col-md-8'>
-              <GolfDraftPanel heading='Pick List'>
-                <PickListEditor
-                  golfersRemaining={this.props.golfersRemaining}
-                  syncedPickList={syncedPickListForEditor}
-                  pendingPickList={pendingPickListForEditor}
-                  height='29em'
-                />
-              </GolfDraftPanel>
-          </div>
-
-        </div>
-
-        <div className='row'>
-          <div className='col-md-12'>
-            <ChatRoom
+        <section className='draft-order-section'>
+          <GolfDraftPanel heading='Draft Order'>
+            <DraftPickOrderView
+              pickOrder={this.props.pickOrder}
               currentUser={this.props.currentUser}
-              messages={this.props.chatMessages}
-              activeUsers={this.props.activeUsers}
-              enabled={this.props.isViewingActiveTourney}
+              currentPick={this.props.currentPick}
+              pickingForUsers={this.props.pickingForUsers}
+              autoPickUsers={this.props.autoPickUsers}
+              pickListUsers={this.props.pickListUsers}
+              onUserSelected={this._onDraftHistorySelectionChange}
             />
-          </div>
-        </div>
+          </GolfDraftPanel>
+        </section>
 
-        <div className='row'>
-          <div className='col-md-12'>
-            <DraftHistory
-              draftPicks={this.props.draftPicks}
-              selectedUserId={this.state.draftHistoryUserId}
-              onSelectionChange={this._onDraftHistorySelectionChange}
+        <section className='pick-list-section'>
+          <GolfDraftPanel heading='Pick List'>
+            <PickListEditor
+              golfersRemaining={this.props.golfersRemaining}
+              syncedPickList={syncedPickListForEditor}
+              pendingPickList={pendingPickListForEditor}
+              height='29em'
             />
-          </div>
-        </div>
+          </GolfDraftPanel>
+        </section>
 
-      </div>
+
+        <section className='chatroom-section'>
+          <ChatRoom
+            currentUser={this.props.currentUser}
+            messages={this.props.chatMessages}
+            activeUsers={this.props.activeUsers}
+            enabled={this.props.isViewingActiveTourney}
+          />
+        </section>
+
+        <section className='draft-history-section'>
+          <DraftHistory
+            draftPicks={this.props.draftPicks}
+            selectedUserId={this.state.draftHistoryUserId}
+            onSelectionChange={this._onDraftHistorySelectionChange}
+          />
+        </section>
+
+      </section>
     );
   }
 

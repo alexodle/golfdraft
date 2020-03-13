@@ -1,11 +1,13 @@
-import {isEmpty, sortBy, escape, some, map, findIndex} from 'lodash';
+import { escape, isEmpty, map, some, sortBy } from 'lodash';
 import * as moment from 'moment';
 import * as React from 'react';
-import Assets from '../constants/Assets';
+import '../../less/chat.less';
 import ChatActions from '../actions/ChatActions';
-import GolfDraftPanel from './GolfDraftPanel';
+import Assets from '../constants/Assets';
 import UserStore from '../stores/UserStore';
-import {User, ChatMessage, Indexed} from '../types/ClientTypes';
+import { ChatMessage, Indexed, User } from '../types/ClientTypes';
+import GolfDraftPanel from './GolfDraftPanel';
+
 
 const BOT_NAME = 'DraftBot';
 
@@ -47,11 +49,11 @@ class AutoComplete extends React.PureComponent<AutoCompleteProps, AutoCompleteSt
     const newChoices = this._getChoices(nextProps);
 
     if (
-        isEmpty(oldChoices) ||
-        isEmpty(newChoices) ||
-        !newChoices[currentIndex] ||
-        oldChoices[currentIndex]._id !== newChoices[currentIndex]._id
-      ) {
+      isEmpty(oldChoices) ||
+      isEmpty(newChoices) ||
+      !newChoices[currentIndex] ||
+      oldChoices[currentIndex]._id !== newChoices[currentIndex]._id
+    ) {
 
       this.setState({ selectedIndex: 0 });
     }
@@ -155,27 +157,27 @@ class ChatRoomInput extends React.PureComponent<{}, ChatRoomInputState> {
     return (
       <div>
         <form onSubmit={this._onSend}>
-          <div className='form-group'>
-            <input
+          <div className='form-group chat-input-form'>
+            <span><input
               ref='input'
               className='form-control'
               value={text}
               onChange={this._onUpdateText}
               onKeyUp={this._onKeyUp}
-            />
-            {!nameTag ? null : (
-              <AutoComplete
-                ref='nameTagger'
-                allChoices={sortBy(UserStore.getAll(), u => u.name)}
-                text={nameTag[0].substr(1)}
-                onChoose={this._onTag} />
-            )}
-            <button type='submit' className='btn btn-default'>
+            /></span>
+            <span><button type='submit' className='btn btn-default'>
               Send
-            </button>
+            </button></span>
           </div>
+          {!nameTag ? null : (
+            <AutoComplete
+              ref='nameTagger'
+              allChoices={sortBy(UserStore.getAll(), u => u.name)}
+              text={nameTag[0].substr(1)}
+              onChoose={this._onTag} />
+          )}
         </form>
-      </div>
+      </div >
     );
   }
 
@@ -321,7 +323,7 @@ export default class ChatRoom extends React.PureComponent<ChatRoomProps, ChatRoo
     const messages = this.props.messages;
     return (
       <GolfDraftPanel heading='Chat Room'>
-        <div className='row'>
+        <div className='chat-room-container'>
           <div className='col-md-9'>
             <div className='panel panel-default chat-panel' ref='chatPanel'>
               <div className='panel-body' ref='chatPanelBody'>
@@ -391,8 +393,8 @@ export default class ChatRoom extends React.PureComponent<ChatRoomProps, ChatRoo
               return [
                 (
                   <dt key={'dt' + i} className={className}>
-                    {displayName} <span className='message-date'>
-                      ({moment(message.date).calendar()})
+                    {displayName}<span className='message-date'>
+                      {" "}({moment(message.date).format('l LT')})
                     </span>:
                   </dt>
                 ),

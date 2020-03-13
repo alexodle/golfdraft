@@ -1,8 +1,8 @@
-import {isEmpty, uniq} from 'lodash';
+import { isEmpty, uniq } from 'lodash';
 import * as React from 'react';
 import DraftActions from '../actions/DraftActions';
-import {Indexed} from '../types/ClientTypes';
-import {postJson} from '../fetch';
+import { Indexed } from '../types/ClientTypes';
+import { postJson } from '../fetch';
 
 const TEXTAREA_PLACEHOLDER = "Sergio Garcia\nPhil Mickelson\nTiger Woods\nDustin Johnson\nJason Day\n...";
 
@@ -133,7 +133,7 @@ class SuggestionSelector extends React.Component<SuggestionSelectorProps, Sugges
           onChange={this._onSelectValueChange}
         >
           {suggestions.map(targetName => (
-              <option key={targetName} value={targetName}>{targetName}</option>
+            <option key={targetName} value={targetName}>{targetName}</option>
           ))}
         </select>
       </section>
@@ -171,11 +171,11 @@ class SuggestionSelectors extends React.Component<SuggestionSelectorsProps, Sugg
   }
 
   render() {
-    const {suggestions, errorMessage, isPosting, onCancel} = this.props;
-    const {selections} = this.state;
+    const { suggestions, errorMessage, isPosting, onCancel } = this.props;
+    const { selections } = this.state;
     return (
       <div>
-        <div className='text-right' style={{marginBottom: '1em'}}>
+        <div className='text-right' style={{ marginBottom: '1em' }}>
           <button
             className='btn btn-default'
             type='button'
@@ -217,7 +217,7 @@ class SuggestionSelectors extends React.Component<SuggestionSelectorsProps, Sugg
   }
 
   _onSuggestionSelectionChange(source: string, target: string) {
-    this.setState({ selections: { ...this.state.selections, [source]: target }});
+    this.setState({ selections: { ...this.state.selections, [source]: target } });
   }
 
   _onSave = () => {
@@ -267,7 +267,7 @@ export default class FreeTextPickListEditor extends React.Component<FreeTextPick
   _onSaveSuggestions = (pickListNames: string[]) => {
     this._save(pickListNames);
   }
-  
+
   _onSaveFreeText = () => {
     this._save(this._cleanedGolfers());
   }
@@ -300,7 +300,7 @@ export default class FreeTextPickListEditor extends React.Component<FreeTextPick
           className='form-control'
           placeholder={TEXTAREA_PLACEHOLDER}
           disabled={isPosting}
-          style={{width:'100%', height: '30em', resize: 'vertical'}}
+          style={{ width: '100%', height: '30em', resize: 'vertical' }}
           onChange={this._onChange}
           value={text}
         />
@@ -342,7 +342,7 @@ export default class FreeTextPickListEditor extends React.Component<FreeTextPick
       window.location.href = '#InlinePickListEditor';
     }
   }
-  
+
   _cleanedGolfers() {
     return uniq(this.state.text
       .split('\n')

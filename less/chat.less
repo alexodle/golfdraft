@@ -1,0 +1,52 @@
+.chat-room-container {
+  display: grid;
+  grid-template-columns: 1fr 130px;
+  column-gap: 10px;
+
+
+  @media only screen and (max-width: 920px) {
+    .dl-horizontal {
+      grid-template-columns: 100px 1fr;
+    }
+  }
+}
+@media only screen and (max-width: 920px) {
+  .chat-room-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chat-panel {
+  height: 350px;
+  min-height: 350px;
+  overflow-y: scroll;
+  resize: vertical;
+
+  .message-date {
+    font-size: 70%;
+  }
+
+  .chat-list {
+    margin-bottom: 0;
+  }
+
+  .bot-message {
+    font-weight: bold;
+  }
+}
+
+.chat-input-form {
+  display: grid;
+  grid-template-columns: 1fr 60px;
+  column-gap: 5px;
+
+  button {
+    margin-top: 11px;
+  }
+}
+
+@media only screen and (max-width: 920px) {
+  .message-date {
+    display: none;
+  }
+}

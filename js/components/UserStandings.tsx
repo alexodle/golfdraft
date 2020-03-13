@@ -5,7 +5,7 @@ import * as utils from '../../common/utils';
 import constants from '../../common/constants';
 import GolferStore from '../stores/GolferStore';
 import UserStore from '../stores/UserStore';
-import {User, DraftPick, TourneyStandings, DraftPickOrder} from '../types/ClientTypes';
+import { User, DraftPick, TourneyStandings, DraftPickOrder } from '../types/ClientTypes';
 
 export interface UserStandingsProps {
   tourneyStandings: TourneyStandings;
@@ -39,7 +39,7 @@ export default class UserStandings extends React.Component<UserStandingsProps, {
       });
 
       const pickNumber = _.findIndex(this.props.pickOrder, dpo => dpo.user === ps.player);
-      
+
       return (
         <tr
           key={p._id}

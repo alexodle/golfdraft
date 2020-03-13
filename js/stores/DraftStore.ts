@@ -1,12 +1,11 @@
-import {difference, includes, uniq, without} from 'lodash';
-import AppDispatcher from '../dispatcher/AppDispatcher';
+import { difference, includes, uniq, without } from 'lodash';
 import AppConstants from '../constants/AppConstants';
 import DraftConstants from '../constants/DraftConstants';
+import AppDispatcher from '../dispatcher/AppDispatcher';
+import { fetch, postJson } from '../fetch';
+import { DraftPick, DraftPickOrder } from '../types/ClientTypes';
 import Store from './Store';
 import UserStore from './UserStore';
-import {DraftPick, DraftPickOrder} from '../types/ClientTypes';
-import {postJson, fetch, post} from '../fetch';
-import constants from '../../common/constants';
 
 let _picks: DraftPick[] = [];
 let _pickOrder: DraftPickOrder[] = [];
@@ -37,7 +36,8 @@ function getCurrentPick(): DraftPickOrder {
 
 function addPick(golfer) {
   const timestamp = new Date();
-  const pick =  { ...getCurrentPick(),
+  const pick = {
+    ...getCurrentPick(),
     golfer: golfer,
     timestamp: timestamp,
     clientTimestamp: timestamp
@@ -88,7 +88,7 @@ const DraftStore = new DraftStoreImpl();
 AppDispatcher.register(async payload => {
   const action = payload.action;
 
-  switch(action.actionType) {
+  switch (action.actionType) {
 
     case DraftConstants.DRAFT_PICK:
       const pick = addPick(action.golfer);
@@ -169,7 +169,7 @@ AppDispatcher.register(async payload => {
       try {
         await postJson('/draft/pickList', data);
       } catch {
-          window.location.reload();
+        window.location.reload();
       }
 
       DraftStore.emitChange();
