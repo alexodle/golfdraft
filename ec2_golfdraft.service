@@ -1,0 +1,16 @@
+[Unit]
+Description=Golfdraft webserver
+After=network.target
+StartLimitIntervalSec=0
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=ubuntu
+EnvironmentFile=/home/ubuntu/config.env
+WorkingDirectory=/home/ubuntu/golfdraft
+ExecStart=/usr/bin/env npm run start
+
+[Install]
+WantedBy=multi-user.target
+
