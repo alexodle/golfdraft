@@ -2,6 +2,7 @@
   display: grid;
   column-gap: 10px;
   row-gap: 10px;
+  grid-template-columns: 1fr 1fr 300px;
 
   &.draft-active {
     grid-template-areas:
@@ -42,13 +43,15 @@
   }
 
   @media only screen and (max-width: 920px) {
+    grid-template-columns: 1fr;
+
     &.draft-active {
       grid-template-areas:
         "clock"
         "chooser"
+        "chat"
         "order"
         "picklist"
-        "chat"
         "hist" !important;
     }
 
@@ -56,9 +59,9 @@
       grid-template-areas:
         "paused"
         "chooser"
+        "chat"
         "order"
         "picklist"
-        "chat"
         "hist" !important;
     }
   }

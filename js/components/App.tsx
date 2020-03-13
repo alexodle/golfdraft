@@ -1,31 +1,21 @@
 import { omit } from 'lodash';
 import * as React from 'react';
-import AdminApp from './AdminApp';
-import AppHeader from './AppHeader';
+import { Redirect, Route, Switch } from 'react-router-dom';
+import constants from '../../common/constants';
 import AppSettingsStore from '../stores/AppSettingsStore';
 import ChatStore from '../stores/ChatStore';
-import DraftApp from './DraftApp';
 import DraftStore from '../stores/DraftStore';
 import GolferStore from '../stores/GolferStore';
 import ScoreStore from '../stores/ScoreStore';
-import TourneyApp from './TourneyApp';
 import TourneyStore from '../stores/TourneyStore';
 import UserStore from '../stores/UserStore';
+import { ChatMessage, DraftPick, Indexed, IndexedGolfers, IndexedUsers, Location, Tourney, TourneyStandings, User } from '../types/ClientTypes';
 import { DraftProps } from '../types/SharedProps';
-import { Route, Switch, Redirect } from 'react-router-dom';
-import constants from '../../common/constants';
+import AdminApp from './AdminApp';
+import AppHeader from './AppHeader';
+import DraftApp from './DraftApp';
+import TourneyApp from './TourneyApp';
 import { TourneyHistory } from './TourneyHistory';
-import {
-  ChatMessage,
-  DraftPick,
-  Indexed,
-  IndexedGolfers,
-  TourneyStandings,
-  IndexedUsers,
-  Tourney,
-  Location,
-  User,
-} from '../types/ClientTypes';
 
 const RELEVANT_STORES = [
   AppSettingsStore,
