@@ -157,27 +157,27 @@ class ChatRoomInput extends React.PureComponent<{}, ChatRoomInputState> {
     return (
       <div>
         <form onSubmit={this._onSend}>
-          <div className='form-group'>
-            <input
+          <div className='form-group chat-input-form'>
+            <span><input
               ref='input'
               className='form-control'
               value={text}
               onChange={this._onUpdateText}
               onKeyUp={this._onKeyUp}
-            />
-            {!nameTag ? null : (
-              <AutoComplete
-                ref='nameTagger'
-                allChoices={sortBy(UserStore.getAll(), u => u.name)}
-                text={nameTag[0].substr(1)}
-                onChoose={this._onTag} />
-            )}
-            <button type='submit' className='btn btn-default'>
+            /></span>
+            <span><button type='submit' className='btn btn-default'>
               Send
-            </button>
+            </button></span>
           </div>
+          {!nameTag ? null : (
+            <AutoComplete
+              ref='nameTagger'
+              allChoices={sortBy(UserStore.getAll(), u => u.name)}
+              text={nameTag[0].substr(1)}
+              onChoose={this._onTag} />
+          )}
         </form>
-      </div>
+      </div >
     );
   }
 
@@ -393,8 +393,8 @@ export default class ChatRoom extends React.PureComponent<ChatRoomProps, ChatRoo
               return [
                 (
                   <dt key={'dt' + i} className={className}>
-                    {displayName} <span className='message-date'>
-                      ({moment(message.date).format('l LT')})
+                    {displayName}<span className='message-date'>
+                      {" "}({moment(message.date).format('l LT')})
                     </span>:
                   </dt>
                 ),

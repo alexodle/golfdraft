@@ -147,7 +147,7 @@ table {
       display: none !important;
     }
     .visible-xs {
-      display: inherit !important;
+      display: table-cell !important;
     }
   }
 }
@@ -160,6 +160,13 @@ table {
   dd {
     padding-left: 0;
     margin-left: 0;
+  }
+}
+
+@media only screen and (max-width: 920px) {
+  .dl-horizontal {
+    grid-template-columns: 150px 1fr;
+    column-gap: 5px;
   }
 }
 
