@@ -2,28 +2,18 @@ import * as React from 'react';
 
 export interface WhoIsYouProps {
   usernames: string[];
+  invalidAuth: boolean;
+  redirectTo?: string;
 }
 
 interface WhoIsYouState {
   selectedUser: string;
   password: string;
-  badAuth: boolean;
   isSubmitted: boolean;
-  redirectTo?: string;
 }
 
 function isEmpty(v): boolean {
   return !v || !(v.length && v.length > 0);
-}
-
-function getBadAuthParam(): boolean {
-  const urlParams = new URLSearchParams(window.location.search);
-  return !!urlParams.get('invalidAuth');
-}
-
-function getRedirectToParam(): string {
-  const urlParams = new URLSearchParams(window.location.search);
-  return urlParams.get('redirect');
 }
 
 export default class WhoIsYou extends React.Component<WhoIsYouProps, WhoIsYouState> {
@@ -36,44 +26,39 @@ export default class WhoIsYou extends React.Component<WhoIsYouProps, WhoIsYouSta
       selectedUser,
       password: '',
       isSubmitted: false,
-      badAuth: getBadAuthParam(),
-      redirectTo: getRedirectToParam(),
     };
   }
 
-  componentDidMount() {
-    (this.refs.userSelect as HTMLSelectElement).focus();
-  }
-
   render() {
-    const {badAuth, isSubmitted, selectedUser, redirectTo, password} = this.state;
+    const { invalidAuth, redirectTo } = this.props;
+    const { isSubmitted, selectedUser, password } = this.state;
 
     const submitDisabled = isSubmitted || isEmpty(password);
     return (
       <div>
         <h2>Who is you?</h2>
-        {!badAuth ? null : (
+        {!invalidAuth || isSubmitted ? null : (
           <div className='alert alert-danger' role='alert'>
             Invalid password. Try again.
           </div>
         )}
         <div className='panel panel-default'>
           <div className='panel-body'>
-            <form role='form' action='/login' method='post'>
+            <form role='form' action='/api/login' method='post'>
               <div className='form-group'>
                 <select
-                  ref='userSelect'
                   id='userSelect'
                   name='username'
                   value={selectedUser}
                   onChange={this._onUserChange}
                   size={15}
                   className='form-control'
+                  autoFocus
                 >
                   {this.props.usernames.sort().map(u => <option key={u} value={u}>{u}</option>)}
                 </select>
               </div>
-              <div className={'form-group' + (badAuth ? ' has-error' : '')}>
+              <div className={'form-group' + (invalidAuth ? ' has-error' : '')}>
                 <input
                   ref='passwordInput'
                   name='password'
@@ -111,7 +96,7 @@ export default class WhoIsYou extends React.Component<WhoIsYouProps, WhoIsYouSta
   }
 
   _onSubmit = () => {
-    this.setState({ isSubmitted: true, badAuth: false });
+    this.setState({ isSubmitted: true });
   }
 
 };
