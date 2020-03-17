@@ -2,14 +2,14 @@ import * as React from 'react';
 
 export interface WhoIsYouProps {
   usernames: string[];
-  invalidAuth: boolean;
   redirectTo?: string;
 }
 
 interface WhoIsYouState {
   selectedUser: string;
   password: string;
-  isSubmitted: boolean;
+  isSubmitting: boolean;
+  invalidAuth: boolean;
 }
 
 function isEmpty(v): boolean {
@@ -25,26 +25,27 @@ export default class WhoIsYou extends React.Component<WhoIsYouProps, WhoIsYouSta
     this.state = {
       selectedUser,
       password: '',
-      isSubmitted: false,
+      isSubmitting: false,
+      invalidAuth: false,
     };
   }
 
   render() {
-    const { invalidAuth, redirectTo } = this.props;
-    const { isSubmitted, selectedUser, password } = this.state;
+    const { redirectTo } = this.props;
+    const { invalidAuth, isSubmitting, selectedUser, password } = this.state;
 
-    const submitDisabled = isSubmitted || isEmpty(password);
+    const submitDisabled = isSubmitting || isEmpty(password);
     return (
       <div>
         <h2>Who is you?</h2>
-        {!invalidAuth || isSubmitted ? null : (
+        {!invalidAuth || isSubmitting ? null : (
           <div className='alert alert-danger' role='alert'>
             Invalid password. Try again.
           </div>
         )}
         <div className='panel panel-default'>
           <div className='panel-body'>
-            <form role='form' action='/api/login' method='post'>
+            <form role='form' onSubmit={this._onSubmit}>
               <div className='form-group'>
                 <select
                   id='userSelect'
@@ -66,7 +67,7 @@ export default class WhoIsYou extends React.Component<WhoIsYouProps, WhoIsYouSta
                   placeholder='Password'
                   className='form-control'
                   onChange={this._onPasswordChange}
-                  disabled={isSubmitted}
+                  disabled={isSubmitting}
                   value={password}
                 />
               </div>
@@ -76,7 +77,6 @@ export default class WhoIsYou extends React.Component<WhoIsYouProps, WhoIsYouSta
               <input
                 type='submit'
                 className='btn btn-default btn-primary'
-                onSubmit={this._onSubmit}
                 disabled={submitDisabled}
                 value='Sign in'
               />
@@ -95,8 +95,30 @@ export default class WhoIsYou extends React.Component<WhoIsYouProps, WhoIsYouSta
     this.setState({ selectedUser: ev.target.value });
   }
 
-  _onSubmit = () => {
-    this.setState({ isSubmitted: true });
+  _onSubmit = async (ev) => {
+    ev.preventDefault()
+    this.setState({ isSubmitting: true });
+
+    try {
+      const res = await fetch(`${process.env.BASE_URL}/api/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user: this.state.selectedUser,
+          password: this.state.password,
+        })
+      })
+      if (!res.ok) {
+        throw new Error('invalid')
+      }
+      const resp = await res.json()
+      console.log(resp)
+    } catch (e) {
+      console.error(e.stack)
+      this.setState({ invalidAuth: true })
+    }
   }
 
 };

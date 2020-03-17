@@ -1,4 +1,4 @@
-import {mongoose} from './mongooseUtil';
+import { mongoose, model } from './mongooseUtil';
 
 const messageSchema = new mongoose.Schema({
   tourneyId: mongoose.Schema.Types.ObjectId,
@@ -9,4 +9,4 @@ const messageSchema = new mongoose.Schema({
 });
 messageSchema.index({ tourneyId: 1 });
 
-export const Message = mongoose.model('Message', messageSchema);
+export const Message = model('Message', messageSchema);

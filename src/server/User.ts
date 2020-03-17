@@ -1,15 +1,10 @@
-import {mongoose} from './mongooseUtil';
-import * as passportLocalMongoose from 'passport-local-mongoose';
+import { model, mongoose } from './mongooseUtil';
 
 const Schema = mongoose.Schema;
 
-const User = new Schema({
+const userSchema = new Schema({
   name: { type: String, required: true, unique: true }
 });
 
-User.plugin(passportLocalMongoose, {
-  limitAttempts: true,
-  maxAttempts: 100
-});
-
-export default mongoose.model('User', User);
+const UserModel = model('User', userSchema);
+export default UserModel;

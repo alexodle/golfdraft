@@ -1,5 +1,5 @@
+import { model, mongoose } from './mongooseUtil';
 import User from './User';
-import {mongoose} from './mongooseUtil';
 
 const SchemaTypes = mongoose.Schema.Types;
 
@@ -105,17 +105,21 @@ const tourneySchema = new mongoose.Schema({
   }
 });
 
+const auth0StateSchema = new mongoose.Schema({
+  dateCreated: { type: Date, required: true, default: Date.now },
+  nonce: { type: String, required: true, unique: true },
+  redirectUrl: String,
+})
+
 export { User };
-export const Golfer = mongoose.model('Golfer', golferSchema);
-export const WGR = mongoose.model('WGR', wgrSchema);
-export const DraftPickOrder = mongoose.model('DraftPickOrder', draftPickOrderSchema);
-export const DraftPick = mongoose.model('DraftPick', draftPickSchema);
-export const DraftPickList = mongoose.model('DraftPickList', draftPickListSchema);
-export const GolferScore = mongoose.model('GolferScore', golferScoreSchema);
-export const GolferScoreOverrides = mongoose.model(
-  'GolferScoreOverrides',
-  golferScoreSchema
-);
-export const TourneyStandings = mongoose.model('TourneyStandings', tourneyStandingsSchema);
-export const AppState = mongoose.model('AppState', appStateSchema);
-export const Tourney = mongoose.model('Tourney', tourneySchema);
+export const Golfer = model('Golfer', golferSchema);
+export const WGR = model('WGR', wgrSchema);
+export const DraftPickOrder = model('DraftPickOrder', draftPickOrderSchema);
+export const DraftPick = model('DraftPick', draftPickSchema);
+export const DraftPickList = model('DraftPickList', draftPickListSchema);
+export const GolferScore = model('GolferScore', golferScoreSchema);
+export const GolferScoreOverrides = model('GolferScoreOverrides', golferScoreSchema);
+export const TourneyStandings = model('TourneyStandings', tourneyStandingsSchema);
+export const AppState = model('AppState', appStateSchema);
+export const Tourney = model('Tourney', tourneySchema);
+export const Auth0State = model('Auth0State', auth0StateSchema)

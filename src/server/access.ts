@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { chain, groupBy, isEmpty, keyBy, keys, map, minBy, once, pick, sortBy, uniq } from 'lodash';
 import { Document, Model } from 'mongoose';
 import constants from '../common/constants';
@@ -10,16 +11,6 @@ import { AppSettings, AppSettingsDoc, ChatMessage, ChatMessageDoc, Draft, DraftP
 import io from './socketIO';
 
 const UNKNOWN_WGR = constants.UNKNOWN_WGR;
-
-const ensureMongo = once(async function ensureMongo() {
-  try {
-    await mongooseUtil.connect();
-  } catch (e) {
-    if (process.env.NODE_ENV === 'production') {
-      throw e
-    }
-  }
-})
 
 const _cache: { [tourneyId: string]: Access } = {};
 export function getAccess(tourneyId: string): Access {
@@ -475,7 +466,7 @@ export class Access {
 
     pick = this.extendWithTourneyId(pick);
     pick.timestamp = new Date();
-    const pickDoc = await models.DraftPick.create(pick);
+    await models.DraftPick.create(pick);
 
     this.fire(Access.EVENTS.pickMade);
 
