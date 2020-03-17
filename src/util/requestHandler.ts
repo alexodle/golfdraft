@@ -1,8 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next"
-import { InvalidRequestError, InvalidRequestErrorStatus, NotFoundError, NotFoundErrorStatus } from "./errors"
-import { auth } from "./auth"
-import { isArray } from "util"
-import { User } from "../server/ServerTypes"
+import { InvalidRequestError, InvalidRequestErrorStatus, InvalidSessionError, InvalidSessionErrorStatus, NotFoundError, NotFoundErrorStatus } from "./errors"
 
 export type Method = 'get' | 'post' | 'put' | 'delete'
 
@@ -33,8 +30,10 @@ export function createRequestHandler(spec: HandlerSpec): HandlerFunc {
         res.status(NotFoundErrorStatus).json({ error: 'not found' })
       } else if (e instanceof InvalidRequestError) {
         res.status(InvalidRequestErrorStatus).json({ error: 'invalid request' })
+      } else if (e instanceof InvalidSessionError || e.code === 'invalid_session') {
+        res.status(InvalidSessionErrorStatus).json({ error: 'invalid session' })
       } else {
-        console.error(e)
+        console.dir(e)
         if (process.env.NODE_ENV !== 'production') {
           res.status(e.status || 500).end(e.message)
         } else {

@@ -9,6 +9,8 @@ export const Layout: FunctionComponent = ({ children }) => (
       font-family: Helvetica Neue,Helvetica,Arial,sans-serif;
       font-size: 14px;
       line-height: 1.42857143;
+      padding: 0;
+      margin: 0;
     }
     body * {
       box-sizing: border-box;
