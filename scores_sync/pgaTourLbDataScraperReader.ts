@@ -78,7 +78,7 @@ function isNullStr(str: string): boolean {
 function parseThru(thruStr: string): Thru {
   thruStr = thruStr.replace('*', '').trim()
   if (isNullStr(thruStr)) {
-    return 0;
+    return null;
   }
   return thruStr === 'F' ? constants.NHOLES : requireParseInt(thruStr, 'failed to parse thruStr')
 }
