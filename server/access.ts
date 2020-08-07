@@ -65,6 +65,7 @@ export async function ensureUsers(allUsers: User[]) {
   const existingUsersByName = keyBy(users, 'name');
   const usersToAdd = allUsers.filter(json => !existingUsersByName[json.name]);
   const promises = usersToAdd.map(u => {
+    console.log(`adding user: ${u.username} with password: ${u.password}`)
     return new Promise((resolve, reject) => {
       (<any>models.User).register(new models.User({ username: u.username, name: u.name }), u.password, (err) => {
         if (err) reject(err);

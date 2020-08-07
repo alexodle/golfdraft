@@ -101,6 +101,7 @@ class PgaTourReader implements Reader {
   parseGolfer(par: number, tourneyRound: number, g: PgaTourGolfer): UpdateGolfer {
     return parseGolfer(par, tourneyRound, g);
   }
+
 }
 
 export default new PgaTourReader();

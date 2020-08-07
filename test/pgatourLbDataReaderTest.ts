@@ -1,9 +1,8 @@
 import './initTestConfig';
 
 import constants from '../common/constants';
-import reader from '../scores_sync/pgaTourLbDataReader';
+import reader, {getPgaTourUserId} from '../scores_sync/pgaTourLbDataReader';
 import { TourneyConfigSpec } from '../scores_sync/Types';
-import * as fs from 'fs';
 
 const { MISSED_CUT } = constants;
 
@@ -48,6 +47,16 @@ function readPostStartJson() {
 }
 
 describe('PgaTourLbReader', () => {
+
+  describe('parsePgaTourUserId', () => {
+
+    it('parses golfder id', async () => {
+      const userIdStr = await getPgaTourUserId('test/files/sample_user_id.js');
+      userIdStr.should.eql('exp=1596770263~acl=*~hmac=e81a78676f431ce7917e5566551d8ac042a3426235c83465767553206c86cd90');
+    })
+
+  })
+
   describe('parseGolfer', () => {
 
     it('parses pre-tourney golfer', async () => {

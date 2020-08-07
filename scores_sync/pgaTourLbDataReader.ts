@@ -2,6 +2,8 @@ import { parseInt } from 'lodash';
 import constants from '../common/constants';
 import { Reader, ReaderResult, UpdateGolfer, TourneyConfigSpec, Score } from './Types';
 import { fetchData } from './util';
+import { toUserId } from './pgatourUserTrackingId';
+import { fstat, readFile, readFileSync } from 'fs';
 
 const { MISSED_CUT, NHOLES, NDAYS } = constants;
 
@@ -115,9 +117,29 @@ function parseGolfer(par: number, g: LbDataGolfer): UpdateGolfer {
   };
 }
 
+async function fetchHelper(urlOrFilePath: string) {
+  if (urlOrFilePath.startsWith('http://')) {
+    return await fetchData(urlOrFilePath);
+  }
+  return readFileSync(urlOrFilePath, "utf8");
+}
+
+const USER_ID_URL = "https://www.pgatour.com/etc/designs/pgatour-libs/frontend/pgatour/main.8b781458d683321d9973dd3b05f6d31b.js";
+const USER_ID_REGEX = /getUserId:function\(\){return"(id[0-9]+)"}/
+
+// Export for testing
+export async function getPgaTourUserId(url: string): Promise<string> {
+  const rawJs = await fetchHelper(url);
+  const result = rawJs.match(USER_ID_REGEX);
+  if (!result || result.length !== 2) {
+    throw new Error("Could not find pgatour user id");
+  }
+  return toUserId(result[1]);
+}
+
 class PgaTourLbDataReader implements Reader {
   async run(config: TourneyConfigSpec, url: string): Promise<ReaderResult> {
-    const data = await fetchData(url);
+    const data = await fetchHelper(url);
     const json = JSON.parse(data);
 
     const par = config.par;
