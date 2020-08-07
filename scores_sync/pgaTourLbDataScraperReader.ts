@@ -1,8 +1,15 @@
 import { load } from 'cheerio';
-import { readFileSync } from 'fs';
 import * as puppeteer from 'puppeteer';
 import constants from '../common/constants';
 import { Reader, ReaderResult, Score, Thru, TourneyConfigSpec, UpdateGolfer } from './Types';
+
+function requireParseInt(intStr: string, errMsg: string): number {
+  const n = parseInt(intStr, 10);
+  if (isNaN(n)) {
+    throw new Error(`Failed to parse int: '${intStr}' - ${errMsg}`);
+  }
+  return n;
+}
 
 class PgaTourScraperReader implements Reader {
   async run(config: TourneyConfigSpec, url: string): Promise<ReaderResult> {
@@ -61,7 +68,7 @@ export function calcCurrentDay(rounds: Score[], isFinished: boolean): number {
 }
 
 function safeParseInt(str: string): number | null {
-  return isNullStr(str) ? null : parseInt(str);
+  return isNullStr(str) ? null : requireParseInt(str, 'failed to safe-parse int');
 }
 
 function isNullStr(str: string): boolean {
@@ -69,15 +76,18 @@ function isNullStr(str: string): boolean {
 }
 
 function parseThru(thruStr: string): Thru {
-  thruStr = thruStr.replace('*', '')
-  return thruStr === 'F' ? constants.NHOLES : parseInt(thruStr)
+  thruStr = thruStr.replace('*', '').trim()
+  if (thruStr === '') {
+    return 0;
+  }
+  return thruStr === 'F' ? constants.NHOLES : requireParseInt(thruStr, 'failed to parse thruStr')
 }
 
 function parseRoundScore(str: string): number {
   if (isNullStr(str)) return 0;
   if (str === 'E') return 0;
-  if (str.startsWith('+')) return parseInt(str.substr(1));
-  if (str.startsWith('-')) return parseInt(str);
+  if (str.startsWith('+')) return requireParseInt(str.substr(1), 'failed to parse positive round score');
+  if (str.startsWith('-')) return requireParseInt(str, 'failed to parse negative round score');
   throw new Error(`Unexpected round score: ${str}`);
 }
 
