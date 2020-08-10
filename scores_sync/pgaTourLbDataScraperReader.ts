@@ -33,7 +33,10 @@ export function parse(html: string | Buffer, par: number): ReaderResult {
     const name = $(tr).find('td.player-name .player-name-col').text().trim()
     const rawThru = $(tr).find('td.thru').text().replace('*', '').trim()
     const rawRounds: string[] = $(tr).find('td.round-x').map((_i, td) => $(td).text().trim()).get()
-    const isWD = $(tr).find('td.position').text().trim() === 'WD'
+
+    const positionStr = $(tr).find('td.position').text().trim()
+    const isWD = positionStr === 'WD'
+    const isCut = positionStr === 'CUT'
 
     let scores: Score[] = rawRounds.map(safeParseInt).map(n => n !== null ? n - par : null)
     let thru = parseThru(rawThru)
@@ -51,6 +54,11 @@ export function parse(html: string | Buffer, par: number): ReaderResult {
     if (isWD) {
       scores = scores.map(s => s === null ? constants.MISSED_CUT : s)
       thru = null
+    }
+
+    if (isCut) {
+      scores[3] = constants.MISSED_CUT;
+      scores[2] = constants.MISSED_CUT
     }
 
     const g: UpdateGolfer = { golfer: name, scores: scores.map(s => s || 0), day: day + 1, thru }
