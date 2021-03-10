@@ -485,7 +485,7 @@ export class Access {
   async undoLastPick(): Promise<DraftPickDoc> {
     const nPicks = await models.DraftPick.count({ tourneyId: this.tourneyId }).exec();
     const query = { tourneyId: this.tourneyId, pickNumber: nPicks - 1 };
-    const golfer = await models.DraftPick.findOneAndRemove(query, { useFindAndModify: true }).exec() as Promise<DraftPickDoc>;
+    const golfer = await models.DraftPick.findOneAndRemove(query, { useFindAndModify: true }).exec() as any as Promise<DraftPickDoc>;
     return golfer
   }
 
