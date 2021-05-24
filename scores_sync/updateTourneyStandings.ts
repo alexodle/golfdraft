@@ -71,7 +71,7 @@ function fillInStandings(sortedScores: PlayerScore[]) {
   let currentStanding = -1;
   sortedScores.forEach((ps, i) => {
     if (i === 0 || ps.totalScore !== sortedScores[i - 1].totalScore) {
-      currentStanding = i;
+      currentStanding++;
     }
     ps.isTied = isTied(sortedScores, i);
     ps.standing = currentStanding;
