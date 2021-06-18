@@ -39,7 +39,10 @@ export function parse(html: string | Buffer, par: number): ReaderResult {
   const $ = load(html)
   const rows = $('table.leaderboard tbody tr.line-row');
   const golfers: UpdateGolfer[] = rows.map((_i, tr) => {
-    const name = $(tr).find('td.player-name .player-name-col').text().replace(' #', '').trim()
+    const name = $(tr).find('td.player-name .player-name-col').text()
+      .replace(' #', '')
+      .replace(' (a)', '')
+      .trim()
     const rawThru = $(tr).find('td.thru').text().replace('*', '').trim()
     const rawRounds: string[] = $(tr).find('td.round-x').map((_i, td) => $(td).text().trim()).get()
 
