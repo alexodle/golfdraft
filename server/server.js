@@ -52,7 +52,7 @@ io.use(function(socket, next) {
 app.use(compression());
 
 // Handlebars
-app.engine('handlebars', exphbs({
+app.engine('handlebars', exphbs.engine({
   helpers: {
     or: function (a, b) { return a || b; }
   }

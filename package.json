@@ -14,8 +14,8 @@
     "connect-redis": "^2.0.0",
     "cookie-parser": "^1.4.1",
     "es6-promise": "^1.0.0",
-    "express": "^4.13.4",
-    "express-handlebars": "^2.0.1",
+    "express": "^4.17.1",
+    "express-handlebars": "^6.0.1",
     "express-session": "^1.13.0",
     "fbjs": "^0.4.0",
     "file-loader": "^0.8.5",
@@ -23,7 +23,7 @@
     "grunt-cli": "^1.2.0",
     "grunt-express-server": "^0.5.2",
     "jquery": "^2.2.1",
-    "jsdom": "<4.0.0",
+    "jsdom": "18.1.0",
     "json-loader": "^0.5.4",
     "lodash": "^2.4.1",
     "logfmt": "^1.1.2",
@@ -44,6 +44,9 @@
     "url-loader": "^0.5.7",
     "webpack": "^1.12.14",
     "webpack-dev-server": "^1.14.1"
+  },
+  "resolutions": {
+    "graceful-fs": "^4.2.4"
   },
   "devDependencies": {
     "autoprefixer-loader": "^3.1.0",
@@ -79,9 +82,5 @@
   },
   "scripts": {
     "start": "node server/server.js"
-  },
-  "engines": {
-    "node": "0.12.x",
-    "npm": "2.7.x"
   }
 }
